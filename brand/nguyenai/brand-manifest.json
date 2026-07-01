@@ -1,13 +1,14 @@
 {
   "brandNameVi": "Nguyễn AI",
   "brandNameEn": "Nguyen AI",
+  "productCategory": "Nguyen AI Computer",
   "domain": "nguyenai.net",
   "codeName": "nguyenai",
-  "category": "Heritage Intelligence Network",
-  "taglineVi": "Trí tuệ kết nối di sản Nguyễn toàn cầu.",
-  "taglineEn": "Intelligence connecting the global Nguyen legacy.",
-  "promiseVi": "Di sản có nguồn. Kết nối có niềm tin. Trí tuệ phục vụ nhiều thế hệ.",
-  "promiseEn": "Sourced heritage. Trusted connections. Intelligence for generations.",
+  "category": "Specialized cloud AI Computer line for the global Nguyen ecosystem",
+  "taglineVi": "Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.",
+  "taglineEn": "Rooted identity. Powerful intelligence. Global execution.",
+  "heroVi": "Máy Tính AI của thế hệ Nguyễn toàn cầu.",
+  "heroEn": "AI Computer for the Global Nguyen Generation.",
   "forbiddenBrandVariants": [
     "Nguyên AI",
     "AI Nguyen",
@@ -16,5 +17,5 @@
     "Nguyen Artificial Intelligence",
     "NAI Network"
   ],
-  "status": "BRAND FOUNDATION READY — SOURCE CODE AUDIT PENDING ACCESS"
+  "status": "BRAND FOUNDATION READY — REPOSITIONED 2026-07-01"
 }

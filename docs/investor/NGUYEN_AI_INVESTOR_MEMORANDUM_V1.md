@@ -233,16 +233,18 @@ Eight subscription tiers (V2 pricing):
 
 Subscription includes: machine usage, compute, Agents, Super Apps, storage, memory, approval, evidence, audit, support, and Academy access (free AI learning).
 
-### V1 original pricing (historical reference)
+### V1 original pricing (historical reference — superseded by V2 above)
 
-| Plan | Draft price |
-|---|---:|
-| Open | Free |
-| Roots | 99,000 VND/month |
-| Legacy | 299,000 VND/month |
-| Founder | 799,000 VND/month |
-| Chapter | 2,990,000 VND/month |
-| Global | Custom quote |
+> Note: V1 Chapter price was 2,990,000 VND/month. V2 Chapter list price is 7,999,000 VND/month. The 2,990,000 VND figure in `FINANCIAL_MODEL_HYPOTHESIS.md` is a blended ARPU assumption (discounted chapters, free-tier inclusion), NOT the list price. V2 list price is the authoritative commercial price.
+
+| Plan | V1 draft price (deprecated) | V2 list price (current) |
+|---|---:|---:|
+| Start / Open | Free | Free |
+| Personal / Roots | 99,000 VND/month | 299,000 VND/month |
+| Family / Legacy | 299,000 VND/month | 599,000 VND/month |
+| Founder | 799,000 VND/month | 1,999,000 VND/month |
+| Chapter | 2,990,000 VND/month | 7,999,000 VND/month |
+| Global / Enterprise | Custom quote | Custom quote |
 
 Additional revenue:
 

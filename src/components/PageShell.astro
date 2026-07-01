@@ -10,9 +10,20 @@ export interface Props {
 
 const { locale, page } = Astro.props;
 const isHome = page.key === 'home';
-const pageJsonLd = {
+const isArticlePage = page.key === 'research' || page.key === 'docs';
+const pageJsonLd = isArticlePage ? {
   '@context': 'https://schema.org',
-  '@type': isHome ? 'WebPage' : 'Article',
+  '@type': 'Article',
+  headline: page.heroTitle,
+  name: page.title,
+  description: page.description,
+  url: absoluteUrl(routeFor(page.key as RouteKey, locale)),
+  inLanguage: locale === 'vi' ? 'vi-VN' : 'en',
+  author: { '@type': 'Organization', name: 'Nguyen AI' },
+  publisher: { '@type': 'Organization', name: 'Nguyen AI', url: 'https://nguyenai.net' }
+} : {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
   headline: page.heroTitle,
   name: page.title,
   description: page.description,
@@ -39,8 +50,8 @@ const faqJsonLd = page.faq?.length ? {
     <p class="hero-text">{page.heroText}</p>
     {(page.primaryCta || page.secondaryCta) && (
       <div class="hero-actions">
-        {page.primaryCta && <a class="button primary" href={routeFor('roots', locale)}>{page.primaryCta}</a>}
-        {page.secondaryCta && <a class="button secondary" href={routeFor('methodology', locale)}>{page.secondaryCta}</a>}
+        {page.primaryCta && <a class="button primary" href={routeFor('ai-computer', locale)}>{page.primaryCta}</a>}
+        {page.secondaryCta && <a class="button secondary" href={routeFor('how-it-works', locale)}>{page.secondaryCta}</a>}
       </div>
     )}
   </section>

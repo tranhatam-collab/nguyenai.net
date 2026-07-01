@@ -12,7 +12,8 @@
 | Year 5 target users | 300,000-800,000 |
 | Free-to-paid conversion | 3-7% |
 | Average revenue per paid user (ARPU) | 150,000-400,000 VND/month |
-| Chapter ARPU | 2,990,000 VND/month |
+| Chapter ARPU (blended) | 2,990,000 VND/month |
+| Chapter list price (V2) | 7,999,000 VND/month |
 | Gross margin target | 65-75% |
 | AI cost per active account | Declining over time |
 
@@ -72,3 +73,4 @@
 - Chapter sales cycle may be longer than consumer.
 - Privacy and legal compliance costs are non-negotiable.
 - Do not present these numbers as verified projections.
+- Chapter ARPU (2,990,000 VND) is a blended assumption including discounts and free-tier inclusion; the V2 list price is 7,999,000 VND/month. Do not confuse ARPU with list price in investor materials.
