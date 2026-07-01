@@ -21,6 +21,10 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/investor/NGUYEN_AI_INVESTOR_DECK.md`
 - `docs/investor/NGUYEN_AI_FINANCIAL_MODEL_HYPOTHESIS.md`
 - `docs/NGUYEN_AI_ACADEMY_PLAN.md`
+- `docs/legal/NGUYEN_AI_ENTITY_FORMATION_CHECKLIST.md`
+- `docs/legal/NGUYEN_AI_IP_AGREEMENT_TEMPLATE.md`
+- `docs/legal/NGUYEN_AI_DATA_ROOM_PLAN.md`
+- `docs/architecture/NGUYEN_AI_GEN2_INTEGRATION_PLAN.md`
 
 ## Brand lock
 
