@@ -1,11 +1,13 @@
-# Nguyễn AI / Nguyen AI — Investor Memorandum v1.1
+# Nguyễn AI / Nguyen AI — Investor Memorandum v1.2
 
 **Domain:** nguyenai.net  
 **Investor site:** invest.nguyenai.net  
-**Version:** 1.1 — AI Computer vertical thesis  
+**Version:** 1.2 — AI Computer vertical thesis + V2 valuation  
 **Date:** 2026-07-01  
 **Status:** PRIVATE INVESTOR BRIEF — NOT A PUBLIC OFFERING  
 **Classification:** Confidential — for qualified investors only
+
+> This memorandum is supplemented by `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md` which is the locked source of truth for valuation and funding round.
 
 ---
 
@@ -51,7 +53,7 @@ Broader scope does NOT automatically increase valuation. Valuation must be prove
 | 1 | `computer.iai.one` | Gen1 core engine — runtime, agent, model routing, memory, tool, workflow, evidence |
 | 2 | `maytinhai.org` | Gen2 public product system — package, sell, operate AI Computers |
 | 3 | `nguyenai.net` | Nguyen AI Computer — specialized line with Nguyen Operating Profile |
-| 4 | `academy.iai.one` | Academy and independent certification |
+| 4 | `academy.nguyenai.net` | Academy and independent certification |
 
 Nguyen AI inherits Gen1 and Gen2, then adds dedicated Agents, Super Apps, Memory Schema, workflows, network, family/founder/business/chapter intelligence, brand and experience.
 
@@ -91,7 +93,24 @@ This is identity audience, not paying customers. The memorandum separates:
 
 ## 4. Valuation
 
-### Scenarios
+> Superseded by `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md` — see V2 for the locked valuation framework.
+
+### V2 summary
+
+| Case | Conditions | Pre-money |
+|---|---|---:|
+| 1 — Engine/IP not audited | no audit, no MVP, no paying users | 2-3M USD |
+| 2 — Gen1/Gen2 verified | runtime running, IP clear, MVP, 100-300 beta | 4-5.5M USD |
+| 3 — Early commercial evidence | 1,000+ MAU, 10+ paying orgs, MRR >20K | 7-10M USD |
+| 4 — Seed-ready | ARR 500K-1M, retention, gross margin >65% | 12-18M USD |
+
+### Recommended now
+
+- Founder anchor: 4.5M USD pre-money
+- Negotiation range: 3.5-5.5M USD pre-money
+- Minimum: 3M USD when engine, IP and platform are proven
+
+### Original v1 scenarios (historical reference)
 
 | Stage | Condition | Reasonable pre-money |
 |---|---|---:|
@@ -99,11 +118,11 @@ This is identity audience, not paying customers. The memorandum separates:
 | Base pre-seed | MVP, 50 founding families, chapter pilot | 2.5-3.5M USD |
 | Strategic pre-seed | 1,000+ active users, paid pilots, LOI | 4-6M USD |
 
-### Recommended negotiation stance
+### Recommended negotiation stance (v1, superseded by V2)
 
-- Founder target: 3.5M USD pre-money
-- Base: 3M USD pre-money
-- Minimum acceptable: 2.5M USD pre-money
+- Founder target: 4.5M USD pre-money (updated by V2)
+- Base: 4M USD pre-money (updated by V2)
+- Minimum acceptable: 3M USD pre-money (updated by V2)
 
 Do not publish valuation above 6M USD before Nguyen AI has:
 
@@ -120,7 +139,34 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 
 ## 5. Funding round
 
-### Preferred scenario
+> Superseded by V2 — see `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md`.
+
+### V2 primary option
+
+| Item | Value |
+|---|---:|
+| Capital raised | 750,000 USD |
+| Pre-money | 4,500,000 USD |
+| Post-money | 5,250,000 USD |
+| Dilution | 14.29% |
+| Runway | 18 months |
+
+### V2 conservative option
+
+| Item | Value |
+|---|---:|
+| Capital raised | 500,000 USD |
+| Pre-money | 4,000,000 USD |
+| Post-money | 4,500,000 USD |
+| Dilution | 11.11% |
+| Runway | 12-15 months |
+
+### V2 two-tranche option
+
+- Tranche 1: 250K USD, cap ~4M USD, for IP/audit/MVP/pilot
+- Tranche 2: 500K USD, cap ~6M USD, released on milestones
+
+### Original v1 preferred scenario (historical reference)
 
 | Item | Value |
 |---|---:|
@@ -140,7 +186,21 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 | Dilution | 15% |
 | Runway | 18-24 months |
 
-### Use of funds — 500,000 USD round
+### Use of funds — V2 primary (750,000 USD)
+
+| Category | Share | Budget |
+|---|---:|---:|
+| Gen1-Gen2 integration | 30% | 225,000 USD |
+| Nguyen Agents & Super Apps | 16% | 120,000 USD |
+| Security, privacy, compliance | 12% | 90,000 USD |
+| AI compute and infrastructure | 10% | 75,000 USD |
+| GTM, chapter, founder partnership | 12% | 90,000 USD |
+| Product design, content, SEO | 7% | 52,500 USD |
+| Academy and onboarding | 5% | 37,500 USD |
+| Operations, customer success | 5% | 37,500 USD |
+| Reserve | 3% | 22,500 USD |
+
+### Use of funds — v1 original (500,000 USD, historical reference)
 
 | Category | Share |
 |---|---:|
@@ -156,18 +216,33 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 
 ## 6. Revenue model
 
-Eight subscription tiers (AI Computer plans):
+> Updated by V2 — see `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md`.
+
+Eight subscription tiers (V2 pricing):
 
 | Plan | Draft price | Audience |
 |---|---:|---|
-| Nguyen Start | Free | Beginners |
-| Nguyen Personal | 99,000 VND/month | Individuals |
-| Nguyen Family | 299,000 VND/month | Multi-generation families |
-| Nguyen Creator | 499,000 VND/month | Creators |
-| Nguyen Founder | 799,000 VND/month | Founders |
-| Nguyen Business | 1,990,000 VND/month | Businesses |
-| Nguyen Chapter | 2,990,000 VND/month | Branches, associations, communities |
-| Nguyen Enterprise/Dedicated | Custom quote | Large organizations |
+| Nguyen Start | Free | Trial |
+| Nguyen Personal | 299,000 VND/month | Individual |
+| Nguyen Family | 599,000 VND/month | Family |
+| Nguyen Creator | 999,000 VND/month | Creator |
+| Nguyen Founder | 1,999,000 VND/month | Founder |
+| Nguyen Business | 4,999,000 VND/month | Business |
+| Nguyen Chapter | 7,999,000 VND/month | Branch, association, community |
+| Nguyen Enterprise/Dedicated | Custom quote | Large organization |
+
+Subscription includes: machine usage, compute, Agents, Super Apps, storage, memory, approval, evidence, audit, support, and Academy access (free AI learning).
+
+### V1 original pricing (historical reference)
+
+| Plan | Draft price |
+|---|---:|
+| Open | Free |
+| Roots | 99,000 VND/month |
+| Legacy | 299,000 VND/month |
+| Founder | 799,000 VND/month |
+| Chapter | 2,990,000 VND/month |
+| Global | Custom quote |
 
 Additional revenue:
 
@@ -357,11 +432,25 @@ Do not publish invest.nguyenai.net before:
 
 ## 14. Valuation conclusion
 
-The professional and defensible presentation is:
+> Superseded by V2. The locked conclusion is in `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md`.
+
+### V2 final verdict
+
+> **Target valuation now: 4.5 million USD pre-money.**
+> **Proposed round: 750,000 USD.**
+> **Dilution: approximately 14.29%.**
+> **Defensible valuation range: 3.5-5.5 million USD.**
+
+The valuation is only officially placed in the data room after completing four pieces of evidence:
+
+1. Gen1 and Gen2 running for real.
+2. Nguyen AI has clear IP rights.
+3. Vertical MVP can be demoed and sold.
+4. There are verifiable beta users or pilots.
+
+### v1 original conclusion (historical reference)
 
 > Nguyen AI raises 500,000 USD at a proposed 3M USD pre-money, conditional on completing MVP (AI Computer Console + public site), establishing IP ownership, having real pilots and passing technical-privacy-legal audit.
-
-This valuation reflects platform potential across AI computing, vertical SaaS, family history and community software, without exceeding what a pre-seed project without traction can defend.
 
 ---
 
@@ -374,4 +463,4 @@ This valuation reflects platform potential across AI computing, vertical SaaS, f
 
 ---
 
-*End of Investor Memorandum v1.1*
+*End of Investor Memorandum v1.2*

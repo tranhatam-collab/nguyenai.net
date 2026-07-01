@@ -25,7 +25,7 @@ const vi: Record<RouteKey, PageContent> = {
     secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
       { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi.' },
-      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy độc lập (academy.iai.one).', items: ['Lớp 1 — Gen1 core engine', 'Lớp 2 — Gen2 product system', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
+      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký (academy.nguyenai.net).', items: ['Lớp 1 — Gen1 core engine', 'Lớp 2 — Gen2 product system', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
       { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
     faq: [
@@ -67,7 +67,7 @@ const vi: Record<RouteKey, PageContent> = {
   },
   plans: {
     key: 'plans', title: 'Gói dịch vụ — Nguyen AI Computer', description: 'Tám gói: Start, Personal, Family, Creator, Founder, Business, Chapter, Enterprise/Dedicated.', eyebrow: 'Plans', heroTitle: 'Gói dịch vụ theo nhu cầu sử dụng.', heroText: 'Các mức giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.', sections: [
-      { title: 'Gói dịch vụ', body: 'Tám gói phục vụ từ người mới bắt đầu đến tổ chức lớn.', items: ['Nguyen Start — Miễn phí', 'Nguyen Personal — 99.000 VNĐ/tháng', 'Nguyen Family — 299.000 VNĐ/tháng', 'Nguyen Creator — 499.000 VNĐ/tháng', 'Nguyen Founder — 799.000 VNĐ/tháng', 'Nguyen Business — 1.990.000 VNĐ/tháng', 'Nguyen Chapter — 2.990.000 VNĐ/tháng', 'Nguyen Enterprise/Dedicated — Báo giá riêng'] }
+      { title: 'Gói dịch vụ', body: 'Tám gói phục vụ từ người mới bắt đầu đến tổ chức lớn.', items: ['Nguyen Start — Miễn phí', 'Nguyen Personal — 299.000 VNĐ/tháng', 'Nguyen Family — 599.000 VNĐ/tháng', 'Nguyen Creator — 999.000 VNĐ/tháng', 'Nguyen Founder — 1.999.000 VNĐ/tháng', 'Nguyen Business — 4.999.000 VNĐ/tháng', 'Nguyen Chapter — 7.999.000 VNĐ/tháng', 'Nguyen Enterprise/Dedicated — Báo giá riêng'] }
     ]
   },
   personal: {
@@ -119,8 +119,8 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy độc lập tại academy.iai.one, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
-      { title: 'Academy độc lập', body: 'Academy giữ tại academy.iai.one, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
+    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký tại academy.nguyenai.net, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
+      { title: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký', body: 'Academy giữ tại academy.nguyenai.net, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
     ]
   },
   security: {
@@ -145,7 +145,7 @@ const vi: Record<RouteKey, PageContent> = {
   },
   about: {
     key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc Gen1–Gen2 và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn, kế thừa Gen1 engine và Gen2 product system.', sections: [
-      { title: 'Kiến trúc bốn lớp', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.iai.one — Academy & certification'] },
+      { title: 'Kiến trúc bốn lớp', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ranh giới đạo đức', body: 'Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống. Nguyen AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn.' }
     ]
   },
@@ -168,7 +168,7 @@ const en: Record<RouteKey, PageContent> = {
     secondaryCta: 'Explore how it works',
     sections: [
       { title: 'Not a chatbot', body: 'Nguyen AI Computer is a personal AI Computer system on the cloud. Each user has a private instance with an Agent team, long-term memory, data vault, tools and workflows — not just single-question answers.' },
-      { title: 'Four-layer architecture', body: 'Nguyen AI Computer inherits the Gen1 core engine (computer.iai.one), the Gen2 product system (maytinhai.org), adds a dedicated Nguyen Operating Profile, and connects to the independent Academy (academy.iai.one).', items: ['Layer 1 — Gen1 core engine', 'Layer 2 — Gen2 product system', 'Layer 3 — Nguyen AI Computer', 'Layer 4 — Academy & certification'] },
+      { title: 'Four-layer architecture', body: 'Nguyen AI Computer inherits the Gen1 core engine (computer.iai.one), the Gen2 product system (maytinhai.org), adds a dedicated Nguyen Operating Profile, and connects to the independent Academy (academy.nguyenai.net).', items: ['Layer 1 — Gen1 core engine', 'Layer 2 — Gen2 product system', 'Layer 3 — Nguyen AI Computer', 'Layer 4 — Academy & certification'] },
       { title: 'Rooted identity. Powerful intelligence. Global execution.', body: 'The Nguyen Operating Profile is designed for the needs of the Nguyen community: rooted identity, knowledge stewardship, founder capacity, adaptive intelligence, network intelligence, proof and trust, and generational responsibility.' }
     ],
     faq: [
@@ -210,7 +210,7 @@ const en: Record<RouteKey, PageContent> = {
   },
   plans: {
     key: 'plans', title: 'Plans — Nguyen AI Computer', description: 'Eight plans: Start, Personal, Family, Creator, Founder, Business, Chapter, Enterprise/Dedicated.', eyebrow: 'Plans', heroTitle: 'Plans by use case.', heroText: 'Current prices are pilot hypotheses, subject to validation of AI, storage, support and legal costs before commercial launch.', sections: [
-      { title: 'Plans', body: 'Eight plans from beginner to large organization.', items: ['Nguyen Start — Free', 'Nguyen Personal — 99,000 VND/month', 'Nguyen Family — 299,000 VND/month', 'Nguyen Creator — 499,000 VND/month', 'Nguyen Founder — 799,000 VND/month', 'Nguyen Business — 1,990,000 VND/month', 'Nguyen Chapter — 2,990,000 VND/month', 'Nguyen Enterprise/Dedicated — Custom quote'] }
+      { title: 'Plans', body: 'Eight plans from beginner to large organization.', items: ['Nguyen Start — Free', 'Nguyen Personal — 299,000 VND/month', 'Nguyen Family — 599,000 VND/month', 'Nguyen Creator — 999,000 VND/month', 'Nguyen Founder — 1,999,000 VND/month', 'Nguyen Business — 4,999,000 VND/month', 'Nguyen Chapter — 7,999,000 VND/month', 'Nguyen Enterprise/Dedicated — Custom quote'] }
     ]
   },
   personal: {
@@ -262,8 +262,8 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Training and certification', description: 'Independent Academy at academy.iai.one, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
-      { title: 'Independent Academy', body: 'Academy remains at academy.iai.one, separate from the product brand to ensure certification independence.' }
+    key: 'academy', title: 'Academy — Training and certification', description: 'Independent Academy at academy.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
+      { title: 'Independent Academy', body: 'Academy is hosted at academy.nguyenai.net and provides free AI learning to all subscribers, with independent certification.' }
     ]
   },
   security: {
@@ -288,7 +288,7 @@ const en: Record<RouteKey, PageContent> = {
   },
   about: {
     key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, Gen1–Gen2 architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, inheriting the Gen1 engine and Gen2 product system.', sections: [
-      { title: 'Four-layer architecture', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.iai.one — Academy & certification'] },
+      { title: 'Four-layer architecture', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ethical boundaries', body: 'The Nguyen Operating Profile is an operating profile, not a bloodline. Nguyen AI does not claim a single origin for all Nguyen people.' }
     ]
   },

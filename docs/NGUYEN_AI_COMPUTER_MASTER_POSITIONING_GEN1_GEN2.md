@@ -15,9 +15,7 @@
 ## 1. Four-layer architecture
 
 ```text
-LAYER 4 — ACADEMY & CERTIFICATION
-academy.iai.one
-Teach users to master, verify and operate the computer.
+LAYER 4 — ACADEMY & CERTIFICATION`nacademy.nguyenai.net`nFree AI learning for all subscribers. Teach users to master, verify and operate the computer.
 
 LAYER 3 — NGUYEN AI COMPUTER
 nguyenai.net
@@ -39,7 +37,7 @@ Runtime, agent, model routing, memory, tool, workflow, evidence.
 | `computer.iai.one` | Technical core, runtime and execution |
 | `maytinhai.org` | Gen2 mass-market AI Computer product |
 | `nguyenai.net` | Specialized AI Computer line with Nguyen Operating Profile |
-| `academy.iai.one` | Learning, proof and independent certification |
+| `academy.nguyenai.net` | Learning, proof and independent certification |
 
 ### How to understand correctly
 
@@ -549,7 +547,7 @@ Plan names differ from the generic maytinhai.org system but share billing and en
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 
-Academy remains at `academy.iai.one`, with a dedicated track for Nguyen AI Computer.
+Academy remains at `academy.nguyenai.net`, with a dedicated track for Nguyen AI Computer.
 
 ---
 

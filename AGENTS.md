@@ -15,10 +15,12 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/privacy/NGUYEN_AI_PRIVACY_DATA_MAP.md`
 - `docs/security/NGUYEN_AI_AI_SAFETY_POLICY.md`
 - `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
+- `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md` — LOCKED valuation
 - `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`
 - `docs/investor/NGUYEN_AI_INVESTOR_SITE_PLAN.md`
 - `docs/investor/NGUYEN_AI_INVESTOR_DECK.md`
 - `docs/investor/NGUYEN_AI_FINANCIAL_MODEL_HYPOTHESIS.md`
+- `docs/NGUYEN_AI_ACADEMY_PLAN.md`
 
 ## Brand lock
 
@@ -49,7 +51,7 @@ Four-layer architecture:
 - Layer 1 — `computer.iai.one` — Gen1 core engine (runtime, agent, model routing, memory, tool, workflow, evidence)
 - Layer 2 — `maytinhai.org` — Gen2 public product system (package, sell, operate AI Computers)
 - Layer 3 — `nguyenai.net` — Nguyen AI Computer (specialized line with Nguyen Operating Profile)
-- Layer 4 — `academy.iai.one` — Academy and certification
+- Layer 4 — `academy.nguyenai.net` — Academy and certification
 
 Approved product pillars (Super Apps + tool families):
 
@@ -61,9 +63,9 @@ Approved Agent team:
 
 - Nguyen Guide, Nguyen Researcher, Nguyen Archivist, Nguyen Verifier, Nguyen Family Steward, Nguyen Founder, Nguyen Business Operator, Nguyen Global Connector, Nguyen Guardian
 
-Approved plans:
+Approved plans (V2 pricing):
 
-- Nguyen Start, Nguyen Personal, Nguyen Family, Nguyen Creator, Nguyen Founder, Nguyen Business, Nguyen Chapter, Nguyen Enterprise/Dedicated
+- Nguyen Start (free), Nguyen Personal (299K VND), Nguyen Family (599K), Nguyen Creator (999K), Nguyen Founder (1.999M), Nguyen Business (4.999M), Nguyen Chapter (7.999M), Nguyen Enterprise/Dedicated (custom)
 
 Approved domains:
 
@@ -72,6 +74,7 @@ Approved domains:
 - `admin.nguyenai.net` — administration
 - `docs.nguyenai.net` — documentation
 - `invest.nguyenai.net` — investors
+- `academy.nguyenai.net` — Academy (free AI learning for subscribers)
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 

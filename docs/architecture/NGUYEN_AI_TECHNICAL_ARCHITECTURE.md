@@ -18,7 +18,7 @@ Do not mark repo audit as complete until the canonical repository is identified 
 | 1 | `computer.iai.one` | Gen1 core engine — runtime, agent, model routing, memory, tool, workflow, evidence |
 | 2 | `maytinhai.org` | Gen2 public product system — package, sell, operate AI Computers |
 | 3 | `nguyenai.net` | Nguyen AI Computer — specialized line with Nguyen Operating Profile |
-| 4 | `academy.iai.one` | Academy and independent certification |
+| 4 | `academy.nguyenai.net` | Academy and independent certification |
 
 Nguyen AI inherits Gen1 runtime and Gen2 commercial model. It does not rebuild the engine.
 

@@ -25,7 +25,7 @@ Heritage and genealogy are important Super Apps, not the whole product.
 | 1 | `computer.iai.one` | Gen1 core engine — runtime, agent, model routing, memory, tool, workflow, evidence |
 | 2 | `maytinhai.org` | Gen2 public product system — package, sell, operate AI Computers |
 | 3 | `nguyenai.net` | Nguyen AI Computer — specialized line with Nguyen Operating Profile |
-| 4 | `academy.iai.one` | Academy and independent certification |
+| 4 | `academy.nguyenai.net` | Academy — free AI learning for subscribers, independent certification |
 
 Nguyen AI does not rebuild the engine. It inherits Gen1 and Gen2, then adds dedicated Agents, Super Apps, Memory Schema, workflows, network, family/founder/business/chapter intelligence, brand and experience.
 
@@ -156,7 +156,7 @@ Financial and legal tools support analysis only, not licensed advisory services.
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 
-Academy remains at `academy.iai.one`, with a dedicated track for Nguyen AI Computer.
+Academy remains at `academy.nguyenai.net`, with a dedicated track for Nguyen AI Computer.
 
 ## 9. Launch truth status
 
