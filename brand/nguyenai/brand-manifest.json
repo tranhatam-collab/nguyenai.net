@@ -1,0 +1,20 @@
+{
+  "brandNameVi": "Nguyễn AI",
+  "brandNameEn": "Nguyen AI",
+  "domain": "nguyenai.net",
+  "codeName": "nguyenai",
+  "category": "Heritage Intelligence Network",
+  "taglineVi": "Trí tuệ kết nối di sản Nguyễn toàn cầu.",
+  "taglineEn": "Intelligence connecting the global Nguyen legacy.",
+  "promiseVi": "Di sản có nguồn. Kết nối có niềm tin. Trí tuệ phục vụ nhiều thế hệ.",
+  "promiseEn": "Sourced heritage. Trusted connections. Intelligence for generations.",
+  "forbiddenBrandVariants": [
+    "Nguyên AI",
+    "AI Nguyen",
+    "NguyenAI",
+    "Nguyễn.AI",
+    "Nguyen Artificial Intelligence",
+    "NAI Network"
+  ],
+  "status": "BRAND FOUNDATION READY — SOURCE CODE AUDIT PENDING ACCESS"
+}

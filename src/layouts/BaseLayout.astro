@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import { absoluteUrl, routeFor, routes, site, type Locale, type RouteKey } from '../data/site';
+
+export interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const { locale, routeKey, title, description, jsonLd } = Astro.props;
+const currentPath = routeFor(routeKey, locale);
+const alternateLocale = locale === 'vi' ? 'en' : 'vi';
+const langLabel = locale === 'vi' ? 'English' : 'Tiếng Việt';
+const navItems = routes.filter((route) => ['about', 'roots', 'legacy', 'knowledge', 'network', 'founders', 'pricing'].includes(route.key));
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name.en,
+  alternateName: site.name.vi,
+  url: site.url,
+  slogan: site.tagline[locale]
+};
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.name[locale],
+  url: site.url,
+  inLanguage: locale === 'vi' ? 'vi-VN' : 'en'
+};
+const graph = [organizationJsonLd, websiteJsonLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])];
+---
+<!doctype html>
+<html lang={locale === 'vi' ? 'vi' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={absoluteUrl(currentPath)} />
+    <link rel="alternate" hreflang="vi-VN" href={absoluteUrl(routeFor(routeKey, 'vi'))} />
+    <link rel="alternate" hreflang="en" href={absoluteUrl(routeFor(routeKey, 'en'))} />
+    <link rel="alternate" hreflang="x-default" href={absoluteUrl(routeFor(routeKey, 'vi'))} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nguyen AI" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={absoluteUrl(currentPath)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#0F2742" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(graph)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{locale === 'vi' ? 'Bỏ qua điều hướng' : 'Skip to content'}</a>
+    <header class="site-header">
+      <a class="brand" href={routeFor('home', locale)} aria-label={site.name[locale]}>
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>{site.name[locale]}</strong>
+          <small>{locale === 'vi' ? 'Heritage Intelligence Network' : 'Heritage Intelligence Network'}</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label={locale === 'vi' ? 'Điều hướng chính' : 'Main navigation'}>
+        {navItems.map((item) => <a href={item[locale]}>{locale === 'vi' ? item.labelVi : item.labelEn}</a>)}
+      </nav>
+      <a class="language-switch" href={routeFor(routeKey, alternateLocale)}>{langLabel}</a>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>{site.name[locale]}</strong>
+        <p>{site.promise[locale]}</p>
+      </div>
+      <nav aria-label={locale === 'vi' ? 'Điều hướng chân trang' : 'Footer navigation'}>
+        <a href={routeFor('methodology', locale)}>{locale === 'vi' ? 'Phương pháp xác minh' : 'Methodology'}</a>
+        <a href={routeFor('privacy', locale)}>{locale === 'vi' ? 'Quyền riêng tư' : 'Privacy'}</a>
+        <a href={routeFor('terms', locale)}>{locale === 'vi' ? 'Điều khoản' : 'Terms'}</a>
+        <a href={routeFor('contact', locale)}>{locale === 'vi' ? 'Liên hệ' : 'Contact'}</a>
+      </nav>
+    </footer>
+  </body>
+</html>

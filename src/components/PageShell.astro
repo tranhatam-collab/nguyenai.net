@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { absoluteUrl, routeFor, type Locale, type RouteKey } from '../data/site';
+import type { PageContent } from '../data/pages';
+
+export interface Props {
+  locale: Locale;
+  page: PageContent;
+}
+
+const { locale, page } = Astro.props;
+const isHome = page.key === 'home';
+const pageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': isHome ? 'WebPage' : 'Article',
+  headline: page.heroTitle,
+  name: page.title,
+  description: page.description,
+  url: absoluteUrl(routeFor(page.key as RouteKey, locale)),
+  inLanguage: locale === 'vi' ? 'vi-VN' : 'en'
+};
+const faqJsonLd = page.faq?.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: page.faq.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer
+    }
+  }))
+} : undefined;
+---
+<BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd}>
+  <section class="hero section-wrap">
+    <div class="eyebrow">{page.eyebrow}</div>
+    <h1>{page.heroTitle}</h1>
+    <p class="hero-text">{page.heroText}</p>
+    {(page.primaryCta || page.secondaryCta) && (
+      <div class="hero-actions">
+        {page.primaryCta && <a class="button primary" href={routeFor('roots', locale)}>{page.primaryCta}</a>}
+        {page.secondaryCta && <a class="button secondary" href={routeFor('methodology', locale)}>{page.secondaryCta}</a>}
+      </div>
+    )}
+  </section>
+
+  <section class="section-wrap content-grid" aria-label={locale === 'vi' ? 'Nội dung chính' : 'Main content'}>
+    {page.sections.map((section) => (
+      <article class="content-card">
+        <h2>{section.title}</h2>
+        <p>{section.body}</p>
+        {section.items && (
+          <ul>
+            {section.items.map((item) => <li>{item}</li>)}
+          </ul>
+        )}
+      </article>
+    ))}
+  </section>
+
+  {page.faq && (
+    <section class="section-wrap faq">
+      <div class="eyebrow">FAQ</div>
+      <h2>{locale === 'vi' ? 'Câu hỏi thường gặp' : 'Frequently asked questions'}</h2>
+      {page.faq.map((item) => (
+        <details>
+          <summary>{item.question}</summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
+    </section>
+  )}
+</BaseLayout>

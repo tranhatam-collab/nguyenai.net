@@ -1,0 +1,20 @@
+{
+  "brand": "Nguyen AI",
+  "version": "1.0.0",
+  "fontFamilies": {
+    "sans": ["Be Vietnam Pro", "Inter", "system-ui", "sans-serif"],
+    "serif": ["Noto Serif", "Georgia", "serif"],
+    "mono": ["JetBrains Mono", "SFMono-Regular", "Consolas", "monospace"]
+  },
+  "usage": {
+    "ui": "sans",
+    "longFormHistory": "serif",
+    "codeAndEvidenceIds": "mono"
+  },
+  "rules": [
+    "Vietnamese diacritics must render correctly.",
+    "Do not use calligraphic fonts for long-form content.",
+    "Limit webfont weights for performance.",
+    "Always provide system fallbacks."
+  ]
+}

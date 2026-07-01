@@ -1,0 +1,26 @@
+{
+  "brand": "Nguyen AI",
+  "version": "1.0.0",
+  "tokens": {
+    "heritageRed": "#7A1F2B",
+    "deepIndigo": "#0F2742",
+    "bronzeGold": "#C89B3C",
+    "jadeGreen": "#1F6D5A",
+    "parchment": "#F4EBDD",
+    "ink": "#161A1D",
+    "warmWhite": "#FFFDF8"
+  },
+  "usage": {
+    "primaryBackground": "warmWhite",
+    "primaryText": "ink",
+    "heroBackground": "deepIndigo",
+    "primaryAccent": "heritageRed",
+    "secondaryAccent": "bronzeGold",
+    "trustAccent": "jadeGreen",
+    "editorialSurface": "parchment"
+  },
+  "accessibility": {
+    "standard": "WCAG 2.2",
+    "note": "All component-level foreground/background pairs must be tested before release."
+  }
+}
