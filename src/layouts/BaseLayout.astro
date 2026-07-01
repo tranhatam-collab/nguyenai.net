@@ -14,7 +14,7 @@ const { locale, routeKey, title, description, jsonLd } = Astro.props;
 const currentPath = routeFor(routeKey, locale);
 const alternateLocale = locale === 'vi' ? 'en' : 'vi';
 const langLabel = locale === 'vi' ? 'English' : 'Tiếng Việt';
-const navItems = routes.filter((route) => ['about', 'roots', 'legacy', 'knowledge', 'network', 'founders', 'pricing'].includes(route.key));
+const navItems = routes.filter((route) => ['ai-computer', 'super-apps', 'agents', 'plans', 'about', 'contact'].includes(route.key));
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -75,12 +75,12 @@ const graph = [organizationJsonLd, websiteJsonLd, ...(Array.isArray(jsonLd) ? js
     <footer class="site-footer">
       <div>
         <strong>{site.name[locale]}</strong>
-        <p>{site.promise[locale]}</p>
+        <p>{site.tagline[locale]}</p>
       </div>
       <nav aria-label={locale === 'vi' ? 'Điều hướng chân trang' : 'Footer navigation'}>
-        <a href={routeFor('methodology', locale)}>{locale === 'vi' ? 'Phương pháp xác minh' : 'Methodology'}</a>
-        <a href={routeFor('privacy', locale)}>{locale === 'vi' ? 'Quyền riêng tư' : 'Privacy'}</a>
-        <a href={routeFor('terms', locale)}>{locale === 'vi' ? 'Điều khoản' : 'Terms'}</a>
+        <a href={routeFor('trust', locale)}>{locale === 'vi' ? 'Minh chứng' : 'Trust'}</a>
+        <a href={routeFor('security', locale)}>{locale === 'vi' ? 'Bảo mật' : 'Security'}</a>
+        <a href={routeFor('docs', locale)}>{locale === 'vi' ? 'Tài liệu' : 'Docs'}</a>
         <a href={routeFor('contact', locale)}>{locale === 'vi' ? 'Liên hệ' : 'Contact'}</a>
       </nav>
     </footer>

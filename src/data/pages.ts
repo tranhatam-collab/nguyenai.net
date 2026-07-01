@@ -16,117 +16,295 @@ export type PageContent = {
 const vi: Record<RouteKey, PageContent> = {
   home: {
     key: 'home',
-    title: 'Nguyễn AI | Trí tuệ kết nối di sản Nguyễn toàn cầu',
-    description: 'Nguyễn AI là nền tảng song ngữ về cội nguồn, di sản, tri thức, mạng lưới và cộng đồng sáng lập mang họ Nguyễn, được xây dựng trên nguyên tắc nguồn dẫn, xác minh và quyền riêng tư.',
-    eyebrow: 'Heritage Intelligence Network',
-    heroTitle: 'Trí tuệ kết nối di sản Nguyễn toàn cầu.',
-    heroText: 'Nguyễn AI giúp gia đình, chi họ, nhà nghiên cứu, nhà sáng lập và cộng đồng lưu giữ lịch sử, kiểm chứng nguồn tư liệu và kết nối nhiều thế hệ bằng AI có trách nhiệm.',
-    primaryCta: 'Khám phá nền tảng',
-    secondaryCta: 'Xem phương pháp xác minh',
+    title: 'Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu',
+    description: 'Nguyen AI Computer là Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
+    eyebrow: 'Nguyen AI Computer',
+    heroTitle: 'Máy Tính AI của thế hệ Nguyễn toàn cầu.',
+    heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
+    primaryCta: 'Khởi tạo Nguyen AI Computer',
+    secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
-      { title: 'Không phải một Máy Tính AI đổi tên', body: 'Nguyễn AI được xây dựng như một mạng lưới trí tuệ di sản, tập trung vào dữ liệu có nguồn, quyền riêng tư, gia phả có kiểm chứng và kết nối cộng đồng Nguyễn toàn cầu.' },
-      { title: 'Bảy trụ cột sản phẩm', body: 'Nền tảng được thiết kế theo các không gian sử dụng rõ ràng.', items: ['Nguyen Roots — Cội Nguồn', 'Nguyen Memory — Di Sản', 'Nguyen Knowledge — Tri Thức', 'Nguyen Trust — Minh Chứng', 'Nguyen Network — Kết Nối', 'Nguyen Founders — Sáng Lập', 'Nguyen Chapter OS — Chi Họ và Cộng Đồng'] },
-      { title: 'Nguyên tắc đạo đức', body: 'Nguyễn AI không mặc định mọi người họ Nguyễn thuộc cùng một huyết hệ, không tự nhận đại diện toàn bộ cộng đồng và không để AI xác nhận huyết thống hay hoàng tộc khi thiếu bằng chứng.' }
+      { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi.' },
+      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy độc lập (academy.iai.one).', items: ['Lớp 1 — Gen1 core engine', 'Lớp 2 — Gen2 product system', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
+      { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
     faq: [
-      { question: 'Nguyễn AI có xác nhận được tổ tiên bằng AI không?', answer: 'Không. AI chỉ hỗ trợ đọc, tổ chức và đối chiếu nguồn. Mọi kết luận phải dựa trên chứng cứ và mức độ tin cậy rõ ràng.' },
-      { question: 'Dữ liệu người còn sống có công khai không?', answer: 'Không. Người còn sống, thông tin liên hệ và cây gia đình mặc định riêng tư, chỉ chia sẻ khi có quyền phù hợp.' }
+      { question: 'Nguyen AI Computer có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ Agent, bộ nhớ, công cụ và workflow dài hạn.' },
+      { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Super App quan trọng, nhưng sản phẩm còn bao gồm làm việc, nghiên cứu, sáng tạo, kinh doanh, tự động hóa và kết nối toàn cầu.' }
     ]
   },
-  about: {
-    key: 'about', title: 'Giới thiệu Nguyễn AI', description: 'Tìm hiểu định vị, lời hứa thương hiệu và ranh giới đạo đức của Nguyễn AI.', eyebrow: 'Giới thiệu', heroTitle: 'Di sản có nguồn. Kết nối có niềm tin.', heroText: 'Nguyễn AI được sáng lập để xây dựng hạ tầng tri thức, dữ liệu và cộng đồng giúp nhiều thế hệ hiểu cội nguồn bằng phương pháp có chứng cứ.', sections: [
-      { title: 'Sứ mệnh', body: 'Giúp gia đình và cộng đồng lưu giữ lịch sử, số hóa tư liệu, phân biệt dữ kiện đã xác minh với truyền khẩu và kết nối thế hệ bằng AI có trách nhiệm.' },
-      { title: 'Ranh giới thương hiệu', body: 'Nguyễn AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn và không thần thoại hóa lịch sử để tạo hiệu ứng truyền thông.' }
+  'ai-computer': {
+    key: 'ai-computer', title: 'AI Computer — Nguyen AI Computer', description: 'Tìm hiểu kiến trúc AI Computer Instance: Command Center, Model Mesh, Agent Team, Super Apps, Data Vault, Memory, Workflow, Evidence, Approval Gates.', eyebrow: 'AI Computer', heroTitle: 'Mỗi người có một AI Computer riêng.', heroText: 'Nguyen AI Computer Instance bao gồm Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine, Verification, Approval Gates, Security Boundary, Cost Governor, Audit & Replay, Sync Layer và Self-Upgrade Registry.', sections: [
+      { title: 'AI Computer Instance', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác.', items: ['Identity & Ownership', 'Command Center', 'Model Mesh', 'Agent Team', 'Super Apps', 'Tool & Connector Kernel', 'Data Vault', 'Long-term Memory', 'Workflow Engine', 'Verification & Evidence', 'Approval Gates', 'Security Boundary', 'Cost Governor', 'Audit & Replay', 'Sync Layer', 'Self-Upgrade Registry'] },
+      { title: 'Khả năng vận hành', body: 'Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' }
     ]
   },
-  roots: {
-    key: 'roots', title: 'Nguyen Roots — Cội Nguồn', description: 'Không gian xây dựng gia phả riêng tư, quản lý quan hệ, nguồn và dữ liệu mâu thuẫn.', eyebrow: 'Nguyen Roots', heroTitle: 'Gia phả riêng tư, có nguồn và có quyền kiểm soát.', heroText: 'Tạo cây gia đình, quản lý nhiều nhánh, ghi nhận địa danh cũ mới, mời người thân xác nhận và xuất dữ liệu khi cần.', sections: [
-      { title: 'Chức năng nền tảng', body: 'Nguyen Roots ưu tiên quyền riêng tư và tính kiểm chứng.', items: ['Cây gia đình riêng tư', 'Quản lý nhiều chi nhánh', 'Nhập và xuất GEDCOM có kiểm soát', 'Mời người thân xác nhận thông tin', 'Ghi nhận dữ liệu mâu thuẫn'] },
-      { title: 'Không suy luận tùy tiện', body: 'Hệ thống không tự nối hai người hoặc hai chi họ chỉ vì giống họ tên, địa danh hoặc truyền khẩu chưa có nguồn.' }
+  'how-it-works': {
+    key: 'how-it-works', title: 'Cách vận hành — Nguyen AI Computer', description: 'Luồng vận hành: lệnh người dùng, Command Kernel, Planner, Model Router, Tool Execution, Reviewer, Evidence, Human Approval.', eyebrow: 'Cách vận hành', heroTitle: 'Từ lệnh đến kết quả có chứng cứ.', heroText: 'Người dùng ra lệnh, hệ thống lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, kiểm tra kết quả, lưu evidence và xin phê duyệt trước hành động nhạy cảm.', sections: [
+      { title: 'Luồng vận hành', body: 'Command Kernel → Planner → Model Router → Tool Execution → Reviewer + Evidence → Human Approval.', items: ['Người dùng ra lệnh', 'Command Kernel tiếp nhận', 'Planner lập kế hoạch', 'Model Router chọn model', 'Tool Execution thực thi', 'Reviewer kiểm tra', 'Evidence lưu chứng cứ', 'Human Approval phê duyệt'] }
     ]
   },
-  legacy: {
-    key: 'legacy', title: 'Nguyen Memory — Di Sản', description: 'Kho tư liệu số cho ảnh, giấy tờ, gia phả, bản ghi âm và lịch sử truyền khẩu.', eyebrow: 'Nguyen Memory', heroTitle: 'Kho lưu trữ di sản cho gia đình và chi họ.', heroText: 'Số hóa tư liệu, ghi nguồn, lưu lịch sử chỉnh sửa và bảo vệ quyền sở hữu tài liệu gia đình.', sections: [
-      { title: 'Loại tư liệu hỗ trợ', body: 'Ảnh, gia phả Hán Nôm và Quốc ngữ, văn bia, giấy khai sinh, giấy kết hôn, giấy chứng tử, nhật ký, bản ghi âm và phỏng vấn lịch sử truyền khẩu.' },
-      { title: 'OCR không phải bằng chứng cuối', body: 'Bản chép máy chỉ hỗ trợ đọc và tìm kiếm; không mặc nhiên là bản dịch hoặc chứng cứ chính xác.' }
+  agents: {
+    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: 'Đội ngũ Agent chuyên biệt: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian.', eyebrow: 'Agent Team', heroTitle: 'Đội ngũ AI Agent chuyên biệt cho hệ sinh thái Nguyễn.', heroText: 'Chín Agent mặc định vận hành trên nền tảng Agent Gen1: Router, Planner, Executor, Reviewer, Security, Cost, Fact Checker, Memory Curator, Human Gate.', sections: [
+      { title: 'Agent chuyên biệt', body: 'Mỗi Agent có vai trò rõ ràng.', items: ['Nguyen Guide — Điều phối chính', 'Nguyen Researcher — Nghiên cứu và tổng hợp nguồn', 'Nguyen Archivist — Quản trị tư liệu', 'Nguyen Verifier — Kiểm tra claim và evidence', 'Nguyen Family Steward — Quản trị family memory', 'Nguyen Founder — Chiến lược và khởi nghiệp', 'Nguyen Business Operator — Vận hành doanh nghiệp', 'Nguyen Global Connector — Diaspora và mạng lưới', 'Nguyen Guardian — Bảo mật, quyền và phê duyệt'] }
     ]
   },
-  knowledge: {
-    key: 'knowledge', title: 'Nguyen Knowledge — Tri Thức', description: 'Kho tri thức song ngữ về lịch sử, địa danh, nhân vật, chi họ và phương pháp nghiên cứu.', eyebrow: 'Nguyen Knowledge', heroTitle: 'Tri thức song ngữ, biên tập và có nguồn.', heroText: 'Xây dựng thư viện nghiên cứu giúp người đọc phân biệt điều đã xác minh, điều còn tranh luận và điều chưa thể kết luận.', sections: [
-      { title: 'Nội dung nền tảng', body: 'Bài nghiên cứu, thư mục nguồn, hồ sơ địa danh, hồ sơ nhân vật lịch sử, nghiên cứu chi họ, bản đồ di cư và thuật ngữ gia phả.' },
-      { title: 'Chuẩn biên tập', body: 'Mỗi bài nghiên cứu cần có tác giả, người biên tập, ngày xuất bản, ngày kiểm tra lại và danh mục nguồn.' }
+  'super-apps': {
+    key: 'super-apps', title: 'Super Apps — Nguyen AI Computer', description: 'Bảy Super App đặc thù Nguyễn: Roots, Memory, Knowledge, Trust, Network, Founders, Chapter OS.', eyebrow: 'Super Apps', heroTitle: 'Super App đặc thù cho cộng đồng Nguyễn.', heroText: 'Gia phả và di sản là các Super App quan trọng, nhưng toàn bộ sản phẩm còn bao gồm làm việc, nghiên cứu, sáng tạo, kinh doanh và tự động hóa.', sections: [
+      { title: 'Bảy Super App Nguyễn', body: 'Mỗi Super App phục vụ một không gian sử dụng rõ ràng.', items: ['Nguyen Roots — Cội Nguồn', 'Nguyen Memory — Di Sản', 'Nguyen Knowledge — Tri Thức', 'Nguyen Trust — Minh Chứng', 'Nguyen Network — Kết Nối', 'Nguyen Founders — Sáng Lập', 'Nguyen Chapter OS — Chi Họ và Cộng Đồng'] },
+      { title: 'Tool families', body: 'Bên cạnh Super App, máy có đầy đủ công cụ AI.', items: ['AI Office', 'AI Research', 'AI Browser', 'AI Content', 'AI Media', 'AI Code', 'AI Automation', 'AI Founder OS', 'AI Business OS', 'AI Sales', 'AI Finance Workspace', 'AI Legal Workspace'] }
+    ]
+  },
+  models: {
+    key: 'models', title: 'Model Mesh — Nguyen AI Computer', description: 'Model Mesh đa mô hình: reasoning, research, coding, translation, vision, voice, verification — không khóa vào một model.', eyebrow: 'Model Mesh', heroTitle: 'Đa mô hình, không khóa vào một nhà cung cấp.', heroText: 'Máy chọn model theo reasoning, research, coding, translation, vision, voice, verification, tốc độ, chi phí, quyền riêng tư và trạng thái nhà cung cấp.', sections: [
+      { title: 'Tiêu chí chọn model', body: 'Model Router chọn model theo nhiệm vụ và ràng buộc.', items: ['Reasoning', 'Research', 'Coding', 'Translation', 'Document extraction', 'Image understanding', 'Voice', 'Verification', 'Speed', 'Cost', 'Privacy', 'Provider status'] }
+    ]
+  },
+  'command-packs': {
+    key: 'command-packs', title: 'Command Packs — Nguyen AI Computer', description: 'Các Command Pack: Family Archive, Founder Launch, Investor Readiness, Business Operations, Global Community, Bilingual Publishing, Research & Evidence, Chapter Governance, Legacy Interview, SME Automation.', eyebrow: 'Command Packs', heroTitle: 'Gói lệnh sẵn sàng cho từng nhu cầu.', heroText: 'Command Pack là tập hợp workflow, Agent và công cụ được đóng gói cho từng trường hợp sử dụng cụ thể.', sections: [
+      { title: 'Command Pack sẵn có', body: 'Mỗi Pack giải quyết một nhóm nhu cầu.', items: ['Family Archive Pack', 'Founder Launch Pack', 'Investor Readiness Pack', 'Business Operations Pack', 'Global Community Pack', 'Bilingual Publishing Pack', 'Research & Evidence Pack', 'Chapter Governance Pack', 'Legacy Interview Pack', 'SME Automation Pack'] }
+    ]
+  },
+  plans: {
+    key: 'plans', title: 'Gói dịch vụ — Nguyen AI Computer', description: 'Tám gói: Start, Personal, Family, Creator, Founder, Business, Chapter, Enterprise/Dedicated.', eyebrow: 'Plans', heroTitle: 'Gói dịch vụ theo nhu cầu sử dụng.', heroText: 'Các mức giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.', sections: [
+      { title: 'Gói dịch vụ', body: 'Tám gói phục vụ từ người mới bắt đầu đến tổ chức lớn.', items: ['Nguyen Start — Miễn phí', 'Nguyen Personal — 99.000 VNĐ/tháng', 'Nguyen Family — 299.000 VNĐ/tháng', 'Nguyen Creator — 499.000 VNĐ/tháng', 'Nguyen Founder — 799.000 VNĐ/tháng', 'Nguyen Business — 1.990.000 VNĐ/tháng', 'Nguyen Chapter — 2.990.000 VNĐ/tháng', 'Nguyen Enterprise/Dedicated — Báo giá riêng'] }
+    ]
+  },
+  personal: {
+    key: 'personal', title: 'Nguyen Personal — Cá nhân', description: 'AI Computer cho cá nhân: công cụ làm việc, nghiên cứu, sáng tạo và quản lý tri thức cá nhân.', eyebrow: 'Nguyen Personal', heroTitle: 'AI Computer cho cá nhân.', heroText: 'Một máy riêng cho công việc, học tập, sáng tạo và tri thức cá nhân — với bộ nhớ dài hạn và đội ngũ Agent.', sections: [
+      { title: 'Không gian cá nhân', body: 'AI Office, AI Research, AI Content, AI Media và quản lý tri thức cá nhân trong một instance riêng.' }
+    ]
+  },
+  family: {
+    key: 'family', title: 'Nguyen Family — Gia đình', description: 'AI Computer cho gia đình nhiều thế hệ: gia phả, kho tư liệu, oral history, bộ nhớ gia đình.', eyebrow: 'Nguyen Family', heroTitle: 'AI Computer cho gia đình nhiều thế hệ.', heroText: 'Lưu giữ cội nguồn, di sản, tư liệu và ký ức gia đình trong một Data Vault riêng với quyền kiểm soát theo thế hệ.', sections: [
+      { title: 'Super App cho gia đình', body: 'Nguyen Roots, Nguyen Memory và Nguyen Family Steward phục vụ nhu cầu gia đình.', items: ['Cây gia đình riêng tư', 'Kho tư liệu số', 'Oral history', 'Bộ nhớ dài hạn cho gia đình', 'Quyền theo thế hệ'] }
+    ]
+  },
+  creator: {
+    key: 'creator', title: 'Nguyen Creator — Sáng tạo', description: 'AI Computer cho nhà sáng tạo: nội dung song ngữ, SEO, đa kênh, media.', eyebrow: 'Nguyen Creator', heroTitle: 'AI Computer cho nhà sáng tạo.', heroText: 'Tạo nội dung song ngữ, lập lịch biên tập, xuất bản đa kênh và quản lý tài sản truyền thông.', sections: [
+      { title: 'Công cụ sáng tạo', body: 'AI Content, AI Media và Bilingual Publishing Pack phục vụ nhà sáng tạo.', items: ['Nội dung song ngữ', 'SEO', 'Mạng xã hội', 'Newsletter', 'Lịch biên tập', 'Xuất bản đa kênh'] }
+    ]
+  },
+  founder: {
+    key: 'founder', title: 'Nguyen Founder — Sáng lập', description: 'AI Computer cho nhà sáng lập: chiến lược, pitch deck, gọi vốn, KPI, board report.', eyebrow: 'Nguyen Founder', heroTitle: 'AI Computer cho nhà sáng lập.', heroText: 'AI Founder OS hỗ trợ vision, strategy, roadmap, decision log, pitch deck, investor brief, fundraising và KPI.', sections: [
+      { title: 'Founder OS', body: 'Công cụ cho người xây dựng dự án.', items: ['Vision & strategy', 'Roadmap', 'Decision log', 'Pitch deck', 'Investor brief', 'Fundraising', 'KPI', 'Board report'] },
+      { title: 'Investor Readiness Pack', body: 'Command Pack giúp nhà sáng lập chuẩn bị gọi vốn: hồ sơ đầu tư, mô hình tài chính, data room và diligence.' }
+    ]
+  },
+  business: {
+    key: 'business', title: 'Nguyen Business — Doanh nghiệp', description: 'AI Computer cho doanh nghiệp: vận hành, SOP, CRM, finance, legal, automation.', eyebrow: 'Nguyen Business', heroTitle: 'AI Computer cho doanh nghiệp.', heroText: 'AI Business OS, AI Sales, AI Finance Workspace và AI Legal Workspace phục vụ vận hành doanh nghiệp.', sections: [
+      { title: 'Business OS', body: 'Công cụ cho doanh nghiệp.', items: ['Operations', 'SOP', 'Task management', 'Internal knowledge', 'Customer care', 'Reporting', 'Automation'] },
+      { title: 'Finance & Legal', body: 'AI Finance Workspace và AI Legal Workspace hỗ trợ phân tích, không thay thế dịch vụ tư vấn có giấy phép.' }
+    ]
+  },
+  chapter: {
+    key: 'chapter', title: 'Nguyen Chapter — Chi Họ và Cộng Đồng', description: 'AI Computer cho chi họ, hội và cộng đồng: quản lý thành viên, governance, sự kiện, tài liệu, quỹ.', eyebrow: 'Nguyen Chapter', heroTitle: 'AI Computer cho chi họ và cộng đồng.', heroText: 'Nguyen Chapter OS cung cấp quản lý thành viên, governance, sự kiện, tài liệu, quỹ, private chapter AI và website riêng.', sections: [
+      { title: 'Chapter OS', body: 'Hệ điều hành cho chi họ và cộng đồng.', items: ['Member management', 'Governance', 'Events', 'Documents', 'Funds and minutes', 'Private chapter AI', 'Dedicated website', 'Permission and audit'] }
+    ]
+  },
+  enterprise: {
+    key: 'enterprise', title: 'Nguyen Enterprise — Tổ chức lớn', description: 'AI Computer Dedicated cho tổ chức lớn: deployment riêng, white-label, API, enterprise archive.', eyebrow: 'Nguyen Enterprise', heroTitle: 'AI Computer Dedicated cho tổ chức lớn.', heroText: 'Deployment riêng, white-label, API gateway, enterprise archive và kiểm soát toàn bộ dữ liệu trong boundary của tổ chức.', sections: [
+      { title: 'Enterprise capabilities', body: 'Dành cho tổ chức lớn.', items: ['Dedicated deployment', 'White-label', 'API gateway', 'Enterprise archive', 'Custom Agent', 'SSO', 'Audit log', 'SLA'] }
+    ]
+  },
+  heritage: {
+    key: 'heritage', title: 'Heritage — Di sản', description: 'Super App di sản: Nguyen Roots, Nguyen Memory, Nguyen Knowledge — gia phả, tư liệu, tri thức có nguồn.', eyebrow: 'Heritage', heroTitle: 'Di sản là Super App, không phải toàn bộ sản phẩm.', heroText: 'Gia phả, kho tư liệu và tri thức có nguồn là các Super App quan trọng trong Nguyen AI Computer.', sections: [
+      { title: 'Super App di sản', body: 'Nguyen Roots, Nguyen Memory và Nguyen Knowledge phục vụ nhu cầu di sản.', items: ['Gia phả riêng tư', 'Kho tư liệu số', 'Tri thức song ngữ', 'Nguồn và evidence', 'Oral history'] },
+      { title: 'Nguyên tắc đạo đức', body: 'Nguyen AI không mặc định mọi người họ Nguyễn thuộc cùng một huyết hệ, không tự nhận đại diện toàn bộ cộng đồng và không để AI xác nhận huyết thống hay hoàng tộc khi thiếu bằng chứng.' }
     ]
   },
   network: {
-    key: 'network', title: 'Nguyen Network — Kết Nối', description: 'Mạng lưới cộng đồng Nguyễn toàn cầu với hồ sơ, nhóm địa phương, sự kiện và chống mạo danh.', eyebrow: 'Nguyen Network', heroTitle: 'Kết nối cộng đồng có niềm tin.', heroText: 'Tìm kiếm, kết nối và cộng tác theo quốc gia, địa phương, lĩnh vực chuyên môn và nhóm gia đình riêng tư.', sections: [
-      { title: 'Kết nối có kiểm soát', body: 'Người dùng có thể ẩn hồ sơ, báo cáo lạm dụng và yêu cầu xác minh danh tính trước khi công khai thông tin quan trọng.' },
-      { title: 'Không tự phong đại diện', body: 'Nguyen Network là hạ tầng kết nối, không tự nhận là tổ chức chính thức đại diện toàn bộ người mang họ Nguyễn.' }
+    key: 'network', title: 'Network — Kết nối', description: 'Mạng lưới cộng đồng Nguyễn toàn cầu: cá nhân, chuyên gia, founder, chapter, diaspora.', eyebrow: 'Network', heroTitle: 'Kết nối cộng đồng có niềm tin.', heroText: 'Nguyen Network kết nối cá nhân, chuyên gia, founder, chapter, diaspora, sự kiện và trusted connections.', sections: [
+      { title: 'Kết nối có kiểm soát', body: 'Người dùng có thể ẩn hồ sơ, báo cáo lạm dụng và yêu cầu xác minh danh tính trước khi công khai thông tin quan trọng.' }
     ]
   },
-  founders: {
-    key: 'founders', title: 'Nguyen Founders — Sáng Lập', description: 'Không gian cho nhà sáng lập, doanh nhân, chuyên gia và dự án do người mang họ Nguyễn kiến tạo.', eyebrow: 'Nguyen Founders', heroTitle: 'Mạng lưới nhà sáng lập Nguyễn toàn cầu.', heroText: 'Hồ sơ founder, bản đồ doanh nghiệp, phòng hợp tác, mentor, opportunity board và case study được xác minh theo quyền của chủ hồ sơ.', sections: [
-      { title: 'Sáng lập là hành động kiến tạo', body: 'Nguyễn AI dùng khái niệm Sáng Lập theo nghĩa cộng đồng doanh nhân và chuyên gia, không phải tuyên bố huyết thống thống nhất.' },
-      { title: 'Xác minh vai trò', body: 'Hồ sơ công khai và huy hiệu xác minh chỉ xuất hiện khi chủ hồ sơ chấp thuận và có thông tin kiểm chứng phù hợp.' }
+  academy: {
+    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy độc lập tại academy.iai.one, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
+      { title: 'Academy độc lập', body: 'Academy giữ tại academy.iai.one, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
     ]
   },
-  pricing: {
-    key: 'pricing', title: 'Gói dịch vụ Nguyễn AI', description: 'Các giả thuyết gói dịch vụ cho cá nhân, gia đình, nhà sáng lập, chi họ và tổ chức.', eyebrow: 'Gói dịch vụ', heroTitle: 'Định giá theo không gian di sản, không theo lời hứa AI mơ hồ.', heroText: 'Các mức giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.', sections: [
-      { title: 'Cá nhân và gia đình', body: 'Open — Khai Mở, Roots — Cội Nguồn và Legacy — Di Sản phục vụ nhu cầu lưu giữ, xác minh và quản lý tư liệu gia đình.' },
-      { title: 'Cộng đồng và tổ chức', body: 'Founder — Sáng Lập, Chapter — Chi Họ & Hội và Global — Toàn Cầu phục vụ nhà sáng lập, chi họ, hội và tổ chức lớn.' }
+  security: {
+    key: 'security', title: 'Security — Bảo mật', description: 'Security Boundary, Approval Gates, Cost Governor, Audit & Replay, permission và phê duyệt.', eyebrow: 'Security', heroTitle: 'Bảo mật, quyền và phê duyệt.', heroText: 'Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được audit, mọi dữ liệu nằm trong boundary của người dùng.', sections: [
+      { title: 'Cơ chế bảo mật', body: 'Security Boundary, Approval Gates, Cost Governor, Audit & Replay.', items: ['Approval trước hành động nhạy cảm', 'Audit log mọi truy cập', 'Cost governor giới hạn chi phí', 'Permission theo vai trò', 'Recovery và replay'] }
     ]
   },
-  methodology: {
-    key: 'methodology', title: 'Phương pháp xác minh', description: 'Cách Nguyễn AI phân loại claim, nguồn, evidence, consent, dispute và confidence.', eyebrow: 'Nguyen Trust', heroTitle: 'Mỗi tuyên bố quan trọng cần nguồn, trạng thái và lịch sử chỉnh sửa.', heroText: 'Nguyễn AI phân biệt dữ kiện đã xác minh, nguồn sơ cấp, nguồn thứ cấp, gia phả chi họ, truyền khẩu, suy luận và thông tin đang tranh luận.', sections: [
-      { title: 'Thang bằng chứng', body: 'A: nguồn sơ cấp hoặc nhiều nguồn độc lập; B: nguồn đáng tin nhưng chưa đủ chuỗi; C: gia phả hoặc tài liệu thứ cấp; D: truyền khẩu, suy luận hoặc chưa xác minh.' },
-      { title: 'AI không tự nâng cấp bằng chứng', body: 'AI có thể gợi ý mức độ tin cậy, nhưng không được tự biến claim cấp C hoặc D thành cấp A.' }
+  trust: {
+    key: 'trust', title: 'Trust — Minh chứng', description: 'Claim, source, evidence, verification, dispute, confidence, audit.', eyebrow: 'Trust', heroTitle: 'Mọi thông tin quan trọng cần có nguồn và evidence.', heroText: 'Nguyen Trust là hệ thống claim-source-evidence với verification, dispute, confidence label và audit log.', sections: [
+      { title: 'Claim-source-evidence', body: 'Mọi claim quan trọng cần có source, evidence, provider, verification status, edit history, dispute, publication rights và audit log.', items: ['Verified', 'Primary source', 'Secondary source', 'According to branch genealogy', 'Oral history', 'Insufficient evidence', 'Disputed', 'Cannot conclude'] }
     ]
   },
-  privacy: {
-    key: 'privacy', title: 'Quyền riêng tư', description: 'Nguyên tắc bảo vệ dữ liệu cá nhân, dữ liệu người còn sống, gia đình và tư liệu riêng tư trong Nguyễn AI.', eyebrow: 'Privacy by design', heroTitle: 'Dữ liệu gia đình phải được bảo vệ từ thiết kế.', heroText: 'Người còn sống, thông tin liên hệ, ngày sinh đầy đủ, địa chỉ, cây gia đình và tư liệu riêng tư mặc định không công khai.', sections: [
-      { title: 'Quyền của người dùng', body: 'Hệ thống cần hỗ trợ quyền biết, đồng ý, rút lại đồng ý, truy cập, chỉnh sửa, tải xuống và yêu cầu xóa dữ liệu.' },
-      { title: 'Dữ liệu AI', body: 'Không dùng dữ liệu riêng tư để huấn luyện mô hình khi chưa có cơ sở pháp lý và đồng ý phù hợp.' }
+  docs: {
+    key: 'docs', title: 'Tài liệu — Nguyen AI Computer', description: 'Tài liệu kỹ thuật, API, SDK và hướng dẫn sử dụng.', eyebrow: 'Docs', heroTitle: 'Tài liệu kỹ thuật và hướng dẫn.', heroText: 'Tài liệu sẽ nằm tại docs.nguyenai.net khi sẵn sàng.', sections: [
+      { title: 'Tài liệu dự kiến', body: 'API reference, SDK, Agent development, Super App development, Command Pack authoring, deployment guide.', items: ['API reference', 'SDK', 'Agent development', 'Super App development', 'Command Pack authoring', 'Deployment guide'] }
     ]
   },
-  terms: {
-    key: 'terms', title: 'Điều khoản sử dụng', description: 'Điều khoản nền tảng cho Nguyễn AI trước khi điền pháp nhân và điều kiện thương mại chính thức.', eyebrow: 'Điều khoản', heroTitle: 'Sử dụng nền tảng với trách nhiệm và tôn trọng nguồn.', heroText: 'Điều khoản chính thức cần được rà soát pháp lý trước khi mở tài khoản, thanh toán hoặc lưu trữ dữ liệu gia đình thật.', sections: [
-      { title: 'Trách nhiệm nội dung', body: 'Người đóng góp chịu trách nhiệm về quyền sử dụng tư liệu, tính phù hợp của dữ liệu và tôn trọng quyền riêng tư của người liên quan.' },
-      { title: 'Không bảo đảm kết luận lịch sử', body: 'Nguyễn AI không cam kết tìm được tổ tiên, xác minh huyết thống hoặc kết luận lịch sử tuyệt đối.' }
+  research: {
+    key: 'research', title: 'Nghiên cứu — Nguyen AI Computer', description: 'Nghiên cứu có nguồn về lịch sử, văn hóa, gia phả và phương pháp xác minh.', eyebrow: 'Research', heroTitle: 'Nghiên cứu có nguồn và có kiểm chứng.', heroText: 'Mỗi bài nghiên cứu cần có tác giả, người biên tập, ngày xuất bản, ngày kiểm tra lại, danh mục nguồn và citation trong nội dung.', sections: [
+      { title: 'Chuẩn biên tập', body: 'Mỗi bài nghiên cứu cần có author, editor, publication date, review date, source list, citations, glossary, verified findings, inconclusive findings, structured data, stable URL và revision history.' }
+    ]
+  },
+  about: {
+    key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc Gen1–Gen2 và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn, kế thừa Gen1 engine và Gen2 product system.', sections: [
+      { title: 'Kiến trúc bốn lớp', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.iai.one — Academy & certification'] },
+      { title: 'Ranh giới đạo đức', body: 'Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống. Nguyen AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn.' }
     ]
   },
   contact: {
-    key: 'contact', title: 'Liên hệ Nguyễn AI', description: 'Liên hệ về nghiên cứu, hợp tác, chi họ, cộng đồng, founder network và triển khai Nguyễn AI.', eyebrow: 'Liên hệ', heroTitle: 'Cùng xây dựng hạ tầng trí tuệ di sản có nguồn.', heroText: 'Liên hệ để thảo luận hợp tác nghiên cứu, số hóa tư liệu, chương địa phương, founder network hoặc triển khai riêng cho cộng đồng.', sections: [
-      { title: 'Kênh liên hệ', body: 'Biểu mẫu liên hệ thật sẽ được nối API ở sprint sau. Giai đoạn scaffold hiện ưu tiên public SEO, cấu trúc nội dung và brand foundation.' },
-      { title: 'Thông tin cần chuẩn bị', body: 'Mục tiêu hợp tác, loại tư liệu, phạm vi cộng đồng, yêu cầu bảo mật và người đại diện có quyền quyết định.' }
+    key: 'contact', title: 'Liên hệ — Nguyen AI Computer', description: 'Liên hệ để khởi tạo AI Computer, tham gia chapter hoặc hợp tác.', eyebrow: 'Liên hệ', heroTitle: 'Liên hệ với Nguyen AI.', heroText: 'Để khởi tạo AI Computer, tham gia chapter hoặc hợp tác, vui lòng gửi thông tin qua form hoặc email.', sections: [
+      { title: 'Kênh liên hệ', body: 'Email, form liên hệ và mạng lưới chapter.', items: ['Email: hello@nguyenai.net', 'Form liên hệ', 'Chapter network'] }
     ]
   }
 };
 
 const en: Record<RouteKey, PageContent> = {
   home: {
-    key: 'home', title: 'Nguyen AI | Intelligence for the Global Nguyen Legacy', description: 'Nguyen AI is a bilingual platform for Nguyen heritage, knowledge, trusted networks and founder communities—built with cited sources, verification and privacy by design.', eyebrow: 'Heritage Intelligence Network', heroTitle: 'Intelligence connecting the global Nguyen legacy.', heroText: 'Nguyen AI helps families, branches, researchers, founders and communities preserve history, verify sources and connect generations through responsible artificial intelligence.', primaryCta: 'Explore the platform', secondaryCta: 'View methodology', sections: [
-      { title: 'Not a renamed AI Computer platform', body: 'Nguyen AI is built as a heritage intelligence network focused on sourced data, privacy, verifiable genealogy and trusted global Nguyen connections.' },
-      { title: 'Seven product pillars', body: 'The platform is organized into clear product spaces.', items: ['Nguyen Roots', 'Nguyen Memory', 'Nguyen Knowledge', 'Nguyen Trust', 'Nguyen Network', 'Nguyen Founders', 'Nguyen Chapter OS'] },
-      { title: 'Ethical boundaries', body: 'Nguyen AI does not assume all Nguyen people share one bloodline, does not claim to represent the whole community, and does not let AI confirm bloodline or royal ancestry without evidence.' }
-    ], faq: [
-      { question: 'Can Nguyen AI confirm ancestry with AI?', answer: 'No. AI can help read, organize and compare sources. Conclusions require evidence and transparent confidence levels.' },
-      { question: 'Is living-person data public?', answer: 'No. Living people, contact details and family trees are private by default and shared only with appropriate permission.' }
+    key: 'home',
+    title: 'Nguyen AI Computer | AI Computer for the Global Nguyen Generation',
+    description: 'Nguyen AI Computer is a specialized cloud AI Computer for individuals, families, founders, businesses and the global Nguyen community — with an Agent team, memory, data vault, work, business, creative, heritage and global connection tools.',
+    eyebrow: 'Nguyen AI Computer',
+    heroTitle: 'AI Computer for the Global Nguyen Generation.',
+    heroText: 'Each individual, family, founder, business and community has a private AI Computer on the cloud — with an Agent team, memory, data vault, work, business, creative, heritage and global connection tools.',
+    primaryCta: 'Initialize Nguyen AI Computer',
+    secondaryCta: 'Explore how it works',
+    sections: [
+      { title: 'Not a chatbot', body: 'Nguyen AI Computer is a personal AI Computer system on the cloud. Each user has a private instance with an Agent team, long-term memory, data vault, tools and workflows — not just single-question answers.' },
+      { title: 'Four-layer architecture', body: 'Nguyen AI Computer inherits the Gen1 core engine (computer.iai.one), the Gen2 product system (maytinhai.org), adds a dedicated Nguyen Operating Profile, and connects to the independent Academy (academy.iai.one).', items: ['Layer 1 — Gen1 core engine', 'Layer 2 — Gen2 product system', 'Layer 3 — Nguyen AI Computer', 'Layer 4 — Academy & certification'] },
+      { title: 'Rooted identity. Powerful intelligence. Global execution.', body: 'The Nguyen Operating Profile is designed for the needs of the Nguyen community: rooted identity, knowledge stewardship, founder capacity, adaptive intelligence, network intelligence, proof and trust, and generational responsibility.' }
+    ],
+    faq: [
+      { question: 'Is Nguyen AI Computer a chatbot?', answer: 'No. It is a personal AI Computer system on the cloud, with an Agent team, memory, tools and long-running workflows.' },
+      { question: 'Is genealogy the whole product?', answer: 'No. Genealogy and heritage are important Super Apps, but the product also covers work, research, creative, business, automation and global connections.' }
     ]
   },
-  about: { key: 'about', title: 'About Nguyen AI', description: 'Learn Nguyen AI positioning, brand promise and ethical boundaries.', eyebrow: 'About', heroTitle: 'Sourced heritage. Trusted connections.', heroText: 'Nguyen AI was founded to build knowledge, data and community infrastructure that helps generations understand heritage through evidence-based methods.', sections: [{ title: 'Mission', body: 'Help families and communities preserve history, digitize records, separate verified facts from oral history and connect generations with responsible AI.' }, { title: 'Brand boundary', body: 'Nguyen AI does not claim one origin for all Nguyen people and does not mythologize history for marketing.' }] },
-  roots: { key: 'roots', title: 'Nguyen Roots', description: 'A private genealogy workspace for relationships, branches, sources and conflicting records.', eyebrow: 'Nguyen Roots', heroTitle: 'Private family trees with sources and control.', heroText: 'Create family trees, manage branches, record historical and modern place names, invite relatives to confirm records and export data when needed.', sections: [{ title: 'Foundation features', body: 'Nguyen Roots prioritizes privacy and verifiability.', items: ['Private family trees', 'Multiple branches', 'Controlled GEDCOM import and export', 'Relative confirmation', 'Conflicting data records'] }, { title: 'No careless inference', body: 'The system must not connect people or branches only because names, places or unverified stories sound similar.' }] },
-  legacy: { key: 'legacy', title: 'Nguyen Memory', description: 'A digital archive for photos, documents, genealogy books, recordings and oral history.', eyebrow: 'Nguyen Memory', heroTitle: 'A heritage vault for families and branches.', heroText: 'Digitize documents, record provenance, preserve revision history and protect family ownership rights.', sections: [{ title: 'Supported materials', body: 'Photos, Hán-Nôm and Quốc ngữ genealogy books, inscriptions, birth records, marriage records, death records, diaries, audio recordings and oral-history interviews.' }, { title: 'OCR is not final proof', body: 'Machine transcription supports reading and search; it is not automatically a verified translation or proof.' }] },
-  knowledge: { key: 'knowledge', title: 'Nguyen Knowledge', description: 'A bilingual knowledge base for history, places, people, branches and research methods.', eyebrow: 'Nguyen Knowledge', heroTitle: 'Bilingual, edited and sourced knowledge.', heroText: 'Build a research library that separates verified findings, disputed topics and questions that cannot yet be concluded.', sections: [{ title: 'Foundation content', body: 'Research articles, source directories, place profiles, historical person profiles, branch studies, migration maps and genealogy terminology.' }, { title: 'Editorial standard', body: 'Each research article should include an author, editor, publication date, review date and source list.' }] },
-  network: { key: 'network', title: 'Nguyen Network', description: 'A global Nguyen community network with profiles, local groups, events and anti-impersonation controls.', eyebrow: 'Nguyen Network', heroTitle: 'Trusted community connections.', heroText: 'Discover, connect and collaborate by country, city, profession and private family group.', sections: [{ title: 'Controlled connection', body: 'Users can hide profiles, report abuse and request identity checks before publishing important information.' }, { title: 'No self-appointed representation', body: 'Nguyen Network is connection infrastructure, not an official representative body for all Nguyen people.' }] },
-  founders: { key: 'founders', title: 'Nguyen Founders', description: 'A space for founders, entrepreneurs, experts and projects created by Nguyen builders.', eyebrow: 'Nguyen Founders', heroTitle: 'A global Nguyen founder network.', heroText: 'Founder profiles, business maps, project rooms, mentors, opportunity boards and verified case studies with profile-owner approval.', sections: [{ title: 'Founding as building', body: 'Nguyen AI uses Founders to mean entrepreneurs, experts and builders, not a claim of unified bloodline.' }, { title: 'Role verification', body: 'Public profiles and verified badges appear only with owner approval and suitable verification.' }] },
-  pricing: { key: 'pricing', title: 'Nguyen AI Pricing', description: 'Draft service plans for individuals, families, founders, branches and organizations.', eyebrow: 'Pricing', heroTitle: 'Pricing by heritage space, not vague AI promises.', heroText: 'Prices are pilot hypotheses and require validation of AI, storage, support and legal costs before commercial publication.', sections: [{ title: 'Individuals and families', body: 'Open, Roots and Legacy support family preservation, verification and document management.' }, { title: 'Communities and organizations', body: 'Founder, Chapter and Global serve founders, branches, associations and large organizations.' }] },
-  methodology: { key: 'methodology', title: 'Verification Methodology', description: 'How Nguyen AI classifies claims, sources, evidence, consent, disputes and confidence.', eyebrow: 'Nguyen Trust', heroTitle: 'Every important claim needs source, status and revision history.', heroText: 'Nguyen AI separates verified facts, primary sources, secondary sources, branch genealogies, oral history, inference and disputed information.', sections: [{ title: 'Evidence scale', body: 'A: primary or multiple independent sources; B: trustworthy but incomplete; C: branch genealogy or secondary source; D: oral history, inference or unverified content.' }, { title: 'AI cannot upgrade evidence', body: 'AI may suggest confidence, but it must not turn a C or D claim into A by itself.' }] },
-  privacy: { key: 'privacy', title: 'Privacy', description: 'Principles for protecting personal data, living-person data, family trees and private archives in Nguyen AI.', eyebrow: 'Privacy by design', heroTitle: 'Family data must be protected by design.', heroText: 'Living people, contact details, full birth dates, addresses, family trees and private archives are not public by default.', sections: [{ title: 'User rights', body: 'The system should support notice, consent, consent withdrawal, access, correction, download and deletion requests.' }, { title: 'AI data', body: 'Private data must not be used to train models without suitable lawful basis and consent.' }] },
-  terms: { key: 'terms', title: 'Terms of Use', description: 'Foundational terms for Nguyen AI before legal entity and commercial terms are finalized.', eyebrow: 'Terms', heroTitle: 'Use the platform responsibly and respect sources.', heroText: 'Official terms require legal review before accounts, payments or real family data storage go live.', sections: [{ title: 'Content responsibility', body: 'Contributors are responsible for usage rights, appropriateness of data and respect for privacy.' }, { title: 'No guaranteed historical result', body: 'Nguyen AI does not guarantee ancestor discovery, bloodline verification or absolute historical conclusions.' }] },
-  contact: { key: 'contact', title: 'Contact Nguyen AI', description: 'Contact Nguyen AI for research, partnerships, branches, communities, founder network or private deployment.', eyebrow: 'Contact', heroTitle: 'Help build sourced heritage intelligence infrastructure.', heroText: 'Reach out to discuss research collaboration, archive digitization, local chapters, founder network or private community deployment.', sections: [{ title: 'Contact channel', body: 'A real contact form will be connected to the API in a later sprint. This scaffold prioritizes public SEO, content structure and brand foundation.' }, { title: 'Prepare before contacting', body: 'Collaboration goal, archive type, community scope, privacy requirements and authorized representative.' }] }
+  'ai-computer': {
+    key: 'ai-computer', title: 'AI Computer — Nguyen AI Computer', description: 'AI Computer Instance architecture: Command Center, Model Mesh, Agent Team, Super Apps, Data Vault, Memory, Workflow, Evidence, Approval Gates.', eyebrow: 'AI Computer', heroTitle: 'Each person has a private AI Computer.', heroText: 'A Nguyen AI Computer Instance includes Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine, Verification, Approval Gates, Security Boundary, Cost Governor, Audit & Replay, Sync Layer and Self-Upgrade Registry.', sections: [
+      { title: 'AI Computer Instance', body: 'Each user owns a private machine on the cloud, without sharing memory or data with others.', items: ['Identity & Ownership', 'Command Center', 'Model Mesh', 'Agent Team', 'Super Apps', 'Tool & Connector Kernel', 'Data Vault', 'Long-term Memory', 'Workflow Engine', 'Verification & Evidence', 'Approval Gates', 'Security Boundary', 'Cost Governor', 'Audit & Replay', 'Sync Layer', 'Self-Upgrade Registry'] },
+      { title: 'Operational capability', body: 'The machine can accept commands in Vietnamese, plan autonomously, select models, distribute work to Agents, call tools, execute long-running workflows, store memory, request approval, verify results and recover from errors.' }
+    ]
+  },
+  'how-it-works': {
+    key: 'how-it-works', title: 'How it works — Nguyen AI Computer', description: 'Operational flow: user command, Command Kernel, Planner, Model Router, Tool Execution, Reviewer, Evidence, Human Approval.', eyebrow: 'How it works', heroTitle: 'From command to evidence-backed result.', heroText: 'The user issues a command, the system plans, selects models, distributes work to Agents, calls tools, verifies results, stores evidence and requests approval before sensitive actions.', sections: [
+      { title: 'Operational flow', body: 'Command Kernel → Planner → Model Router → Tool Execution → Reviewer + Evidence → Human Approval.', items: ['User command', 'Command Kernel', 'Planner', 'Model Router', 'Tool Execution', 'Reviewer', 'Evidence', 'Human Approval'] }
+    ]
+  },
+  agents: {
+    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: 'Specialized Agent team: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian.', eyebrow: 'Agent Team', heroTitle: 'A specialized AI Agent team for the Nguyen ecosystem.', heroText: 'Nine default Agents operate on top of the Gen1 platform Agent team: Router, Planner, Executor, Reviewer, Security, Cost, Fact Checker, Memory Curator, Human Gate.', sections: [
+      { title: 'Specialized Agents', body: 'Each Agent has a clear role.', items: ['Nguyen Guide — Primary coordinator', 'Nguyen Researcher — Research and source synthesis', 'Nguyen Archivist — Archive management', 'Nguyen Verifier — Claim and evidence verification', 'Nguyen Family Steward — Family memory management', 'Nguyen Founder — Strategy and entrepreneurship', 'Nguyen Business Operator — Business operations', 'Nguyen Global Connector — Diaspora and network', 'Nguyen Guardian — Security, permissions, approvals'] }
+    ]
+  },
+  'super-apps': {
+    key: 'super-apps', title: 'Super Apps — Nguyen AI Computer', description: 'Seven Nguyen-specific Super Apps: Roots, Memory, Knowledge, Trust, Network, Founders, Chapter OS.', eyebrow: 'Super Apps', heroTitle: 'Specialized Super Apps for the Nguyen community.', heroText: 'Genealogy and heritage are important Super Apps, but the product also covers work, research, creative, business and automation.', sections: [
+      { title: 'Seven Nguyen Super Apps', body: 'Each Super App serves a clear use case.', items: ['Nguyen Roots', 'Nguyen Memory', 'Nguyen Knowledge', 'Nguyen Trust', 'Nguyen Network', 'Nguyen Founders', 'Nguyen Chapter OS'] },
+      { title: 'Tool families', body: 'Beyond Super Apps, the machine has full AI tools.', items: ['AI Office', 'AI Research', 'AI Browser', 'AI Content', 'AI Media', 'AI Code', 'AI Automation', 'AI Founder OS', 'AI Business OS', 'AI Sales', 'AI Finance Workspace', 'AI Legal Workspace'] }
+    ]
+  },
+  models: {
+    key: 'models', title: 'Model Mesh — Nguyen AI Computer', description: 'Multi-model Model Mesh: reasoning, research, coding, translation, vision, voice, verification — not locked to one model.', eyebrow: 'Model Mesh', heroTitle: 'Multi-model, not locked to one provider.', heroText: 'The machine selects models by reasoning, research, coding, translation, vision, voice, verification, speed, cost, privacy and provider status.', sections: [
+      { title: 'Model selection criteria', body: 'The Model Router selects models by task and constraints.', items: ['Reasoning', 'Research', 'Coding', 'Translation', 'Document extraction', 'Image understanding', 'Voice', 'Verification', 'Speed', 'Cost', 'Privacy', 'Provider status'] }
+    ]
+  },
+  'command-packs': {
+    key: 'command-packs', title: 'Command Packs — Nguyen AI Computer', description: 'Command Packs: Family Archive, Founder Launch, Investor Readiness, Business Operations, Global Community, Bilingual Publishing, Research & Evidence, Chapter Governance, Legacy Interview, SME Automation.', eyebrow: 'Command Packs', heroTitle: 'Ready-made command packs for each need.', heroText: 'A Command Pack is a bundle of workflows, Agents and tools packaged for a specific use case.', sections: [
+      { title: 'Available Command Packs', body: 'Each Pack solves a group of needs.', items: ['Family Archive Pack', 'Founder Launch Pack', 'Investor Readiness Pack', 'Business Operations Pack', 'Global Community Pack', 'Bilingual Publishing Pack', 'Research & Evidence Pack', 'Chapter Governance Pack', 'Legacy Interview Pack', 'SME Automation Pack'] }
+    ]
+  },
+  plans: {
+    key: 'plans', title: 'Plans — Nguyen AI Computer', description: 'Eight plans: Start, Personal, Family, Creator, Founder, Business, Chapter, Enterprise/Dedicated.', eyebrow: 'Plans', heroTitle: 'Plans by use case.', heroText: 'Current prices are pilot hypotheses, subject to validation of AI, storage, support and legal costs before commercial launch.', sections: [
+      { title: 'Plans', body: 'Eight plans from beginner to large organization.', items: ['Nguyen Start — Free', 'Nguyen Personal — 99,000 VND/month', 'Nguyen Family — 299,000 VND/month', 'Nguyen Creator — 499,000 VND/month', 'Nguyen Founder — 799,000 VND/month', 'Nguyen Business — 1,990,000 VND/month', 'Nguyen Chapter — 2,990,000 VND/month', 'Nguyen Enterprise/Dedicated — Custom quote'] }
+    ]
+  },
+  personal: {
+    key: 'personal', title: 'Nguyen Personal — Individual', description: 'AI Computer for individuals: work, research, creative and personal knowledge tools.', eyebrow: 'Nguyen Personal', heroTitle: 'AI Computer for individuals.', heroText: 'A private machine for work, study, creative and personal knowledge — with long-term memory and an Agent team.', sections: [
+      { title: 'Personal workspace', body: 'AI Office, AI Research, AI Content, AI Media and personal knowledge management in a private instance.' }
+    ]
+  },
+  family: {
+    key: 'family', title: 'Nguyen Family — Family', description: 'AI Computer for multi-generation families: genealogy, archive, oral history, family memory.', eyebrow: 'Nguyen Family', heroTitle: 'AI Computer for multi-generation families.', heroText: 'Preserve roots, heritage, artifacts and family memory in a private Data Vault with generation-based access control.', sections: [
+      { title: 'Super Apps for family', body: 'Nguyen Roots, Nguyen Memory and Nguyen Family Steward serve family needs.', items: ['Private family tree', 'Digital archive', 'Oral history', 'Long-term family memory', 'Generation-based access'] }
+    ]
+  },
+  creator: {
+    key: 'creator', title: 'Nguyen Creator — Creator', description: 'AI Computer for creators: bilingual content, SEO, multi-channel, media.', eyebrow: 'Nguyen Creator', heroTitle: 'AI Computer for creators.', heroText: 'Create bilingual content, schedule editorial, publish multi-channel and manage media assets.', sections: [
+      { title: 'Creative tools', body: 'AI Content, AI Media and Bilingual Publishing Pack serve creators.', items: ['Bilingual content', 'SEO', 'Social media', 'Newsletter', 'Editorial calendar', 'Multi-channel publishing'] }
+    ]
+  },
+  founder: {
+    key: 'founder', title: 'Nguyen Founder — Founder', description: 'AI Computer for founders: strategy, pitch deck, fundraising, KPI, board report.', eyebrow: 'Nguyen Founder', heroTitle: 'AI Computer for founders.', heroText: 'AI Founder OS supports vision, strategy, roadmap, decision log, pitch deck, investor brief, fundraising and KPI.', sections: [
+      { title: 'Founder OS', body: 'Tools for project builders.', items: ['Vision & strategy', 'Roadmap', 'Decision log', 'Pitch deck', 'Investor brief', 'Fundraising', 'KPI', 'Board report'] },
+      { title: 'Investor Readiness Pack', body: 'A Command Pack that helps founders prepare for fundraising: investor brief, financial model, data room and diligence.' }
+    ]
+  },
+  business: {
+    key: 'business', title: 'Nguyen Business — Business', description: 'AI Computer for businesses: operations, SOP, CRM, finance, legal, automation.', eyebrow: 'Nguyen Business', heroTitle: 'AI Computer for businesses.', heroText: 'AI Business OS, AI Sales, AI Finance Workspace and AI Legal Workspace serve business operations.', sections: [
+      { title: 'Business OS', body: 'Tools for businesses.', items: ['Operations', 'SOP', 'Task management', 'Internal knowledge', 'Customer care', 'Reporting', 'Automation'] },
+      { title: 'Finance & Legal', body: 'AI Finance Workspace and AI Legal Workspace support analysis, not licensed advisory services.' }
+    ]
+  },
+  chapter: {
+    key: 'chapter', title: 'Nguyen Chapter — Branch & Community', description: 'AI Computer for branches, associations and communities: member management, governance, events, documents, funds.', eyebrow: 'Nguyen Chapter', heroTitle: 'AI Computer for branches and communities.', heroText: 'Nguyen Chapter OS provides member management, governance, events, documents, funds, private chapter AI and a dedicated website.', sections: [
+      { title: 'Chapter OS', body: 'An operating system for branches and communities.', items: ['Member management', 'Governance', 'Events', 'Documents', 'Funds and minutes', 'Private chapter AI', 'Dedicated website', 'Permission and audit'] }
+    ]
+  },
+  enterprise: {
+    key: 'enterprise', title: 'Nguyen Enterprise — Large organization', description: 'Dedicated AI Computer for large organizations: dedicated deployment, white-label, API, enterprise archive.', eyebrow: 'Nguyen Enterprise', heroTitle: 'Dedicated AI Computer for large organizations.', heroText: 'Dedicated deployment, white-label, API gateway, enterprise archive and full data control within the organization boundary.', sections: [
+      { title: 'Enterprise capabilities', body: 'For large organizations.', items: ['Dedicated deployment', 'White-label', 'API gateway', 'Enterprise archive', 'Custom Agent', 'SSO', 'Audit log', 'SLA'] }
+    ]
+  },
+  heritage: {
+    key: 'heritage', title: 'Heritage — Heritage', description: 'Heritage Super Apps: Nguyen Roots, Nguyen Memory, Nguyen Knowledge — genealogy, archive, sourced knowledge.', eyebrow: 'Heritage', heroTitle: 'Heritage is a Super App, not the whole product.', heroText: 'Genealogy, archive and sourced knowledge are important Super Apps within Nguyen AI Computer.', sections: [
+      { title: 'Heritage Super Apps', body: 'Nguyen Roots, Nguyen Memory and Nguyen Knowledge serve heritage needs.', items: ['Private genealogy', 'Digital archive', 'Bilingual knowledge', 'Source and evidence', 'Oral history'] },
+      { title: 'Ethics', body: 'Nguyen AI does not assume all Nguyen people share one bloodline, does not claim to represent the entire community, and does not let AI confirm ancestry or royal lineage without evidence.' }
+    ]
+  },
+  network: {
+    key: 'network', title: 'Network — Network', description: 'Global Nguyen community network: individuals, experts, founders, chapters, diaspora.', eyebrow: 'Network', heroTitle: 'Trusted community connections.', heroText: 'Nguyen Network connects individuals, experts, founders, chapters, diaspora, events and trusted connections.', sections: [
+      { title: 'Controlled connections', body: 'Users can hide profiles, report abuse and request identity verification before publishing important information.' }
+    ]
+  },
+  academy: {
+    key: 'academy', title: 'Academy — Training and certification', description: 'Independent Academy at academy.iai.one, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
+      { title: 'Independent Academy', body: 'Academy remains at academy.iai.one, separate from the product brand to ensure certification independence.' }
+    ]
+  },
+  security: {
+    key: 'security', title: 'Security — Security', description: 'Security Boundary, Approval Gates, Cost Governor, Audit & Replay, permissions and approvals.', eyebrow: 'Security', heroTitle: 'Security, permissions and approvals.', heroText: 'Every sensitive action requires approval, every access is audited, all data stays within the user boundary.', sections: [
+      { title: 'Security mechanisms', body: 'Security Boundary, Approval Gates, Cost Governor, Audit & Replay.', items: ['Approval before sensitive actions', 'Audit log for every access', 'Cost governor limits', 'Role-based permissions', 'Recovery and replay'] }
+    ]
+  },
+  trust: {
+    key: 'trust', title: 'Trust — Trust', description: 'Claim, source, evidence, verification, dispute, confidence, audit.', eyebrow: 'Trust', heroTitle: 'Every important piece of information needs source and evidence.', heroText: 'Nguyen Trust is a claim-source-evidence system with verification, dispute, confidence labels and audit log.', sections: [
+      { title: 'Claim-source-evidence', body: 'Every important claim needs source, evidence, provider, verification status, edit history, dispute, publication rights and audit log.', items: ['Verified', 'Primary source', 'Secondary source', 'According to branch genealogy', 'Oral history', 'Insufficient evidence', 'Disputed', 'Cannot conclude'] }
+    ]
+  },
+  docs: {
+    key: 'docs', title: 'Docs — Nguyen AI Computer', description: 'Technical documentation, API, SDK and user guides.', eyebrow: 'Docs', heroTitle: 'Technical documentation and guides.', heroText: 'Documentation will be available at docs.nguyenai.net when ready.', sections: [
+      { title: 'Expected documentation', body: 'API reference, SDK, Agent development, Super App development, Command Pack authoring, deployment guide.', items: ['API reference', 'SDK', 'Agent development', 'Super App development', 'Command Pack authoring', 'Deployment guide'] }
+    ]
+  },
+  research: {
+    key: 'research', title: 'Research — Nguyen AI Computer', description: 'Sourced research on history, culture, genealogy and verification methodology.', eyebrow: 'Research', heroTitle: 'Sourced and verified research.', heroText: 'Each research article needs author, editor, publication date, review date, source list and in-body citations.', sections: [
+      { title: 'Editorial standard', body: 'Each research article needs author, editor, publication date, review date, source list, citations, glossary, verified findings, inconclusive findings, structured data, stable URL and revision history.' }
+    ]
+  },
+  about: {
+    key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, Gen1–Gen2 architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, inheriting the Gen1 engine and Gen2 product system.', sections: [
+      { title: 'Four-layer architecture', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.iai.one — Academy & certification'] },
+      { title: 'Ethical boundaries', body: 'The Nguyen Operating Profile is an operating profile, not a bloodline. Nguyen AI does not claim a single origin for all Nguyen people.' }
+    ]
+  },
+  contact: {
+    key: 'contact', title: 'Contact — Nguyen AI Computer', description: 'Contact to initialize an AI Computer, join a chapter or partner.', eyebrow: 'Contact', heroTitle: 'Contact Nguyen AI.', heroText: 'To initialize an AI Computer, join a chapter or partner, please send information via form or email.', sections: [
+      { title: 'Contact channels', body: 'Email, contact form and chapter network.', items: ['Email: hello@nguyenai.net', 'Contact form', 'Chapter network'] }
+    ]
+  }
 };
 
-export const pages = { vi, en } as const;
+export const pages: Record<Locale, Record<RouteKey, PageContent>> = { vi, en };
 
-export function getPage(locale: Locale, key: RouteKey) {
-  return pages[locale][key];
+export function pageFor(key: RouteKey, locale: Locale): PageContent {
+  return pages[locale][key] ?? pages[locale].home;
+}
+
+export function getPage(locale: Locale, key: RouteKey): PageContent {
+  return pageFor(key, locale);
 }

@@ -1,8 +1,8 @@
-# Nguyễn AI / Nguyen AI — Investor Memorandum v1.0
+# Nguyễn AI / Nguyen AI — Investor Memorandum v1.1
 
 **Domain:** nguyenai.net  
 **Investor site:** invest.nguyenai.net  
-**Version:** 1.0  
+**Version:** 1.1 — AI Computer vertical thesis  
 **Date:** 2026-07-01  
 **Status:** PRIVATE INVESTOR BRIEF — NOT A PUBLIC OFFERING  
 **Classification:** Confidential — for qualified investors only
@@ -17,27 +17,43 @@ Information in this memorandum does not constitute an offer to sell securities, 
 
 ## 1. Strategic verdict
 
-Nguyen AI can become a notable investment opportunity if positioned as:
+Nguyen AI Computer is a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community, built on a reusable Gen1 execution engine and Gen2 product system, with a dedicated Nguyen Operating Profile.
 
-> Heritage intelligence, family data and verified community infrastructure — starting from the Nguyen community, then expanding into a digital heritage platform for Vietnamese people and global communities.
+> Nguyen AI is an AI Computer platform verticalized on a reusable engine. The first specialized market is the global Nguyen community, including individuals, families, founders, businesses and organizations. This architecture can then expand to other cultural, professional and community verticals without rebuilding the core runtime.
 
 Not positioned as:
 
-- a genealogy website;
-- a Nguyen surname social network;
-- a history library;
+- a genealogy website only;
+- a Nguyen surname social network only;
+- a history library only;
 - a chatbot;
 - a clone of Ancestry or MyHeritage.
 
-Investment value lies in combining:
+Value layers:
 
-1. Family graph
-2. Source and evidence graph
-3. Digital archive
-4. Private family AI
-5. Chapter SaaS
-6. Founder network
-7. Privacy and verification infrastructure
+1. Gen1 core engine
+2. Gen2 product system
+3. Nguyen vertical
+4. Memory and data moat
+5. Agent and command-pack IP
+6. Founder/community network
+7. Academy proof and certification
+8. Enterprise deployment
+
+Broader scope does NOT automatically increase valuation. Valuation must be proven by real runtime, active users, paid plans, retention, cost, security, IP, pilots and revenue.
+
+---
+
+## 2. Four-layer architecture
+
+| Layer | System | Function |
+|---|---|---|
+| 1 | `computer.iai.one` | Gen1 core engine — runtime, agent, model routing, memory, tool, workflow, evidence |
+| 2 | `maytinhai.org` | Gen2 public product system — package, sell, operate AI Computers |
+| 3 | `nguyenai.net` | Nguyen AI Computer — specialized line with Nguyen Operating Profile |
+| 4 | `academy.iai.one` | Academy and independent certification |
+
+Nguyen AI inherits Gen1 and Gen2, then adds dedicated Agents, Super Apps, Memory Schema, workflows, network, family/founder/business/chapter intelligence, brand and experience.
 
 ---
 
@@ -48,7 +64,9 @@ Family history has proven it can build large subscription and data businesses.
 - Blackstone acquired Ancestry at enterprise value ~4.7 billion USD. At the time, Ancestry had 3.6M+ subscribers, 1B+ USD annual revenue, operating in 30+ countries. Source: Blackstone press release.
 - Francisco Partners describes MyHeritage as a genealogy platform with 90M+ users, billions of historical records, 42 languages. Reported acquisition ~600M USD in 2021. Source: Francisco Partners.
 
-This does not mean Nguyen AI should be valued comparably. These deals only prove that family data, historical content, subscription and network effects can create large enterprise value.
+The broader AI personal computing and agentic cloud infrastructure market is also growing rapidly, with vertical AI SaaS, productivity, SME automation, creator tools and private knowledge systems as adjacent categories. Nguyen AI competes across these categories with a verticalized AI Computer approach.
+
+This does not mean Nguyen AI should be valued comparably. These deals only prove that family data, historical content, subscription, network effects and agentic AI can create large enterprise value.
 
 ---
 
@@ -65,9 +83,9 @@ Assuming 31.5%:
 
 This is identity audience, not paying customers. The memorandum separates:
 
-- TAM: global family history and heritage intelligence market.
-- SAM: Nguyen families, diaspora, branches, organizations and founder network.
-- SOM: achievable paying customers within 36 months.
+- TAM: global AI personal computing + family history + heritage intelligence + vertical AI SaaS.
+- SAM: Nguyen individuals, families, founders, businesses, chapters, diaspora, organizations.
+- SOM: achievable paying customers within 36 months across consumer, founder, business and chapter plans.
 
 ---
 
@@ -138,19 +156,22 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 
 ## 6. Revenue model
 
-Six subscription tiers:
+Eight subscription tiers (AI Computer plans):
 
-| Plan | Draft price |
-|---|---:|
-| Open | Free |
-| Roots | 99,000 VND/month |
-| Legacy | 299,000 VND/month |
-| Founder | 799,000 VND/month |
-| Chapter | 2,990,000 VND/month |
-| Global | Custom quote |
+| Plan | Draft price | Audience |
+|---|---:|---|
+| Nguyen Start | Free | Beginners |
+| Nguyen Personal | 99,000 VND/month | Individuals |
+| Nguyen Family | 299,000 VND/month | Multi-generation families |
+| Nguyen Creator | 499,000 VND/month | Creators |
+| Nguyen Founder | 799,000 VND/month | Founders |
+| Nguyen Business | 1,990,000 VND/month | Businesses |
+| Nguyen Chapter | 2,990,000 VND/month | Branches, associations, communities |
+| Nguyen Enterprise/Dedicated | Custom quote | Large organizations |
 
 Additional revenue:
 
+- Command Packs (Founder Launch, Investor Readiness, Business Operations, etc.);
 - archive digitization;
 - genealogy migration;
 - private heritage AI;
@@ -169,12 +190,14 @@ Do not include DNA, NFT, token or data sale in the early-stage model.
 
 Pre-seed capital should be used to reach:
 
-- production MVP;
+- production MVP (AI Computer Console + public site);
 - 50 founding families;
 - 10 chapter pilots or LOIs;
-- first paid users;
+- first paid users across Personal/Family/Founder/Business plans;
 - source-claim-evidence operating;
 - AI answers with citations;
+- Agent team running on Gen1 runtime;
+- Model Mesh with at least 3 providers;
 - 1,000-5,000 initial users;
 - diaspora pilot;
 - privacy and security audit;
@@ -244,7 +267,7 @@ All private areas must:
 
 **Description**
 
-> Nguyen AI kết hợp gia phả, kho tư liệu, nguồn dẫn, quyền riêng tư, AI có kiểm chứng và mạng lưới cộng đồng — bắt đầu từ hàng chục triệu người mang họ Nguyễn trên toàn cầu.
+> Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.
 
 **Primary CTA**
 
@@ -262,18 +285,18 @@ All private areas must:
 
 ## 10. Investor deck — 16 slides
 
-1. Cover — Nguyen AI, Heritage Intelligence Network.
-2. Problem — family data is scattered, unsourced, unprotected.
-3. Opportunity — 33-34M identity audience, proven market.
-4. Solution — heritage intelligence platform with sourced claims.
-5. Product — 7 pillars (Roots, Memory, Knowledge, Trust, Network, Founders, Chapter OS).
-6. Moat — family graph + evidence graph + private AI + community.
-7. Market — TAM/SAM/SOM.
-8. Business model — 6 tiers + add-on services.
-9. Traction — MVP status, founding families target, chapter pilots.
+1. Cover — Nguyen AI Computer, specialized cloud AI Computer for the global Nguyen ecosystem.
+2. Problem — work, research, business, heritage and family data are scattered, unsourced, unprotected and not automated.
+3. Opportunity — 33-34M identity audience + broader AI personal computing market.
+4. Solution — verticalized AI Computer with Agent team, Model Mesh, Super Apps, evidence and approval gates.
+5. Product — AI Computer Instance architecture + 7 Nguyen Super Apps + tool families.
+6. Moat — Gen1 engine + Gen2 product + Nguyen vertical + memory/data + Agent IP + network + Academy.
+7. Market — TAM/SAM/SOM across AI computing, family history, vertical SaaS.
+8. Business model — 8 plans + Command Packs + add-on services.
+9. Traction — MVP status, founding families target, chapter pilots, Agent runtime.
 10. Roadmap — 18 months to seed-ready.
-11. Go-to-market — Vietnam-first, diaspora second, global third.
-12. Competition — vs Ancestry, MyHeritage, generic AI tools.
+11. Go-to-market — Vietnam-first, diaspora second, global third, chapter-led.
+12. Competition — vs Ancestry, MyHeritage, generic AI tools, vertical SaaS.
 13. Team and advisors.
 14. Financial projections — 5-year hypothesis.
 15. The ask — 500K USD at 3M pre-money.
@@ -336,9 +359,9 @@ Do not publish invest.nguyenai.net before:
 
 The professional and defensible presentation is:
 
-> Nguyen AI raises 500,000 USD at a proposed 3M USD pre-money, conditional on completing MVP, establishing IP ownership, having real pilots and passing technical-privacy-legal audit.
+> Nguyen AI raises 500,000 USD at a proposed 3M USD pre-money, conditional on completing MVP (AI Computer Console + public site), establishing IP ownership, having real pilots and passing technical-privacy-legal audit.
 
-This valuation reflects platform potential without exceeding what a pre-seed project without traction can defend.
+This valuation reflects platform potential across AI computing, vertical SaaS, family history and community software, without exceeding what a pre-seed project without traction can defend.
 
 ---
 
@@ -351,4 +374,4 @@ This valuation reflects platform potential without exceeding what a pre-seed pro
 
 ---
 
-*End of Investor Memorandum v1.0*
+*End of Investor Memorandum v1.1*

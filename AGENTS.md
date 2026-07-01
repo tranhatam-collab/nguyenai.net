@@ -1,11 +1,12 @@
 # Nguyễn AI / Nguyen AI
 
-Heritage Intelligence Network for Nguyen heritage, genealogy, sourced knowledge, trusted communities and global founder networks.
+Nguyen AI Computer — a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community. Each user owns a private AI Computer Instance with multi-model intelligence, an Agent team, tools, memory, data vault, workflows, evidence, approval gates and a secure execution environment. Heritage and genealogy are important Super Apps, not the whole product.
 
 ## Source of truth
 
 Read these before making product, brand, SEO, privacy or architecture changes:
 
+- `docs/NGUYEN_AI_COMPUTER_MASTER_POSITIONING_GEN1_GEN2.md` — LOCKED positioning
 - `docs/NGUYEN_AI_MASTER_FOUNDATION.md`
 - `docs/brand/NGUYEN_AI_BRAND_CHARTER.md`
 - `docs/brand/NGUYEN_AI_BRAND_CODEX.md`
@@ -18,7 +19,6 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/investor/NGUYEN_AI_INVESTOR_SITE_PLAN.md`
 - `docs/investor/NGUYEN_AI_INVESTOR_DECK.md`
 - `docs/investor/NGUYEN_AI_FINANCIAL_MODEL_HYPOTHESIS.md`
-- `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
 
 ## Brand lock
 
@@ -42,17 +42,38 @@ Do not use as public brand names:
 
 ## Strategic positioning
 
-Nguyen AI is a Heritage Intelligence Network. It is not a renamed Máy Tính AI, not an AI Computer catalog, and not a generic AI productivity tool.
+Nguyen AI Computer is a specialized cloud AI Computer line for the global Nguyen ecosystem, built on the Gen1 core engine (`computer.iai.one`) and Gen2 product system (`maytinhai.org`), with a dedicated Nguyen Operating Profile. It is NOT only a genealogy site, NOT only a heritage network, NOT a chatbot, and NOT a generic AI tool catalog.
 
-Approved product pillars:
+Four-layer architecture:
 
-- Nguyen Roots — Cội Nguồn
-- Nguyen Memory — Di Sản
-- Nguyen Knowledge — Tri Thức
-- Nguyen Trust — Minh Chứng
-- Nguyen Network — Kết Nối
-- Nguyen Founders — Sáng Lập
-- Nguyen Chapter OS — Chi Họ và Cộng Đồng
+- Layer 1 — `computer.iai.one` — Gen1 core engine (runtime, agent, model routing, memory, tool, workflow, evidence)
+- Layer 2 — `maytinhai.org` — Gen2 public product system (package, sell, operate AI Computers)
+- Layer 3 — `nguyenai.net` — Nguyen AI Computer (specialized line with Nguyen Operating Profile)
+- Layer 4 — `academy.iai.one` — Academy and certification
+
+Approved product pillars (Super Apps + tool families):
+
+- AI Office, AI Research, AI Browser, AI Content, AI Media, AI Code, AI Automation
+- AI Founder OS, AI Business OS, AI Sales, AI Finance Workspace, AI Legal Workspace
+- Nguyen Roots, Nguyen Memory, Nguyen Knowledge, Nguyen Trust, Nguyen Network, Nguyen Founders, Nguyen Chapter OS
+
+Approved Agent team:
+
+- Nguyen Guide, Nguyen Researcher, Nguyen Archivist, Nguyen Verifier, Nguyen Family Steward, Nguyen Founder, Nguyen Business Operator, Nguyen Global Connector, Nguyen Guardian
+
+Approved plans:
+
+- Nguyen Start, Nguyen Personal, Nguyen Family, Nguyen Creator, Nguyen Founder, Nguyen Business, Nguyen Chapter, Nguyen Enterprise/Dedicated
+
+Approved domains:
+
+- `nguyenai.net` — public brand and product
+- `app.nguyenai.net` — AI Computer Console
+- `admin.nguyenai.net` — administration
+- `docs.nguyenai.net` — documentation
+- `invest.nguyenai.net` — investors
+- `status.nguyenai.net` — service status
+- `api.nguyenai.net` — API gateway
 
 ## Ethics and historical boundaries
 
@@ -60,7 +81,11 @@ Never imply that all Nguyen people share one bloodline, descend from Nguyễn B�
 
 Never claim AI can confirm ancestry, royal lineage or bloodline. Use evidence labels and uncertainty language.
 
+"Nguyen Operating Profile" refers to an operating profile, value system, dataset, toolset, Agent team and workflow designed for the needs of the Nguyen community — NOT bloodline, genetics, superiority, royal descent or shared ancestry.
+
 Required labels include: verified, primary source, secondary source, according to branch genealogy, oral history, insufficient evidence, disputed, cannot conclude.
+
+Financial and legal tools support analysis only, not licensed advisory services.
 
 ## Privacy defaults
 
@@ -81,11 +106,12 @@ Required labels include: verified, primary source, secondary source, according t
 
 ## Technical status
 
-Current state at creation of this file:
+Current state:
 
-- Source code: unverified / not yet scaffolded in this workspace.
+- Public website: scaffolded (Astro static, 24 bilingual routes).
+- AI Computer runtime: not yet scaffolded in this workspace (inherits Gen1 from `computer.iai.one`).
 - Live runtime: unverified.
-- Brand and product plan: ready for founder lock.
+- Brand and product plan: locked via Master Positioning Gen1–Gen2.
 - Production release: not approved.
 
 ## Recommended stack
@@ -105,7 +131,7 @@ Do not approve production release without:
 
 - repository identity;
 - source inventory;
-- clone contamination audit for maytinhai / Máy Tính AI / computer.iai.one / AI Computer terms;
+- clone contamination audit for maytinhai / Máy Tính AI / computer.iai.one / AI Computer terms (note: "AI Computer" is now an approved product category per Master Positioning, but "Máy Tính AI" and "computer.iai.one" must not appear as Nguyen AI brand surfaces);
 - security audit;
 - privacy/data audit;
 - bilingual SEO audit;

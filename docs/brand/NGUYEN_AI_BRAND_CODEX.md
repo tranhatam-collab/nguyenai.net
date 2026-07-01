@@ -6,6 +6,7 @@ Approved:
 
 - Nguyễn AI in Vietnamese copy.
 - Nguyen AI in English copy.
+- Nguyen AI Computer as the product category name.
 - nguyenai in code identifiers, package names and URLs.
 - nguyenai.net as the canonical domain.
 

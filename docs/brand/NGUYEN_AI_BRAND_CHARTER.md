@@ -4,25 +4,30 @@
 
 - Vietnamese name: Nguyễn AI
 - English name: Nguyen AI
+- Product category: Nguyen AI Computer
 - Domain: nguyenai.net
 - Founder: Trần Hà Tâm
-- Category: Heritage Intelligence Network
+- Category: Specialized cloud AI Computer line for the global Nguyen ecosystem
 
 ## Positioning
 
 Vietnamese:
 
-> Nguyễn AI là nền tảng trí tuệ di sản và mạng lưới toàn cầu, giúp các gia đình, dòng họ, nhà nghiên cứu, nhà sáng lập và cộng đồng mang họ Nguyễn lưu giữ lịch sử, kiểm chứng nguồn tư liệu, kết nối thế hệ và kiến tạo giá trị mới bằng trí tuệ nhân tạo có trách nhiệm.
+> Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt dành cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu. Mỗi người sở hữu một AI Computer Instance riêng với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.
 
 English:
 
-> Nguyen AI is a heritage intelligence and global network platform helping Nguyen families, researchers, founders and communities preserve history, verify sources, connect generations and create new value through responsible artificial intelligence.
+> Nguyen AI Computer is a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community. Each user owns a private AI Computer Instance with an Agent team, memory, data vault, work tools, business tools, creative tools, heritage tools and global connections.
 
 ## Brand promise
 
-> Di sản có nguồn. Kết nối có niềm tin. Trí tuệ phục vụ nhiều thế hệ.
+> Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.
 
-> Sourced heritage. Trusted connections. Intelligence for generations.
+> Rooted identity. Powerful intelligence. Global execution.
+
+## Primary H1
+
+> Máy Tính AI của thế hệ Nguyễn toàn cầu.
 
 ## Tone of voice
 
@@ -35,7 +40,10 @@ Nguyen AI must sound:
 - modern;
 - non-mythologizing;
 - privacy-first;
-- evidence-driven.
+- evidence-driven;
+- capable;
+- operational;
+- agentic.
 
 Do not sound:
 
@@ -44,7 +52,9 @@ Do not sound:
 - absolute;
 - self-appointed;
 - pseudo-historical;
-- AI-hype driven.
+- AI-hype driven;
+- chatbot-like;
+- genealogy-only.
 
 ## Correct sample language
 

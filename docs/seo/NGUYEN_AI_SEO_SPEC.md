@@ -1,5 +1,7 @@
 # Nguyễn AI / Nguyen AI — Bilingual SEO Spec
 
+> Subordinate to `docs/NGUYEN_AI_COMPUTER_MASTER_POSITIONING_GEN1_GEN2.md`.
+
 ## Language architecture
 
 | Language | Route |
@@ -11,89 +13,120 @@ Do not use query-string language switching, IP-only automatic redirects, shared 
 
 Each language version must have a distinct URL, reciprocal hreflang, self-referencing hreflang, canonical URL and x-default.
 
-## Public sitemap
+## Public sitemap (AI Computer structure)
 
 Vietnamese:
 
 ```text
 /
-/gioi-thieu/
-/coi-nguon/
-/di-san/
-/tri-thuc/
-/ket-noi/
-/sang-lap/
-/goi-dich-vu/
-/thu-vien/
-/nghien-cuu/
-/phuong-phap-xac-minh/
-/bao-mat/
-/quyen-rieng-tu/
-/dieu-khoan/
-/lien-he/
+/ai-computer/
+/how-it-works/
+/agents/
+/super-apps/
+/models/
+/command-packs/
+/plans/
+/personal/
+/family/
+/creator/
+/founder/
+/business/
+/chapter/
+/enterprise/
+/heritage/
+/network/
+/academy/
+/security/
+/trust/
+/docs/
+/research/
+/about/
+/contact/
 ```
 
 English:
 
 ```text
 /en/
-/en/about/
-/en/roots/
-/en/legacy/
-/en/knowledge/
+/en/ai-computer/
+/en/how-it-works/
+/en/agents/
+/en/super-apps/
+/en/models/
+/en/command-packs/
+/en/plans/
+/en/personal/
+/en/family/
+/en/creator/
+/en/founder/
+/en/business/
+/en/chapter/
+/en/enterprise/
+/en/heritage/
 /en/network/
-/en/founders/
-/en/pricing/
-/en/library/
-/en/research/
-/en/methodology/
+/en/academy/
 /en/security/
-/en/privacy/
-/en/terms/
+/en/trust/
+/en/docs/
+/en/research/
+/en/about/
 /en/contact/
 ```
 
-Private app routes must be authenticated, server-side access controlled, noindex and excluded from public sitemap.
+Private app routes (`app.nguyenai.net`, `admin.nguyenai.net`) must be authenticated, server-side access controlled, noindex and excluded from public sitemap.
 
 ## Homepage metadata
 
 Vietnamese title:
 
-> Nguyễn AI | Trí tuệ kết nối di sản Nguyễn toàn cầu
+> Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu
 
 Vietnamese description:
 
-> Nguyễn AI là nền tảng song ngữ về cội nguồn, di sản, tri thức, mạng lưới và cộng đồng sáng lập mang họ Nguyễn, được xây dựng trên nguyên tắc nguồn dẫn, xác minh và quyền riêng tư.
+> Nguyen AI Computer là Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.
 
 English title:
 
-> Nguyen AI | Intelligence for the Global Nguyen Legacy
+> Nguyen AI Computer | AI Computer for the Global Nguyen Generation
 
 English description:
 
-> Nguyen AI is a bilingual platform for Nguyen heritage, knowledge, trusted networks and founder communities—built with cited sources, verification and privacy by design.
+> Nguyen AI Computer is a specialized cloud AI Computer for individuals, families, founders, businesses and the global Nguyen community — with an Agent team, memory, data vault, work, business, creative, heritage and global connection tools.
 
 ## Keyword clusters
 
 Vietnamese:
 
+- Máy Tính AI;
+- Máy Tính AI cá nhân;
+- Máy Tính AI đám mây;
+- AI Computer;
+- AI Agent;
+- đội ngũ AI Agent;
 - họ Nguyễn;
 - lịch sử họ Nguyễn;
 - gia phả họ Nguyễn;
 - dòng họ Nguyễn;
 - nguồn gốc họ Nguyễn;
 - chi họ Nguyễn;
-- gia phả Việt Nam;
 - số hóa gia phả;
 - AI gia phả;
-- nghiên cứu gia phả;
 - cộng đồng họ Nguyễn;
 - người họ Nguyễn trên thế giới;
 - doanh nhân họ Nguyễn;
-- nhà sáng lập họ Nguyễn.
+- nhà sáng lập họ Nguyễn;
+- AI cho doanh nghiệp;
+- AI cho gia đình;
+- AI cho founder;
+- tự động hóa AI;
+- workflow AI.
 
 English:
 
+- AI Computer;
+- personal AI Computer;
+- cloud AI Computer;
+- AI Agent team;
 - Nguyen family history;
 - Nguyen genealogy;
 - Nguyen surname history;
@@ -104,18 +137,25 @@ English:
 - Nguyen family archive;
 - AI genealogy assistant;
 - Nguyen founders;
-- Vietnamese diaspora history.
+- Vietnamese diaspora history;
+- AI for business;
+- AI for families;
+- AI for founders;
+- AI automation;
+- AI workflow.
 
 ## Content pillars
 
-1. History and origins.
-2. Genealogy and research methodology.
-3. Documents and archives.
-4. People and events.
-5. Branches and local communities.
-6. Nguyen diaspora.
-7. Entrepreneurs and founders.
-8. AI, data and privacy.
+1. AI Computer concept and architecture.
+2. Agent team and Model Mesh.
+3. Super Apps and tool families.
+4. Plans and Command Packs.
+5. Heritage and genealogy (as Super Apps).
+6. Founder and business tools.
+7. Network and community.
+8. Security, privacy and trust.
+9. Academy and certification.
+10. Research and evidence methodology.
 
 Do not auto-generate thousands of thin person pages without sources or consent.
 
@@ -125,8 +165,9 @@ Use only when visible page content supports it:
 
 - Organization;
 - WebSite;
-- WebPage;
+- WebSiteApplication (AI Computer);
 - SoftwareApplication;
+- WebPage;
 - Article;
 - BreadcrumbList;
 - Person, only with lawful public information and consent where required;
