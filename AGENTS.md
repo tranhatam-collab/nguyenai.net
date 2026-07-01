@@ -14,6 +14,11 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/privacy/NGUYEN_AI_PRIVACY_DATA_MAP.md`
 - `docs/security/NGUYEN_AI_AI_SAFETY_POLICY.md`
 - `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
+- `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`
+- `docs/investor/NGUYEN_AI_INVESTOR_SITE_PLAN.md`
+- `docs/investor/NGUYEN_AI_INVESTOR_DECK.md`
+- `docs/investor/NGUYEN_AI_FINANCIAL_MODEL_HYPOTHESIS.md`
+- `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
 
 ## Brand lock
 
@@ -107,6 +112,19 @@ Do not approve production release without:
 - accessibility audit;
 - commerce audit if payments exist;
 - release evidence pack.
+
+## Investor site rules (invest.nguyenai.net)
+
+- Source of truth: `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`.
+- Public investor pages are indexable with canonical and hreflang.
+- Private investor room routes must be noindex, nofollow, noarchive and excluded from sitemap.
+- Never expose cap table, bank account or term sheet in public HTML.
+- Investor qualification required before private room access.
+- Audit log every private room access.
+- Access must be expiring and revocable.
+- Disclosure line required on every public investor page.
+- Do not publish invest.nguyenai.net before legal entity, IP ownership and disclaimer review are complete.
+- Financial model is hypothesis only, not a forecast or commitment.
 
 ## Dev commands
 
