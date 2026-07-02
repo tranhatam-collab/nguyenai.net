@@ -1,5 +1,38 @@
 import type { Locale, RouteKey } from './site';
 
+export type PricingPlan = {
+  name: string;
+  code: string;
+  price: string;
+  period?: string;
+  target: string;
+  features: string[];
+  cta?: string;
+  highlighted?: boolean;
+};
+
+export type ComparisonColumn = { label: string; highlight?: boolean };
+export type ComparisonRow = { label: string; values: string[] };
+
+export type FeatureCard = { name: string; description: string; tag?: string };
+
+export type DemoScenario = {
+  title: string;
+  user: string;
+  command: string;
+  steps: string[];
+  result: string;
+};
+
+export type CtaBanner = {
+  title: string;
+  body: string;
+  primaryCta?: string;
+  primaryHref?: string;
+  secondaryCta?: string;
+  secondaryHref?: string;
+};
+
 export type PageContent = {
   key: RouteKey;
   title: string;
@@ -10,6 +43,11 @@ export type PageContent = {
   primaryCta?: string;
   secondaryCta?: string;
   sections: Array<{ title: string; body: string; items?: string[] }>;
+  featureGrid?: { title: string; body?: string; cards: FeatureCard[] };
+  comparisonTable?: { title: string; body?: string; columns: ComparisonColumn[]; rows: ComparisonRow[] };
+  pricingTable?: { title: string; body?: string; plans: PricingPlan[] };
+  demoScenarios?: { title: string; body?: string; scenarios: DemoScenario[] };
+  ctaBanner?: CtaBanner;
   faq?: Array<{ question: string; answer: string }>;
 };
 
@@ -25,7 +63,7 @@ const vi: Record<RouteKey, PageContent> = {
     secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
       { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi.' },
-      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký (academy.nguyenai.net).', items: ['Lớp 1 — Gen1 core engine', 'Lớp 2 — Gen2 product system', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
+      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer sở hữu backend riêng độc lập với @nai/* packages (auth, runtime, agents, memory, evidence, billing), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy giữ tại academy.nguyenai.net, cung cấp học AI cho người đăng ký.', items: ['Lớp 1 — Backend độc lập (@nai/* packages)', 'Lớp 2 — Nguyen Operating Profile', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
       { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
     faq: [
@@ -144,8 +182,8 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   about: {
-    key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc Gen1–Gen2 và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn, kế thừa Gen1 engine và Gen2 product system.', sections: [
-      { title: 'Kiến trúc bốn lớp', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
+    key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc backend độc lập và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn, sở hữu backend riêng độc lập với @nai/* packages.', sections: [
+      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — backend độc lập', 'Nguyen Operating Profile — hồ sơ vận hành', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ranh giới đạo đức', body: 'Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống. Nguyen AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn.' }
     ]
   },
@@ -157,10 +195,10 @@ const vi: Record<RouteKey, PageContent> = {
   invest: {
     key: 'invest',
     title: 'Đầu tư — Nguyen AI Computer | Cơ hội đầu tư giai đoạn Seed',
-    description: 'Nguyen AI đang gọi vốn Seed 500K–1M USD, định giá 1.5–3M USD pre-money. Đầu tư qua chuyển khoản ngân hàng Việt Nam hoặc chuyển khoản quốc tế. Xác minh danh tính qua Google + verify.iai.one, bảo mật 2 bước cho phòng đầu tư.',
+    description: 'Nguyen AI đang gọi vốn Seed 500K–1M USD, định giá 1.5–3M USD pre-money. Đầu tư qua chuyển khoản ngân hàng Việt Nam hoặc chuyển khoản quốc tế. Xác minh danh tính qua Google + Nguyen AI Identity, bảo mật 2 bước cho phòng đầu tư.',
     eyebrow: 'Đầu tư',
     heroTitle: 'Cơ hội đầu tư Seed — Nguyen AI Computer.',
-    heroText: 'Nguyen AI đang gọi vốn Seed 500K–1M USD với định giá 1.5–3M USD pre-money. Nhà đầu tư xác minh danh tính qua Google Login + verify.iai.one, thanh toán qua QR chuyển khoản, và truy cập phòng đầu tư sau khi hoàn tất bảo mật 2 bước.',
+    heroText: 'Nguyen AI đang gọi vốn Seed 500K–1M USD với định giá 1.5–3M USD pre-money. Nhà đầu tư xác minh danh tính qua Google Login + Nguyen AI Identity, thanh toán qua QR chuyển khoản, và truy cập phòng đầu tư sau khi hoàn tất bảo mật 2 bước.',
     primaryCta: 'Yêu cầu truy cập phòng đầu tư',
     secondaryCta: 'Tải hồ sơ đầu tư',
     sections: [
@@ -168,15 +206,15 @@ const vi: Record<RouteKey, PageContent> = {
       { title: 'Thực thể pháp lý', body: 'VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống, sở hữu IP. Kasan JSC (Việt Nam) chỉ là đại diện thương mại đăng ký theo luật Việt Nam để vận hành an toàn, phát hành VAT, tuân thủ PDPD.', items: ['Mỹ: VIET CAN NEW CORP — thực thể pháp lý chính, sở hữu IP, chịu trách nhiệm hoàn toàn', 'Việt Nam: Kasan JSC — đại diện thương mại, đăng ký theo luật VN, an toàn vận hành', 'Mã số thuế VN: 0315521422', 'Tra cứu MST: masothue.com/0315521422', 'Kasan JSC không sở hữu IP, không chịu trách nhiệm pháp lý chính yếu', 'SAFE / Convertible Note phát hành bởi VIET CAN NEW CORP cho mọi nhà đầu tư'] },
       { title: 'Thanh toán đầu tư — Chuyển khoản Việt Nam (VND)', body: 'Nhà đầu tư trong Việt Nam thanh toán qua chuyển khoản ngân hàng đến đại diện thương mại. Nội dung chuyển khoản bắt buộc ghi rõ mục đích đầu tư.', items: ['Số tài khoản: 3051378', 'Ngân hàng: ACB — Chi nhánh Hồ Chí Minh', 'Chủ tài khoản: Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan', 'Vai trò: Đại diện thương mại cho VIET CAN NEW CORP tại Việt Nam', 'Nội dung CK (bắt buộc): "INVEST NGUYENAI.NET" hoặc "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"', 'Trách nhiệm pháp lý: thuộc VIET CAN NEW CORP (Hoa Kỳ)', 'Sau khi chuyển khoản, gửi biên lai qua email đầu tư để xác nhận'] },
       { title: 'Thanh toán đầu tư — Chuyển khoản quốc tế (USD)', body: 'Nhà đầu tư quốc tế thanh toán trực tiếp VIET CAN NEW CORP — thực thể pháp lý chính.', items: ['Thực thể nhận: VIET CAN NEW CORP (Mỹ) — thực thể pháp lý chính', 'Loại tiền: USD', 'Thông tin wire transfer: cung cấp sau xác minh', 'Nhà đầu tư quốc tế liên hệ invest@nguyenai.net để nhận hướng dẫn'] },
-      { title: 'Quy trình xác minh nhà đầu tư', body: 'Mọi nhà đầu tư phải hoàn tất xác minh danh tính trước khi truy cập phòng đầu tư riêng.', items: ['Bước 1: Đăng nhập bằng Google (OAuth)', 'Bước 2: Khai báo họ tên thật + ngày tháng năm sinh', 'Bước 3: Xác minh danh tính qua verify.iai.one', 'Bước 4: Thanh toán đầu tư (QR chuyển khoản VN hoặc wire USD)', 'Bước 5: Kích hoạt bảo mật 2 bước (TOTP hoặc SMS)', 'Bước 6: Truy cập phòng đầu tư riêng (data room, tài chính, cap table)'] },
-      { title: 'Bảo mật phòng đầu tư', body: 'Phòng đầu tư riêng được bảo vệ nghiêm ngặt theo chính sách quản trị.', items: ['Bắt buộc xác minh danh tính qua verify.iai.one', 'Bắt buộc bảo mật 2 bước (TOTP hoặc SMS)', 'Mọi lượt truy cập được ghi audit log', 'Quyền truy cập có hạn (90 ngày), có thể thu hồi', 'Không công khai cap table, tài khoản ngân hàng hoặc term sheet trên HTML public', 'Trang riêng: noindex, nofollow, noarchive, loại khỏi sitemap'] },
+      { title: 'Quy trình xác minh nhà đầu tư', body: 'Mọi nhà đầu tư phải hoàn tất xác minh danh tính trước khi truy cập phòng đầu tư riêng.', items: ['Bước 1: Đăng nhập bằng Google (OAuth)', 'Bước 2: Khai báo họ tên thật + ngày tháng năm sinh', 'Bước 3: Xác minh danh tính qua Nguyen AI Identity', 'Bước 4: Thanh toán đầu tư (QR chuyển khoản VN hoặc wire USD)', 'Bước 5: Kích hoạt bảo mật 2 bước (TOTP hoặc SMS)', 'Bước 6: Truy cập phòng đầu tư riêng (data room, tài chính, cap table)'] },
+      { title: 'Bảo mật phòng đầu tư', body: 'Phòng đầu tư riêng được bảo vệ nghiêm ngặt theo chính sách quản trị.', items: ['Bắt buộc xác minh danh tính qua Nguyen AI Identity', 'Bắt buộc bảo mật 2 bước (TOTP hoặc SMS)', 'Mọi lượt truy cập được ghi audit log', 'Quyền truy cập có hạn (90 ngày), có thể thu hồi', 'Không công khai cap table, tài khoản ngân hàng hoặc term sheet trên HTML public', 'Trang riêng: noindex, nofollow, noarchive, loại khỏi sitemap'] },
       { title: 'Cơ hội đầu tư', body: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn toàn cầu — 32 triệu người họ Nguyễn trên thế giới.', items: ['Thị trường: 32 triệu người họ Nguyễn toàn cầu', 'Sản phẩm: 9 Model máy + 9 Functional Products (xem Product Catalog 9×9)', 'Doanh thu: subscription Model + add-on Functional Product + Academy', 'Lợi thế: di sản + tri thức + kết nối cộng đồng + AI Computer runtime', 'Roadmap: MVP 18 tuần, production release sau Sprint P3'] },
       { title: 'Tuyên bố pháp lý', body: 'Thông tin trên trang này không cấu thành lời chào bán chứng khoán, cam kết lợi nhuận hoặc tư vấn đầu tư. Mọi đầu tư có rủi ro. Chỉ nhà đầu tư đủ điều kiện sau xác minh mới truy cập tài liệu đầy đủ.' }
     ],
     faq: [
       { question: 'Tôi có thể đầu tư bao nhiêu?', answer: 'Tối thiểu 25.000 USD hoặc tương đương VND. Khoảng đầu tư linh hoạt tùy nhà đầu tư chiến lược.' },
       { question: 'Tôi thanh toán bằng cách nào?', answer: 'Nhà đầu tư Việt Nam: chuyển khoản ngân hàng đến số TK 3051378 (ACB CN HCM) với nội dung "INVEST NGUYENAI.NET". Nhà đầu tư quốc tế: wire transfer USD qua VIET CAN NEW CORP sau khi xác minh.' },
-      { question: 'Tại sao phải xác minh danh tính?', answer: 'Để bảo vệ nhà đầu tư và tuân thủ quy định. Xác minh qua Google Login + verify.iai.one đảm bảo danh tính thật, và bảo mật 2 bước bảo vệ phòng đầu tư khỏi truy cập trái phép.' },
+      { question: 'Tại sao phải xác minh danh tính?', answer: 'Để bảo vệ nhà đầu tư và tuân thủ quy định. Xác minh qua Google Login + Nguyen AI Identity đảm bảo danh tính thật, và bảo mật 2 bước bảo vệ phòng đầu tư khỏi truy cập trái phép.' },
       { question: 'Phòng đầu tư riêng có gì?', answer: 'Data room, mô hình tài chính 5 năm, cap table, báo cáo audit kỹ thuật, IP ownership, báo cáo security, hợp đồng pháp lý, và lịch họp với founder.' },
       { question: 'Thực thể pháp lý nào chịu trách nhiệm?', answer: 'VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống, sở hữu IP. Kasan JSC (MST 0315521422) chỉ là đại diện thương mại tại Việt Nam — đăng ký theo luật VN, phát hành VAT, tuân thủ PDPD,但不 chịu trách nhiệm pháp lý chính yếu.' }
     ]
@@ -195,7 +233,7 @@ const en: Record<RouteKey, PageContent> = {
     secondaryCta: 'Explore how it works',
     sections: [
       { title: 'Not a chatbot', body: 'Nguyen AI Computer is a personal AI Computer system on the cloud. Each user has a private instance with an Agent team, long-term memory, data vault, tools and workflows — not just single-question answers.' },
-      { title: 'Four-layer architecture', body: 'Nguyen AI Computer inherits the Gen1 core engine (computer.iai.one), the Gen2 product system (maytinhai.org), adds a dedicated Nguyen Operating Profile, and connects to the independent Academy (academy.nguyenai.net).', items: ['Layer 1 — Gen1 core engine', 'Layer 2 — Gen2 product system', 'Layer 3 — Nguyen AI Computer', 'Layer 4 — Academy & certification'] },
+      { title: 'Four-layer architecture', body: 'Nguyen AI Computer owns an independent backend with @nai/* packages (auth, runtime, agents, memory, evidence, billing), adds a dedicated Nguyen Operating Profile, and connects to the Academy (academy.nguyenai.net).', items: ['Layer 1 — Independent backend (@nai/* packages)', 'Layer 2 — Nguyen Operating Profile', 'Layer 3 — Nguyen AI Computer', 'Layer 4 — Academy & certification'] },
       { title: 'Rooted identity. Powerful intelligence. Global execution.', body: 'The Nguyen Operating Profile is designed for the needs of the Nguyen community: rooted identity, knowledge stewardship, founder capacity, adaptive intelligence, network intelligence, proof and trust, and generational responsibility.' }
     ],
     faq: [
@@ -314,8 +352,8 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   about: {
-    key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, Gen1–Gen2 architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, inheriting the Gen1 engine and Gen2 product system.', sections: [
-      { title: 'Four-layer architecture', body: 'Gen1 core engine, Gen2 product system, Nguyen AI Computer, Academy.', items: ['computer.iai.one — Gen1 core engine', 'maytinhai.org — Gen2 product system', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
+    key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, independent backend architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, owning an independent backend with @nai/* packages.', sections: [
+      { title: 'Four-layer architecture', body: 'Independent backend, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — independent backend', 'Nguyen Operating Profile — operating profile', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ethical boundaries', body: 'The Nguyen Operating Profile is an operating profile, not a bloodline. Nguyen AI does not claim a single origin for all Nguyen people.' }
     ]
   },
@@ -327,10 +365,10 @@ const en: Record<RouteKey, PageContent> = {
   invest: {
     key: 'invest',
     title: 'Invest — Nguyen AI Computer | Seed Round Opportunity',
-    description: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Invest via Vietnamese bank transfer or international wire. Identity verification via Google + verify.iai.one, 2FA required for investor room.',
+    description: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Invest via Vietnamese bank transfer or international wire. Identity verification via Google + Nguyen AI Identity, 2FA required for investor room.',
     eyebrow: 'Invest',
     heroTitle: 'Seed Round Opportunity — Nguyen AI Computer.',
-    heroText: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Investors verify identity via Google Login + verify.iai.one, pay via QR bank transfer, and access the investor room after completing 2FA.',
+    heroText: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Investors verify identity via Google Login + Nguyen AI Identity, pay via QR bank transfer, and access the investor room after completing 2FA.',
     primaryCta: 'Request investor room access',
     secondaryCta: 'Download investor brief',
     sections: [
@@ -338,15 +376,15 @@ const en: Record<RouteKey, PageContent> = {
       { title: 'Legal entities', body: 'VIET CAN NEW CORP (US) bears full legal responsibility for founding, operating the system, and owns all IP. Kasan JSC (Vietnam) is a commercial representative registered under Vietnam law for safe local operations, VAT invoicing, and PDPD compliance. Kasan JSC does not own IP and does not bear primary legal liability.', items: ['US: VIET CAN NEW CORP — primary legal entity, owns IP, bears full legal responsibility', 'Vietnam: Kasan JSC — commercial representative, registered under VN law, safe operations', 'VN Tax ID: 0315521422', 'Tax lookup: masothue.com/0315521422', 'Kasan JSC does not own IP, does not bear primary legal liability', 'SAFE / Convertible Note issued by VIET CAN NEW CORP to all investors'] },
       { title: 'Payment — Vietnam bank transfer (VND)', body: 'Vietnam-based investors pay via bank transfer to the commercial representative. Transfer content must state the investment purpose.', items: ['Account number: 3051378', 'Bank: ACB — Ho Chi Minh Branch', 'Account holder: Kasan Education Investment & Tourism Journey JSC', 'Role: Commercial representative for VIET CAN NEW CORP in Vietnam', 'Transfer memo (required): "INVEST NGUYENAI.NET" or "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"', 'Legal liability: belongs to VIET CAN NEW CORP (US)', 'After transfer, email the receipt to invest@nguyenai.net for confirmation'] },
       { title: 'Payment — International wire (USD)', body: 'International investors pay directly to VIET CAN NEW CORP — the primary legal entity.', items: ['Receiving entity: VIET CAN NEW CORP (US) — primary legal entity', 'Currency: USD', 'Wire details: provided after verification', 'International investors contact invest@nguyenai.net for instructions'] },
-      { title: 'Investor verification flow', body: 'All investors must complete identity verification before accessing the private investor room.', items: ['Step 1: Sign in with Google (OAuth)', 'Step 2: Provide full legal name + date of birth', 'Step 3: Identity verification via verify.iai.one', 'Step 4: Investment payment (VN QR transfer or USD wire)', 'Step 5: Enable 2FA (TOTP or SMS)', 'Step 6: Access private investor room (data room, financials, cap table)'] },
-      { title: 'Investor room security', body: 'The private investor room is strictly protected per governance policy.', items: ['Identity verification required via verify.iai.one', '2FA required (TOTP or SMS)', 'Every access logged in audit trail', 'Access is expiring (90 days) and revocable', 'No cap table, bank account or term sheet in public HTML', 'Private routes: noindex, nofollow, noarchive, excluded from sitemap'] },
+      { title: 'Investor verification flow', body: 'All investors must complete identity verification before accessing the private investor room.', items: ['Step 1: Sign in with Google (OAuth)', 'Step 2: Provide full legal name + date of birth', 'Step 3: Identity verification via Nguyen AI Identity', 'Step 4: Investment payment (VN QR transfer or USD wire)', 'Step 5: Enable 2FA (TOTP or SMS)', 'Step 6: Access private investor room (data room, financials, cap table)'] },
+      { title: 'Investor room security', body: 'The private investor room is strictly protected per governance policy.', items: ['Identity verification required via Nguyen AI Identity', '2FA required (TOTP or SMS)', 'Every access logged in audit trail', 'Access is expiring (90 days) and revocable', 'No cap table, bank account or term sheet in public HTML', 'Private routes: noindex, nofollow, noarchive, excluded from sitemap'] },
       { title: 'Investment opportunity', body: 'Nguyen AI Computer is a specialized cloud AI Computer line for the global Nguyen ecosystem — 32 million Nguyen people worldwide.', items: ['Market: 32 million Nguyen people worldwide', 'Product: 9 AI Computer Models + 9 Functional Products (see Product Catalog 9×9)', 'Revenue: Model subscription + Functional Product add-on + Academy', 'Moat: heritage + knowledge + community network + AI Computer runtime', 'Roadmap: MVP 18 weeks, production release after Sprint P3'] },
       { title: 'Legal disclaimer', body: 'Information on this page does not constitute an offer to sell securities, a profit guarantee or investment advice. All investments carry risk. Only qualified investors who complete verification may access full documentation.' }
     ],
     faq: [
       { question: 'How much can I invest?', answer: 'Minimum 25,000 USD or VND equivalent. Investment size is flexible for strategic investors.' },
       { question: 'How do I pay?', answer: 'Vietnam investors: bank transfer to account 3051378 (ACB HCM Branch) with memo "INVEST NGUYENAI.NET". International investors: USD wire via VIET CAN NEW CORP after verification.' },
-      { question: 'Why is identity verification required?', answer: 'To protect investors and comply with regulations. Google Login + verify.iai.one ensures real identity, and 2FA protects the investor room from unauthorized access.' },
+      { question: 'Why is identity verification required?', answer: 'To protect investors and comply with regulations. Google Login + Nguyen AI Identity ensures real identity, and 2FA protects the investor room from unauthorized access.' },
       { question: 'What is in the private investor room?', answer: 'Data room, 5-year financial model, cap table, technical audit reports, IP ownership, security reports, legal contracts, and meeting scheduling with the founder.' },
       { question: 'Which legal entity bears legal responsibility?', answer: 'VIET CAN NEW CORP (US) bears full legal responsibility for founding, operating the system, and owns all IP. Kasan JSC (Tax ID 0315521422) is a commercial representative in Vietnam — registered under VN law, issues VAT, complies with PDPD, but does not bear primary legal liability.' }
     ]

@@ -43,6 +43,7 @@ const faqJsonLd = page.faq?.length ? {
   }))
 } : undefined;
 ---
+
 <BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd}>
   <section class="hero section-wrap">
     <div class="eyebrow">{page.eyebrow}</div>
@@ -69,6 +70,106 @@ const faqJsonLd = page.faq?.length ? {
       </article>
     ))}
   </section>
+
+  {page.featureGrid && (
+    <section class="section-wrap feature-section" aria-label={page.featureGrid.title}>
+      <div class="eyebrow">{page.featureGrid.title}</div>
+      {page.featureGrid.body && <p class="section-intro">{page.featureGrid.body}</p>}
+      <div class="feature-grid">
+        {page.featureGrid.cards.map((card) => (
+          <article class="feature-card">
+            {card.tag && <span class="feature-tag">{card.tag}</span>}
+            <h3>{card.name}</h3>
+            <p>{card.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {page.comparisonTable && (
+    <section class="section-wrap comparison-section" aria-label={page.comparisonTable.title}>
+      <div class="eyebrow">{page.comparisonTable.title}</div>
+      {page.comparisonTable.body && <p class="section-intro">{page.comparisonTable.body}</p>}
+      <div class="table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th></th>
+              {page.comparisonTable.columns.map((col) => (
+                <th class={col.highlight ? 'highlight' : ''}>{col.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {page.comparisonTable.rows.map((row) => (
+              <tr>
+                <td class="row-label">{row.label}</td>
+                {row.values.map((val, i) => (
+                  <td class={(page.comparisonTable!.columns[i]?.highlight) ? 'highlight' : ''}>{val}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
+  {page.pricingTable && (
+    <section class="section-wrap pricing-section" aria-label={page.pricingTable.title}>
+      <div class="eyebrow">{page.pricingTable.title}</div>
+      {page.pricingTable.body && <p class="section-intro">{page.pricingTable.body}</p>}
+      <div class="pricing-grid">
+        {page.pricingTable.plans.map((plan) => (
+          <article class={`pricing-card${plan.highlighted ? ' highlighted' : ''}`}>
+            <header>
+              <h3>{plan.name}</h3>
+              <div class="price">{plan.price}{plan.period && <span class="period">{plan.period}</span>}</div>
+              <p class="target">{plan.target}</p>
+            </header>
+            <ul>
+              {plan.features.map((f) => <li>{f}</li>)}
+            </ul>
+            {plan.cta && <a class="button primary" href={routeFor('contact', locale)}>{plan.cta}</a>}
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {page.demoScenarios && (
+    <section class="section-wrap demo-section" aria-label={page.demoScenarios.title}>
+      <div class="eyebrow">{page.demoScenarios.title}</div>
+      {page.demoScenarios.body && <p class="section-intro">{page.demoScenarios.body}</p>}
+      <div class="demo-grid">
+        {page.demoScenarios.scenarios.map((scenario) => (
+          <article class="demo-card">
+            <h3>{scenario.title}</h3>
+            <div class="demo-user">{scenario.user}</div>
+            <div class="demo-command">{scenario.command}</div>
+            <ol>
+              {scenario.steps.map((step) => <li>{step}</li>)}
+            </ol>
+            <div class="demo-result">{scenario.result}</div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {page.ctaBanner && (
+    <section class="cta-banner" aria-label={page.ctaBanner.title}>
+      <div class="section-wrap">
+        <h2>{page.ctaBanner.title}</h2>
+        <p>{page.ctaBanner.body}</p>
+        <div class="hero-actions">
+          {page.ctaBanner.primaryCta && <a class="button primary" href={page.ctaBanner.primaryHref || routeFor('ai-computer', locale)}>{page.ctaBanner.primaryCta}</a>}
+          {page.ctaBanner.secondaryCta && <a class="button secondary" href={page.ctaBanner.secondaryHref || routeFor('contact', locale)}>{page.ctaBanner.secondaryCta}</a>}
+        </div>
+      </div>
+    </section>
+  )}
 
   {page.faq && (
     <section class="section-wrap faq">

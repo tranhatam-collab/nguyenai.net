@@ -7,3 +7,5 @@ dist/
 .DS_Store
 .devin/research-drive/
 .wrangler/
+.turbo/
+apps/*/.turbo/
