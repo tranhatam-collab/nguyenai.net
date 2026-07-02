@@ -1,20 +1,27 @@
 {
-  "brand": "Nguyen AI",
-  "version": "1.0.0",
-  "fontFamilies": {
-    "sans": ["Be Vietnam Pro", "Inter", "system-ui", "sans-serif"],
-    "serif": ["Noto Serif", "Georgia", "serif"],
-    "mono": ["JetBrains Mono", "SFMono-Regular", "Consolas", "monospace"]
+  "ui": {
+    "family": "Be Vietnam Pro",
+    "weights": [
+      400,
+      500,
+      700
+    ],
+    "fallback": "Inter, system-ui, sans-serif"
   },
-  "usage": {
-    "ui": "sans",
-    "longFormHistory": "serif",
-    "codeAndEvidenceIds": "mono"
+  "editorial": {
+    "family": "Noto Serif",
+    "weights": [
+      400,
+      700
+    ],
+    "fallback": "Georgia, serif"
   },
-  "rules": [
-    "Vietnamese diacritics must render correctly.",
-    "Do not use calligraphic fonts for long-form content.",
-    "Limit webfont weights for performance.",
-    "Always provide system fallbacks."
-  ]
+  "mono": {
+    "family": "JetBrains Mono",
+    "weights": [
+      400,
+      500
+    ],
+    "fallback": "Consolas, monospace"
+  }
 }

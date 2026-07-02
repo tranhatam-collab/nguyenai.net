@@ -1,0 +1,16 @@
+/* Nguyen AI founder-locked brand tokens */
+:root {
+  --nai-deep-navy: #072B5C;
+  --nai-royal-blue: #0D62C6;
+  --nai-sky-blue: #159EE4;
+  --nai-cyan: #22BDC9;
+  --nai-teal: #18A9AD;
+  --nai-ink: #11233D;
+  --nai-muted: #657489;
+  --nai-border: #DDE6EE;
+  --nai-surface: #F7FAFC;
+  --nai-white: #FFFFFF;
+  --nai-font-ui: "Be Vietnam Pro", Inter, system-ui, sans-serif;
+  --nai-font-editorial: "Noto Serif", Georgia, serif;
+  --nai-font-mono: "JetBrains Mono", Consolas, monospace;
+}

@@ -1,26 +1,22 @@
 {
-  "brand": "Nguyen AI",
-  "version": "1.0.0",
-  "tokens": {
-    "heritageRed": "#7A1F2B",
-    "deepIndigo": "#0F2742",
-    "bronzeGold": "#C89B3C",
-    "jadeGreen": "#1F6D5A",
-    "parchment": "#F4EBDD",
-    "ink": "#161A1D",
-    "warmWhite": "#FFFDF8"
+  "brand-source-of-truth": "Founder-selected NAI infinity logo, 2026-07-02",
+  "primary": {
+    "deep-navy": "#072B5C",
+    "royal-blue": "#0D62C6",
+    "sky-blue": "#159EE4",
+    "cyan": "#22BDC9",
+    "teal": "#18A9AD",
+    "ink": "#11233D",
+    "muted": "#657489",
+    "border": "#DDE6EE",
+    "surface": "#F7FAFC",
+    "white": "#FFFFFF"
   },
   "usage": {
-    "primaryBackground": "warmWhite",
-    "primaryText": "ink",
-    "heroBackground": "deepIndigo",
-    "primaryAccent": "heritageRed",
-    "secondaryAccent": "bronzeGold",
-    "trustAccent": "jadeGreen",
-    "editorialSurface": "parchment"
-  },
-  "accessibility": {
-    "standard": "WCAG 2.2",
-    "note": "All component-level foreground/background pairs must be tested before release."
+    "logo-background": "#FFFFFF",
+    "primary-text": "#11233D",
+    "primary-action": "#0D62C6",
+    "technology-accent": "#22BDC9",
+    "trust-accent": "#18A9AD"
   }
 }
