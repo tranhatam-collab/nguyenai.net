@@ -4,8 +4,27 @@ Nguyen AI Computer — a specialized cloud AI Computer line for individuals, fam
 
 ## Source of truth
 
-Read these before making product, brand, SEO, privacy or architecture changes:
+Read these before making product, brand, SEO, privacy or architecture changes.
 
+### Governance Lock (Sprint 0 — BINDING, overrides all prior docs)
+
+- `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` — architecture + layer responsibilities
+- `docs/governance/BRAND_SURFACE_MATRIX.md` — brand surface classification
+- `docs/governance/PRODUCT_BOUNDARY_CONTRACT.md` — 5 commercial objects
+- `docs/governance/IDENTITY_AND_TENANCY_RFC.md` — shared identity contract
+- `docs/governance/ENTITLEMENT_MODEL.md` — plan→entitlement mapping
+- `docs/governance/DATA_CLASSIFICATION_AND_RETENTION.md` — 15 data classes
+- `docs/governance/INVESTOR_ACCESS_POLICY.md` — private room gating
+- `docs/governance/NGUYEN_AI_FOUNDER_VERDICT_2026-07-02.md` — Founder verdict
+- `docs/governance/NGUYEN_AI_ECOSYSTEM_AUDIT_4_REPOS_2026-07-02.md` — 4-repo audit
+- `docs/governance/QA_AUDIT_TOTAL_PLAN_2026-07-02.md` — QA audit of total plan
+- `docs/governance/PRODUCT_CATALOG_9x9.md` — 9 Models + 9 Functional Products (BINDING)
+- `docs/governance/DEV_TEAM_INTEGRATION_PLAN.md` — Dev team plan + 41 tool inventory (BINDING)
+
+### Strategy + Investor (canonical)
+
+- `docs/NGUYEN_AI_MASTER_MARKET_POSITIONING_INVESTMENT_STRATEGY_V3_2026.md` — LOCKED Master Strategy V3.0
+- `docs/investor/HO_SO_KEU_GOI_DAU_TU_CHIEN_LUOC_NGUYEN_AI_TIENG_VIET_V1.md` — Hồ sơ đầu tư VI V1.0
 - `docs/NGUYEN_AI_COMPUTER_MASTER_POSITIONING_GEN1_GEN2.md` — LOCKED positioning
 - `docs/NGUYEN_AI_MASTER_FOUNDATION.md`
 - `docs/brand/NGUYEN_AI_BRAND_CHARTER.md`
@@ -15,7 +34,6 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/privacy/NGUYEN_AI_PRIVACY_DATA_MAP.md`
 - `docs/security/NGUYEN_AI_AI_SAFETY_POLICY.md`
 - `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
-- `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md` — LOCKED valuation
 - `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`
 - `docs/investor/NGUYEN_AI_INVESTOR_SITE_PLAN.md`
 - `docs/investor/NGUYEN_AI_INVESTOR_DECK.md`
@@ -25,6 +43,10 @@ Read these before making product, brand, SEO, privacy or architecture changes:
 - `docs/legal/NGUYEN_AI_IP_AGREEMENT_TEMPLATE.md`
 - `docs/legal/NGUYEN_AI_DATA_ROOM_PLAN.md`
 - `docs/architecture/NGUYEN_AI_GEN2_INTEGRATION_PLAN.md`
+
+### Superseded (giữ làm tham khảo lịch sử, không sử dụng cho quyết định mới)
+
+- `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md` — SUPERSEDED by V3.0 + Hồ sơ VI V1.0
 
 ## Brand lock
 
@@ -78,7 +100,7 @@ Approved domains:
 - `admin.nguyenai.net` — administration
 - `docs.nguyenai.net` — documentation
 - `invest.nguyenai.net` — investors
-- `academy.nguyenai.net` — Academy (free AI learning for subscribers)
+- `academy.nguyenai.net` — Academy (paid Academy Pass, separate entitlement)
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 

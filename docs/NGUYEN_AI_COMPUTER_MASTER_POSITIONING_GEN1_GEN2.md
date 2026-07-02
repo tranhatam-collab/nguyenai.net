@@ -15,7 +15,9 @@
 ## 1. Four-layer architecture
 
 ```text
-LAYER 4 — ACADEMY & CERTIFICATION`nacademy.nguyenai.net`nFree AI learning for all subscribers. Teach users to master, verify and operate the computer.
+LAYER 4 — ACADEMY & CERTIFICATION
+academy.nguyenai.net
+Standalone paid Academy Pass, certification and mastery tracks.
 
 LAYER 3 — NGUYEN AI COMPUTER
 nguyenai.net
@@ -544,10 +546,9 @@ Plan names differ from the generic maytinhai.org system but share billing and en
 - `admin.nguyenai.net` — administration
 - `docs.nguyenai.net` — documentation
 - `invest.nguyenai.net` — investors
+- `academy.nguyenai.net` — Academy (paid Academy Pass)
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
-
-Academy remains at `academy.nguyenai.net`, with a dedicated track for Nguyen AI Computer.
 
 ---
 

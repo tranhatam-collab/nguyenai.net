@@ -6,7 +6,7 @@
 
 | Assumption | Value |
 |---|---|
-| Identity audience | 33-34M |
+| Identity audience | ~32 million |
 | Year 1 target users | 1,000-5,000 |
 | Year 3 target users | 50,000-150,000 |
 | Year 5 target users | 300,000-800,000 |

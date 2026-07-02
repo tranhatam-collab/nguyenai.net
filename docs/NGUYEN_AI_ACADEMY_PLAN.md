@@ -6,9 +6,9 @@
 
 ## Purpose
 
-Academy is the onboarding, certification and retention layer of Nguyen AI Computer. It provides free AI learning to all subscribers, with a dedicated track for Nguyen AI Computer operation.
+Academy is the onboarding, certification and retention layer of Nguyen AI Computer. It provides AI learning through a standalone paid Academy Pass, separate from machine subscription, with a dedicated track for Nguyen AI Computer operation.
 
-Academy is NOT a separate paid product. It is included with every subscription plan and serves as:
+Academy is a separate paid product governed by the `academy.pass` entitlement (see `ENTITLEMENT_MODEL.md` §2.2). It is **not** included with any subscription plan by default. It serves as:
 
 - onboarding for new users;
 - skill building for Agent operation;
@@ -19,7 +19,7 @@ Academy is NOT a separate paid product. It is included with every subscription p
 ## Domain
 
 - `academy.nguyenai.net` — Academy platform
-- Integrated with `app.nguyenai.net` for subscriber authentication
+- Integrated with shared identity / SSO via `auth.nguyenai.net` and its relying parties
 - Certification verifiable at `academy.nguyenai.net/verify/`
 
 ## Learning tracks
@@ -169,11 +169,10 @@ Academy is NOT a separate paid product. It is included with every subscription p
 
 ## Business model
 
-- Academy is free for all subscribers
-- Certification exams are free for paid plans
-- Free plan users can access lessons but certification requires at least Nguyen Personal
+- Academy requires paid Academy Pass (separate entitlement from machine subscription)
+- Certification exams have separate Certification Fee per attempt (see `ENTITLEMENT_MODEL.md` §2.3)
 - Enterprise and Chapter can request custom tracks
-- Academy is a retention tool, not a revenue line
+- Academy is both a retention tool and a revenue line
 
 ## Success metrics
 

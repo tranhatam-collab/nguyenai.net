@@ -16,7 +16,7 @@
 
 ## Slide 3 — Opportunity
 
-- 33-34M identity audience (Nguyen surname, Vietnam + diaspora).
+- ~32M identity audience (Nguyen surname, Vietnam + diaspora).
 - Family history market proven: Ancestry 4.7B, MyHeritage ~600M.
 - AI agent market growing but needs real workflows, cost control, evidence.
 - Nguyen name is distribution wedge; AI Computer utility is retention.
@@ -26,7 +26,7 @@
 - Verticalized AI Computer with Agent team, Model Mesh, Super Apps, evidence and approval gates.
 - Each user owns a private AI Computer Instance.
 - Inherits Gen1 engine + Gen2 commerce system.
-- Free Academy for all subscribers.
+- Separate paid Academy Pass with independent certification.
 
 ## Slide 5 — Product
 
@@ -55,7 +55,7 @@
 
 - 8 plans: Start (free), Personal, Family, Creator, Founder, Business, Chapter, Enterprise.
 - Command Packs + add-on services.
-- Academy free for all subscribers.
+- Academy paid (separate Academy Pass + Certification Fee).
 - No DNA, NFT, token or data sale.
 
 ## Slide 9 — Traction
@@ -106,10 +106,13 @@
 
 ## Slide 15 — The ask
 
-- 750,000 USD at 4.5M USD pre-money.
-- 14.29% dilution.
-- 18 month runway.
-- Use of funds breakdown (9 categories).
+> **⚠️ Updated 2026-07-02 per V3.0:**
+
+- Pre-beta: 500K–750K USD at 3,5–5M USD pre-money.
+- Post-beta: 1M USD at 6M USD pre-money (7M post-money).
+- ~14.29% dilution (post-beta round).
+- 18–24 month runway.
+- Use of funds breakdown (9 categories, see Hồ sơ VI §XX).
 - IP ownership structure (HoldCo or direct transfer).
 
 ## Slide 16 — Closing

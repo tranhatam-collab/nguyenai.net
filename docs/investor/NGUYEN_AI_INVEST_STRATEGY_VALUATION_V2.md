@@ -1,8 +1,24 @@
 # Nguyễn AI Computer — Investment Strategy & Valuation V2.0
 
-**Version:** 2.0  
+> **⚠️ SUPERSEDED — 2026-07-02**
+>
+> Tài liệu này đã được thay thế bởi:
+> - `docs/NGUYEN_AI_MASTER_MARKET_POSITIONING_INVESTMENT_STRATEGY_V3_2026.md` (Master Strategy V3.0)
+> - `docs/investor/HO_SO_KEU_GOI_DAU_TU_CHIEN_LUOC_NGUYEN_AI_TIENG_VIET_V1.md` (Hồ sơ đầu tư VI V1.0)
+> - `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` (Governance Lock)
+>
+> Các thay đổi chính:
+> 1. Định giá scaffold hiện tại: 1,5–3 triệu USD (không phải 4,5 triệu USD)
+> 2. Vòng vốn: 500K–750K trước beta, 1M sau beta (không phải 750K cố định)
+> 3. Academy là sản phẩm trả phí riêng, không free cho subscribers
+> 4. Audience Nguyễn: ~32 triệu (không phải 33–34 triệu)
+> 5. Data room access expiry: 90 ngày (không phải 30 ngày)
+>
+> Giữ tài liệu này để tham khảo lịch sử. Không sử dụng cho investor conversations mới.
+
+**Version:** 2.0 (SUPERSEDED)
 **Date:** 2026-07-01  
-**Status:** PRIVATE INVESTOR BRIEF — NOT A PUBLIC OFFERING  
+**Status:** SUPERSEDED — see V3.0 and Hồ sơ VI V1.0
 **Classification:** Confidential — for qualified investors only
 
 ---
@@ -57,7 +73,7 @@ This confirms the opportunity for Nguyen AI is not in claiming "we have Agents,"
 
 ## 3. The Nguyen market is a distribution wedge
 
-Vietnam population 2024: ~100.99 million (World Bank). A 2024 onomastics study estimates the Nguyen surname at ~31.57% in the modern dataset analyzed, implying a theoretical identity audience of ~31.88 million people in Vietnam. Source: MDPI.
+Vietnam population 2024: ~100.99 million (World Bank). A 2024 onomastics study estimates the Nguyen surname at ~31.57% in the modern dataset analyzed, implying a theoretical identity audience of **~32 million people** in Vietnam (102,3M × 31,57% ≈ 32,3M as of 2025). Source: MDPI.
 
 This number:
 
@@ -175,7 +191,7 @@ Subscription must include:
 - evidence;
 - audit;
 - support;
-- Academy access (free AI learning with subscription).
+- Academy access (paid Academy Pass, separate from subscription).
 
 Do not sell "unlimited AI" due to model cost risk.
 
@@ -512,7 +528,9 @@ Each AI Computer Instance must default to:
 
 ## 16. Academy as part of the product
 
-Academy is hosted at `academy.nguyenai.net` and provides free AI learning to all subscribers. Academy is not a separate paid product — it is an onboarding, certification and retention layer of the AI Computer.
+> **⚠️ SUPERSEDED 2026-07-02:** Section này đã cũ. Academy hiện là sản phẩm trả phí riêng, không free cho subscribers. Xem `ENTITLEMENT_MODEL.md` §2.2-2.3 và hồ sơ VI V1.0 §XIV.
+
+Academy is hosted at `academy.nguyenai.net` and provides **paid Academy Pass access with independent certification**. Academy is a separate revenue product with its own Academy Pass entitlement and Certification Fee. See `ENTITLEMENT_MODEL.md` §2.2-2.3.
 
 Academy tracks:
 
@@ -533,10 +551,12 @@ Academy certification is independent and can be verified by third parties.
 
 ## Final verdict
 
-> **Target valuation now: 4.5 million USD pre-money.**
-> **Proposed round: 750,000 USD.**
-> **Dilution: approximately 14.29%.**
-> **Defensible valuation range: 3.5-5.5 million USD.**
+> **⚠️ SUPERSEDED 2026-07-02:** Định giá và vòng vốn dưới đây đã cũ. Xem V3.0 và hồ sơ VI V1.0 cho con số canonical.
+
+> **~~Target valuation now: 4.5 million USD pre-money.~~** → **1,5–3 triệu USD** (V3.0)
+> **~~Proposed round: 750,000 USD.~~** → **500K–750K trước beta, 1M sau beta** (V3.0)
+> **Dilution: approximately 14.29%.** (áp dụng cho vòng 1M sau beta)
+> **~~Defensible valuation range: 3.5-5.5 million USD.~~** → **1,5–3M scaffold, 4–7M integrated beta** (V3.0)
 
 The valuation is only officially placed in the data room after completing four pieces of evidence:
 

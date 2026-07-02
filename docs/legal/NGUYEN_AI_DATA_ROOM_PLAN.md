@@ -54,8 +54,8 @@
 ### 5. Financial Model
 - [ ] 5-year P&L projection
 - [ ] Cash flow projection
-- [ ] Use of funds breakdown (750K USD)
-- [ ] Runway analysis (18 months)
+- [ ] Use of funds breakdown (500K–750K pre-beta, 1M post-beta) — per V3.0
+- [ ] Runway analysis (18-24 months) — per V3.0
 - [ ] Gross margin analysis
 
 ### 6. Technology
@@ -123,7 +123,7 @@
 
 ### Access management
 - Unique access link per investor
-- Access expires after 30 days (renewable)
+- Access expires after 90 days (renewable) — per `INVESTOR_ACCESS_POLICY.md` §5.1
 - All document views logged (who, what, when)
 - Watermarking on sensitive documents
 - No download for tier 2-3; download only for tier 4

@@ -139,9 +139,13 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 
 ## 5. Funding round
 
-> Superseded by V2 — see `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md`.
+> **⚠️ SUPERSEDED 2026-07-02:** Các con số dưới đây đã cũ. Xem `docs/NGUYEN_AI_MASTER_MARKET_POSITIONING_INVESTMENT_STRATEGY_V3_2026.md` §XVII và `docs/investor/HO_SO_KEU_GOI_DAU_TU_CHIEN_LUOC_NGUYEN_AI_TIENG_VIET_V1.md` §XIX cho con số canonical.
+>
+> **Canonical (V3.0):**
+> - Trước beta: 500K–750K USD, pre-money 3,5–5M USD
+> - Sau beta: 1M USD, pre-money 6M USD, post-money 7M USD, dilution ~14,29%, runway 18–24 tháng
 
-### V2 primary option
+### ~~V2 primary option~~ (SUPERSEDED)
 
 | Item | Value |
 |---|---:|
@@ -176,7 +180,7 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 | Dilution | ~14.3% |
 | Runway | 15-18 months |
 
-### Strategic scenario
+### ~~Strategic scenario~~ (SUPERSEDED)
 
 | Item | Value |
 |---|---:|
@@ -186,7 +190,7 @@ Do not publish valuation above 6M USD before Nguyen AI has:
 | Dilution | 15% |
 | Runway | 18-24 months |
 
-### Use of funds — V2 primary (750,000 USD)
+### ~~Use of funds — V2 primary (750,000 USD)~~ (SUPERSEDED — see Hồ sơ VI §XX)
 
 | Category | Share | Budget |
 |---|---:|---:|
@@ -231,7 +235,7 @@ Eight subscription tiers (V2 pricing):
 | Nguyen Chapter | 7,999,000 VND/month | Branch, association, community |
 | Nguyen Enterprise/Dedicated | Custom quote | Large organization |
 
-Subscription includes: machine usage, compute, Agents, Super Apps, storage, memory, approval, evidence, audit, support, and Academy access (free AI learning).
+Subscription includes: machine usage, compute, Agents, Super Apps, storage, memory, approval, evidence, audit, support. Academy access requires separate Academy Pass entitlement (see `ENTITLEMENT_MODEL.md` §2.2).
 
 ### V1 original pricing (historical reference — superseded by V2 above)
 
@@ -364,7 +368,7 @@ All private areas must:
 
 1. Cover — Nguyen AI Computer, specialized cloud AI Computer for the global Nguyen ecosystem.
 2. Problem — work, research, business, heritage and family data are scattered, unsourced, unprotected and not automated.
-3. Opportunity — 33-34M identity audience + broader AI personal computing market.
+3. Opportunity — ~32M identity audience + broader AI personal computing market.
 4. Solution — verticalized AI Computer with Agent team, Model Mesh, Super Apps, evidence and approval gates.
 5. Product — AI Computer Instance architecture + 7 Nguyen Super Apps + tool families.
 6. Moat — Gen1 engine + Gen2 product + Nguyen vertical + memory/data + Agent IP + network + Academy.
@@ -434,14 +438,14 @@ Do not publish invest.nguyenai.net before:
 
 ## 14. Valuation conclusion
 
-> Superseded by V2. The locked conclusion is in `docs/investor/NGUYEN_AI_INVEST_STRATEGY_VALUATION_V2.md`.
+> **⚠️ SUPERSEDED 2026-07-02:** Xem `docs/NGUYEN_AI_MASTER_MARKET_POSITIONING_INVESTMENT_STRATEGY_V3_2026.md` §XVI cho valuation ladder canonical (6 mức + upside).
 
-### V2 final verdict
+### ~~V2 final verdict~~ (SUPERSEDED)
 
-> **Target valuation now: 4.5 million USD pre-money.**
-> **Proposed round: 750,000 USD.**
-> **Dilution: approximately 14.29%.**
-> **Defensible valuation range: 3.5-5.5 million USD.**
+> **~~Target valuation now: 4.5 million USD pre-money.~~** → **1,5–3M scaffold** (V3.0)
+> **~~Proposed round: 750,000 USD.~~** → **500K–750K trước beta, 1M sau beta** (V3.0)
+> **Dilution: approximately 14.29%.** (áp dụng cho vòng 1M sau beta)
+> **~~Defensible valuation range: 3.5-5.5 million USD.~~** → **1,5–3M scaffold, 4–7M integrated beta** (V3.0)
 
 The valuation is only officially placed in the data room after completing four pieces of evidence:
 

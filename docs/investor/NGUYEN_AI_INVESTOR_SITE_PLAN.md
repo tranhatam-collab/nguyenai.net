@@ -9,7 +9,7 @@ A dedicated investor-facing subsite separate from the public AI Computer platfor
 ```text
 nguyenai.net              -> public AI Computer platform
 invest.nguyenai.net       -> investor brief and private data room
-academy.nguyenai.net      -> Academy (free AI learning for subscribers)
+academy.nguyenai.net      -> Academy (paid Academy Pass, separate entitlement)
 app.nguyenai.net          -> AI Computer Console
 ```
 

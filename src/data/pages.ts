@@ -262,8 +262,8 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Training and certification', description: 'Independent Academy at academy.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
-      { title: 'Independent Academy', body: 'Academy is hosted at academy.nguyenai.net and provides free AI learning to all subscribers, with independent certification.' }
+    key: 'academy', title: 'Academy — Training and certification', description: 'Independent paid Academy at academy.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
+      { title: 'Independent Academy', body: 'Academy is hosted at academy.nguyenai.net and provides a separate paid Academy Pass with independent certification.' }
     ]
   },
   security: {
