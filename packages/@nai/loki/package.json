@@ -1,0 +1,21 @@
+{
+  "name": "@nai/loki",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for loki (https://github.com/grafana/loki). Original source consumed via native package manager.",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/loki\""
+  },
+  "keywords": [
+    "loki",
+    "nai",
+    "nguyenai",
+    "go"
+  ],
+  "upstream": "https://github.com/grafana/loki"
+}

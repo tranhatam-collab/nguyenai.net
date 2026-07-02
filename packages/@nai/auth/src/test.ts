@@ -37,7 +37,7 @@ function assert(condition: boolean, msg: string) {
 async function testPasswordHashing() {
   console.log('Test: password hashing');
   const hash = await hashPassword('testPassword123');
-  assert(hash.startsWith('pbkdf2:100000:'), 'hash format correct');
+  assert(hash.startsWith('pbkdf2:600000:'), 'hash format correct with 600K iterations');
   const valid = await verifyPassword('testPassword123', hash);
   assert(valid === true, 'correct password verifies');
   const invalid = await verifyPassword('wrongPassword', hash);

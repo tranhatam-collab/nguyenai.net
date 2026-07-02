@@ -1,0 +1,21 @@
+{
+  "name": "@nai/semgrep",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for semgrep (https://github.com/semgrep/semgrep). Original source consumed via native package manager.",
+  "license": "LGPL-2.1",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/semgrep\""
+  },
+  "keywords": [
+    "semgrep",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/semgrep/semgrep"
+}

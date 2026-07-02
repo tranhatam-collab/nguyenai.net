@@ -1,0 +1,31 @@
+{
+  "name": "@nai/auth-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'auth-worker tested via E2E suite'",
+    "lint": "echo 'TODO: eslint for @nai/auth-worker'",
+    "db:apply": "wrangler d1 execute nai-identity --local --file ../../migrations/001_identity_access.d1.sql",
+    "db:apply:remote": "wrangler d1 execute nai-identity --remote --file ../../migrations/001_identity_access.d1.sql",
+    "db:query": "wrangler d1 execute nai-identity --local --command",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "otpauth": "^9.3.0",
+    "@nai/auth": "workspace:*",
+    "@nai/audit": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0",
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "@cloudflare/workers-types": "^4.20240620.0"
+  }
+}

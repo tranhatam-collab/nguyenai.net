@@ -1,0 +1,21 @@
+{
+  "name": "@nai/langfuse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for langfuse (https://github.com/langfuse/langfuse). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/langfuse\""
+  },
+  "keywords": [
+    "langfuse",
+    "nai",
+    "nguyenai",
+    "ts"
+  ],
+  "upstream": "https://github.com/langfuse/langfuse"
+}

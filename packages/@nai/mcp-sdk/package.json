@@ -1,0 +1,21 @@
+{
+  "name": "@nai/mcp-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for sdk-typescript (https://github.com/modelcontextprotocol/typescript-sdk). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/mcp-sdk\""
+  },
+  "keywords": [
+    "sdk-typescript",
+    "nai",
+    "nguyenai",
+    "ts"
+  ],
+  "upstream": "https://github.com/modelcontextprotocol/typescript-sdk"
+}

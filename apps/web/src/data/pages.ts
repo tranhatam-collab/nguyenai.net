@@ -153,8 +153,8 @@ const vi: Record<RouteKey, PageContent> = {
       title: 'Kiến trúc Gen 1 → Gen 2 → Nguyen AI',
       body: 'Không xây backend riêng tùy tiện cho từng repository. Ba lớp kế thừa, mỗi lớp có vai trò rõ ràng.',
       layers: [
-        { name: 'Gen 1 — Lõi thực thi', role: 'Runtime, Agent, công cụ, bộ nhớ, bằng chứng', items: ['computer.iai.one', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
-        { name: 'Gen 2 — Danh tính & thương mại', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['maytinhai.org', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
+        { name: 'Runtime độc lập — Lõi thực thi', role: 'Runtime, Agent, công cụ, bộ nhớ, bằng chứng', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
+        { name: 'Identity & commerce', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
         { name: 'Nguyen AI — Thương hiệu & sản phẩm chuyên biệt', role: 'Thương hiệu, sản phẩm chuyên biệt, nội dung và phân phối', items: ['nguyenai.net', 'Nguyen Operating Profile', '9 Model + 9 Functional Products', '7 Super App + 12 tool family + 9 Agent'] }
       ]
     },
@@ -633,8 +633,8 @@ const en: Record<RouteKey, PageContent> = {
       title: 'Architecture: Gen 1 → Gen 2 → Nguyen AI',
       body: 'No ad-hoc backend per repository. Three inherited layers, each with a clear role.',
       layers: [
-        { name: 'Gen 1 — Execution core', role: 'Runtime, Agent, tools, memory, evidence', items: ['computer.iai.one', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
-        { name: 'Gen 2 — Identity & commerce', role: 'Identity, account, plans, entitlements, billing', items: ['maytinhai.org', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
+        { name: 'Independent runtime — Execution core', role: 'Runtime, Agent, tools, memory, evidence', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
+        { name: 'Identity & commerce', role: 'Identity, account, plans, entitlements, billing', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
         { name: 'Nguyen AI — Brand & specialized product', role: 'Brand, specialized product, content and distribution', items: ['nguyenai.net', 'Nguyen Operating Profile', '9 Models + 9 Functional Products', '7 Super Apps + 12 tool families + 9 Agents'] }
       ]
     },

@@ -31,6 +31,7 @@ SCAN_DIRS=(
   "content"
   "public"
   "src"
+  "packages/@nai"
 )
 
 # Exempt files (governance audit docs, LICENSE/NOTICE)
@@ -39,6 +40,9 @@ EXCLUDE_PATTERNS=(
   "docs/architecture/"
   "NOTICE.nai.md"
   "LICENSE"
+  "LICENSE.md"
+  "node_modules"
+  ".git"
 )
 
 # Build exclude grep flags

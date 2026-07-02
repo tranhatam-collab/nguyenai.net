@@ -1,0 +1,21 @@
+{
+  "name": "@nai/skyvern",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for skyvern (https://github.com/Skyvern-AI/skyvern). Original source consumed via native package manager.",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/skyvern\""
+  },
+  "keywords": [
+    "skyvern",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/Skyvern-AI/skyvern"
+}

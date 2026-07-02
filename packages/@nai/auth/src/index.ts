@@ -98,7 +98,7 @@ export interface ApiKey {
 // Password hashing — PBKDF2 via Web Crypto API (Workers-compatible)
 // ============================================================
 
-const PBKDF2_ITERATIONS = 100_000;
+const PBKDF2_ITERATIONS = 600_000; // OWASP 2026: ≥600K for PBKDF2-SHA256
 const SALT_LENGTH = 16;
 const KEY_LENGTH = 32;
 

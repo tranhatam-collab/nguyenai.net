@@ -1,0 +1,21 @@
+{
+  "name": "@nai/crewai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for crewAI (https://github.com/crewAIInc/crewAI). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/crewai\""
+  },
+  "keywords": [
+    "crewAI",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/crewAIInc/crewAI"
+}

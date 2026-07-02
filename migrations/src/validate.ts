@@ -12,18 +12,19 @@ const migrationsDir = join(__dirname, '..');
 
 let errors: string[] = [];
 
+// Only validate Postgres migrations (.sql) — D1/SQLite migrations (.d1.sql) have different syntax
 const files = readdirSync(migrationsDir)
-  .filter((f) => f.endsWith('.sql'))
+  .filter((f) => f.endsWith('.sql') && !f.endsWith('.d1.sql'))
   .sort();
 
 if (files.length === 0) {
-  errors.push('No migration files found');
+  errors.push('No Postgres migration files found');
 }
 
 for (const file of files) {
   const content = readFileSync(join(migrationsDir, file), 'utf-8');
 
-  // Check BEGIN/COMMIT wrapping
+  // Check BEGIN/COMMIT wrapping (Postgres only)
   if (!content.includes('BEGIN;') || !content.includes('COMMIT;')) {
     errors.push(`${file}: must be wrapped in BEGIN; ... COMMIT;`);
   }
