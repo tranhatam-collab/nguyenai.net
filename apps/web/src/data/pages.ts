@@ -55,20 +55,89 @@ const vi: Record<RouteKey, PageContent> = {
   home: {
     key: 'home',
     title: 'Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu',
-    description: 'Nguyen AI Computer là Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
+    description: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 Model máy + 9 Functional Products + 9 Agent chuyên biệt + 7 Super App di sản.',
     eyebrow: 'Nguyen AI Computer',
     heroTitle: 'Máy Tính AI của thế hệ Nguyễn toàn cầu.',
-    heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
+    heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ 9 AI Agent, bộ nhớ dài hạn, kho dữ liệu, 7 Super App di sản, 12 tool family làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
     primaryCta: 'Khởi tạo Nguyen AI Computer',
     secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
-      { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi.' },
-      { title: 'Kiến trúc bốn lớp', body: 'Nguyen AI Computer sở hữu backend riêng độc lập với @nai/* packages (auth, runtime, agents, memory, evidence, billing), bổ sung Nguyen Operating Profile riêng, và kết nối với Academy giữ tại academy.nguyenai.net, cung cấp học AI cho người đăng ký.', items: ['Lớp 1 — Backend độc lập (@nai/* packages)', 'Lớp 2 — Nguyen Operating Profile', 'Lớp 3 — Nguyen AI Computer', 'Lớp 4 — Academy & certification'] },
+      { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi một.' },
+      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập với @nai/* packages, Nguyen Operating Profile riêng, sản phẩm Nguyen AI Computer, và Academy tách biệt cho certification.', items: ['Lớp 1 — Backend độc lập (@nai/* packages: auth, runtime, agents, memory, evidence, billing)', 'Lớp 2 — Nguyen Operating Profile (hồ sơ vận hành cho cộng đồng Nguyễn)', 'Lớp 3 — Nguyen AI Computer (sản phẩm thương mại)', 'Lớp 4 — Academy & certification (academy.nguyenai.net)'] },
       { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
+    featureGrid: {
+      title: '9 Agent chuyên biệt',
+      body: 'Đội ngũ AI Agent mặc định vận hành trên nền tảng Gen1, mỗi Agent có vai trò rõ ràng.',
+      cards: [
+        { name: 'Nguyen Guide', description: 'Điều phối chính, tiếp nhận lệnh, lập kế hoạch và phân việc.', tag: 'Core' },
+        { name: 'Nguyen Researcher', description: 'Nghiên cứu, tổng hợp nguồn, so sánh tài liệu.', tag: 'Research' },
+        { name: 'Nguyen Archivist', description: 'Quản trị tư liệu, gia phả, kho lưu trữ.', tag: 'Archive' },
+        { name: 'Nguyen Verifier', description: 'Kiểm tra claim, evidence, fact-checking.', tag: 'Trust' },
+        { name: 'Nguyen Family Steward', description: 'Quản trị family memory, oral history, quyền thế hệ.', tag: 'Family' },
+        { name: 'Nguyen Founder', description: 'Chiến lược, pitch deck, gọi vốn, decision log.', tag: 'Founder' },
+        { name: 'Nguyen Business Operator', description: 'Vận hành doanh nghiệp, SOP, CRM, automation.', tag: 'Business' },
+        { name: 'Nguyen Global Connector', description: 'Diaspora, mạng lưới, kết nối cộng đồng toàn cầu.', tag: 'Network' },
+        { name: 'Nguyen Guardian', description: 'Bảo mật, quyền, phê duyệt, audit log.', tag: 'Security' }
+      ]
+    },
+    comparisonTable: {
+      title: 'So sánh 9 Model máy',
+      body: 'Mỗi Model là một cấp độ Máy Tính AI với năng lực, bộ nhớ, vault, agent và quota khác nhau. Model cao hơn = nhiều agent hơn, model tier cao hơn, memory lớn hơn.',
+      columns: [
+        { label: 'Start' }, { label: 'Personal' }, { label: 'Family' }, { label: 'Creator' },
+        { label: 'Founder' }, { label: 'Business' }, { label: 'Chapter' },
+        { label: 'Enterprise', highlight: true }, { label: 'Sovereign', highlight: true }
+      ],
+      rows: [
+        { label: 'Giá/tháng', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Báo giá', 'Báo giá'] },
+        { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise', 'enterprise+'] },
+        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom', '9+custom'] },
+        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom', 'Dedicated'] },
+        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom', 'Dedicated'] },
+        { label: 'Quota/ngày', values: ['10', '100', '300', '500', '1.000', '5.000', '10.000', 'Custom', 'Unlimited'] },
+        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+', 'All+'] },
+        { label: 'Approval gate', values: ['sensitive', 'sensitive', 'family', 'sensitive', 'financial', 'per-role', 'board', 'custom', 'custom'] }
+      ]
+    },
+    pricingTable: {
+      title: '9 Functional Products (add-on)',
+      body: 'Mỗi Functional Product là một bộ tool chuyên biệt, mua thêm cho bất kỳ Model nào (trừ Start). Khách hàng chọn 1 Model + 1 hoặc nhiều Functional Products.',
+      plans: [
+        { name: 'Office Pro', code: 'func-office', price: '99.000₫', period: '/tháng', target: 'Văn phòng, tài liệu, báo cáo, tự động hóa', features: ['AI Office + AI Automation', 'Documents, spreadsheets, reports', 'Workflow, trigger, scheduled task', 'Compatible: Personal trở lên'], cta: 'Chọn gói' },
+        { name: 'Research Lab', code: 'func-research', price: '199.000₫', period: '/tháng', target: 'Nghiên cứu, source synthesis, evidence', features: ['AI Research + AI Browser + Nguyen Trust', 'Web search, PDF reading, bibliography', 'Claim-source-evidence verification', 'Compatible: Personal trở lên'], cta: 'Chọn gói' },
+        { name: 'Content Studio', code: 'func-content', price: '299.000₫', period: '/tháng', target: 'Sáng tạo nội dung, multi-channel, song ngữ', features: ['AI Content + AI Media', 'Bilingual publishing, SEO, social', 'Editorial calendar, media assets', 'Compatible: Personal trở lên'], cta: 'Chọn gói' },
+        { name: 'Code Forge', code: 'func-code', price: '299.000₫', period: '/tháng', target: 'Coding, review, test, deploy', features: ['AI Code + AI Automation', 'Repository audit, write, test, fix', 'CI/CD workflow, release evidence', 'Compatible: Personal trở lên'], cta: 'Chọn gói' },
+        { name: 'Founder Suite', code: 'func-founder', price: '499.000₫', period: '/tháng', target: 'Strategy, pitch, gọi vốn, decision log', features: ['AI Founder OS + Finance + Legal + Nguyen Founders', 'Vision, roadmap, pitch deck, KPI', 'Contract analysis, cash flow, board report', 'Compatible: Founder trở lên'], cta: 'Chọn gói', highlighted: true },
+        { name: 'Business Pack', code: 'func-business', price: '799.000₫', period: '/tháng', target: 'Vận hành doanh nghiệp, CRM, SOP', features: ['AI Business OS + AI Sales + AI Automation', 'Operations, SOP, task management', 'CRM, pipeline, customer care', 'Compatible: Business trở lên'], cta: 'Chọn gói' },
+        { name: 'Heritage Vault', code: 'func-heritage', price: '199.000₫', period: '/tháng', target: 'Gia phả, oral history, lưu trữ gia đình', features: ['Nguyen Roots + Memory + Knowledge', 'Family graph, tree, branches, timeline', 'Photos, documents, interviews, archive', 'Compatible: Family trở lên'], cta: 'Chọn gói' },
+        { name: 'Community OS', code: 'func-community', price: '599.000₫', period: '/tháng', target: 'Chi họ, hội, cộng đồng, events', features: ['Nguyen Chapter OS + Network + Trust', 'Membership, governance, events, archive', 'Private chapter AI, dedicated website', 'Compatible: Chapter trở lên'], cta: 'Chọn gói' },
+        { name: 'Evidence Pro', code: 'func-evidence', price: '149.000₫', period: '/tháng', target: 'Kiểm chứng, audit, compliance, certification', features: ['Nguyen Trust + AI Research + proof engine', 'Claim, source, evidence, audit trail', 'Evidence pack export, certification prep', 'Compatible: Personal trở lên'], cta: 'Chọn gói' }
+      ]
+    },
+    demoScenarios: {
+      title: 'Demo — Máy vận hành thế nào',
+      body: 'Bốn tình huống thực tế cho thấy Machines Tính AI vận hành từ lệnh đến kết quả có chứng cứ.',
+      scenarios: [
+        { title: 'Gia đình lưu giữ di sản', user: 'Nguyễn Văn A — Nguyen Family plan', command: '"Hãy phỏng vấn bà nội về cội nguồn, số hóa ảnh cũ, và tạo cây gia phả 3 thế hệ."', steps: ['Nguyen Guide tiếp nhận và lập kế hoạch', 'Nguyen Family Steward lên lịch phỏng vấn', 'Nguyen Archivist số hóa ảnh, trích xuất metadata', 'Nguyen Roots xây cây gia phả từ dữ liệu', 'Nguyen Verifier gắn nhãn nguồn: oral history, primary photo', 'Lưu vào Family Vault với quyền theo thế hệ'], result: 'Cây gia phả 3 thế hệ + 47 ảnh số hóa + 1 audio interview + evidence labels' },
+        { title: 'Founder chuẩn bị gọi vốn', user: 'Nguyễn Thị B — Nguyen Founder + Founder Suite', command: '"Chuẩn bị pitch deck, mô hình tài chính 5 năm, và data room cho vòng Seed."', steps: ['Nguyen Founder lập outline pitch deck', 'AI Finance Workspace xây mô hình 5 năm', 'AI Legal Workspace chuẩn bị SAFE template', 'Nguyen Verifier kiểm tra consistency', 'Nguyen Guardian thiết lập data room access', 'Investor Readiness Pack tạo diligence checklist'], result: 'Pitch deck 15 slide + financial model + data room + diligence checklist' },
+        { title: 'Doanh nghiệp vận hành', user: 'Nguyễn C — Nguyen Business + Business Pack', command: '"Tự động hóa báo cáo bán hàng tuần, cập nhật CRM, và gửi follow-up cho 50 khách."', steps: ['Nguyen Business Operator trích xuất dữ liệu CRM', 'AI Sales phân tích pipeline và đề xuất follow-up', 'AI Automation lên lịch gửi email', 'Nguyen Verifier kiểm tra tính chính xác', 'Nguyen Guardian phê duyệt trước khi gửi', 'Audit log ghi mọi hành động'], result: 'Báo cáo tuần + 50 email follow-up đã gửi + audit trail đầy đủ' },
+        { title: 'Chi họ quản lý cộng đồng', user: 'Chi họ Nguyễn — Nguyen Chapter + Community OS', command: '"Tạo website chi họ, quản lý 120 thành viên, và tổ chức đại hội năm 2026."', steps: ['Nguyen Global Connector tạo website chi họ', 'Nguyen Chapter OS nhập 120 thành viên', 'Nguyen Guardian thiết lập quyền theo vai trò', 'Nguyen Archivist số hóa tài liệu chi họ', 'Nguyen Guide lên kế hoạch đại hội', 'Nguyen Verifier kiểm tra tính chính xác lịch sử'], result: 'Website chi họ + 120 thành viên + kế hoạch đại hội + tài liệu số hóa' }
+      ]
+    },
+    ctaBanner: {
+      title: 'Sẵn sàng khởi tạo AI Computer của bạn?',
+      body: 'Bắt đầu miễn phí với Nguyen Start, hoặc chọn gói phù hợp từ Personal đến Enterprise. Mỗi người dùng có một máy riêng, bộ nhớ riêng, dữ liệu riêng.',
+      primaryCta: 'Khởi tạo ngay',
+      secondaryCta: 'Liên hệ tư vấn'
+    },
     faq: [
-      { question: 'Nguyen AI Computer có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ Agent, bộ nhớ, công cụ và workflow dài hạn.' },
-      { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Super App quan trọng, nhưng sản phẩm còn bao gồm làm việc, nghiên cứu, sáng tạo, kinh doanh, tự động hóa và kết nối toàn cầu.' }
+      { question: 'Nguyen AI Computer có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ 9 Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow dài hạn.' },
+      { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Super App quan trọng, nhưng sản phẩm còn bao gồm 12 tool family: AI Office, AI Research, AI Content, AI Media, AI Code, AI Automation, AI Founder OS, AI Business OS, AI Sales, AI Finance, AI Legal, và 7 Super App Nguyễn.' },
+      { question: 'Tôi chọn Model và Functional Product thế nào?', answer: 'Model là cấp độ máy (năng lực phần cứng: agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt (chức năng). Bạn chọn 1 Model + 1 hoặc nhiều Functional Products. Ví dụ: Nguyen Founder + Founder Suite.' },
+      { question: 'Giá hiện tại có phải giá cuối cùng không?', answer: 'Không. Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.' },
+      { question: 'Dữ liệu của tôi có an toàn không?', answer: 'Mỗi người dùng có instance riêng, không chia sẻ memory hay data. Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được audit log, dữ liệu nằm trong boundary của người dùng.' },
+      { question: 'Nguyen AI có phải chỉ cho người họ Nguyễn?', answer: 'Nguyen AI Computer được thiết kế cho hệ sinh thái Nguyễn toàn cầu, nhưng sản phẩm hoạt động cho mọi cá nhân, gia đình, founder và doanh nghiệp. Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống.' }
     ]
   },
   'ai-computer': {
