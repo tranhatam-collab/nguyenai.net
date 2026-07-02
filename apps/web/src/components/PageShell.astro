@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { absoluteUrl, routeFor, type Locale, type RouteKey } from '../data/site';
-import type { PageContent } from '../data/pages';
+import type { PageContent, DemoLabel } from '../data/pages';
 
 export interface Props {
   locale: Locale;
@@ -9,7 +9,6 @@ export interface Props {
 }
 
 const { locale, page } = Astro.props;
-const isHome = page.key === 'home';
 const isArticlePage = page.key === 'research' || page.key === 'docs';
 const pageJsonLd = isArticlePage ? {
   '@context': 'https://schema.org',
@@ -36,15 +35,27 @@ const faqJsonLd = page.faq?.length ? {
   mainEntity: page.faq.map((item) => ({
     '@type': 'Question',
     name: item.question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: item.answer
-    }
+    acceptedAnswer: { '@type': 'Answer', text: item.answer }
   }))
 } : undefined;
+
+const labelClass: Record<DemoLabel, string> = {
+  'Live demo': 'demo-label live',
+  'Interactive demo': 'demo-label interactive',
+  'Simulated demo': 'demo-label simulated',
+  'Product preview': 'demo-label preview',
+  'Planned': 'demo-label planned'
+};
+const statusClass: Record<string, string> = {
+  'Available': 'status-badge available',
+  'Beta': 'status-badge beta',
+  'Planned': 'status-badge planned',
+  'Enterprise only': 'status-badge enterprise'
+};
 ---
 
 <BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd}>
+  {/* 1. Hero */}
   <section class="hero section-wrap">
     <div class="eyebrow">{page.eyebrow}</div>
     <h1>{page.heroTitle}</h1>
@@ -57,6 +68,21 @@ const faqJsonLd = page.faq?.length ? {
     )}
   </section>
 
+  {/* 2. Trust bar */}
+  {page.trustBar && (
+    <section class="trust-bar" aria-label={locale === 'vi' ? 'Thông tin niềm tin' : 'Trust indicators'}>
+      <div class="section-wrap trust-bar-inner">
+        {page.trustBar.items.map((item) => (
+          <div class="trust-item">
+            <strong>{item.value}</strong>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 3. Content grid (general sections) */}
   <section class="section-wrap content-grid" aria-label={locale === 'vi' ? 'Nội dung chính' : 'Main content'}>
     {page.sections.map((section) => (
       <article class="content-card">
@@ -71,6 +97,49 @@ const faqJsonLd = page.faq?.length ? {
     ))}
   </section>
 
+  {/* 4. Comparison vs chatbot */}
+  {page.comparisonVsChatbot && (
+    <section class="section-wrap comparison-section" aria-label={page.comparisonVsChatbot.title}>
+      <div class="eyebrow">{page.comparisonVsChatbot.title}</div>
+      <div class="table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr><th>{locale === 'vi' ? 'Tiêu chí' : 'Criteria'}</th><th>Chatbot</th><th>Nguyen AI Computer</th></tr>
+          </thead>
+          <tbody>
+            {page.comparisonVsChatbot.rows.map((row) => (
+              <tr>
+                <td class="row-label">{row.label}</td>
+                <td>{row.values[0]}</td>
+                <td class="highlight">{row.values[1]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
+  {/* 5. Architecture diagram */}
+  {page.architectureDiagram && (
+    <section class="section-wrap arch-section" aria-label={page.architectureDiagram.title}>
+      <div class="eyebrow">{page.architectureDiagram.title}</div>
+      {page.architectureDiagram.body && <p class="section-intro">{page.architectureDiagram.body}</p>}
+      <div class="arch-stack">
+        {page.architectureDiagram.layers.map((layer, i) => (
+          <div class={`arch-layer arch-layer-${i + 1}`}>
+            <h3>{layer.name}</h3>
+            <p class="arch-role">{layer.role}</p>
+            <ul>
+              {layer.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 6. Feature grid (agents) */}
   {page.featureGrid && (
     <section class="section-wrap feature-section" aria-label={page.featureGrid.title}>
       <div class="eyebrow">{page.featureGrid.title}</div>
@@ -87,6 +156,152 @@ const faqJsonLd = page.faq?.length ? {
     </section>
   )}
 
+  {/* 7. Super Apps general */}
+  {page.superAppsGeneral && (
+    <section class="section-wrap feature-section" aria-label={page.superAppsGeneral.title}>
+      <div class="eyebrow">{page.superAppsGeneral.title}</div>
+      {page.superAppsGeneral.body && <p class="section-intro">{page.superAppsGeneral.body}</p>}
+      <div class="feature-grid">
+        {page.superAppsGeneral.cards.map((card) => (
+          <article class="feature-card">
+            {card.tag && <span class="feature-tag">{card.tag}</span>}
+            <h3>{card.name}</h3>
+            <p>{card.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 8. Super Apps specialized */}
+  {page.superAppsSpecialized && (
+    <section class="section-wrap feature-section" aria-label={page.superAppsSpecialized.title}>
+      <div class="eyebrow">{page.superAppsSpecialized.title}</div>
+      {page.superAppsSpecialized.body && <p class="section-intro">{page.superAppsSpecialized.body}</p>}
+      <div class="feature-grid">
+        {page.superAppsSpecialized.cards.map((card) => (
+          <article class="feature-card">
+            {card.tag && <span class="feature-tag">{card.tag}</span>}
+            <h3>{card.name}</h3>
+            <p>{card.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 9. User groups */}
+  {page.userGroups && (
+    <section class="section-wrap feature-section" aria-label={page.userGroups.title}>
+      <div class="eyebrow">{page.userGroups.title}</div>
+      {page.userGroups.body && <p class="section-intro">{page.userGroups.body}</p>}
+      <div class="user-group-grid">
+        {page.userGroups.cards.map((card) => (
+          <article class="user-group-card">
+            <div class="ug-icon">{card.icon}</div>
+            <h3>{card.name}</h3>
+            <p>{card.description}</p>
+            <span class="ug-plan">{card.plan}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 10. Demo scenarios */}
+  {page.demoScenarios && (
+    <section class="section-wrap demo-section" aria-label={page.demoScenarios.title}>
+      <div class="eyebrow">{page.demoScenarios.title}</div>
+      {page.demoScenarios.body && <p class="section-intro">{page.demoScenarios.body}</p>}
+      <div class="demo-grid">
+        {page.demoScenarios.scenarios.map((scenario) => (
+          <article class="demo-card">
+            <span class={labelClass[scenario.label]}>{scenario.label}</span>
+            <h3>{scenario.title}</h3>
+            <div class="demo-user">{scenario.user}</div>
+            <div class="demo-command">{scenario.command}</div>
+            <ol>
+              {scenario.steps.map((step) => <li>{step}</li>)}
+            </ol>
+            <div class="demo-result">{scenario.result}</div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 11. Workflow steps */}
+  {page.workflowSteps && (
+    <section class="section-wrap workflow-section" aria-label={page.workflowSteps.title}>
+      <div class="eyebrow">{page.workflowSteps.title}</div>
+      {page.workflowSteps.body && <p class="section-intro">{page.workflowSteps.body}</p>}
+      <ol class="workflow-list">
+        {page.workflowSteps.steps.map((step, i) => (
+          <li><span class="workflow-num">{i + 1}</span><span>{step}</span></li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  {/* 12. Pricing table (compact) */}
+  {page.pricingTable && (
+    <section class="section-wrap pricing-section" aria-label={page.pricingTable.title}>
+      <div class="eyebrow">{page.pricingTable.title}</div>
+      {page.pricingTable.body && <p class="section-intro">{page.pricingTable.body}</p>}
+      <div class="pricing-grid">
+        {page.pricingTable.plans.map((plan) => (
+          <article class={`pricing-card${plan.highlighted ? ' highlighted' : ''}`}>
+            <header>
+              <h3>{plan.name}</h3>
+              <div class="price">{plan.price}{plan.period && <span class="period">{plan.period}</span>}</div>
+              <p class="target">{plan.target}</p>
+            </header>
+            <ul>
+              {plan.features.map((f) => <li>{f}</li>)}
+            </ul>
+            {plan.cta && <a class="button primary" href={routeFor('contact', locale)}>{plan.cta}</a>}
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 13. Plan details (full 13-field breakdown) */}
+  {page.planDetails && (
+    <section class="section-wrap plan-details-section" aria-label={page.planDetails.title}>
+      <div class="eyebrow">{page.planDetails.title}</div>
+      {page.planDetails.body && <p class="section-intro">{page.planDetails.body}</p>}
+      <div class="plan-details-list">
+        {page.planDetails.plans.map((plan) => (
+          <article class={`plan-detail-card${plan.highlighted ? ' highlighted' : ''}`}>
+            <header>
+              <h3>{plan.name}</h3>
+              <span class={statusClass[plan.status] || 'status-badge'}>{plan.status}</span>
+              <div class="price">{plan.price}{plan.period && <span class="period">{plan.period}</span>}</div>
+              <p class="target">{plan.target}</p>
+            </header>
+            <dl>
+              <dt>{locale === 'vi' ? 'Thành viên' : 'Members'}</dt><dd>{plan.members}</dd>
+              <dt>{locale === 'vi' ? 'Agent' : 'Agents'}</dt><dd>{plan.agents}</dd>
+              <dt>{locale === 'vi' ? 'Siêu Ứng Dụng' : 'Super Apps'}</dt><dd>{plan.superApps}</dd>
+              <dt>{locale === 'vi' ? 'Bộ nhớ' : 'Memory'}</dt><dd>{plan.memory}</dd>
+              <dt>{locale === 'vi' ? 'Dung lượng' : 'Storage'}</dt><dd>{plan.storage}</dd>
+              <dt>{locale === 'vi' ? 'Năng lực tính toán' : 'Compute'}</dt><dd>{plan.compute}</dd>
+              <dt>{locale === 'vi' ? 'Bằng chứng' : 'Evidence'}</dt><dd>{plan.evidence}</dd>
+              <dt>{locale === 'vi' ? 'Phê duyệt' : 'Approval'}</dt><dd>{plan.approval}</dd>
+              <dt>Academy</dt><dd>{plan.academy}</dd>
+              <dt>{locale === 'vi' ? 'Hỗ trợ' : 'Support'}</dt><dd>{plan.support}</dd>
+              <dt>{locale === 'vi' ? 'Giới hạn' : 'Limits'}</dt><dd>{plan.limits}</dd>
+              <dt>{locale === 'vi' ? 'Vượt hạn mức' : 'Overage'}</dt><dd>{plan.overage}</dd>
+            </dl>
+            {plan.cta && <a class="button primary" href={routeFor('contact', locale)}>{plan.cta}</a>}
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* 14. Comparison table */}
   {page.comparisonTable && (
     <section class="section-wrap comparison-section" aria-label={page.comparisonTable.title}>
       <div class="eyebrow">{page.comparisonTable.title}</div>
@@ -116,48 +331,63 @@ const faqJsonLd = page.faq?.length ? {
     </section>
   )}
 
-  {page.pricingTable && (
-    <section class="section-wrap pricing-section" aria-label={page.pricingTable.title}>
-      <div class="eyebrow">{page.pricingTable.title}</div>
-      {page.pricingTable.body && <p class="section-intro">{page.pricingTable.body}</p>}
-      <div class="pricing-grid">
-        {page.pricingTable.plans.map((plan) => (
-          <article class={`pricing-card${plan.highlighted ? ' highlighted' : ''}`}>
-            <header>
-              <h3>{plan.name}</h3>
-              <div class="price">{plan.price}{plan.period && <span class="period">{plan.period}</span>}</div>
-              <p class="target">{plan.target}</p>
-            </header>
-            <ul>
-              {plan.features.map((f) => <li>{f}</li>)}
-            </ul>
-            {plan.cta && <a class="button primary" href={routeFor('contact', locale)}>{plan.cta}</a>}
+  {/* 15. Academy section */}
+  {page.academySection && (
+    <section class="section-wrap info-section" aria-label={page.academySection.title}>
+      <div class="eyebrow">{page.academySection.title}</div>
+      <p class="section-intro">{page.academySection.body}</p>
+      {page.academySection.items && (
+        <ul class="info-list">
+          {page.academySection.items.map((item) => <li>{item}</li>)}
+        </ul>
+      )}
+    </section>
+  )}
+
+  {/* 16. Memory & Vault section */}
+  {page.memoryVaultSection && (
+    <section class="section-wrap info-section" aria-label={page.memoryVaultSection.title}>
+      <div class="eyebrow">{page.memoryVaultSection.title}</div>
+      <p class="section-intro">{page.memoryVaultSection.body}</p>
+      {page.memoryVaultSection.items && (
+        <ul class="info-list">
+          {page.memoryVaultSection.items.map((item) => <li>{item}</li>)}
+        </ul>
+      )}
+    </section>
+  )}
+
+  {/* 17. Security section */}
+  {page.securitySection && (
+    <section class="section-wrap info-section" aria-label={page.securitySection.title}>
+      <div class="eyebrow">{page.securitySection.title}</div>
+      <p class="section-intro">{page.securitySection.body}</p>
+      {page.securitySection.items && (
+        <ul class="info-list">
+          {page.securitySection.items.map((item) => <li>{item}</li>)}
+        </ul>
+      )}
+    </section>
+  )}
+
+  {/* 18. Use cases */}
+  {page.useCases && (
+    <section class="section-wrap feature-section" aria-label={page.useCases.title}>
+      <div class="eyebrow">{page.useCases.title}</div>
+      {page.useCases.body && <p class="section-intro">{page.useCases.body}</p>}
+      <div class="feature-grid">
+        {page.useCases.cards.map((card) => (
+          <article class="feature-card">
+            {card.tag && <span class="feature-tag">{card.tag}</span>}
+            <h3>{card.name}</h3>
+            <p>{card.description}</p>
           </article>
         ))}
       </div>
     </section>
   )}
 
-  {page.demoScenarios && (
-    <section class="section-wrap demo-section" aria-label={page.demoScenarios.title}>
-      <div class="eyebrow">{page.demoScenarios.title}</div>
-      {page.demoScenarios.body && <p class="section-intro">{page.demoScenarios.body}</p>}
-      <div class="demo-grid">
-        {page.demoScenarios.scenarios.map((scenario) => (
-          <article class="demo-card">
-            <h3>{scenario.title}</h3>
-            <div class="demo-user">{scenario.user}</div>
-            <div class="demo-command">{scenario.command}</div>
-            <ol>
-              {scenario.steps.map((step) => <li>{step}</li>)}
-            </ol>
-            <div class="demo-result">{scenario.result}</div>
-          </article>
-        ))}
-      </div>
-    </section>
-  )}
-
+  {/* 19. CTA banner */}
   {page.ctaBanner && (
     <section class="cta-banner" aria-label={page.ctaBanner.title}>
       <div class="section-wrap">
@@ -171,6 +401,7 @@ const faqJsonLd = page.faq?.length ? {
     </section>
   )}
 
+  {/* 20. FAQ */}
   {page.faq && (
     <section class="section-wrap faq">
       <div class="eyebrow">FAQ</div>
