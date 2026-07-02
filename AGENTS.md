@@ -20,6 +20,8 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/QA_AUDIT_TOTAL_PLAN_2026-07-02.md` — QA audit of total plan
 - `docs/governance/PRODUCT_CATALOG_9x9.md` — 9 Models + 9 Functional Products (BINDING)
 - `docs/governance/DEV_TEAM_INTEGRATION_PLAN.md` — Dev team plan + 41 tool inventory (BINDING)
+- `docs/governance/DEV_EXECUTION_CHECKLIST.md` — 96-task execution checklist (BINDING)
+- `docs/governance/DEV_WORK_ITEMS_P0_P1.md` — 62 P0+P1 work items with estimates (BINDING)
 
 ### Strategy + Investor (canonical)
 

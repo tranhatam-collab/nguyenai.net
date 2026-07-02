@@ -14,10 +14,17 @@
 
 Đưa NAI từ trạng thái hiện tại (governance lock + Astro public scaffold + Gen1/Gen2 partial) lên **production-ready MVP** cho 4 lớp:
 
-1. **Layer 1 — Gen1 core runtime** (computer.iai.one) — runtime, agent, model routing, memory, tool, workflow, evidence
-2. **Layer 2 — Gen2 product system** (maytinhai-os) — package, sell, operate AI Computers
+1. **Layer 1 — Gen1 core runtime** (`computer.iai.one`) — runtime, agent, model routing, memory, tool, workflow, evidence
+2. **Layer 2 — Gen2 product system** (`maytinhai.org`) — package, sell, operate AI Computers
 3. **Layer 3 — NAI product line** (nguyenai.net) — specialized line + Nguyen Operating Profile
 4. **Layer 4 — Academy** (academy.nguyenai.net) — paid Academy Pass + certification
+
+### 1.1 Gen2 audit status
+
+- **Status:** NOT independently cloned/executed in the 4-repo audit.
+- **Evidence available:** governance docs only, plus consistency references inside `nguyenai.net`.
+- **Implication:** treat Gen2 as a required integration target, not as a verified runtime.
+- **Plan rule:** no production claim for Gen2 until a separate clone/build/audit pass exists for the actual Gen2 repo.
 
 Kế hoạch này:
 - Liệt kê toàn bộ tool có sẵn trong `ai-dev-stack-repos/` (41 repos)
@@ -339,7 +346,7 @@ nguyenai.net/                          (monorepo root, pnpm workspace)
 
 | Task | Owner | Output |
 |---|---|---|
-| P1-B.1 Migrate `maytinhai-os/packages/` vào `nguyenai.net/packages/` với rebrand `@maytinhai/*` → `@nai/*` | Dev | Packages migrated |
+| P1-B.1 Migrate `maytinhai.org/packages/` vào `nguyenai.net/packages/` với rebrand `@maytinhai/*` → `@nai/*` | Dev | Packages migrated |
 | P1-B.2 Implement `@nai/catalog` — đọc `PRODUCT_CATALOG_9x9.md` → JSON catalog (models, functional products, compatibility matrix) | Dev | Catalog service |
 | P1-B.3 Implement `@nai/billing` — subscription recurring, dunning, proration | Dev | Billing service |
 | P1-B.4 Tích hợp payment: VNPay (VND) + Stripe (USD) | Dev | Payment gateway |
