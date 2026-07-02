@@ -75,7 +75,7 @@ Owner of:
 
 Gen 2 is the **only** entitlement and billing authority. No repo may hardcode its own pricing, plan, or entitlement definition.
 
-### 2.3 Nguyen AI — Brand / Distribution / Content Layer
+### 2.3 Nguyen AI — Brand / Distribution / Content Layer + Independent Backend
 
 Owner of:
 - public brand surface (`nguyenai.net`)
@@ -86,8 +86,11 @@ Owner of:
 - Academy lesson content for the Nguyen AI vertical
 - investor thesis and disclosure copy
 - localization (VI / EN) for the Nguyen AI surfaces
+- **independent backend monorepo** (`nguyenai.net/` chứa `apps/api/`, `packages/@nai/*`) — Founder decision 2026-07-02
 
-Nguyen AI **does not own** runtime, identity, entitlement, billing, or certification engine. It consumes them via contracts.
+> **FOUNDER OVERRIDE 2026-07-02:** `nguyenai.net` sở hữu backend riêng độc lập cho vertical Nguyen AI (auth, runtime, agents, billing, evidence). Không phụ thuộc runtime Gen1 (`computer.iai.one`) hay Gen2 (`maytinhai.org`) lúc chạy. Gen1 và Gen2 đóng băng (reference only, không sửa, không deploy). Được phép copy có chọn lọc package từ `maytinhai-os` (fix security khi copy). See `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
+
+Nguyen AI **không còn là** brand-only static layer. Nó sở hữu runtime riêng cho vertical Nguyen AI. Gen1/Gen2 không còn là dependency runtime — chỉ là reference kiến trúc.
 
 ### 2.4 Shared Identity Service — `auth.nguyenai.net`
 
@@ -118,16 +121,18 @@ Used by Academy and any future credential-bearing surface. Academy does not impl
 
 | Repo / surface | Layer | Owns backend? | Consumes |
 |---|---|---|---|
-| `nguyenai.net` | Nguyen AI brand | No (static) | nothing at runtime |
-| `nguyenai-console` | Nguyen AI brand | No | Identity, Gen 1 Command/Job/Approval, Gen 2 Entitlement/Billing |
-| `nguyenai-academy` | Nguyen AI brand | No (only content) | Identity, Proof/Verify, Gen 2 Entitlement (Academy pass) |
-| `nguyenai-invest` | Nguyen AI brand | No (only public copy + request form) | Identity, Investor Qualification Service |
-| `computer.iai.one` (Gen 1) | Core runtime | Yes | its own services |
-| `maytinhai.org` (Gen 2) | Product layer | Yes | Gen 1 runtime APIs, Identity |
-| `auth.nguyenai.net` | Shared identity | Yes | its own store |
-| Proof / Verify service | Shared | Yes | Identity, Gen 1 evidence |
+| `nguyenai.net` | Nguyen AI brand + independent backend | **Yes** (Founder override 2026-07-02) | its own services (`@nai/*` packages) |
+| `nguyenai-console` | Nguyen AI brand | No | merged into `nguyenai.net/apps/console/` |
+| `nguyenai-academy` | Nguyen AI brand | No (only content) | merged into `nguyenai.net/apps/academy/` |
+| `nguyenai-invest` | Nguyen AI brand | No (only public copy + request form) | merged into `nguyenai.net/apps/invest/` |
+| `computer.iai.one` (Gen 1) | Core runtime (FROZEN — reference only) | Yes (frozen) | — |
+| `maytinhai.org` (Gen 2) | Product layer (FROZEN — reference only) | Yes (frozen) | — |
+| `auth.nguyenai.net` | Identity (now lives inside `nguyenai.net/packages/@nai/auth`) | Yes | its own store |
+| Proof / Verify service | Shared (now lives inside `nguyenai.net/packages/@nai/evidence`) | Yes | Identity |
 
-Any repo that currently has its own auth, pricing, progress store, certificate generator, or command runtime must remove it and consume the shared service instead.
+> **FOUNDER OVERRIDE 2026-07-02:** `nguyenai.net` là backend độc lập. Gen1/Gen2 đóng băng (reference only, không sửa, không deploy). `auth.nguyenai.net` và Proof/Verify service được implement bên trong `nguyenai.net/packages/@nai/*` thay vì service riêng. Repo `nguyenai-console`, `nguyenai-academy`, `nguyenai-invest` merge vào `nguyenai.net/apps/*`.
+
+Any repo that currently has its own auth, pricing, progress store, certificate generator, or command runtime must remove it and consume the shared service instead — **trừ `nguyenai.net`**, nơi các service này được build mới theo `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
 
 ---
 
@@ -150,19 +155,21 @@ Any repo that currently has its own auth, pricing, progress store, certificate g
 
 ---
 
-## 5. What Nguyen AI is NOT (locked)
+## 5. What Nguyen AI is NOT (locked, amended 2026-07-02)
 
-- Not a new runtime
-- Not a new identity provider
-- Not a new academy engine
-- Not a new billing engine
-- Not a new certificate engine
-- Not a Gen 3
-- Not a fork of Gen 1 or Gen 2
+> **FOUNDER OVERRIDE 2026-07-02:** Lines struck through below are superseded by Founder sign-off. `nguyenai.net` now owns an independent backend. See `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
+
+- ~~Not a new runtime~~ → **IS a new runtime** (independent backend, `apps/api/` Hono on Workers)
+- ~~Not a new identity provider~~ → **IS its own identity provider** (`@nai/auth` via better-auth)
+- ~~Not a new academy engine~~ → **IS its own academy engine** (`apps/academy/`)
+- ~~Not a new billing engine~~ → **IS its own billing engine** (`@nai/billing`, VNPay + Stripe)
+- ~~Not a new certificate engine~~ → **IS its own certificate engine** (`@nai/evidence`)
+- Not a Gen 3 (it is a vertical product line, not a generation)
+- Not a fork of Gen 1 or Gen 2 (fresh build, selective copy only)
 - Not a replacement brand for `maytinhai.org`
-- Not a vertical that owns its own user database
+- ~~Not a vertical that owns its own user database~~ → **IS a vertical that owns its own user database** (Neon Postgres + D1)
 
-Any code, doc, or commit that implies any of the above is a defect and must be corrected before release.
+Any code, doc, or commit that still implies the struck-through items is a defect and must be corrected before release.
 
 ---
 
@@ -170,7 +177,7 @@ Any code, doc, or commit that implies any of the above is a defect and must be c
 
 | Repo | May NOT |
 |---|---|
-| `nguyenai.net` | define pricing independently, expose `computer.iai.one` on hero/CTA, claim runtime readiness without evidence |
+| `nguyenai.net` | expose `computer.iai.one` on hero/CTA, claim runtime readiness without evidence, copy packages from `maytinhai-os` without security audit |
 | `nguyenai-console` | implement its own auth, persist business state in localStorage, call model providers directly from browser, define plans/entitlements |
 | `nguyenai-academy` | implement its own auth, persist progress in memory, generate certificate IDs with `Math.random`, define quiz bank per track in isolation from Proof service |
 | `nguyenai-invest` | implement its own auth, ship private room as static HTML, define its own qualification rules outside this contract |

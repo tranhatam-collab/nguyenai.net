@@ -52,6 +52,7 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/brand/NAI_BRAND_IDENTITY_DESIGN_PROMPT.md` — full brand identity system prompt (logo, color, typography, icons, social, favicon)
 - `docs/product/NGUYEN_AI_PRODUCT_ARCHITECTURE.md`
 - `docs/seo/NGUYEN_AI_SEO_SPEC.md`
+- `docs/seo/GOOGLE_SEARCH_CONSOLE_SETUP.md` — GSC verification + sitemap submission guide
 - `docs/privacy/NGUYEN_AI_PRIVACY_DATA_MAP.md`
 - `docs/security/NGUYEN_AI_AI_SAFETY_POLICY.md`
 - `docs/architecture/NGUYEN_AI_TECHNICAL_ARCHITECTURE.md`
@@ -156,24 +157,32 @@ Financial and legal tools support analysis only, not licensed advisory services.
 
 ## Technical status
 
+> **FOUNDER OVERRIDE 2026-07-02:** `nguyenai.net` sở hữu backend riêng độc lập. Gen1 (`computer.iai.one`) và Gen2 (`maytinhai.org`) đóng băng (reference only, không sửa, không deploy). See `docs/governance/NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
+
 Current state:
 
-- Public website: scaffolded (Astro static, 24 bilingual routes).
-- AI Computer runtime: not yet scaffolded in this workspace (inherits Gen1 from `computer.iai.one`).
+- Public website: scaffolded (Astro static, 24 bilingual routes) — sẽ chuyển vào `apps/web/`.
+- AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1).
+- Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa.
+- Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package.
 - Live runtime: unverified.
 - Brand and product plan: locked via Master Positioning Gen1–Gen2.
 - Production release: not approved.
 
 ## Recommended stack
 
-Initial implementation should prefer:
+> **LOCKED 2026-07-02** per `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`:
 
-- Astro for public SEO site.
-- Cloudflare Pages for hosting.
-- Cloudflare Workers + Hono for API.
-- Neon PostgreSQL or Cloudflare D1 after data model decision.
-- Cloudflare R2 for archival media.
-- Resend or equivalent for transactional email.
+- Public web: Astro static (`apps/web/`).
+- Console (`app.nguyenai.net`): Astro + React islands (`apps/console/`).
+- API: Cloudflare Workers + Hono (`apps/api/`).
+- DB: **Neon PostgreSQL** (primary, cần pgvector + transaction) + Cloudflare D1 (edge).
+- Storage: Cloudflare R2 (vault, audit archive).
+- Cache/KV: Cloudflare KV.
+- Vector: Qdrant Cloud (dev) → dedicated (prod).
+- Email: Resend.
+- Auth: `@nai/auth` (better-auth rebrand) chạy trong Workers.
+- Hosting web: Cloudflare Pages.
 
 ## Required audit before production
 
@@ -204,13 +213,27 @@ Do not approve production release without:
 
 ## Dev commands
 
-Public website (Astro static):
+> **Phase 0 (2026-07-02):** Monorepo setup. `src/` chuyển vào `apps/web/`. Root dùng pnpm workspace + turbo.
+
+Monorepo (root):
 
 ```bash
-npm install
-npm run dev
-npm run build
-npm run preview
+pnpm install          # install tất cả workspace
+pnpm build            # build tất cả apps + packages (turbo)
+pnpm typecheck        # typecheck tất cả
+pnpm test             # test tất cả
+pnpm lint             # lint tất cả
+pnpm --filter ./apps/web dev      # chạy web dev
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
 ```
 
-Build currently runs `astro build` for the static public website.
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).

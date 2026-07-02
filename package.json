@@ -3,12 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@^9",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "dev:web": "pnpm --filter ./apps/web dev",
+    "build:web": "pnpm --filter ./apps/web build",
+    "preview:web": "pnpm --filter ./apps/web preview",
+    "dev:api": "pnpm --filter ./apps/api dev",
+    "build:api": "pnpm --filter ./apps/api build",
+    "typecheck:web": "pnpm --filter ./apps/web exec tsc --noEmit",
+    "typecheck:api": "pnpm --filter ./apps/api exec tsc --noEmit",
+    "verify": "pnpm run typecheck && pnpm run build",
+    "audit:contamination": "bash tools/audit-clone-contamination.sh"
   },
-  "dependencies": {
-    "astro": "^7.0.4"
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0"
   }
 }

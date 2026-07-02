@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Nguyen AI — Arch of Light Logo Mark (monochrome white, for dark backgrounds) -->
+  <path d="M 25 175 Q 100 25 175 175" stroke="#FFFFFF" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <path d="M 42 175 Q 100 52 158 175" stroke="#FFFFFF" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 59 175 Q 100 79 141 175" stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="100" cy="100" r="16" fill="#FFFFFF"/>
+  <g stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6">
+    <line x1="100" y1="74" x2="100" y2="67"/>
+    <line x1="100" y1="126" x2="100" y2="133"/>
+    <line x1="74" y1="100" x2="67" y2="100"/>
+    <line x1="126" y1="100" x2="133" y2="100"/>
+    <line x1="82" y1="82" x2="77" y2="77"/>
+    <line x1="118" y1="118" x2="123" y2="123"/>
+    <line x1="118" y1="82" x2="123" y2="77"/>
+    <line x1="82" y1="118" x2="77" y2="123"/>
+  </g>
+  <line x1="20" y1="175" x2="180" y2="175" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 20 175 Q 50 165 80 170 Q 110 163 140 169 Q 155 166 180 175 L 180 185 L 20 185 Z" fill="#FFFFFF" opacity="0.5"/>
+</svg>

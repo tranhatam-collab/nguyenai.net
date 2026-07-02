@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" fill="none">
+  <!--
+    Nguyen AI — Arch of Light Logo (geometric SVG reconstruction)
+    FOUNDER LOCKED Arch V3.0 — 2026-07-02
+    Concept: layered arch, rising sun, open horizon, terrain base
+    Full-color version: ONLY on white #FFFFFF background
+  -->
+  <defs>
+    <linearGradient id="archOuter" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#7A2212"/>
+      <stop offset="100%" stop-color="#A6260C"/>
+    </linearGradient>
+    <linearGradient id="archMid" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#A6260C"/>
+      <stop offset="100%" stop-color="#E55B09"/>
+    </linearGradient>
+    <linearGradient id="archInner" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#E55B09"/>
+      <stop offset="100%" stop-color="#F48B0D"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FFB810"/>
+      <stop offset="60%" stop-color="#F48B0D"/>
+      <stop offset="100%" stop-color="#E55B09" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="terrain" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7A2212"/>
+      <stop offset="50%" stop-color="#A6260C"/>
+      <stop offset="100%" stop-color="#7A2212"/>
+    </linearGradient>
+  </defs>
+
+  <!-- White background (mandatory for full-color logo) -->
+  <rect width="600" height="200" fill="#FFFFFF"/>
+
+  <!-- Logo mark area: 0-180 x, 10-190 y -->
+  <!-- Outer arch (largest, darkest) -->
+  <path d="M 20 170 Q 90 20 160 170" stroke="url(#archOuter)" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+  <!-- Middle arch -->
+  <path d="M 35 170 Q 90 45 145 170" stroke="url(#archMid)" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- Inner arch (smallest, brightest) -->
+  <path d="M 50 170 Q 90 70 130 170" stroke="url(#archInner)" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Sun glow (behind sun disc) -->
+  <circle cx="90" cy="95" r="28" fill="url(#sunGlow)" opacity="0.6"/>
+
+  <!-- Sun disc (center, gold) -->
+  <circle cx="90" cy="95" r="14" fill="#FFB810"/>
+
+  <!-- Sun rays (8 short lines radiating) -->
+  <g stroke="#F48B0D" stroke-width="2.5" stroke-linecap="round" opacity="0.8">
+    <line x1="90" y1="72" x2="90" y2="66"/>
+    <line x1="90" y1="118" x2="90" y2="124"/>
+    <line x1="67" y1="95" x2="61" y2="95"/>
+    <line x1="113" y1="95" x2="119" y2="95"/>
+    <line x1="74" y1="79" x2="70" y2="75"/>
+    <line x1="106" y1="111" x2="110" y2="115"/>
+    <line x1="106" y1="79" x2="110" y2="75"/>
+    <line x1="74" y1="111" x2="70" y2="115"/>
+  </g>
+
+  <!-- Horizon line (open gateway) -->
+  <line x1="15" y1="170" x2="165" y2="170" stroke="#4A1D14" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Terrain base (layered ground) -->
+  <path d="M 15 170 Q 45 160 75 165 Q 105 158 135 164 Q 150 161 165 170 L 165 178 L 15 178 Z" fill="url(#terrain)" opacity="0.85"/>
+
+  <!-- Digital pixels (3 small squares, representing data/cloud) -->
+  <rect x="28" y="150" width="4" height="4" fill="#F48B0D" rx="0.5"/>
+  <rect x="148" y="150" width="4" height="4" fill="#FFB810" rx="0.5"/>
+  <rect x="88" y="135" width="4" height="4" fill="#E55B09" rx="0.5"/>
+
+  <!-- Wordmark: NGUYEN AI -->
+  <text x="200" y="105" font-family="'Be Vietnam Pro', Inter, system-ui, sans-serif" font-size="42" font-weight="700" fill="#4A1D14" letter-spacing="-0.02em">NGUYEN AI</text>
+
+  <!-- Product category subtitle -->
+  <text x="202" y="135" font-family="'Be Vietnam Pro', Inter, system-ui, sans-serif" font-size="14" font-weight="400" fill="#A6260C" letter-spacing="0.08em">NGUYEN AI COMPUTER</text>
+</svg>
