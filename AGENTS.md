@@ -47,6 +47,7 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/NGUYEN_AI_MASTER_FOUNDATION.md`
 - `docs/brand/NGUYEN_AI_BRAND_CHARTER.md`
 - `docs/brand/NGUYEN_AI_BRAND_CODEX.md`
+- `docs/brand/NAI_BRAND_IDENTITY_DESIGN_PROMPT.md` — full brand identity system prompt (logo, color, typography, icons, social, favicon)
 - `docs/product/NGUYEN_AI_PRODUCT_ARCHITECTURE.md`
 - `docs/seo/NGUYEN_AI_SEO_SPEC.md`
 - `docs/privacy/NGUYEN_AI_PRIVACY_DATA_MAP.md`
