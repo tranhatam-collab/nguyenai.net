@@ -30,33 +30,38 @@ Lock the rules for who may access `invest.nguyenai.net/private/*`, how access is
 
 ## 3. Access flow (locked)
 
+> **BINDING — Founder directive:** VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn. Kasan JSC chỉ là đại diện thương mại. Mọi SAFE / Convertible Note phát hành bởi VIET CAN NEW CORP.
+
 ```
 [Unauthenticated visitor]
         ↓
 Public investor pages (thesis, ecosystem, request access)
         ↓
-User submits request-access form (real backend, not e.preventDefault)
+Step 1: Google Login (OAuth) — no password stored
         ↓
-Email verification
+Step 2: Identity declaration (full legal name + date of birth)
         ↓
-Identity / company information collected
+Step 3: Identity verification via verify.iai.one (document + liveness + name/DOB match)
         ↓
-Qualification questionnaire
+Step 4: Investment payment
+        — VN: QR bank transfer to 3051378 (ACB HCM, Kasan JSC as commercial representative)
+          memo: "INVEST NGUYENAI.NET" or "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"
+        — International: USD wire to VIET CAN NEW CORP (details after verification)
         ↓
-Consent + disclosure acceptance (versioned)
+Step 5: 2FA activation (TOTP or SMS) — required before room access
         ↓
-Manual or automated review by ADMIN / SUPER_ADMIN
-        ↓
-If approved: access grant created with expiry
-        ↓
-MFA login required
-        ↓
-Scoped private-room session (audience = invest.nguyenai.net/private)
+Step 6: Scoped private-room session (audience = invest.nguyenai.net/private)
+        — 90-day expiry, revocable, 2FA gate on every access
         ↓
 Audit every document view / download
         ↓
 Grant expires or is revoked → access removed immediately
 ```
+
+### Legal entity roles in investment flow
+
+- **VIET CAN NEW CORP (US):** primary legal entity, bears full legal responsibility, owns IP, issues SAFE/Convertible Note to all investors (both USD and VND)
+- **Kasan JSC (VN, MST 0315521422):** commercial representative only, receives VND as collection agent, issues VAT, complies with PDPD — does NOT own IP, does NOT bear primary legal liability
 
 ---
 

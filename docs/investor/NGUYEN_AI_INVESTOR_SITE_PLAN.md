@@ -140,20 +140,25 @@ Google Login (OAuth)
 
 ## Payment details (public — shown on invest page)
 
-### Vietnam (VND)
+> **BINDING — Founder directive:** VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống Nguyen AI, sở hữu IP. Kasan JSC (Việt Nam) chỉ là đại diện thương mại đăng ký theo luật Việt Nam để vận hành an toàn, phát hành hóa đơn VAT, tuân thủ PDPD. Kasan JSC không sở hữu IP và không chịu trách nhiệm pháp lý chính yếu.
+
+### Vietnam (VND) — qua đại diện thương mại
 
 - **Account number:** 3051378
 - **Bank:** ACB — Ho Chi Minh Branch (ACB CN HCM)
 - **Account holder:** Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan
+- **Vai trò:** Đại diện thương mại cho VIET CAN NEW CORP tại Việt Nam
 - **Tax ID (MST):** 0315521422
 - **Tax lookup:** https://masothue.com/0315521422-cong-ty-co-phan-dau-tu-giao-duc-va-du-lich-hanh-trinh-kasan
 - **Transfer memo (required):** `INVEST NGUYENAI.NET` or `Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net`
+- **Lưu ý pháp lý:** Mọi trách nhiệm pháp lý về đầu tư thuộc VIET CAN NEW CORP (Hoa Kỳ). Kasan JSC chỉ là đại diện thương mại thu hộ theo luật Việt Nam.
 
-### International (USD)
+### International (USD) — trực tiếp VIET CAN NEW CORP
 
-- **Receiving entity:** VIET CAN NEW CORP (US)
+- **Receiving entity:** VIET CAN NEW CORP (US) — primary legal entity
 - **Wire details:** provided after verify.iai.one verification
 - **Contact:** invest@nguyenai.net
+- **Lưu ý pháp lý:** VIET CAN NEW CORP chịu trách nhiệm pháp lý hoàn toàn về khoản đầu tư này.
 
 ## Email service
 
