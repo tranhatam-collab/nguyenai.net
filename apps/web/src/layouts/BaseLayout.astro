@@ -109,12 +109,19 @@ const graph = [
       <div>
         <strong>{site.name[locale]}</strong>
         <p>{site.tagline[locale]}</p>
+        <p class="footer-legal">
+          {locale === 'vi'
+            ? 'VIET CAN NEW CORP (Hoa Kỳ) — thực thể pháp lý chính, đang hoàn tất đăng ký. Kasan JSC (MST 0315521422) — đại diện thương mại tại Việt Nam.'
+            : 'VIET CAN NEW CORP (US) — primary legal entity, formation in progress. Kasan JSC (Tax ID 0315521422) — commercial representative in Vietnam.'}
+        </p>
       </div>
       <nav aria-label={locale === 'vi' ? 'Điều hướng chân trang' : 'Footer navigation'}>
         <a href={routeFor('trust', locale)}>{locale === 'vi' ? 'Minh chứng' : 'Trust'}</a>
         <a href={routeFor('security', locale)}>{locale === 'vi' ? 'Bảo mật' : 'Security'}</a>
         <a href={routeFor('docs', locale)}>{locale === 'vi' ? 'Tài liệu' : 'Docs'}</a>
         <a href={routeFor('contact', locale)}>{locale === 'vi' ? 'Liên hệ' : 'Contact'}</a>
+        <a href={routeFor('terms', locale)}>{locale === 'vi' ? 'Điều khoản' : 'Terms'}</a>
+        <a href={routeFor('privacy', locale)}>{locale === 'vi' ? 'Quyền riêng tư' : 'Privacy'}</a>
       </nav>
     </footer>
   </body>

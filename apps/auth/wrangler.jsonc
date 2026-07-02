@@ -8,7 +8,8 @@
     "ENVIRONMENT": "development",
     "AUTH_ISSUER": "auth.nguyenai.net",
     "DEFAULT_AUDIENCE": "app.nguyenai.net",
-    "SESSION_MAX_AGE": "3600"
+    "SESSION_MAX_AGE": "3600",
+    "GOOGLE_REDIRECT_URI": "https://auth.nguyenai.net/v1/auth/oauth/google/callback"
   },
   "d1_databases": [
     {

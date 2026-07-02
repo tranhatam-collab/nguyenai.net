@@ -39,6 +39,7 @@ INSERT INTO audit_event_registry (event_type, registry_version, description) VAL
   ('mfa_removed', '2026-07-02.1', 'MFA removed'),
   ('api_key_created', '2026-07-02.1', 'API key created'),
   ('api_key_revoked', '2026-07-02.1', 'API key revoked'),
+  ('email_verified', '2026-07-02.1', 'Email address verified'),
   ('account_deletion_requested', '2026-07-02.1', 'User requested account deletion'),
   -- Authorization events (6)
   ('role_changed', '2026-07-02.1', 'User role changed'),

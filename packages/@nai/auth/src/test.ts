@@ -118,6 +118,7 @@ function testSessionChecks() {
     session_id: 'test',
     user_id: 'test',
     tenant_id: 'test',
+    plan_id: 'nguyen-start',
     audience: 'app.nguyenai.net',
     issuer: 'auth.nguyenai.net',
     roles: ['ADMIN' as Role],

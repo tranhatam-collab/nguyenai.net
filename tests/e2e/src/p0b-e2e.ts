@@ -229,7 +229,7 @@ async function main() {
 
   // Admin approves
   const adminId = crypto.randomUUID();
-  await approveRequest(approvalId, adminId, 'verified safe');
+  await approveRequest(approvalId, adminId, tenantId, 'verified safe');
   const approvedStatus = await checkApprovalStatus(approvalId);
   assert(approvedStatus === 'approved', 'approval is approved');
 

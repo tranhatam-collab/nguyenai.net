@@ -61,7 +61,9 @@ export const routes = [
   { key: 'research', vi: '/research/', en: '/en/research/', labelVi: 'Nghiên cứu', labelEn: 'Research' },
   { key: 'about', vi: '/about/', en: '/en/about/', labelVi: 'Giới thiệu', labelEn: 'About' },
   { key: 'invest', vi: '/invest/', en: '/en/invest/', labelVi: 'Đầu tư', labelEn: 'Invest' },
-  { key: 'contact', vi: '/contact/', en: '/en/contact/', labelVi: 'Liên hệ', labelEn: 'Contact' }
+  { key: 'contact', vi: '/contact/', en: '/en/contact/', labelVi: 'Liên hệ', labelEn: 'Contact' },
+  { key: 'terms', vi: '/terms/', en: '/en/terms/', labelVi: 'Điều khoản', labelEn: 'Terms' },
+  { key: 'privacy', vi: '/privacy/', en: '/en/privacy/', labelVi: 'Quyền riêng tư', labelEn: 'Privacy' }
 ] as const;
 
 export type RouteKey = typeof routes[number]['key'];

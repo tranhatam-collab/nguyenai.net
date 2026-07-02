@@ -8,6 +8,14 @@
     "ENVIRONMENT": "development",
     "AUTH_ISSUER": "auth.nguyenai.net"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nai-identity",
+      "database_id": "5d0f4d21-ecfd-444b-8196-590bcab642bf",
+      "migrations_dir": "../../migrations"
+    }
+  ],
   "r2_buckets": [
     { "binding": "AUDIT_ARCHIVE", "bucket_name": "nai-audit-archive" }
   ]

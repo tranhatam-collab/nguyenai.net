@@ -27,6 +27,7 @@ export type AuditEventType =
   | 'mfa_removed'
   | 'api_key_created'
   | 'api_key_revoked'
+  | 'email_verified'
   | 'account_deletion_requested'
   // Authorization events (6)
   | 'role_changed'
@@ -65,7 +66,7 @@ export const AUDIT_REGISTRY_VERSION = '2026-07-02.1';
 export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'login_success', 'login_failure', 'logout', 'session_revoked', 'session_expired',
   'passkey_registered', 'passkey_removed', 'mfa_enrolled', 'mfa_removed',
-  'api_key_created', 'api_key_revoked', 'account_deletion_requested',
+  'api_key_created', 'api_key_revoked', 'email_verified', 'account_deletion_requested',
   'role_changed', 'permission_granted', 'permission_revoked',
   'org_member_added', 'org_member_removed', 'access_denied',
   'entitlement_granted', 'entitlement_updated', 'entitlement_revoked',

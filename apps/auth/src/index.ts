@@ -25,6 +25,8 @@
  *   GET  /v1/auth/api-keys — list user's API keys
  *   DELETE /v1/auth/api-keys/:id — revoke API key (ownership checked)
  *   GET  /v1/auth/audit — query user's audit log
+ *   GET  /v1/auth/oauth/google/begin — start Google OAuth flow
+ *   GET  /v1/auth/oauth/google/callback — handle Google OAuth callback
  */
 
 import { Hono } from 'hono';
@@ -61,6 +63,9 @@ import {
   createSession,
   findSessionById,
   revokeSession,
+  saveVerificationToken,
+  findUserByVerificationToken,
+  markEmailVerified,
   createMfaFactor,
   findMfaFactorsByUser,
   findPendingMfaFactor,
@@ -71,6 +76,10 @@ import {
   revokeApiKey,
   countFailedLogins,
   countFailedLoginsByIp,
+  findOAuthAccount,
+  findOAuthAccountsByUser,
+  createOAuthAccount,
+  findUserByEmailVerified,
 } from './db.ts';
 
 import type { Context } from 'hono';
@@ -86,6 +95,9 @@ interface AuthEnv {
     AUTH_ISSUER: string;
     DEFAULT_AUDIENCE: string;
     SESSION_MAX_AGE: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_REDIRECT_URI: string;
   };
   Variables: {
     session: Session | null;
@@ -163,6 +175,7 @@ function parseD1Session(s: Record<string, unknown>): Session {
     session_id: s.session_id as string,
     user_id: s.user_id as string,
     tenant_id: s.tenant_id as string,
+    plan_id: (s.plan_id as string) ?? 'nguyen-start',
     audience: s.audience as string,
     issuer: s.issuer as string,
     roles: JSON.parse((s.roles as string) ?? '[]'),
@@ -342,7 +355,10 @@ app.post('/v1/auth/register', async (c) => {
     metadata: { role: 'USER', plan: 'nguyen-start' },
   });
 
-  // P1-5: Send verification + welcome email via @nai/email
+  // P1-5: Save verification token + send welcome email via @nai/email
+  const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24h
+  await saveVerificationToken(c.env.DB, userId, verificationToken, verificationExpiresAt);
+
   try {
     const { createEmailService } = await import('@nai/email');
     const emailService = createEmailService(c.env as { RESEND_API_KEY?: string; ENVIRONMENT?: string });
@@ -365,6 +381,44 @@ app.post('/v1/auth/register', async (c) => {
     organization: { org_id: orgId, tenant_id: tenantId, plan_id: 'nguyen-start' },
     message: 'Account created. Email verification required before login.',
   }, 201);
+});
+
+// ============================================================
+// Verify email — POST /v1/auth/verify-email
+// Per IDENTITY_AND_TENANCY_RFC §3.2 — token-based email verification
+// ============================================================
+
+app.post('/v1/auth/verify-email', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const token = body.token;
+  if (!token || typeof token !== 'string') {
+    return c.json({ error: 'token is required' }, 400);
+  }
+
+  const user = await findUserByVerificationToken(c.env.DB, token);
+  if (!user) {
+    return c.json({ error: 'invalid or already used token' }, 400);
+  }
+
+  // Check expiry
+  if (user.verification_expires_at && new Date(user.verification_expires_at) < new Date()) {
+    return c.json({ error: 'token expired' }, 400);
+  }
+
+  await markEmailVerified(c.env.DB, user.user_id);
+
+  await logAuditEvent({
+    user_id: user.user_id,
+    session_id: null,
+    event_type: 'email_verified',
+    actor_ip: getClientIp(c),
+    user_agent: getUserAgent(c),
+    target: user.user_id,
+    result: 'success',
+    metadata: { email: user.email },
+  });
+
+  return c.json({ verified: true, email: user.email });
 });
 
 // ============================================================
@@ -742,6 +796,176 @@ app.get('/v1/auth/audit', async (c) => {
       ...e,
       metadata: JSON.parse((e.metadata as string) ?? '{}'),
     })),
+  });
+});
+
+// ============================================================
+// Google OAuth — GET /v1/auth/oauth/google/begin
+// ============================================================
+
+const GOOGLE_OAUTH_SCOPE = 'openid email profile';
+const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
+
+function generateStateToken(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+app.get('/v1/auth/oauth/google/begin', async (c) => {
+  const state = generateStateToken();
+  const redirectUri = c.env.GOOGLE_REDIRECT_URI || `https://${c.env.AUTH_ISSUER}/v1/auth/oauth/google/callback`;
+  const params = new URLSearchParams({
+    client_id: c.env.GOOGLE_CLIENT_ID,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: GOOGLE_OAUTH_SCOPE,
+    state,
+    access_type: 'online',
+    prompt: 'select_account',
+  });
+  const url = `${GOOGLE_AUTH_URL}?${params.toString()}`;
+  return c.json({ authorize_url: url, state });
+});
+
+// ============================================================
+// Google OAuth — GET /v1/auth/oauth/google/callback
+// ============================================================
+
+app.get('/v1/auth/oauth/google/callback', async (c) => {
+  const code = c.req.query('code');
+  const state = c.req.query('state');
+  const error = c.req.query('error');
+
+  if (error) {
+    return c.json({ error: `OAuth error: ${error}` }, 400);
+  }
+  if (!code || !state) {
+    return c.json({ error: 'missing code or state' }, 400);
+  }
+
+  const redirectUri = c.env.GOOGLE_REDIRECT_URI || `https://${c.env.AUTH_ISSUER}/v1/auth/oauth/google/callback`;
+
+  // Exchange code for tokens
+  const tokenResp = await fetch(GOOGLE_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
+      client_id: c.env.GOOGLE_CLIENT_ID,
+      client_secret: c.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+    }),
+  });
+
+  if (!tokenResp.ok) {
+    const errText = await tokenResp.text();
+    console.error('Google token exchange failed:', errText);
+    return c.json({ error: 'token exchange failed' }, 502);
+  }
+
+  const tokens = await tokenResp.json() as { access_token: string; id_token?: string };
+
+  // Fetch user profile
+  const userInfoResp = await fetch(GOOGLE_USERINFO_URL, {
+    headers: { Authorization: `Bearer ${tokens.access_token}` },
+  });
+
+  if (!userInfoResp.ok) {
+    return c.json({ error: 'failed to fetch user info' }, 502);
+  }
+
+  const userInfo = await userInfoResp.json() as {
+    sub: string;
+    email: string;
+    email_verified?: boolean;
+    name?: string;
+    picture?: string;
+    locale?: string;
+  };
+
+  if (!userInfo.email) {
+    return c.json({ error: 'no email returned from Google' }, 400);
+  }
+
+  // Check if OAuth account already linked
+  const existingOAuth = await findOAuthAccount(c.env.DB, 'google', userInfo.sub);
+  let userId: string;
+  let isNewUser = false;
+
+  if (existingOAuth) {
+    // Existing OAuth user — log in
+    userId = existingOAuth.user_id;
+  } else {
+    // Check if email exists (verified)
+    const existingUser = await findUserByEmailVerified(c.env.DB, userInfo.email);
+    if (existingUser) {
+      // Link OAuth to existing account
+      userId = existingUser.user_id;
+      const oauthId = generateSessionId();
+      await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
+    } else {
+      // Create new user
+      userId = generateSessionId();
+      const orgId = generateSessionId();
+      const membershipId = generateSessionId();
+      const name = userInfo.name ?? userInfo.email.split('@')[0];
+      const locale = userInfo.locale === 'vi' ? 'vi' : 'en';
+
+      await createUser(c.env.DB, userId, userInfo.email, null, name, locale);
+      await createOrganization(c.env.DB, orgId, userId, `${name}'s workspace`);
+      await createMembership(c.env.DB, membershipId, orgId, userId, 'owner');
+
+      // Mark email verified (Google verified)
+      if (userInfo.email_verified) {
+        await markEmailVerified(c.env.DB, userId);
+      }
+
+      // Link OAuth account
+      const oauthId = generateSessionId();
+      await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
+      isNewUser = true;
+    }
+  }
+
+  // Create session
+  const sessionId = generateSessionId();
+  const csrfToken = generateCsrfToken();
+  const maxAge = getMaxAge(c);
+  const expiresAt = getExpiresAt(maxAge);
+  const ip = getClientIp(c);
+  const userAgent = getUserAgent(c);
+
+  await createSession(
+    c.env.DB,
+    sessionId,
+    userId,
+    'nguyen-start',
+    c.env.DEFAULT_AUDIENCE,
+    c.env.AUTH_ISSUER,
+    ['user'],
+    getPermissionsForRoles(['user' as Role]),
+    null,
+    ip,
+    userAgent,
+    csrfToken,
+    expiresAt,
+  );
+
+  await logLoginSuccess(userId, sessionId, ip, userAgent, 'google-oauth');
+
+  const cookie = buildCookieHeader(sessionId, maxAge, c.env.AUTH_ISSUER);
+  c.header('Set-Cookie', cookie);
+
+  return c.json({
+    session_id: sessionId,
+    user_id: userId,
+    csrf_token: csrfToken,
+    is_new_user: isNewUser,
+    expires_at: expiresAt,
   });
 });
 

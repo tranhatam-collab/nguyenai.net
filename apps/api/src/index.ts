@@ -20,7 +20,6 @@ import { cors } from 'hono/cors';
 
 import {
   SESSION_COOKIE_NAME,
-  resolveSessionFromCookie,
   buildClearCookieHeader,
   type Session,
   type Role,
@@ -34,11 +33,12 @@ import {
   InMemoryAuditStore,
   setAuditStore,
 } from '@nai/audit';
+import { D1AuditStore } from './d1-audit-store';
 
 import {
   resolveEntitlements,
   checkCommandQuota,
-  type InMemoryEntitlementStore,
+  InMemoryEntitlementStore,
   setEntitlementStore,
 } from '@nai/entitlement';
 
@@ -63,6 +63,7 @@ interface AppEnv {
     ENVIRONMENT: string;
     AUTH_ISSUER: string;
     AUDIT_ARCHIVE: R2Bucket;
+    DB: D1Database;
     DATABASE_URL?: string;
   };
   Variables: {
@@ -86,21 +87,35 @@ app.use('*', cors({
 }));
 
 // ============================================================
-// Initialize stores (in-memory for dev; production uses Postgres + R2)
+// Initialize stores
+// Audit: D1-backed (persistent) — R2 fix
+// Entitlement: InMemory for custom records (plan-based comes from static catalog)
+// Approval: InMemory (will move to D1 in next sprint)
 // ============================================================
 
-setAuditStore(new InMemoryAuditStore());
-setEntitlementStore(new (await import('@nai/entitlement')).InMemoryEntitlementStore());
-setApprovalStore(new InMemoryApprovalStore());
+let storesInitialized = false;
+function initStores(env: AppEnv['Bindings']): void {
+  if (storesInitialized) return;
+  // Use D1 audit store for persistence (R2 fix)
+  if (env.DB) {
+    setAuditStore(new D1AuditStore(env.DB));
+  } else {
+    setAuditStore(new InMemoryAuditStore());
+  }
+  setEntitlementStore(new InMemoryEntitlementStore());
+  setApprovalStore(new InMemoryApprovalStore());
+  storesInitialized = true;
+}
 
 // ============================================================
 // Middleware — resolve session from cookie
 // ============================================================
 
 app.use('/v1/*', async (c, next) => {
+  initStores(c.env);
   const cookie = c.req.header('Cookie') ?? '';
   const sessionCookie = parseCookie(cookie, SESSION_COOKIE_NAME);
-  c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie) : null);
+  c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie, c.env) : null);
   await next();
 });
 
@@ -170,7 +185,8 @@ app.get('/v1/entitlements', async (c) => {
   if (!session) {
     return c.json({ error: 'unauthorized' }, 401);
   }
-  const planId = (c.req.query('plan') ?? 'nguyen-start') as PlanId;
+  // P0 escalation fix: plan comes from session (org), NOT from query param
+  const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
   const ent = await resolveEntitlements(session.user_id, session.tenant_id, planId);
   return c.json(ent);
 });
@@ -199,7 +215,8 @@ app.get('/v1/usage', async (c) => {
   if (!session) {
     return c.json({ error: 'unauthorized' }, 401);
   }
-  const planId = (c.req.query('plan') ?? 'nguyen-start') as PlanId;
+  // P0 escalation fix: plan comes from session (org), NOT from query param
+  const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
   const quota = await checkCommandQuota(session.user_id, session.tenant_id, planId);
   return c.json({ command_quota: quota });
 });
@@ -233,7 +250,7 @@ app.post('/v1/approvals/:id/approve', async (c) => {
   }
   const id = c.req.param('id');
   try {
-    await approveRequest(id, session.user_id);
+    await approveRequest(id, session.user_id, session.tenant_id);
     return c.json({ approval_id: id, status: 'approved' });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
@@ -247,7 +264,7 @@ app.post('/v1/approvals/:id/deny', async (c) => {
   }
   const id = c.req.param('id');
   try {
-    await denyRequest(id, session.user_id);
+    await denyRequest(id, session.user_id, session.tenant_id);
     return c.json({ approval_id: id, status: 'denied' });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
@@ -308,11 +325,41 @@ function parseCookie(cookieHeader: string, name: string): string | null {
   return null;
 }
 
-// Stub — in production this calls the auth service
-async function resolveSessionFromCookie(_cookie: string): Promise<Session | null> {
-  // TODO: call auth.nguyenai.net /v1/session with the cookie
-  // For now, return null (no session in dev without real auth service)
-  return null;
+// R2 fix: resolve session from D1 (shared with auth Worker)
+async function resolveSessionFromCookie(sessionId: string, env: AppEnv['Bindings']): Promise<Session | null> {
+  if (!env.DB) return null;
+  const row = await env.DB.prepare(
+    `SELECT s.*, o.plan_id
+     FROM sessions s
+     JOIN organizations o ON o.tenant_id = s.tenant_id
+     WHERE s.session_id = ?1 AND s.revoked_at IS NULL`
+  ).bind(sessionId).first<{
+    session_id: string; user_id: string; tenant_id: string; plan_id: string;
+    audience: string; issuer: string; roles: string; permissions: string;
+    csrf_token: string; issued_at: string; expires_at: string;
+    rotated_at: string | null; revoked_at: string | null;
+    device: string | null; ip_address: string | null; user_agent: string | null;
+  }>();
+  if (!row) return null;
+  if (new Date(row.expires_at) < new Date()) return null;
+  return {
+    session_id: row.session_id,
+    user_id: row.user_id,
+    tenant_id: row.tenant_id,
+    plan_id: row.plan_id ?? 'nguyen-start',
+    audience: row.audience,
+    issuer: row.issuer,
+    roles: JSON.parse(row.roles ?? '[]'),
+    permissions: JSON.parse(row.permissions ?? '[]'),
+    device: row.device ? JSON.parse(row.device) : null,
+    ip_address: row.ip_address,
+    user_agent: row.user_agent,
+    csrf_token: row.csrf_token,
+    issued_at: row.issued_at,
+    expires_at: row.expires_at,
+    rotated_at: row.rotated_at,
+    revoked_at: row.revoked_at,
+  };
 }
 
 export default app;

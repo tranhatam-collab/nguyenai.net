@@ -68,6 +68,7 @@ export interface Session {
   session_id: string;
   user_id: string;
   tenant_id: string;
+  plan_id: string;
   audience: string;
   issuer: string;
   roles: Role[];

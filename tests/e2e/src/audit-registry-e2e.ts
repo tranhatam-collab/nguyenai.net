@@ -1,8 +1,8 @@
 /**
- * Audit Event Registry E2E — verify all 38 event types insert + query.
+ * Audit Event Registry E2E — verify all 39 event types insert + query.
  *
  * Per AUDIT_EVENT_REGISTRY.md (registry version 2026-07-02.1):
- * - All 38 event types must insert successfully
+ * - All 39 event types must insert successfully
  * - Unknown event type must be rejected (TS compile-time)
  * - Registry version must be recorded per event
  * - Append-only: no update/delete methods
@@ -22,11 +22,11 @@ function assert(cond: boolean, msg: string): void {
 }
 
 async function main(): Promise<void> {
-  console.log('=== Audit Event Registry E2E: 38 event types ===\n');
+  console.log('=== Audit Event Registry E2E: 39 event types ===\n');
 
   const store = new InMemoryAuditStore();
 
-  // Insert all 38 event types
+  // Insert all 39 event types
   let inserted = 0;
   for (const eventType of EVENT_TYPES) {
     const id = await store.log({
@@ -43,12 +43,12 @@ async function main(): Promise<void> {
     assert(!!id, `${eventType} should return event_id`);
     inserted++;
   }
-  assert(inserted === 38, `should insert 38 events, got ${inserted}`);
-  console.log(`✓ Inserted ${inserted}/38 event types`);
+  assert(inserted === 39, `should insert 39 events, got ${inserted}`);
+  console.log(`✓ Inserted ${inserted}/39 event types`);
 
   // Verify count via store.query
   const allEvents = await store.query({});
-  assert(allEvents.length === 38, `total events should be 38, got ${allEvents.length}`);
+  assert(allEvents.length === 39, `total events should be 39, got ${allEvents.length}`);
   console.log(`✓ Total count: ${allEvents.length}`);
 
   // Verify registry version on each event
@@ -65,15 +65,15 @@ async function main(): Promise<void> {
     const events = await store.query({ event_type: eventType });
     assert(events.length === 1, `${eventType} should have exactly 1 event, got ${events.length}`);
   }
-  console.log('✓ All 38 event types individually queryable');
+  console.log('✓ All 39 event types individually queryable');
 
   // Verify append-only (no update/delete)
   assert(typeof (store as unknown as { update?: unknown }).update === 'undefined', 'no update method');
   assert(typeof (store as unknown as { delete?: unknown }).delete === 'undefined', 'no delete method');
   console.log('✓ Append-only: no update/delete methods');
 
-  // Verify count is 38 (not 19 from old registry)
-  assert(EVENT_TYPES.length === 38, `AUDIT_EVENT_TYPES should have 38 entries, got ${EVENT_TYPES.length}`);
+  // Verify count is 39 (not 19 from old registry)
+  assert(EVENT_TYPES.length === 39, `AUDIT_EVENT_TYPES should have 39 entries, got ${EVENT_TYPES.length}`);
   console.log(`✓ AUDIT_EVENT_TYPES export has ${EVENT_TYPES.length} entries`);
 
   console.log('\n=== ALL AUDIT REGISTRY TESTS PASSED ===');

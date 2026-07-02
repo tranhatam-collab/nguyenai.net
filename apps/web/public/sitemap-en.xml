@@ -25,4 +25,7 @@
   <url><loc>https://nguyenai.net/en/about/</loc><xhtml:link rel="alternate" hreflang="vi-VN" href="https://nguyenai.net/about/"/><xhtml:link rel="alternate" hreflang="en" href="https://nguyenai.net/en/about/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://nguyenai.net/about/"/></url>
   <url><loc>https://nguyenai.net/en/invest/</loc><xhtml:link rel="alternate" hreflang="vi-VN" href="https://nguyenai.net/invest/"/><xhtml:link rel="alternate" hreflang="en" href="https://nguyenai.net/en/invest/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://nguyenai.net/invest/"/></url>
   <url><loc>https://nguyenai.net/en/contact/</loc><xhtml:link rel="alternate" hreflang="vi-VN" href="https://nguyenai.net/contact/"/><xhtml:link rel="alternate" hreflang="en" href="https://nguyenai.net/en/contact/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://nguyenai.net/contact/"/></url>
+
+  <url><loc>https://nguyenai.net/en/terms/</loc><xhtml:link rel="alternate" hreflang="vi-VN" href="https://nguyenai.net/terms/"/><xhtml:link rel="alternate" hreflang="en" href="https://nguyenai.net/en/terms/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://nguyenai.net/terms/"/></url>
+  <url><loc>https://nguyenai.net/en/privacy/</loc><xhtml:link rel="alternate" hreflang="vi-VN" href="https://nguyenai.net/privacy/"/><xhtml:link rel="alternate" hreflang="en" href="https://nguyenai.net/en/privacy/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://nguyenai.net/privacy/"/></url>
 </urlset>

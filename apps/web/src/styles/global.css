@@ -320,6 +320,13 @@ summary:hover {
   color: rgba(255, 255, 255, 0.7);
 }
 
+.footer-legal {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+}
+
 .site-footer nav {
   display: flex;
   flex-wrap: wrap;

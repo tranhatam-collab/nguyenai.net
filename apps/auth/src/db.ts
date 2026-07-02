@@ -14,12 +14,15 @@ export interface D1User {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
+  verification_token: string | null;
+  verification_expires_at: string | null;
 }
 
 export interface D1Session {
   session_id: string;
   user_id: string;
   tenant_id: string;
+  plan_id: string;
   audience: string;
   issuer: string;
   roles: string;
@@ -210,7 +213,12 @@ export async function createSession(
 }
 
 export async function findSessionById(db: D1Database, sessionId: string): Promise<D1Session | null> {
-  const stmt = db.prepare('SELECT * FROM sessions WHERE session_id = ?1');
+  const stmt = db.prepare(
+    `SELECT s.*, o.plan_id
+     FROM sessions s
+     JOIN organizations o ON o.tenant_id = s.tenant_id
+     WHERE s.session_id = ?1`
+  );
   const result = await stmt.bind(sessionId).first<D1Session>();
   return result ?? null;
 }
@@ -386,4 +394,93 @@ export async function queryAuditLogD1(
   const bound = params.length > 0 ? stmt.bind(...params) : stmt;
   const result = await bound.all();
   return result.results ?? [];
+}
+
+// ============================================================
+// Email verification queries — per IDENTITY_AND_TENANCY_RFC §3.2
+// ============================================================
+
+export async function saveVerificationToken(
+  db: D1Database,
+  userId: string,
+  token: string,
+  expiresAt: string,
+): Promise<void> {
+  await db.prepare(
+    'UPDATE users SET verification_token = ?1, verification_expires_at = ?2 WHERE user_id = ?3'
+  ).bind(token, expiresAt, userId).run();
+}
+
+export async function findUserByVerificationToken(
+  db: D1Database,
+  token: string,
+): Promise<D1User | null> {
+  const result = await db.prepare(
+    'SELECT * FROM users WHERE verification_token = ?1 AND deleted_at IS NULL'
+  ).bind(token).first<D1User>();
+  return result ?? null;
+}
+
+export async function markEmailVerified(
+  db: D1Database,
+  userId: string,
+): Promise<void> {
+  await db.prepare(
+    'UPDATE users SET email_verified = 1, verification_token = NULL, verification_expires_at = NULL WHERE user_id = ?1'
+  ).bind(userId).run();
+}
+
+// ============================================================
+// OAuth accounts
+// ============================================================
+
+export interface D1OAuthAccount {
+  oauth_id: string;
+  user_id: string;
+  provider: string;
+  provider_user_id: string;
+  created_at: string;
+}
+
+export async function findOAuthAccount(
+  db: D1Database,
+  provider: string,
+  providerUserId: string,
+): Promise<D1OAuthAccount | null> {
+  const result = await db.prepare(
+    'SELECT * FROM oauth_accounts WHERE provider = ?1 AND provider_user_id = ?2'
+  ).bind(provider, providerUserId).first<D1OAuthAccount>();
+  return result ?? null;
+}
+
+export async function findOAuthAccountsByUser(
+  db: D1Database,
+  userId: string,
+): Promise<D1OAuthAccount[]> {
+  const result = await db.prepare(
+    'SELECT * FROM oauth_accounts WHERE user_id = ?1 ORDER BY created_at DESC'
+  ).bind(userId).all<D1OAuthAccount>();
+  return result.results ?? [];
+}
+
+export async function createOAuthAccount(
+  db: D1Database,
+  oauthId: string,
+  userId: string,
+  provider: string,
+  providerUserId: string,
+): Promise<void> {
+  await db.prepare(
+    'INSERT INTO oauth_accounts (oauth_id, user_id, provider, provider_user_id) VALUES (?1, ?2, ?3, ?4)'
+  ).bind(oauthId, userId, provider, providerUserId).run();
+}
+
+export async function findUserByEmailVerified(
+  db: D1Database,
+  email: string,
+): Promise<D1User | null> {
+  const result = await db.prepare(
+    'SELECT * FROM users WHERE email = ?1 AND email_verified = 1 AND deleted_at IS NULL'
+  ).bind(email).first<D1User>();
+  return result ?? null;
 }
