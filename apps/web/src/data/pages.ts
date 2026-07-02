@@ -113,10 +113,10 @@ export type PageContent = {
 const vi: Record<RouteKey, PageContent> = {
   home: {
     key: 'home',
-    title: 'Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu',
+    title: 'Nguyen AI Computer | AI Computer cho thế hệ Nguyễn toàn cầu',
     description: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 Model máy + 9 Functional Products + 9 Agent chuyên biệt + 7 Super App di sản.',
     eyebrow: 'Nguyen AI Computer',
-    heroTitle: 'Máy Tính AI của thế hệ Nguyễn toàn cầu.',
+    heroTitle: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
     heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ 9 AI Agent, bộ nhớ dài hạn, kho dữ liệu, 7 Super App di sản, 12 tool family làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
     primaryCta: 'Khởi tạo Nguyen AI Computer',
     secondaryCta: 'Khám phá cách hệ thống vận hành',
@@ -150,8 +150,8 @@ const vi: Record<RouteKey, PageContent> = {
       ]
     },
     architectureDiagram: {
-      title: 'Kiến trúc Gen 1 → Gen 2 → Nguyen AI',
-      body: 'Không xây backend riêng tùy tiện cho từng repository. Ba lớp kế thừa, mỗi lớp có vai trò rõ ràng.',
+      title: 'Kiến trúc Nguyen AI — Backend độc lập',
+      body: 'Nguyen AI sở hữu backend riêng độc lập. Gen 1 và Gen 2 đóng băng làm kiến trúc tham chiếu; adapter giữ compatibility contract khi integrate. Ba lớp vận hành, mỗi lớp có vai trò rõ ràng.',
       layers: [
         { name: 'Runtime độc lập — Lõi thực thi', role: 'Runtime, Agent, công cụ, bộ nhớ, bằng chứng', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
         { name: 'Identity & commerce', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
@@ -248,7 +248,7 @@ const vi: Record<RouteKey, PageContent> = {
       ]
     },
     pricingTable: {
-      title: '8 Gói sản phẩm — Giá định hướng',
+      title: '9 Model máy — Giá định hướng',
       body: 'Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.',
       plans: [
         { name: 'Nguyen Start', code: 'nguyen-start', price: 'Free', target: 'Người mới thử', features: ['2 Agent (Guide, Guardian)', '100MB memory, 500MB vault', '10 commands/ngày', 'Không Super App'], cta: 'Bắt đầu miễn phí' },
@@ -258,26 +258,27 @@ const vi: Record<RouteKey, PageContent> = {
         { name: 'Nguyen Founder', code: 'nguyen-founder', price: '1.999.000₫', period: '/tháng', target: 'Nhà sáng lập', features: ['7 Agent (+Founder, Business)', '50GB memory, 200GB vault', '1.000 commands/ngày', '+ Founder OS, Finance, Legal'], cta: 'Chọn Founder', highlighted: true },
         { name: 'Nguyen Business', code: 'nguyen-business', price: '4.999.000₫', period: '/tháng', target: 'Doanh nghiệp 5-25 seat', features: ['8 Agent (+Global Connector)', '200GB memory, 1TB vault', '5.000 commands/ngày', '+ Business OS, Sales, Automation'], cta: 'Chọn Business' },
         { name: 'Nguyen Chapter', code: 'nguyen-chapter', price: '7.999.000₫', period: '/tháng', target: 'Chi họ, hội, cộng đồng', features: ['9 Agent (all)', '500GB memory, 5TB vault', '10.000 commands/ngày', '+ Chapter OS, Network, Knowledge'], cta: 'Chọn Chapter' },
-        { name: 'Enterprise / Dedicated', code: 'nguyen-enterprise', price: 'Báo giá', target: 'Tổ chức lớn 25+ seat', features: ['9 Agent + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Liên hệ' }
+        { name: 'Nguyen Enterprise', code: 'nguyen-enterprise', price: 'Báo giá', target: 'Tổ chức lớn 25+ seat', features: ['9 Agent + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Liên hệ' },
+        { name: 'Nguyen Sovereign', code: 'nguyen-sovereign', price: 'Báo giá', target: 'Dedicated/private, on-premise', features: ['9 Agent + custom', 'Dedicated memory, dedicated vault', 'Unlimited quota', 'Data residency, on-prem, sovereign deploy'], cta: 'Liên hệ' }
       ]
     },
     comparisonTable: {
-      title: 'So sánh chi tiết 8 gói',
-      body: 'So sánh năng lực, bộ nhớ, vault, agent, quota, Super App và approval gate giữa 8 gói.',
+      title: 'So sánh chi tiết 9 Model',
+      body: 'So sánh năng lực, bộ nhớ, vault, agent, quota, Super App và approval gate giữa 9 Model máy.',
       columns: [
         { label: 'Start' }, { label: 'Personal' }, { label: 'Family' }, { label: 'Creator' },
         { label: 'Founder', highlight: true }, { label: 'Business' }, { label: 'Chapter' },
-        { label: 'Enterprise', highlight: true }
+        { label: 'Enterprise', highlight: true }, { label: 'Sovereign', highlight: true }
       ],
       rows: [
-        { label: 'Giá/tháng', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Báo giá'] },
-        { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise'] },
-        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom'] },
-        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom'] },
-        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom'] },
-        { label: 'Quota/ngày', values: ['10', '100', '300', '500', '1.000', '5.000', '10.000', 'Custom'] },
-        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+'] },
-        { label: 'Approval', values: ['sensitive', 'sensitive', 'family', 'sensitive', 'financial', 'per-role', 'board', 'custom'] }
+        { label: 'Giá/tháng', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Báo giá', 'Báo giá'] },
+        { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise', 'enterprise'] },
+        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom', '9+custom'] },
+        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom', 'Dedicated'] },
+        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom', 'Dedicated'] },
+        { label: 'Quota/ngày', values: ['10', '100', '300', '500', '1.000', '5.000', '10.000', 'Custom', 'Unlimited'] },
+        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+', 'All+'] },
+        { label: 'Approval', values: ['all', 'sensitive', 'sensitive', 'sensitive', 'sensitive', 'per-role', 'board', 'custom', 'custom'] }
       ]
     },
     academySection: {
@@ -630,8 +631,8 @@ const en: Record<RouteKey, PageContent> = {
       ]
     },
     architectureDiagram: {
-      title: 'Architecture: Gen 1 → Gen 2 → Nguyen AI',
-      body: 'No ad-hoc backend per repository. Three inherited layers, each with a clear role.',
+      title: 'Nguyen AI Architecture — Independent backend',
+      body: 'Nguyen AI owns an independent backend. Gen 1 and Gen 2 are frozen as reference architecture; an adapter maintains compatibility contract when integrating. Three operating layers, each with a clear role.',
       layers: [
         { name: 'Independent runtime — Execution core', role: 'Runtime, Agent, tools, memory, evidence', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
         { name: 'Identity & commerce', role: 'Identity, account, plans, entitlements, billing', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
@@ -728,7 +729,7 @@ const en: Record<RouteKey, PageContent> = {
       ]
     },
     pricingTable: {
-      title: '8 product plans — Indicative pricing',
+      title: '9 Machine Models — Indicative pricing',
       body: 'Current prices are pilot hypotheses, subject to validation of AI, storage, support and legal costs before commercial launch.',
       plans: [
         { name: 'Nguyen Start', code: 'nguyen-start', price: 'Free', target: 'New user trial', features: ['2 Agents (Guide, Guardian)', '100MB memory, 500MB vault', '10 commands/day', 'No Super Apps'], cta: 'Start free' },
@@ -738,26 +739,27 @@ const en: Record<RouteKey, PageContent> = {
         { name: 'Nguyen Founder', code: 'nguyen-founder', price: '1,999,000₫', period: '/mo', target: 'Founder', features: ['7 Agents (+Founder, Business)', '50GB memory, 200GB vault', '1,000 commands/day', '+ Founder OS, Finance, Legal'], cta: 'Choose Founder', highlighted: true },
         { name: 'Nguyen Business', code: 'nguyen-business', price: '4,999,000₫', period: '/mo', target: 'Business 5-25 seats', features: ['8 Agents (+Global Connector)', '200GB memory, 1TB vault', '5,000 commands/day', '+ Business OS, Sales, Automation'], cta: 'Choose Business' },
         { name: 'Nguyen Chapter', code: 'nguyen-chapter', price: '7,999,000₫', period: '/mo', target: 'Chapters, associations, communities', features: ['9 Agents (all)', '500GB memory, 5TB vault', '10,000 commands/day', '+ Chapter OS, Network, Knowledge'], cta: 'Choose Chapter' },
-        { name: 'Enterprise / Dedicated', code: 'nguyen-enterprise', price: 'Custom', target: 'Large org 25+ seats', features: ['9 Agents + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Contact' }
+        { name: 'Nguyen Enterprise', code: 'nguyen-enterprise', price: 'Custom', target: 'Large org 25+ seats', features: ['9 Agents + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Contact' },
+        { name: 'Nguyen Sovereign', code: 'nguyen-sovereign', price: 'Custom', target: 'Dedicated/private, on-premise', features: ['9 Agents + custom', 'Dedicated memory, dedicated vault', 'Unlimited quota', 'Data residency, on-prem, sovereign deploy'], cta: 'Contact' }
       ]
     },
     comparisonTable: {
-      title: 'Detailed comparison of 8 plans',
-      body: 'Compare capacity, memory, vault, agents, quota, Super Apps and approval gates across 8 plans.',
+      title: 'Detailed comparison of 9 Models',
+      body: 'Compare capacity, memory, vault, agents, quota, Super Apps and approval gates across 9 machine models.',
       columns: [
         { label: 'Start' }, { label: 'Personal' }, { label: 'Family' }, { label: 'Creator' },
         { label: 'Founder', highlight: true }, { label: 'Business' }, { label: 'Chapter' },
-        { label: 'Enterprise', highlight: true }
+        { label: 'Enterprise', highlight: true }, { label: 'Sovereign', highlight: true }
       ],
       rows: [
-        { label: 'Price/mo', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Custom'] },
-        { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise'] },
-        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom'] },
-        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom'] },
-        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom'] },
-        { label: 'Quota/day', values: ['10', '100', '300', '500', '1,000', '5,000', '10,000', 'Custom'] },
-        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+'] },
-        { label: 'Approval', values: ['sensitive', 'sensitive', 'family', 'sensitive', 'financial', 'per-role', 'board', 'custom'] }
+        { label: 'Price/mo', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Custom', 'Custom'] },
+        { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise', 'enterprise'] },
+        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom', '9+custom'] },
+        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom', 'Dedicated'] },
+        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom', 'Dedicated'] },
+        { label: 'Quota/day', values: ['10', '100', '300', '500', '1,000', '5,000', '10,000', 'Custom', 'Unlimited'] },
+        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+', 'All+'] },
+        { label: 'Approval', values: ['all', 'sensitive', 'sensitive', 'sensitive', 'sensitive', 'per-role', 'board', 'custom', 'custom'] }
       ]
     },
     academySection: {

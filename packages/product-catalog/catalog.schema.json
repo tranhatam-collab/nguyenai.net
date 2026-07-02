@@ -5,7 +5,7 @@
   "definitions": {
     "plan_id": {
       "type": "string",
-      "enum": ["nguyen-start", "nguyen-personal", "nguyen-family", "nguyen-creator", "nguyen-founder", "nguyen-business", "nguyen-chapter", "nguyen-enterprise"]
+      "enum": ["nguyen-start", "nguyen-personal", "nguyen-family", "nguyen-creator", "nguyen-founder", "nguyen-business", "nguyen-chapter", "nguyen-enterprise", "nguyen-sovereign"]
     },
     "plan_status": {
       "type": "string",

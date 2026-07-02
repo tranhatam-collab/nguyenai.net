@@ -90,14 +90,14 @@ The 8 plans defined in `packages/product-catalog/plans.json` map to entitlements
 | Personal | personal | 1 | standard | false | 0 | sensitive |
 | Family | family | 1 shared | standard | false | 0 | sensitive |
 | Creator | creator | 1 | standard | false | 0 | sensitive |
-| Founder | founder | 1 | pro | false | 0 | sensitive |
+| Founder | founder | 1 | pro | true | 0 | sensitive |
 | Business | business | 5 | pro | false | 0 | sensitive |
-| Chapter | chapter | 1 shared | pro | false | 0 | sensitive |
+| Chapter | chapter | 1 shared | pro | true | 0 | sensitive |
 | Enterprise | enterprise | custom | enterprise | custom | custom | custom |
 
 ### 3.1 Important rules
 
-- `academy.pass` is **not** granted by any machine plan by default. Academy Pass is a standalone paid product and may be purchased independently.
+- `academy.pass` is granted by **Founder** and **Chapter** plans (per Founder decision 2026-07-02). Other plans do not include Academy Pass by default. Academy Pass is also a standalone paid product and may be purchased independently for any plan.
 - `academy.cert.discount` is not plan-linked by default. Any promotion or scholarship for Academy or certification must be issued as a separate, audited grant.
 - `machine.approval.required = all` for the free plan means every command requires approval.
 - Enterprise plan entitlements are defined per contract, not per plan row.

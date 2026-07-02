@@ -14,7 +14,7 @@ export const site = {
     en: 'Rooted identity. Powerful intelligence. Global execution.'
   },
   hero: {
-    vi: 'Máy Tính AI của thế hệ Nguyễn toàn cầu.',
+    vi: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
     en: 'AI Computer for the Global Nguyen Generation.'
   },
   heroDescription: {

@@ -131,8 +131,76 @@ Exempt: `docs/governance/`, `docs/architecture/`, `NOTICE.nai.md`, `LICENSE`, `n
 
 ---
 
+### Occurrence 8 — `computer.iai.one` on homepage body (VI)
+
+| Field | Content |
+|---|---|
+| File | `apps/web/src/data/pages.ts` |
+| Line | 154 |
+| String | `Gen 1 (computer.iai.one) và Gen 2 (maytinhai.org)` |
+| Type | brand / forbidden (homepage body per BRAND_SURFACE_MATRIX §4.2) |
+| Decision | sửa — xóa domain names, giữ "Gen 1" và "Gen 2" |
+| New content | `Gen 1 và Gen 2 đóng băng làm kiến trúc tham chiếu` |
+| Commit | (this commit) |
+| Verified | Yes — contamination audit PASS |
+
+### Occurrence 9 — `computer.iai.one` on homepage body (EN)
+
+| Field | Content |
+|---|---|
+| File | `apps/web/src/data/pages.ts` |
+| Line | 635 |
+| String | `Gen 1 (computer.iai.one) and Gen 2 (maytinhai.org)` |
+| Type | brand / forbidden (homepage body per BRAND_SURFACE_MATRIX §4.2) |
+| Decision | sửa — xóa domain names |
+| New content | `Gen 1 and Gen 2 are frozen as reference architecture` |
+| Commit | (this commit) |
+| Verified | Yes — contamination audit PASS |
+
+### Occurrence 10 — "Máy Tính AI" in SEO title + OG title
+
+| Field | Content |
+|---|---|
+| File | `apps/web/src/data/pages.ts` |
+| Line | 116 |
+| String | `Nguyen AI Computer \| Máy Tính AI của thế hệ Nguyễn toàn cầu` |
+| Type | brand / forbidden (SEO title per BRAND_SURFACE_MATRIX §4) |
+| Decision | sửa — "Máy Tính AI" không dùng trong brand surface (title/OG/hero) |
+| New content | `Nguyen AI Computer \| AI Computer cho thế hệ Nguyễn toàn cầu` |
+| Commit | (this commit) |
+| Verified | Yes |
+
+### Occurrence 11 — "Máy Tính AI" in hero tagline (site.ts)
+
+| Field | Content |
+|---|---|
+| File | `apps/web/src/data/site.ts` |
+| Line | 17 |
+| String | `Máy Tính AI của thế hệ Nguyễn toàn cầu.` |
+| Type | brand / forbidden (hero tagline = brand surface) |
+| Decision | sửa |
+| New content | `AI Computer cho thế hệ Nguyễn toàn cầu.` |
+| Commit | (this commit) |
+| Verified | Yes |
+
+### Occurrence 12 — "Máy Tính AI" in heroTitle (pages.ts)
+
+| Field | Content |
+|---|---|
+| File | `apps/web/src/data/pages.ts` |
+| Line | 119 |
+| String | `Máy Tính AI của thế hệ Nguyễn toàn cầu.` |
+| Type | brand / forbidden (heroTitle = brand surface) |
+| Decision | sửa |
+| New content | `AI Computer cho thế hệ Nguyễn toàn cầu.` |
+| Commit | (this commit) |
+| Verified | Yes |
+
+---
+
 ## 5. Change log
 
 | Date | Change |
 |---|---|
 | 2026-07-02 | Initial log — 7 occurrences remediated (4 from Phase 1, 3 from forked packages) |
+| 2026-07-02 | Added occurrences 8-12 (homepage domains + "Máy Tính AI" in brand surfaces) |

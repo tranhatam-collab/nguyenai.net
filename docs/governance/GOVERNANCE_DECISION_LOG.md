@@ -110,6 +110,20 @@ Chronological log of all Founder governance decisions. Each entry is binding. Su
 - **Decision:** Disclosure.astro phải được thay trước khi: request-access form mở công khai, public investor portal phát hành, nhà đầu tư nào được mời vào private room. Gắn vào Sprint 1.
 - **Status:** ACTIVE
 
+### D-015 — Founder/Chapter Academy Pass
+
+- **Date:** 2026-07-02
+- **Decision:** Founder và Chapter plans bao gồm Academy Pass (academy_pass=True). Sync plans.json + entitlements.json + ENTITLEMENT_MODEL §3.
+- **Status:** ACTIVE
+- **See:** `ENTITLEMENT_MODEL.md` §3, §3.1
+
+### D-016 — Brand surface cleanup (homepage + SEO title)
+
+- **Date:** 2026-07-02
+- **Decision:** Xóa domain names (computer.iai.one, maytinhai.org) khỏi homepage body. Sửa SEO title + OG title — bỏ "Máy Tính AI" khỏi brand surface (title/OG/hero). Body copy vẫn dùng "Máy Tính AI" như product category.
+- **Status:** ACTIVE
+- **See:** `BRAND_REMEDIATION_LOG.md`, `BRAND_SURFACE_MATRIX.md` §4
+
 ---
 
 ## Change log
@@ -117,3 +131,4 @@ Chronological log of all Founder governance decisions. Each entry is binding. Su
 | Date | Change |
 |---|---|
 | 2026-07-02 | Initial decision log — 14 decisions (D-001 through D-014) |
+| 2026-07-02 | Added D-015 (Founder/Chapter Academy Pass) + D-016 (brand surface cleanup) |

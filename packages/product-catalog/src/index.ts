@@ -19,7 +19,8 @@ export type PlanId =
   | 'nguyen-founder'
   | 'nguyen-business'
   | 'nguyen-chapter'
-  | 'nguyen-enterprise';
+  | 'nguyen-enterprise'
+  | 'nguyen-sovereign';
 
 export type PlanStatus = 'Available' | 'Beta' | 'Planned' | 'Enterprise only';
 export type ModelTier = 'free' | 'standard' | 'standard+' | 'pro' | 'enterprise';
