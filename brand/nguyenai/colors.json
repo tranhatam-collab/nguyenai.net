@@ -1,22 +1,22 @@
 {
-  "brand-source-of-truth": "Founder-selected NAI infinity logo, 2026-07-02",
+  "status": "FOUNDER LOCKED",
+  "date": "2026-07-02",
+  "logo": "Arch of light / layered horizon symbol",
   "primary": {
-    "deep-navy": "#072B5C",
-    "royal-blue": "#0D62C6",
-    "sky-blue": "#159EE4",
-    "cyan": "#22BDC9",
-    "teal": "#18A9AD",
-    "ink": "#11233D",
-    "muted": "#657489",
-    "border": "#DDE6EE",
-    "surface": "#F7FAFC",
+    "heritage-dark": "#7A2212",
+    "heritage-red": "#A6260C",
+    "burnt-orange": "#E55B09",
+    "sun-orange": "#F48B0D",
+    "gold": "#FFB810",
+    "light-cream": "#FFFACC",
+    "ink": "#4A1D14",
     "white": "#FFFFFF"
   },
   "usage": {
     "logo-background": "#FFFFFF",
-    "primary-text": "#11233D",
-    "primary-action": "#0D62C6",
-    "technology-accent": "#22BDC9",
-    "trust-accent": "#18A9AD"
+    "primary-text": "#4A1D14",
+    "primary-action": "#A6260C",
+    "highlight": "#F48B0D",
+    "premium-accent": "#FFB810"
   }
 }

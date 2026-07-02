@@ -1,15 +1,16 @@
 :root {
-  --deep-navy: #072B5C;
-  --royal-blue: #0D62C6;
-  --sky-blue: #159EE4;
-  --cyan: #22BDC9;
-  --teal: #18A9AD;
-  --ink: #11233D;
-  --muted: #657489;
-  --surface: #F7FAFC;
+  --heritage-dark: #7A2212;
+  --heritage-red: #A6260C;
+  --burnt-orange: #E55B09;
+  --sun-orange: #F48B0D;
+  --gold: #FFB810;
+  --light-cream: #FFFACC;
+  --ink: #4A1D14;
   --white: #FFFFFF;
-  --border: #DDE6EE;
-  --shadow: 0 24px 70px rgba(7, 43, 92, 0.10);
+  --muted: #8A6B5E;
+  --surface: #FFFAF0;
+  --border: rgba(74, 29, 20, 0.12);
+  --shadow: 0 24px 70px rgba(122, 34, 18, 0.10);
   color-scheme: light;
   font-family: "Be Vietnam Pro", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -32,12 +33,12 @@ body {
 }
 
 a {
-  color: var(--royal-blue);
+  color: var(--heritage-red);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--sky-blue);
+  color: var(--burnt-orange);
 }
 
 .skip-link {
@@ -46,7 +47,7 @@ a:hover {
   top: -4rem;
   z-index: 100;
   border-radius: 999px;
-  background: var(--cyan);
+  background: var(--gold);
   color: var(--ink);
   padding: 0.7rem 1rem;
   font-weight: 700;
@@ -65,7 +66,7 @@ a:hover {
   align-items: center;
   gap: 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(7, 43, 92, 0.96);
+  background: rgba(122, 34, 18, 0.96);
   color: var(--white);
   padding: 0.75rem clamp(1rem, 4vw, 4rem);
   backdrop-filter: blur(16px);
@@ -116,7 +117,7 @@ a:hover {
 }
 
 .main-nav a:hover {
-  color: var(--cyan);
+  color: var(--gold);
 }
 
 .language-switch,
@@ -137,8 +138,8 @@ a:hover {
 }
 
 .language-switch:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .section-wrap {
@@ -154,9 +155,9 @@ a:hover {
   margin: 0;
   padding: clamp(5rem, 12vw, 9rem) max(1rem, calc((100vw - 1120px) / 2)) clamp(4rem, 10vw, 7rem);
   background:
-    radial-gradient(circle at 82% 16%, rgba(34, 189, 201, 0.18), transparent 28rem),
-    radial-gradient(circle at 12% 82%, rgba(13, 98, 198, 0.22), transparent 22rem),
-    linear-gradient(135deg, var(--deep-navy), var(--ink) 78%);
+    radial-gradient(circle at 82% 16%, rgba(255, 184, 16, 0.18), transparent 28rem),
+    radial-gradient(circle at 12% 82%, rgba(229, 91, 9, 0.22), transparent 22rem),
+    linear-gradient(135deg, var(--heritage-dark), var(--ink) 78%);
   color: var(--white);
 }
 
@@ -166,12 +167,12 @@ a:hover {
   inset: auto 8% -8rem auto;
   width: 22rem;
   height: 22rem;
-  border: 1px solid rgba(34, 189, 201, 0.22);
+  border: 1px solid rgba(255, 184, 16, 0.22);
   border-radius: 50%;
 }
 
 .eyebrow {
-  color: var(--cyan);
+  color: var(--gold);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -223,12 +224,12 @@ p {
 }
 
 .button.primary {
-  background: var(--royal-blue);
+  background: var(--heritage-red);
   color: var(--white);
 }
 
 .button.primary:hover {
-  background: var(--sky-blue);
+  background: var(--burnt-orange);
 }
 
 .button.secondary {
@@ -237,8 +238,8 @@ p {
 }
 
 .button.secondary:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .content-grid {
@@ -271,7 +272,7 @@ p {
 }
 
 .content-card li::marker {
-  color: var(--royal-blue);
+  color: var(--burnt-orange);
 }
 
 .faq {
@@ -295,12 +296,12 @@ details + details {
 
 summary {
   cursor: pointer;
-  color: var(--deep-navy);
+  color: var(--heritage-dark);
   font-weight: 700;
 }
 
 summary:hover {
-  color: var(--royal-blue);
+  color: var(--heritage-red);
 }
 
 .site-footer {
@@ -308,7 +309,7 @@ summary:hover {
   grid-template-columns: 1fr auto;
   gap: 1.5rem;
   border-top: 1px solid var(--border);
-  background: var(--deep-navy);
+  background: var(--heritage-dark);
   color: var(--white);
   padding: clamp(2rem, 5vw, 3.5rem) clamp(1rem, 4vw, 4rem);
 }
@@ -331,11 +332,11 @@ summary:hover {
 }
 
 .site-footer nav a:hover {
-  color: var(--cyan);
+  color: var(--gold);
 }
 
 :focus-visible {
-  outline: 3px solid var(--cyan);
+  outline: 3px solid var(--gold);
   outline-offset: 4px;
 }
 

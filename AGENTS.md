@@ -47,7 +47,8 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/NGUYEN_AI_MASTER_FOUNDATION.md`
 - `docs/brand/NGUYEN_AI_BRAND_CHARTER.md`
 - `docs/brand/NGUYEN_AI_BRAND_CODEX.md`
-- `docs/brand/NGUYEN_AI_FINAL_BRAND_SYSTEM_V2.md` — FOUNDER LOCKED V2.0 (logo infinity + N + AI, navy/blue/teal palette, overrides V1.0)
+- `docs/brand/NGUYEN_AI_FINAL_BRAND_SYSTEM_V3.md` — FOUNDER LOCKED Arch V3.0 (arch of light logo, red/orange/gold/cream palette, overrides V2.0 + V1.0)
+- `docs/brand/NGUYEN_AI_FINAL_BRAND_SYSTEM_V2.md` — SUPERSEDED by V3.0 (giữ làm tham khảo lịch sử)
 - `docs/brand/NAI_BRAND_IDENTITY_DESIGN_PROMPT.md` — full brand identity system prompt (logo, color, typography, icons, social, favicon)
 - `docs/product/NGUYEN_AI_PRODUCT_ARCHITECTURE.md`
 - `docs/seo/NGUYEN_AI_SEO_SPEC.md`

@@ -26,12 +26,13 @@ export const site = {
 export type Locale = 'vi' | 'en';
 
 export const colors = {
-  deepNavy: '#072B5C',
-  royalBlue: '#0D62C6',
-  skyBlue: '#159EE4',
-  cyan: '#22BDC9',
-  teal: '#18A9AD',
-  ink: '#11233D',
+  heritageDark: '#7A2212',
+  heritageRed: '#A6260C',
+  burntOrange: '#E55B09',
+  sunOrange: '#F48B0D',
+  gold: '#FFB810',
+  lightCream: '#FFFACC',
+  ink: '#4A1D14',
   white: '#FFFFFF'
 } as const;
 

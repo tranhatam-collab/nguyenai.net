@@ -1,0 +1,22 @@
+{
+  "status": "FOUNDER LOCKED",
+  "date": "2026-07-02",
+  "logo": "Arch of light / layered horizon symbol",
+  "primary": {
+    "heritage-dark": "#7A2212",
+    "heritage-red": "#A6260C",
+    "burnt-orange": "#E55B09",
+    "sun-orange": "#F48B0D",
+    "gold": "#FFB810",
+    "light-cream": "#FFFACC",
+    "ink": "#4A1D14",
+    "white": "#FFFFFF"
+  },
+  "usage": {
+    "logo-background": "#FFFFFF",
+    "primary-text": "#4A1D14",
+    "primary-action": "#A6260C",
+    "highlight": "#F48B0D",
+    "premium-accent": "#FFB810"
+  }
+}

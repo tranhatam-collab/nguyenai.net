@@ -1,0 +1,27 @@
+{
+  "ui": {
+    "family": "Be Vietnam Pro",
+    "weights": [
+      400,
+      500,
+      700
+    ],
+    "fallback": "Inter, system-ui, sans-serif"
+  },
+  "editorial": {
+    "family": "Noto Serif",
+    "weights": [
+      400,
+      700
+    ],
+    "fallback": "Georgia, serif"
+  },
+  "mono": {
+    "family": "JetBrains Mono",
+    "weights": [
+      400,
+      500
+    ],
+    "fallback": "Consolas, monospace"
+  }
+}

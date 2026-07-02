@@ -1,14 +1,12 @@
-/* Nguyen AI founder-locked brand tokens */
+/* Nguyen AI Founder-Locked Brand Tokens - Arch Logo V3.0 */
 :root {
-  --nai-deep-navy: #072B5C;
-  --nai-royal-blue: #0D62C6;
-  --nai-sky-blue: #159EE4;
-  --nai-cyan: #22BDC9;
-  --nai-teal: #18A9AD;
-  --nai-ink: #11233D;
-  --nai-muted: #657489;
-  --nai-border: #DDE6EE;
-  --nai-surface: #F7FAFC;
+  --nai-heritage-dark: #7A2212;
+  --nai-heritage-red: #A6260C;
+  --nai-burnt-orange: #E55B09;
+  --nai-sun-orange: #F48B0D;
+  --nai-gold: #FFB810;
+  --nai-light-cream: #FFFACC;
+  --nai-ink: #4A1D14;
   --nai-white: #FFFFFF;
   --nai-font-ui: "Be Vietnam Pro", Inter, system-ui, sans-serif;
   --nai-font-editorial: "Noto Serif", Georgia, serif;

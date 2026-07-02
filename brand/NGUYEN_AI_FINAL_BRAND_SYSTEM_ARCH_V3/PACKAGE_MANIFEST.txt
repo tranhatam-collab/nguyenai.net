@@ -1,0 +1,22 @@
+NGUYEN AI FINAL BRAND SYSTEM - ARCH V3.0
+
+Founder-selected logo:
+- Layered arch / sun / horizon symbol
+- Wordmark NGUYEN AI
+- Full-color use on pure white #FFFFFF
+
+This package replaces:
+- Infinity N+AI logo
+- Previous NAI experimental concepts
+- Earlier unapproved logo systems
+
+Contents:
+- Logo assets
+- Favicon and app icons
+- Social Open Graph assets
+- Developer tokens
+- Founder-lock Markdown
+- Brand Guidelines DOCX
+
+Production note:
+A manually redrawn SVG vector master is still recommended for trademark registration and large-format production.

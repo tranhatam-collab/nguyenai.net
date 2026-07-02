@@ -1,10 +1,10 @@
 {
   "name": "Nguyen AI",
-  "short_name": "NAI",
+  "short_name": "Nguyen AI",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
-  "theme_color": "#072B5C",
+  "theme_color": "#7A2212",
   "icons": [
     {
       "src": "/icon-192x192.png",
