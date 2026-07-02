@@ -15,37 +15,83 @@
 // ============================================================
 
 export type AuditEventType =
+  // Identity events (12)
   | 'login_success'
   | 'login_failure'
   | 'logout'
   | 'session_revoked'
+  | 'session_expired'
   | 'passkey_registered'
+  | 'passkey_removed'
   | 'mfa_enrolled'
+  | 'mfa_removed'
+  | 'api_key_created'
+  | 'api_key_revoked'
+  | 'account_deletion_requested'
+  // Authorization events (6)
   | 'role_changed'
   | 'permission_granted'
   | 'permission_revoked'
   | 'org_member_added'
   | 'org_member_removed'
-  | 'account_deletion_requested'
   | 'access_denied'
+  // Entitlement events (5)
   | 'entitlement_granted'
+  | 'entitlement_updated'
   | 'entitlement_revoked'
+  | 'entitlement_expired'
+  | 'entitlement_recalculated'
+  // Approval events (4)
   | 'approval_requested'
   | 'approval_granted'
   | 'approval_denied'
-  | 'sensitive_action_executed';
+  | 'sensitive_action_executed'
+  // Command & runtime events (5)
+  | 'command_executed'
+  | 'command_failed'
+  | 'command_cancelled'
+  | 'tool_called'
+  | 'workflow_completed'
+  // Academy & certification events (4)
+  | 'academy_lesson_completed'
+  | 'proof_submitted'
+  | 'certificate_issued'
+  | 'certificate_revoked'
+  // Billing & investor events (2)
+  | 'payment_received'
+  | 'investor_room_accessed';
+
+export const AUDIT_REGISTRY_VERSION = '2026-07-02.1';
+export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
+  'login_success', 'login_failure', 'logout', 'session_revoked', 'session_expired',
+  'passkey_registered', 'passkey_removed', 'mfa_enrolled', 'mfa_removed',
+  'api_key_created', 'api_key_revoked', 'account_deletion_requested',
+  'role_changed', 'permission_granted', 'permission_revoked',
+  'org_member_added', 'org_member_removed', 'access_denied',
+  'entitlement_granted', 'entitlement_updated', 'entitlement_revoked',
+  'entitlement_expired', 'entitlement_recalculated',
+  'approval_requested', 'approval_granted', 'approval_denied', 'sensitive_action_executed',
+  'command_executed', 'command_failed', 'command_cancelled', 'tool_called', 'workflow_completed',
+  'academy_lesson_completed', 'proof_submitted', 'certificate_issued', 'certificate_revoked',
+  'payment_received', 'investor_room_accessed',
+] as const;
 
 export type AuditResult = 'success' | 'failure' | 'denied';
 
 export interface AuditEvent {
   event_id?: string;
   timestamp?: string;
+  registry_version?: string;
   user_id: string | null;
+  tenant_id?: string | null;
   session_id: string | null;
+  actor_id?: string | null;
+  actor_role?: string | null;
   event_type: AuditEventType;
   actor_ip: string | null;
   user_agent: string | null;
   target: string | null;
+  trace_id?: string | null;
   result: AuditResult;
   metadata: Record<string, unknown>;
 }
@@ -80,7 +126,12 @@ export class InMemoryAuditStore implements AuditStore {
   async log(event: AuditEvent): Promise<string> {
     const event_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    const stored: AuditEvent = { ...event, event_id, timestamp };
+    const stored: AuditEvent = {
+      ...event,
+      event_id,
+      timestamp,
+      registry_version: event.registry_version ?? AUDIT_REGISTRY_VERSION,
+    };
     this.events.push(stored);
     return event_id;
   }

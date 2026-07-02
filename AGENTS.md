@@ -2,6 +2,28 @@
 
 Nguyen AI Computer — a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community. Each user owns a private AI Computer Instance with multi-model intelligence, an Agent team, tools, memory, data vault, workflows, evidence, approval gates and a secure execution environment. Heritage and genealogy are important Super Apps, not the whole product.
 
+## FOUNDER ARCHITECTURE AMENDMENT — 2026-07-02 (BỔ SUNG, không thay thế)
+
+> **Lưu ý:** Amendment này BỔ SUNG ràng buộc lên Decision 1 (Founder Override:
+> nguyenai.net sở hữu backend riêng độc lập). Amendment KHÔNG đảo ngược Decision 1.
+> Nguyen AI giữ backend riêng + phải tuân thủ ràng buộc adapter dưới đây.
+
+Binding architecture (bổ sung):
+
+- Gen 1 (`computer.iai.one`) giữ vai trò kiến trúc runtime tham chiếu.
+  Freezing repo ≠ revoked authority. Bất kỳ thay thế nào cần Founder decision riêng.
+- Gen 2 (`maytinhai.org`) giữ vai trò kiến trúc product/entitlement/billing tham chiếu.
+  Freezing repo ≠ revoked authority.
+- Nguyen AI sở hữu backend riêng độc lập (per Founder Override Decision 1),
+  nhưng phải duy trì compatibility contract với Gen 1/Gen 2 khi integrate.
+- Một adapter, gateway hoặc facade owned by Nguyen AI có thể kết nối
+  frontends với Gen 1 và Gen 2 contracts. Adapter không trở thành source of truth.
+- A Nguyen AI integration gateway may exist, but it is not a system of
+  record and does not own command execution, identity, entitlement,
+  billing, proof or certificate authority khi integrate với Gen 1/Gen 2.
+- Bất kỳ thay thế nào cho Gen 1/Gen 2 authority yêu cầu:
+  Founder architecture decision riêng + migration plan + compatibility contract.
+
 ## Quy luật làm việc nghiêm túc
 
 Khối quy luật này là ràng buộc bắt buộc cho mọi AI agent, mọi phiên làm việc, mọi task, mọi output. Nếu có xung đột giữa thói quen làm việc và các quy luật dưới đây, phải ưu tiên quy luật này.
@@ -157,17 +179,20 @@ Financial and legal tools support analysis only, not licensed advisory services.
 
 ## Technical status
 
-> **FOUNDER OVERRIDE 2026-07-02:** `nguyenai.net` sở hữu backend riêng độc lập. Gen1 (`computer.iai.one`) và Gen2 (`maytinhai.org`) đóng băng (reference only, không sửa, không deploy). See `docs/governance/NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
+> **FOUNDER OVERRIDE 2026-07-02 (Decision 1 — vẫn hiệu lực):** `nguyenai.net` sở hữu backend riêng độc lập. Gen1 (`computer.iai.one`) và Gen2 (`maytinhai.org`) đóng băng (reference only, không sửa, không deploy). See `docs/governance/NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
+>
+> **FOUNDER ARCHITECTURE AMENDMENT 2026-07-02 (bổ sung):** Gen1/Gen2 giữ vai trò kiến trúc tham chiếu. Freezing repo ≠ revoked authority. Nguyen AI backend riêng phải duy trì compatibility contract khi integrate với Gen1/Gen2. Adapter/gateway không trở thành source of truth. See `FOUNDER ARCHITECTURE AMENDMENT` at top of file.
 
 Current state:
 
 - Public website: scaffolded (Astro static, 24 bilingual routes) — sẽ chuyển vào `apps/web/`.
-- AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1).
-- Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa.
-- Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package.
+- AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
+- Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
+- Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
 - Live runtime: unverified.
 - Brand and product plan: locked via Master Positioning Gen1–Gen2.
 - Production release: not approved.
+- Sprint 0 governance: **OPEN** — not yet locked. See Sprint 0 Exit Gate requirements.
 
 ## Recommended stack
 

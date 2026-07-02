@@ -6,7 +6,7 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/p0b-e2e.ts",
+    "test": "tsx src/p0b-e2e.ts && tsx src/audit-registry-e2e.ts",
     "lint": "echo 'TODO'"
   },
   "dependencies": {

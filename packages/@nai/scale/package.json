@@ -1,0 +1,21 @@
+{
+  "name": "@nai/scale",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for scale (https://github.com/confident-ai/deepeval). Original source consumed via native package manager.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/deepeval\""
+  },
+  "keywords": [
+    "deepeval",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/confident-ai/deepeval"
+}

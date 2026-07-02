@@ -1,0 +1,21 @@
+{
+  "name": "@nai/scroll",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for llama_index (https://github.com/run-llama/llama_index). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/llama-index\""
+  },
+  "keywords": [
+    "llama_index",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/run-llama/llama_index"
+}

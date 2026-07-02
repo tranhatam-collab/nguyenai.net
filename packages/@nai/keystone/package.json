@@ -1,0 +1,21 @@
+{
+  "name": "@nai/keystone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for better-auth (https://github.com/better-auth/better-auth). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/auth-core\""
+  },
+  "keywords": [
+    "better-auth",
+    "nai",
+    "nguyenai",
+    "ts"
+  ],
+  "upstream": "https://github.com/better-auth/better-auth"
+}

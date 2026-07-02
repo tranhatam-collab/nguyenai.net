@@ -1,0 +1,21 @@
+{
+  "name": "@nai/seal",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for seal (https://github.com/sigstore/cosign). Original source consumed via native package manager.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/cosign\""
+  },
+  "keywords": [
+    "cosign",
+    "nai",
+    "nguyenai",
+    "go"
+  ],
+  "upstream": "https://github.com/sigstore/cosign"
+}

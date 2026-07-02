@@ -1,0 +1,21 @@
+{
+  "name": "@nai/tally",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for tally (https://github.com/Helicone/helicone). Original source consumed via native package manager.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/helicone\""
+  },
+  "keywords": [
+    "helicone",
+    "nai",
+    "nguyenai",
+    "ts"
+  ],
+  "upstream": "https://github.com/Helicone/helicone"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@nai/beacon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for beacon (https://github.com/Arize-ai/phoenix). Original source consumed via native package manager.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/phoenix\""
+  },
+  "keywords": [
+    "phoenix",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/Arize-ai/phoenix"
+}

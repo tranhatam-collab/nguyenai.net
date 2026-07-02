@@ -116,6 +116,27 @@ academy.pass = true   ← granted by:
 
 A user with any machine plan and no Academy Pass may see the Academy marketing page but cannot access lessons. The academy portal must check `academy.pass` server-side, not just `machine.plan`.
 
+### 4.1 Academy Limited Preview (locked 2026-07-02)
+
+Users without Academy Pass may access a **limited preview** of Academy content:
+
+```
+academy.pass = false
+academy.preview.enabled = true
+academy.preview.lesson_limit = 5
+academy.preview.track_ids = ["free-intro"]
+academy.preview.certificate = false
+academy.preview.proof_submission_limit = 1
+```
+
+Preview does NOT grant:
+- certificate (official);
+- proof submission beyond 1 attempt;
+- access to non-preview tracks;
+- Academy Pass entitlement.
+
+Preview is read-only + limited. Any proof submission during preview is marked `preview=true` and cannot be converted to a certificate without Academy Pass + cert fee.
+
 ---
 
 ## 5. Certification Fee — separate transaction

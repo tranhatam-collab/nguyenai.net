@@ -1,0 +1,21 @@
+{
+  "name": "@nai/scout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Wrapper package for scout (https://github.com/browser-use/browser-use). Original source consumed via native package manager.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "echo \"wrapper package — tests in integration\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/browser-use\""
+  },
+  "keywords": [
+    "browser-use",
+    "nai",
+    "nguyenai",
+    "py"
+  ],
+  "upstream": "https://github.com/browser-use/browser-use"
+}

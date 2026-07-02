@@ -140,7 +140,13 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/argo-cd: {}
+  packages/@nai/aqueduct: {}
+
+  packages/@nai/armada: {}
+
+  packages/@nai/artisan: {}
+
+  packages/@nai/atlas: {}
 
   packages/@nai/audit:
     devDependencies:
@@ -179,17 +185,25 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/auth-core: {}
+  packages/@nai/beacon: {}
 
-  packages/@nai/browser-use: {}
+  packages/@nai/bulwark: {}
 
-  packages/@nai/cosign: {}
+  packages/@nai/catalog-mcp: {}
 
-  packages/@nai/crewai: {}
+  packages/@nai/compass: {}
 
-  packages/@nai/deepeval: {}
+  packages/@nai/conductor: {}
 
-  packages/@nai/dify: {}
+  packages/@nai/contracts: {}
+
+  packages/@nai/conveyor: {}
+
+  packages/@nai/covenant: {}
+
+  packages/@nai/echo: {}
+
+  packages/@nai/ensemble: {}
 
   packages/@nai/entitlement:
     dependencies:
@@ -207,47 +221,31 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/gitleaks: {}
+  packages/@nai/forge: {}
 
-  packages/@nai/grafana: {}
+  packages/@nai/foundation: {}
 
-  packages/@nai/grype: {}
+  packages/@nai/gateway-sdk:
+    dependencies:
+      '@nai/contracts':
+        specifier: workspace:*
+        version: link:../contracts
 
-  packages/@nai/haystack: {}
+  packages/@nai/harness: {}
 
-  packages/@nai/helicone: {}
+  packages/@nai/hound: {}
 
-  packages/@nai/kubernetes: {}
+  packages/@nai/keystone: {}
 
-  packages/@nai/langfuse: {}
+  packages/@nai/laboratory: {}
 
-  packages/@nai/langgraph: {}
+  packages/@nai/loom: {}
 
-  packages/@nai/llama-index: {}
+  packages/@nai/mcp-client: {}
 
-  packages/@nai/loki: {}
+  packages/@nai/mcp-host: {}
 
-  packages/@nai/mcp-sdk: {}
-
-  packages/@nai/mcp-servers: {}
-
-  packages/@nai/mcp-servers-catalog: {}
-
-  packages/@nai/mem0: {}
-
-  packages/@nai/n8n: {}
-
-  packages/@nai/opa: {}
-
-  packages/@nai/openfga: {}
-
-  packages/@nai/openhands: {}
-
-  packages/@nai/opik: {}
-
-  packages/@nai/otel-collector: {}
-
-  packages/@nai/phoenix: {}
+  packages/@nai/pilot: {}
 
   packages/@nai/policy-engine:
     dependencies:
@@ -280,21 +278,40 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/promptfoo: {}
+  packages/@nai/prism: {}
 
-  packages/@nai/qdrant: {}
+  packages/@nai/provenance: {}
 
-  packages/@nai/semgrep: {}
+  packages/@nai/relic: {}
 
-  packages/@nai/skyvern: {}
+  packages/@nai/runtime-sdk:
+    dependencies:
+      '@nai/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@nai/gateway-sdk':
+        specifier: workspace:*
+        version: link:../gateway-sdk
 
-  packages/@nai/slsa: {}
+  packages/@nai/scale: {}
 
-  packages/@nai/software-agent-sdk: {}
+  packages/@nai/scout: {}
 
-  packages/@nai/terraform: {}
+  packages/@nai/scroll: {}
 
-  packages/@nai/trivy: {}
+  packages/@nai/seal: {}
+
+  packages/@nai/seismograph: {}
+
+  packages/@nai/sentinel: {}
+
+  packages/@nai/tally: {}
+
+  packages/@nai/trace: {}
+
+  packages/@nai/veil: {}
+
+  packages/@nai/warden: {}
 
   packages/product-catalog:
     dependencies:

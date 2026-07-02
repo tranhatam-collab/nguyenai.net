@@ -339,14 +339,54 @@ Before any repo may call itself "auth-connected", it must:
 
 ---
 
-## 13. Open questions (to resolve in Sprint 1 implementation)
+## 13. Implementation decisions (LOCKED 2026-07-02 per Founder)
 
-1. Exact passkey library / WebAuthn server library (to be benchmarked).
-2. Whether to use Cloudflare Access for `admin.nguyenai.net` internal staging or build full custom auth.
-3. Whether the audit store is Cloudflare D1, Postgres, or R2 + index.
-4. Whether refresh tokens are rotating cookies or server-side session extension.
+### 13.1 Passkey (WebAuthn)
 
-These are implementation choices, not contract choices. The contract in this document is locked.
+- **Standard:** WebAuthn tiêu chuẩn.
+- **Library:** phải hỗ trợ Cloudflare Workers runtime. Không khóa vendor cụ thể tại RFC level — implementation chọn library phải benchmark + verify Workers compatibility.
+- **Challenge:** lưu server-side hoặc kho tạm có TTL.
+- **Origin + RP ID:** phải được validate严格.
+- **Library selection criteria:** Workers-compatible, no Node.js-only deps, active maintenance, MIT/Apache license.
+
+### 13.2 Cloudflare Access
+
+- **Use case:** chỉ dùng cho admin nội bộ, staging, công cụ vận hành.
+- **NOT for:** customer-facing authentication. Customer auth uses Passkey + session (per §13.1).
+- **Scope:** `admin.nguyenai.net` and internal staging tools only.
+
+### 13.3 Audit store
+
+- **Hot store:** Cloudflare D1 (edge, last 30 days, queryable).
+- **Cold archive:** R2 (immutable, batch export, 7+ years).
+- **Warm store (when needed):** Postgres (Neon) — only when scale or complex query requires it.
+- **Phase 1:** D1 + R2 only. Postgres added when query complexity demands it.
+- See `AUDIT_EVENT_REGISTRY.md` for event types + registry versioning.
+
+### 13.4 Refresh token
+
+- **Type:** session opaque token (not JWT).
+- **Storage:** server-side only.
+- **Rotation:** yes — each refresh produces a new token, old token invalidated.
+- **Reuse detection:** if a rotated token is reused, the entire session is revoked (reuse → revoke all).
+- **Cookie flags:** `HttpOnly`, `Secure`, `SameSite=Lax` (or `Strict` for sensitive).
+- **Access session:** short-lived (15 min default).
+- **Refresh token:** longer-lived (7 days default), server-side revocable.
+- **No localStorage:** tokens never stored in `localStorage` or `sessionStorage`.
+- **Revocation:** immediate upon logout, password change, or admin action.
+
+### 13.5 Recovery alias
+
+- **Decision:** Bỏ khái niệm "recovery alias" khỏi governance hiện tại.
+- **Lý do:** chưa có mô hình định danh; dễ tạo lỗ hổng riêng tư; có thể gửi thông tin xóa tài khoản tới địa chỉ không còn được xác minh; không cần thiết cho MVP.
+- **Approved deletion process:**
+  1. Trước khi xóa: gửi thông báo tới email đang được xác minh.
+  2. Hiển thị xác nhận trong phiên đăng nhập.
+  3. Cung cấp mã tham chiếu xóa.
+  4. Sau khi xóa: không gửi nội dung nhạy cảm.
+  5. Chỉ lưu receipt tối thiểu theo chính sách pháp lý.
+
+These implementation decisions are LOCKED. The contract in this document is locked.
 
 ---
 

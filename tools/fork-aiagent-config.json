@@ -1,0 +1,31 @@
+{
+  "comment": "Fork 25 packages from aiagent.iai.one/packages/ → packages/@nai/* with new names. These are RUNTIME packages (not wrappers) — real TypeScript source.",
+  "source_root": "/Users/tranhatam/Documents/Devnewproject/aiagent.iai.one/packages",
+  "forks": [
+    { "src": "contracts", "pkg": "contracts", "name": "@nai/contracts", "role": "Shared type definitions for all @nai runtime packages" },
+    { "src": "agent-runtime-sdk", "pkg": "runtime-sdk", "name": "@nai/runtime-sdk", "role": "12 agents + parallel execution + orchestration" },
+    { "src": "agent-matrix-sdk", "pkg": "matrix-sdk", "name": "@nai/matrix-sdk", "role": "Agent coordination matrix" },
+    { "src": "model-gateway-sdk", "pkg": "gateway-sdk", "name": "@nai/gateway-sdk", "role": "13 provider routing + auto-failover + language router" },
+    { "src": "a2a-sdk", "pkg": "delegation-sdk", "name": "@nai/delegation-sdk", "role": "Agent-to-agent delegation registry" },
+    { "src": "connector-sdk", "pkg": "connector-sdk", "name": "@nai/connector-sdk", "role": "Tool connector + computer bridge" },
+    { "src": "memory-sdk", "pkg": "memory-sdk", "name": "@nai/memory-sdk", "role": "KV-based memory CRUD" },
+    { "src": "storage-sdk", "pkg": "storage-sdk", "name": "@nai/storage-sdk", "role": "R2 + AES-GCM encryption" },
+    { "src": "auth-sdk", "pkg": "auth-service-sdk", "name": "@nai/auth-service-sdk", "role": "Anonymous + Google OAuth + magic-link" },
+    { "src": "entitlement-sdk", "pkg": "entitlement-matrix", "name": "@nai/entitlement-matrix", "role": "19-field entitlement matrix (upgraded from @nai/entitlement)" },
+    { "src": "policy-sdk", "pkg": "policy-matrix", "name": "@nai/policy-matrix", "role": "Tool permission 8 levels (upgraded from @nai/policy-engine)" },
+    { "src": "eval-sdk", "pkg": "eval-sdk", "name": "@nai/eval-sdk", "role": "Eval pipeline + trust score" },
+    { "src": "trust-graph-sdk", "pkg": "trust-graph", "name": "@nai/trust-graph", "role": "Trust graph verification" },
+    { "src": "billing-sdk", "pkg": "billing-sdk", "name": "@nai/billing-sdk", "role": "Usage ledger + cost-per-provider" },
+    { "src": "cost-guard", "pkg": "cost-guard", "name": "@nai/cost-guard", "role": "Cost optimization + model selection by cost" },
+    { "src": "payment-payos", "pkg": "payment-payos", "name": "@nai/payment-payos", "role": "VNPay checkout (Vietnam payment)" },
+    { "src": "payment-stripe", "pkg": "payment-stripe", "name": "@nai/payment-stripe", "role": "Stripe billing (international)" },
+    { "src": "commerce-primitives", "pkg": "commerce", "name": "@nai/commerce", "role": "Product/plan/order primitives" },
+    { "src": "email-sdk", "pkg": "email-sdk", "name": "@nai/email-sdk", "role": "Transactional email" },
+    { "src": "i18n-sdk", "pkg": "i18n", "name": "@nai/i18n", "role": "Internationalization VI/EN" },
+    { "src": "language-routing-sdk", "pkg": "language-router", "name": "@nai/language-router", "role": "Language detection + routing" },
+    { "src": "locale-kit", "pkg": "locale-kit", "name": "@nai/locale-kit", "role": "Locale data" },
+    { "src": "observability-sdk", "pkg": "observability", "name": "@nai/observability", "role": "Trace + metrics SDK" },
+    { "src": "protocol-stack", "pkg": "protocol", "name": "@nai/protocol", "role": "Protocol layer" },
+    { "src": "resilience-sdk", "pkg": "resilience", "name": "@nai/resilience", "role": "Retry + circuit breaker" }
+  ]
+}
