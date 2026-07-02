@@ -300,6 +300,7 @@ app.post('/v1/auth/register', async (c) => {
   const userId = crypto.randomUUID();
   const passwordHash = await hashPassword(password);
   const userLocale = locale === 'en' ? 'en' : 'vi';
+  const verificationToken = crypto.randomUUID();
 
   await createUser(c.env.DB, {
     user_id: userId,
@@ -341,11 +342,18 @@ app.post('/v1/auth/register', async (c) => {
     metadata: { role: 'USER', plan: 'nguyen-start' },
   });
 
-  // P1-5: In production, send verification email here via Resend
-  // For now, auto-verify in development
-  if (c.env.ENVIRONMENT === 'development') {
-    // Auto-verify in dev only — production must send email
-    // TODO: wire Resend email verification
+  // P1-5: Send verification + welcome email via @nai/email
+  try {
+    const { createEmailService } = await import('@nai/email');
+    const emailService = createEmailService(c.env as { RESEND_API_KEY?: string; ENVIRONMENT?: string });
+    await emailService.sendTemplate('welcome', {
+      locale: userLocale as 'vi' | 'en',
+      user_email: email,
+      user_name: name ?? undefined,
+      verification_token: verificationToken,
+    });
+  } catch {
+    // Email send failure should not block registration
   }
 
   return c.json({

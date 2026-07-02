@@ -152,8 +152,20 @@ export async function requestApproval(params: RequestApprovalParams): Promise<st
     metadata: { action: params.action, resource: params.resource },
   });
 
-  // Notify approvers (in production: send email/notification via Resend)
-  // For now, just log
+  // Notify approvers via email (best-effort, non-blocking)
+  try {
+    const { createEmailService } = await import('@nai/email');
+    const emailService = createEmailService({ ENVIRONMENT: 'development' });
+    await emailService.sendTemplate('approval_requested', {
+      locale: 'vi',
+      user_email: 'approver@nguyenai.net',
+      action: params.action,
+      requested_by: params.user_id,
+      request_id: approvalId,
+    });
+  } catch {
+    // Email failure should not block approval flow
+  }
   return approvalId;
 }
 

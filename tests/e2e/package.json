@@ -16,7 +16,8 @@
     "@nai/entitlement": "workspace:*",
     "@nai/policy-engine": "workspace:*",
     "@nai/approval": "workspace:*",
-    "@nai/product-catalog": "workspace:*"
+    "@nai/product-catalog": "workspace:*",
+    "@nai/email": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

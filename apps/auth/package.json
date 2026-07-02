@@ -19,7 +19,8 @@
     "hono": "^4.6.0",
     "otpauth": "^9.3.0",
     "@nai/auth": "workspace:*",
-    "@nai/audit": "workspace:*"
+    "@nai/audit": "workspace:*",
+    "@nai/email": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",
