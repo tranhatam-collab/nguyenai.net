@@ -314,21 +314,24 @@ export async function recordFailedLogin(db: D1Database, email: string, ip: strin
 }
 
 export async function countFailedLogins(db: D1Database, email: string, sinceISO: string): Promise<number> {
-  // Query audit_log for login_failure events for this email within the window
+  // D1 stores timestamps as 'YYYY-MM-DD HH:MM:SS' (SQLite CURRENT_TIMESTAMP).
+  // Convert ISO input to SQLite datetime format for comparison.
+  const sqliteSince = sinceISO.replace('T', ' ').replace(/\.\d+Z$/, '');
   const stmt = db.prepare(
     `SELECT COUNT(*) as cnt FROM audit_log
      WHERE event_type = 'login_failure' AND target = ?1 AND timestamp >= ?2`
   );
-  const result = await stmt.bind(email, sinceISO).first<{ cnt: number }>();
+  const result = await stmt.bind(email, sqliteSince).first<{ cnt: number }>();
   return result?.cnt ?? 0;
 }
 
 export async function countFailedLoginsByIp(db: D1Database, ip: string, sinceISO: string): Promise<number> {
+  const sqliteSince = sinceISO.replace('T', ' ').replace(/\.\d+Z$/, '');
   const stmt = db.prepare(
     `SELECT COUNT(*) as cnt FROM audit_log
      WHERE event_type = 'login_failure' AND actor_ip = ?1 AND timestamp >= ?2`
   );
-  const result = await stmt.bind(ip, sinceISO).first<{ cnt: number }>();
+  const result = await stmt.bind(ip, sqliteSince).first<{ cnt: number }>();
   return result?.cnt ?? 0;
 }
 
