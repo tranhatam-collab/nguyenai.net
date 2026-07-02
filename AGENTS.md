@@ -2,6 +2,21 @@
 
 Nguyen AI Computer — a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community. Each user owns a private AI Computer Instance with multi-model intelligence, an Agent team, tools, memory, data vault, workflows, evidence, approval gates and a secure execution environment. Heritage and genealogy are important Super Apps, not the whole product.
 
+## Quy luật làm việc nghiêm túc
+
+Khối quy luật này là ràng buộc bắt buộc cho mọi AI agent, mọi phiên làm việc, mọi task, mọi output. Nếu có xung đột giữa thói quen làm việc và các quy luật dưới đây, phải ưu tiên quy luật này.
+
+1. Nghiên cứu trước, viết sau: Không viết nội dung, code, hay fix nào cho đến khi đã đọc và hiểu đầy đủ ngữ cảnh. Không đoán.
+2. Bản đồ trước, chi tiết sau: Mọi tính năng phải có chỗ trong một bản đồ hệ thống. Nếu không vẽ được bản đồ, không bắt tay vào làm.
+3. Verify trước khi báo cáo: Chỉ nói "Completed" sau khi đã chạy lệnh verify và đọc output thật. Không dựa vào memory để báo "đã fix". Báo cáo phải ghi rõ đã làm gì, verify thế nào, và kết quả thật là gì.
+4. Không lấy công cũ làm công mới: Nếu lỗi đã fix từ phiên trước, phải nói rõ "đã fix từ commit X, verify lại lần này ra kết quả Y". Không nói "đã fix" như vừa làm xong.
+5. Không delegate mù quáng: Subagent chỉ dùng khi task thật sự độc lập và có cơ chế check kết quả. Nếu delegate, phải verify output trước khi dùng. Không dùng subagent để tạo cảm giác nhanh.
+6. Báo cáo đỏ trước báo cáo xanh: Nói cái chưa xong, cái sai, cái chưa verify trước. Nói cái xong sau. Không bury cái xấu dưới cái tốt.
+7. End-to-end trước unit: "Build green" không đủ. Phải đi user flow thật: mở trang → click → đi từ đầu đến cuối. Build chỉ là điều kiện cần, không phải điều kiện đủ.
+8. Không tự khen: Không nói "hoàn hảo", "production-ready", "chất lượng cao" về chính mình. Chỉ mô tả việc đã làm và kết quả verify được.
+9. Khi không chắc, nói không chắc: "Tôi không biết" là câu trả lời đúng khi không biết. Đoán rồi báo cáo là lỗi nghiêm trọng.
+10. Nghĩ về sản phẩm, không nghĩ về task: Mỗi task phải trả lời được câu hỏi nó phục vụ trải nghiệm người dùng cuối nào. Nếu không trả lời được, việc đó không nên làm.
+
 ## Source of truth
 
 Read these before making product, brand, SEO, privacy or architecture changes.
@@ -20,8 +35,9 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/QA_AUDIT_TOTAL_PLAN_2026-07-02.md` — QA audit of total plan
 - `docs/governance/PRODUCT_CATALOG_9x9.md` — 9 Models + 9 Functional Products (BINDING)
 - `docs/governance/DEV_TEAM_INTEGRATION_PLAN.md` — Dev team plan + 41 tool inventory (BINDING)
-- `docs/governance/DEV_EXECUTION_CHECKLIST.md` — 96-task execution checklist (BINDING)
+- `docs/governance/DEV_EXECUTION_CHECKLIST.md` — 103-task execution checklist (BINDING)
 - `docs/governance/DEV_WORK_ITEMS_P0_P1.md` — 62 P0+P1 work items with estimates (BINDING)
+- `docs/governance/RELEASE_EVIDENCE_PACK_2026-07-02.md` — Pre-deploy verification pass (50 routes, SEO, accessibility)
 
 ### Strategy + Investor (canonical)
 
