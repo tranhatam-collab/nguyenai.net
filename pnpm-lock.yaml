@@ -29,6 +29,9 @@ importers:
       '@nai/auth':
         specifier: workspace:*
         version: link:../../packages/@nai/auth
+      '@nai/billing':
+        specifier: workspace:*
+        version: link:../../packages/@nai/billing
       '@nai/email':
         specifier: workspace:*
         version: link:../../packages/@nai/email
@@ -195,6 +198,16 @@ importers:
         version: 5.9.3
 
   packages/@nai/beacon: {}
+
+  packages/@nai/billing:
+    dependencies:
+      '@nai/product-catalog':
+        specifier: workspace:*
+        version: link:../../product-catalog
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/bulwark: {}
 

@@ -13,6 +13,10 @@
  * - POST /v1/approvals/:id/approve — approve request
  * - POST /v1/approvals/:id/deny — deny request
  * - GET  /v1/audit — query audit log (SUPER_ADMIN only)
+ * - POST /v1/payment/checkout — create checkout session (Stripe or VNPay)
+ * - GET  /v1/payment/vnpay/return — VNPay return URL
+ * - POST /v1/payment/webhook/stripe — Stripe webhook
+ * - GET  /v1/prices — list all prices from product-catalog
  */
 
 import { Hono } from 'hono';
@@ -53,6 +57,22 @@ import {
 } from '@nai/approval';
 
 import { getAllPlans, getPlan, type PlanId } from '@nai/product-catalog';
+import {
+  createStripeCheckout,
+  createVnPayCheckout,
+  verifyStripeWebhook,
+  verifyVnPayReturn,
+  parseStripeEvent,
+  parseVnPayReturn,
+  generateInvoice,
+  computeVat,
+  type Gateway,
+  type Currency,
+  type CheckoutRequest,
+} from '@nai/billing';
+
+// Load prices.json statically (bundled at build time)
+import pricesData from '../../../packages/product-catalog/prices.json';
 
 // ============================================================
 // App context
@@ -65,6 +85,12 @@ interface AppEnv {
     AUDIT_ARCHIVE: R2Bucket;
     DB: D1Database;
     DATABASE_URL?: string;
+    STRIPE_SECRET_KEY: string;
+    STRIPE_WEBHOOK_SECRET: string;
+    VNPAY_TMN_CODE: string;
+    VNPAY_HASH_SECRET: string;
+    VNPAY_PAY_URL: string;
+    VNPAY_RETURN_URL: string;
   };
   Variables: {
     session: Session | null;
@@ -361,5 +387,180 @@ async function resolveSessionFromCookie(sessionId: string, env: AppEnv['Bindings
     revoked_at: row.revoked_at,
   };
 }
+
+// ============================================================
+// Prices — GET /v1/prices
+// ============================================================
+
+app.get('/v1/prices', (c) => {
+  return c.json({ prices: pricesData });
+});
+
+// ============================================================
+// Payment checkout — POST /v1/payment/checkout
+// ============================================================
+
+app.post('/v1/payment/checkout', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+
+  const body = await c.req.json();
+  const { price_id, gateway, currency, success_url, cancel_url, locale } = body as {
+    price_id: string;
+    gateway: Gateway;
+    currency: Currency;
+    success_url: string;
+    cancel_url: string;
+    locale: 'vi' | 'en';
+  };
+
+  if (!price_id || !gateway || !currency) {
+    return c.json({ error: 'price_id, gateway, currency are required' }, 400);
+  }
+  if (gateway !== 'stripe' && gateway !== 'vnpay') {
+    return c.json({ error: 'gateway must be stripe or vnpay' }, 400);
+  }
+  if (gateway === 'vnpay' && currency !== 'VND') {
+    return c.json({ error: 'VNPay only supports VND' }, 400);
+  }
+
+  const price = (pricesData as Array<{ id: string }>).find((p) => p.id === price_id);
+  if (!price) return c.json({ error: 'price not found' }, 404);
+
+  const req: CheckoutRequest = {
+    price_id,
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    email: '', // would fetch from auth service
+    currency,
+    gateway,
+    success_url: success_url ?? `https://app.nguyenai.net/payment/success`,
+    cancel_url: cancel_url ?? `https://app.nguyenai.net/payment/cancel`,
+    locale: locale ?? 'vi',
+  };
+
+  try {
+    if (gateway === 'stripe') {
+      const session_url = await createStripeCheckout(
+        { STRIPE_SECRET_KEY: c.env.STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET: c.env.STRIPE_WEBHOOK_SECRET },
+        req,
+        price as any,
+      );
+      await logAuditEvent({
+        user_id: session.user_id,
+        session_id: session.session_id,
+        event_type: 'payment_received',
+        actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+        user_agent: c.req.header('User-Agent') ?? 'unknown',
+        target: price_id,
+        result: 'success',
+        metadata: { gateway: 'stripe', amount: session_url.amount, currency },
+      });
+      return c.json(session_url);
+    } else {
+      const session_url = await createVnPayCheckout(
+        {
+          VNPAY_TMN_CODE: c.env.VNPAY_TMN_CODE,
+          VNPAY_HASH_SECRET: c.env.VNPAY_HASH_SECRET,
+          VNPAY_PAY_URL: c.env.VNPAY_PAY_URL,
+          VNPAY_RETURN_URL: c.env.VNPAY_RETURN_URL,
+        },
+        req,
+        price as any,
+      );
+      await logAuditEvent({
+        user_id: session.user_id,
+        session_id: session.session_id,
+        event_type: 'payment_received',
+        actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+        user_agent: c.req.header('User-Agent') ?? 'unknown',
+        target: price_id,
+        result: 'success',
+        metadata: { gateway: 'vnpay', amount: session_url.amount, currency: 'VND' },
+      });
+      return c.json(session_url);
+    }
+  } catch (err) {
+    console.error('Checkout creation failed:', err);
+    return c.json({ error: 'checkout creation failed' }, 502);
+  }
+});
+
+// ============================================================
+// VNPay return — GET /v1/payment/vnpay/return
+// ============================================================
+
+app.get('/v1/payment/vnpay/return', async (c) => {
+  const params: Record<string, string> = {};
+  c.req.queries().forEach((v, k) => { params[k] = v; });
+
+  const valid = await verifyVnPayReturn(
+    {
+      VNPAY_TMN_CODE: c.env.VNPAY_TMN_CODE,
+      VNPAY_HASH_SECRET: c.env.VNPAY_HASH_SECRET,
+      VNPAY_PAY_URL: c.env.VNPAY_PAY_URL,
+      VNPAY_RETURN_URL: c.env.VNPAY_RETURN_URL,
+    },
+    params,
+  );
+
+  if (!valid) return c.json({ error: 'invalid signature' }, 400);
+
+  const result = parseVnPayReturn(params);
+  const invoice = generateInvoice(result, true); // VNPay = Vietnam customer
+
+  await logAuditEvent({
+    user_id: result.user_id || 'unknown',
+    session_id: null,
+    event_type: 'payment_received',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+    user_agent: c.req.header('User-Agent') ?? 'unknown',
+    target: result.gateway_payment_id,
+    result: result.status === 'paid' ? 'success' : 'failure',
+    metadata: { gateway: 'vnpay', amount: result.amount, invoice_id: invoice.invoice_id },
+  });
+
+  return c.json({ payment: result, invoice });
+});
+
+// ============================================================
+// Stripe webhook — POST /v1/payment/webhook/stripe
+// ============================================================
+
+app.post('/v1/payment/webhook/stripe', async (c) => {
+  const payload = await c.req.text();
+  const signature = c.req.header('Stripe-Signature') ?? '';
+
+  const valid = await verifyStripeWebhook(
+    { STRIPE_SECRET_KEY: c.env.STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET: c.env.STRIPE_WEBHOOK_SECRET },
+    payload,
+    signature,
+  );
+
+  if (!valid) return c.json({ error: 'invalid signature' }, 400);
+
+  const event = JSON.parse(payload) as Record<string, unknown>;
+  const result = parseStripeEvent(event);
+
+  if (!result) {
+    // Event type not payment-related — acknowledge but don't process
+    return c.json({ received: true, processed: false });
+  }
+
+  const invoice = generateInvoice(result, false); // Stripe = international, no VAT
+
+  await logAuditEvent({
+    user_id: result.user_id || 'unknown',
+    session_id: null,
+    event_type: 'payment_received',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+    user_agent: c.req.header('User-Agent') ?? 'unknown',
+    target: result.gateway_payment_id,
+    result: 'success',
+    metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id },
+  });
+
+  return c.json({ received: true, processed: true, payment: result, invoice });
+});
 
 export default app;

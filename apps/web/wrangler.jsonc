@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nai-web",
+  "compatibility_date": "2026-06-01",
+  "pages_build_output_dir": "./dist",
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}

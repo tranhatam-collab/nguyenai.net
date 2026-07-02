@@ -6,7 +6,9 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "development",
-    "AUTH_ISSUER": "auth.nguyenai.net"
+    "AUTH_ISSUER": "auth.nguyenai.net",
+    "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+    "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return"
   },
   "d1_databases": [
     {

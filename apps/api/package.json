@@ -20,7 +20,8 @@
     "@nai/policy-engine": "workspace:*",
     "@nai/approval": "workspace:*",
     "@nai/product-catalog": "workspace:*",
-    "@nai/email": "workspace:*"
+    "@nai/email": "workspace:*",
+    "@nai/billing": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

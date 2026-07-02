@@ -77,7 +77,6 @@ import {
   countFailedLogins,
   countFailedLoginsByIp,
   findOAuthAccount,
-  findOAuthAccountsByUser,
   createOAuthAccount,
   findUserByEmailVerified,
 } from './db.ts';
@@ -894,30 +893,55 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
   // Check if OAuth account already linked
   const existingOAuth = await findOAuthAccount(c.env.DB, 'google', userInfo.sub);
   let userId: string;
+  let tenantId: string;
   let isNewUser = false;
 
   if (existingOAuth) {
     // Existing OAuth user — log in
     userId = existingOAuth.user_id;
+    const orgs = await findOrgsByUser(c.env.DB, userId);
+    tenantId = orgs[0]?.org.tenant_id ?? crypto.randomUUID();
   } else {
     // Check if email exists (verified)
     const existingUser = await findUserByEmailVerified(c.env.DB, userInfo.email);
     if (existingUser) {
       // Link OAuth to existing account
       userId = existingUser.user_id;
-      const oauthId = generateSessionId();
+      const orgs = await findOrgsByUser(c.env.DB, userId);
+      tenantId = orgs[0]?.org.tenant_id ?? crypto.randomUUID();
+      const oauthId = crypto.randomUUID();
       await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
     } else {
-      // Create new user
-      userId = generateSessionId();
-      const orgId = generateSessionId();
-      const membershipId = generateSessionId();
+      // Create new user (no password — OAuth only)
+      userId = crypto.randomUUID();
+      const orgId = crypto.randomUUID();
+      tenantId = crypto.randomUUID();
       const name = userInfo.name ?? userInfo.email.split('@')[0];
-      const locale = userInfo.locale === 'vi' ? 'vi' : 'en';
+      const userLocale = userInfo.locale === 'vi' ? 'vi' : 'en';
 
-      await createUser(c.env.DB, userId, userInfo.email, null, name, locale);
-      await createOrganization(c.env.DB, orgId, userId, `${name}'s workspace`);
-      await createMembership(c.env.DB, membershipId, orgId, userId, 'owner');
+      await createUser(c.env.DB, {
+        user_id: userId,
+        email: userInfo.email,
+        password_hash: '', // OAuth-only user, no password
+        name,
+        locale: userLocale,
+      });
+
+      await createOrganization(c.env.DB, {
+        org_id: orgId,
+        name: `${name}'s workspace`,
+        slug: `user-${userId.slice(0, 8)}`,
+        plan_id: 'nguyen-start',
+        tenant_id: tenantId,
+      });
+
+      await createMembership(c.env.DB, {
+        membership_id: crypto.randomUUID(),
+        user_id: userId,
+        org_id: orgId,
+        role: 'USER',
+        permissions: [],
+      });
 
       // Mark email verified (Google verified)
       if (userInfo.email_verified) {
@@ -925,7 +949,7 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
       }
 
       // Link OAuth account
-      const oauthId = generateSessionId();
+      const oauthId = crypto.randomUUID();
       await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
       isNewUser = true;
     }
@@ -935,37 +959,34 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
   const sessionId = generateSessionId();
   const csrfToken = generateCsrfToken();
   const maxAge = getMaxAge(c);
-  const expiresAt = getExpiresAt(maxAge);
   const ip = getClientIp(c);
   const userAgent = getUserAgent(c);
 
-  await createSession(
-    c.env.DB,
-    sessionId,
-    userId,
-    'nguyen-start',
-    c.env.DEFAULT_AUDIENCE,
-    c.env.AUTH_ISSUER,
-    ['user'],
-    getPermissionsForRoles(['user' as Role]),
-    null,
-    ip,
-    userAgent,
-    csrfToken,
-    expiresAt,
-  );
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: userId,
+    tenant_id: tenantId,
+    audience: c.env.DEFAULT_AUDIENCE,
+    issuer: c.env.AUTH_ISSUER,
+    roles: ['user'],
+    permissions: getPermissionsForRoles(['user' as Role]),
+    device: JSON.stringify({ ua: userAgent }),
+    ip_address: ip,
+    user_agent: userAgent,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
 
-  await logLoginSuccess(userId, sessionId, ip, userAgent, 'google-oauth');
+  await logLoginSuccess(userId, sessionId, ip, userAgent);
 
-  const cookie = buildCookieHeader(sessionId, maxAge, c.env.AUTH_ISSUER);
-  c.header('Set-Cookie', cookie);
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
 
   return c.json({
     session_id: sessionId,
     user_id: userId,
     csrf_token: csrfToken,
     is_new_user: isNewUser,
-    expires_at: expiresAt,
+    expires_at: getExpiresAt(maxAge),
   });
 });
 
