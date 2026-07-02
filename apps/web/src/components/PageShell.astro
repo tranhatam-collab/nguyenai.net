@@ -6,9 +6,17 @@ import type { PageContent, DemoLabel } from '../data/pages';
 export interface Props {
   locale: Locale;
   page: PageContent;
+  ogImage?: string;
 }
 
-const { locale, page } = Astro.props;
+const { locale, page, ogImage } = Astro.props;
+
+// Route-specific OG images
+const OG_IMAGE_MAP: Record<string, string> = {
+  invest: '/og-invest.png',
+  academy: '/og-academy.png',
+};
+const resolvedOgImage = ogImage ?? OG_IMAGE_MAP[page.key] ?? '/og-default.png';
 const isArticlePage = page.key === 'research' || page.key === 'docs';
 const pageJsonLd = isArticlePage ? {
   '@context': 'https://schema.org',
@@ -54,7 +62,7 @@ const statusClass: Record<string, string> = {
 };
 ---
 
-<BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd}>
+<BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd} ogImage={resolvedOgImage}>
   {/* 1. Hero */}
   <section class="hero section-wrap">
     <div class="eyebrow">{page.eyebrow}</div>
