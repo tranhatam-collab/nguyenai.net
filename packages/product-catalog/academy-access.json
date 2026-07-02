@@ -1,0 +1,63 @@
+{
+  "academy_pass": {
+    "product_id": "academy-pass",
+    "grants": {
+      "academy.pass": true,
+      "academy.tracks.enabled": ["basic", "founder", "business", "heritage"],
+      "academy.lessons.limit": "unlimited"
+    },
+    "pricing": {
+      "monthly": { "price_vnd": 199000, "price_usd": 8 },
+      "annual": { "price_vnd": 1990000, "price_usd": 80 }
+    },
+    "rules": {
+      "not_granted_by_machine_plan": true,
+      "standalone_purchase_only": true,
+      "promotional_grant_allowed": true,
+      "promotional_grant_must_be_audited": true,
+      "promotional_grant_must_have_expiry": true
+    }
+  },
+  "certification_fee": {
+    "product_id": "cert-fee-standard",
+    "grants": {
+      "cert.fee.paid": true
+    },
+    "pricing": {
+      "standard": { "price_vnd": 499000, "price_usd": 20 },
+      "premium_proctored": { "price_vnd": 999000, "price_usd": 40 }
+    },
+    "rules": {
+      "per_attempt_transaction": true,
+      "discount_via_academy_cert_discount": true,
+      "voucher_scholarship_allowed": true,
+      "voucher_must_be_audited": true,
+      "voucher_must_be_time_limited": true
+    }
+  },
+  "free_track_access": {
+    "description": "Free introductory lessons available to all users without Academy Pass",
+    "grants": {
+      "academy.tracks.enabled": ["free-intro"],
+      "academy.lessons.limit": 5
+    },
+    "rules": {
+      "no_purchase_required": true,
+      "upgrade_cta_on_limit": true
+    }
+  },
+  "promotional_rules": {
+    "scholarship": {
+      "allowed": true,
+      "must_be_audited": true,
+      "must_have_expiry": true,
+      "max_duration_days": 365,
+      "granted_by": ["admin:grant", "system:scholarship"]
+    },
+    "bulk_discount": {
+      "allowed": true,
+      "applies_to": ["nguyen-business", "nguyen-chapter", "nguyen-enterprise"],
+      "must_be_audited": true
+    }
+  }
+}

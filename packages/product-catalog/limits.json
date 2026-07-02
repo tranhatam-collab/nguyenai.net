@@ -1,0 +1,12 @@
+{
+  "machine.command.quota": { "unit": "commands", "period": "day", "enforce": "server-side", "error_code": 429 },
+  "machine.tokens.quota": { "unit": "tokens", "period": "month", "enforce": "server-side", "error_code": 429 },
+  "machine.instance.count": { "unit": "instances", "enforce": "server-side", "error_code": 403 },
+  "machine.memory.mb": { "unit": "MB", "enforce": "server-side", "error_code": 403 },
+  "machine.vault.mb": { "unit": "MB", "enforce": "server-side", "error_code": 403 },
+  "academy.lessons.limit": { "unit": "lessons", "period": "month", "enforce": "server-side", "error_code": 403 },
+  "academy.cert.attempts": { "unit": "attempts", "period": "month", "enforce": "server-side", "error_code": 403 },
+  "academy.pass": { "type": "boolean", "enforce": "server-side", "error_code": 403 },
+  "invest.private.scope": { "type": "list", "enforce": "server-side", "error_code": 403 },
+  "invest.download.allowed": { "type": "boolean", "enforce": "server-side", "error_code": 403 }
+}

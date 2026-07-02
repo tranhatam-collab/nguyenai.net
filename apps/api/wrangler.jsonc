@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nai-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ENVIRONMENT": "development",
+    "AUTH_ISSUER": "auth.nguyenai.net"
+  },
+  "r2_buckets": [
+    { "binding": "AUDIT_ARCHIVE", "bucket_name": "nai-audit-archive" }
+  ]
+}

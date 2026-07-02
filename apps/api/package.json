@@ -1,0 +1,31 @@
+{
+  "name": "@nai/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'API tested via E2E suite (tests/e2e)'",
+    "lint": "echo 'TODO: eslint for @nai/api'"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "@nai/auth": "workspace:*",
+    "@nai/audit": "workspace:*",
+    "@nai/policy-fga": "workspace:*",
+    "@nai/entitlement": "workspace:*",
+    "@nai/policy-engine": "workspace:*",
+    "@nai/approval": "workspace:*",
+    "@nai/product-catalog": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0",
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "@cloudflare/workers-types": "^4.20240620.0"
+  }
+}

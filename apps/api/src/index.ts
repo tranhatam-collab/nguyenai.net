@@ -1,0 +1,318 @@
+/**
+ * @nai/api — Nguyen AI API gateway on Cloudflare Workers (Hono).
+ *
+ * Routes:
+ * - GET  /health — health check (no auth)
+ * - GET  /v1/session — resolve session from cookie
+ * - POST /v1/logout — revoke session
+ * - GET  /v1/me — current user profile
+ * - GET  /v1/entitlements — current user entitlements
+ * - GET  /v1/plans — list all plans from product-catalog
+ * - GET  /v1/usage — current usage state
+ * - POST /v1/approvals — request approval
+ * - POST /v1/approvals/:id/approve — approve request
+ * - POST /v1/approvals/:id/deny — deny request
+ * - GET  /v1/audit — query audit log (SUPER_ADMIN only)
+ */
+
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+
+import {
+  SESSION_COOKIE_NAME,
+  resolveSessionFromCookie,
+  buildClearCookieHeader,
+  type Session,
+  type Role,
+} from '@nai/auth';
+
+import {
+  logAuditEvent,
+  logLogout,
+  logAccessDenied,
+  queryAuditLog,
+  InMemoryAuditStore,
+  setAuditStore,
+} from '@nai/audit';
+
+import {
+  resolveEntitlements,
+  checkCommandQuota,
+  type InMemoryEntitlementStore,
+  setEntitlementStore,
+} from '@nai/entitlement';
+
+import {
+  requestApproval,
+  approveRequest,
+  denyRequest,
+  checkApprovalStatus,
+  listPendingApprovals,
+  InMemoryApprovalStore,
+  setApprovalStore,
+} from '@nai/approval';
+
+import { getAllPlans, getPlan, type PlanId } from '@nai/product-catalog';
+
+// ============================================================
+// App context
+// ============================================================
+
+interface AppEnv {
+  Bindings: {
+    ENVIRONMENT: string;
+    AUTH_ISSUER: string;
+    AUDIT_ARCHIVE: R2Bucket;
+    DATABASE_URL?: string;
+  };
+  Variables: {
+    session: Session | null;
+  };
+}
+
+const app = new Hono<AppEnv>();
+
+// CORS — restrict to nguyenai.net subdomains only
+app.use('*', cors({
+  origin: (origin) => {
+    if (!origin) return null;
+    if (/^https:\/\/.*\.nguyenai\.net$/.test(origin)) return origin;
+    if (origin === 'http://localhost:4321') return origin;
+    return null;
+  },
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// ============================================================
+// Initialize stores (in-memory for dev; production uses Postgres + R2)
+// ============================================================
+
+setAuditStore(new InMemoryAuditStore());
+setEntitlementStore(new (await import('@nai/entitlement')).InMemoryEntitlementStore());
+setApprovalStore(new InMemoryApprovalStore());
+
+// ============================================================
+// Middleware — resolve session from cookie
+// ============================================================
+
+app.use('/v1/*', async (c, next) => {
+  const cookie = c.req.header('Cookie') ?? '';
+  const sessionCookie = parseCookie(cookie, SESSION_COOKIE_NAME);
+  c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie) : null);
+  await next();
+});
+
+// ============================================================
+// Health check — no auth
+// ============================================================
+
+app.get('/health', (c) => {
+  return c.json({
+    status: 'ok',
+    service: 'nai-api',
+    version: '0.1.0',
+    timestamp: new Date().toISOString(),
+    environment: c.env.ENVIRONMENT,
+  });
+});
+
+// ============================================================
+// Session — GET /v1/session
+// ============================================================
+
+app.get('/v1/session', (c) => {
+  const session = c.get('session');
+  if (!session || session.revoked_at) {
+    return c.json({ error: 'no valid session' }, 401);
+  }
+  return c.json(session);
+});
+
+// ============================================================
+// Logout — POST /v1/logout
+// ============================================================
+
+app.post('/v1/logout', async (c) => {
+  const session = c.get('session');
+  if (session) {
+    await logLogout(session.user_id, session.session_id);
+  }
+  c.header('Set-Cookie', buildClearCookieHeader(SESSION_COOKIE_NAME));
+  return c.body(null, 204);
+});
+
+// ============================================================
+// Me — GET /v1/me
+// ============================================================
+
+app.get('/v1/me', (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  return c.json({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    roles: session.roles,
+    permissions: session.permissions,
+    audience: session.audience,
+  });
+});
+
+// ============================================================
+// Entitlements — GET /v1/entitlements
+// ============================================================
+
+app.get('/v1/entitlements', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const planId = (c.req.query('plan') ?? 'nguyen-start') as PlanId;
+  const ent = await resolveEntitlements(session.user_id, session.tenant_id, planId);
+  return c.json(ent);
+});
+
+// ============================================================
+// Plans — GET /v1/plans
+// ============================================================
+
+app.get('/v1/plans', (c) => {
+  return c.json(getAllPlans());
+});
+
+app.get('/v1/plans/:id', (c) => {
+  const id = c.req.param('id') as PlanId;
+  const plan = getPlan(id);
+  if (!plan) return c.json({ error: 'plan not found' }, 404);
+  return c.json(plan);
+});
+
+// ============================================================
+// Usage — GET /v1/usage
+// ============================================================
+
+app.get('/v1/usage', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const planId = (c.req.query('plan') ?? 'nguyen-start') as PlanId;
+  const quota = await checkCommandQuota(session.user_id, session.tenant_id, planId);
+  return c.json({ command_quota: quota });
+});
+
+// ============================================================
+// Approvals — POST /v1/approvals
+// ============================================================
+
+app.post('/v1/approvals', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const body = await c.req.json();
+  const id = await requestApproval({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    action: body.action,
+    resource: body.resource,
+    requested_by: session.user_id,
+    reason: body.reason,
+    metadata: body.metadata,
+  });
+  return c.json({ approval_id: id, status: 'pending' }, 201);
+});
+
+app.post('/v1/approvals/:id/approve', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const id = c.req.param('id');
+  try {
+    await approveRequest(id, session.user_id);
+    return c.json({ approval_id: id, status: 'approved' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+app.post('/v1/approvals/:id/deny', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const id = c.req.param('id');
+  try {
+    await denyRequest(id, session.user_id);
+    return c.json({ approval_id: id, status: 'denied' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+app.get('/v1/approvals', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  const pending = await listPendingApprovals(session.user_id, session.tenant_id);
+  return c.json({ pending });
+});
+
+// ============================================================
+// Audit — GET /v1/audit (SUPER_ADMIN only)
+// ============================================================
+
+app.get('/v1/audit', async (c) => {
+  const session = c.get('session');
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  if (!session.roles.includes('SUPER_ADMIN' as Role)) {
+    await logAccessDenied(session.user_id, session.session_id, '/v1/audit', 'missing SUPER_ADMIN role');
+    return c.json({ error: 'forbidden: SUPER_ADMIN only' }, 403);
+  }
+  const events = await queryAuditLog({
+    user_id: c.req.query('user_id') ?? undefined,
+    event_type: c.req.query('event_type') as never ?? undefined,
+    limit: parseInt(c.req.query('limit') ?? '100', 10),
+  });
+  return c.json({ events });
+});
+
+// ============================================================
+// 404 handler
+// ============================================================
+
+app.notFound((c) => c.json({ error: 'not found' }, 404));
+
+app.onError((err, c) => {
+  console.error('Unhandled error:', err);
+  return c.json({ error: 'internal server error' }, 500);
+});
+
+// ============================================================
+// Helpers
+// ============================================================
+
+function parseCookie(cookieHeader: string, name: string): string | null {
+  const parts = cookieHeader.split(';');
+  for (const part of parts) {
+    const [k, v] = part.trim().split('=');
+    if (k === name) return v ?? null;
+  }
+  return null;
+}
+
+// Stub — in production this calls the auth service
+async function resolveSessionFromCookie(_cookie: string): Promise<Session | null> {
+  // TODO: call auth.nguyenai.net /v1/session with the cookie
+  // For now, return null (no session in dev without real auth service)
+  return null;
+}
+
+export default app;

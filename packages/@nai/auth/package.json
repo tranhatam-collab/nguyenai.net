@@ -1,0 +1,27 @@
+{
+  "name": "@nai/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./middleware/astro": "./middleware/astro.ts"
+  },
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly by workspace'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/test.ts",
+    "lint": "echo 'TODO: eslint for @nai/auth'"
+  },
+  "dependencies": {
+    "@nai/audit": "workspace:*",
+    "otpauth": "^9.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

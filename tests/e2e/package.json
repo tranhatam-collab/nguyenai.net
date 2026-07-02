@@ -1,0 +1,26 @@
+{
+  "name": "@nai/e2e-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'no build'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/p0b-e2e.ts",
+    "lint": "echo 'TODO'"
+  },
+  "dependencies": {
+    "@nai/auth": "workspace:*",
+    "@nai/audit": "workspace:*",
+    "@nai/policy-fga": "workspace:*",
+    "@nai/entitlement": "workspace:*",
+    "@nai/policy-engine": "workspace:*",
+    "@nai/approval": "workspace:*",
+    "@nai/product-catalog": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

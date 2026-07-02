@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Nguyen AI Product Catalog",
+  "description": "JSON Schema for plans.json, entitlements.json, limits.json, prices.json, academy-access.json",
+  "definitions": {
+    "plan_id": {
+      "type": "string",
+      "enum": ["nguyen-start", "nguyen-personal", "nguyen-family", "nguyen-creator", "nguyen-founder", "nguyen-business", "nguyen-chapter", "nguyen-enterprise"]
+    },
+    "plan_status": {
+      "type": "string",
+      "enum": ["Available", "Beta", "Planned", "Enterprise only"]
+    },
+    "model_tier": {
+      "type": "string",
+      "enum": ["free", "standard", "standard+", "pro", "enterprise"]
+    },
+    "approval_gate": {
+      "type": "string",
+      "enum": ["all", "sensitive", "per-role", "board", "custom"]
+    },
+    "agent_id": {
+      "type": "string",
+      "enum": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-family-steward", "nguyen-founder", "nguyen-business-operator", "nguyen-global-connector", "nguyen-archivist", "nguyen-creator"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "plans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "price_vnd", "currency", "period", "status", "model_tier", "agents", "memory_mb", "vault_mb", "commands_per_day", "tokens_per_month", "super_apps", "approval_gate", "academy_pass", "academy_cert_discount"],
+        "properties": {
+          "id": { "$ref": "#/definitions/plan_id" },
+          "name": { "type": "string" },
+          "name_vi": { "type": "string" },
+          "name_en": { "type": "string" },
+          "price_vnd": { "type": ["number", "null"] },
+          "price_usd": { "type": ["number", "null"] },
+          "currency": { "type": "string", "enum": ["VND"] },
+          "period": { "type": "string", "enum": ["month", "year", "per-attempt"] },
+          "status": { "$ref": "#/definitions/plan_status" },
+          "target_vi": { "type": "string" },
+          "target_en": { "type": "string" },
+          "model_tier": { "$ref": "#/definitions/model_tier" },
+          "agents": { "type": ["array", "string"], "items": { "$ref": "#/definitions/agent_id" } },
+          "memory_mb": { "type": ["number", "null"] },
+          "vault_mb": { "type": ["number", "null"] },
+          "commands_per_day": { "type": ["number", "null"] },
+          "tokens_per_month": { "type": ["number", "null"] },
+          "super_apps": { "type": ["array", "string"] },
+          "approval_gate": { "$ref": "#/definitions/approval_gate" },
+          "academy_pass": { "type": ["boolean", "string"] },
+          "academy_cert_discount": { "type": ["number", "string"] }
+        }
+      }
+    }
+  }
+}

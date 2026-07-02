@@ -1,0 +1,30 @@
+{
+  "name": "@nai/product-catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./plans.json": "./plans.json",
+    "./entitlements.json": "./entitlements.json",
+    "./limits.json": "./limits.json",
+    "./prices.json": "./prices.json",
+    "./academy-access.json": "./academy-access.json"
+  },
+  "scripts": {
+    "build": "echo 'no build needed for JSON catalog'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/validate.ts",
+    "lint": "echo 'TODO: eslint for @nai/product-catalog'"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

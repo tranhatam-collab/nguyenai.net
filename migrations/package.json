@@ -1,0 +1,23 @@
+{
+  "name": "@nai/migrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'no build needed for SQL migrations'",
+    "typecheck": "echo 'no typecheck for SQL'",
+    "test": "tsx src/validate.ts",
+    "lint": "echo 'TODO: eslint for @nai/migrations'",
+    "migrate:apply": "tsx src/apply.ts",
+    "migrate:status": "tsx src/status.ts"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0"
+  }
+}
