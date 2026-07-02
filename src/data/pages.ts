@@ -153,6 +153,33 @@ const vi: Record<RouteKey, PageContent> = {
     key: 'contact', title: 'Liên hệ — Nguyen AI Computer', description: 'Liên hệ để khởi tạo AI Computer, tham gia chapter hoặc hợp tác.', eyebrow: 'Liên hệ', heroTitle: 'Liên hệ với Nguyen AI.', heroText: 'Để khởi tạo AI Computer, tham gia chapter hoặc hợp tác, vui lòng gửi thông tin qua form hoặc email.', sections: [
       { title: 'Kênh liên hệ', body: 'Email, form liên hệ và mạng lưới chapter.', items: ['Email: hello@nguyenai.net', 'Form liên hệ', 'Chapter network'] }
     ]
+  },
+  invest: {
+    key: 'invest',
+    title: 'Đầu tư — Nguyen AI Computer | Cơ hội đầu tư giai đoạn Seed',
+    description: 'Nguyen AI đang gọi vốn Seed 500K–1M USD, định giá 1.5–3M USD pre-money. Đầu tư qua chuyển khoản ngân hàng Việt Nam hoặc chuyển khoản quốc tế. Xác minh danh tính qua Google + verify.iai.one, bảo mật 2 bước cho phòng đầu tư.',
+    eyebrow: 'Đầu tư',
+    heroTitle: 'Cơ hội đầu tư Seed — Nguyen AI Computer.',
+    heroText: 'Nguyen AI đang gọi vốn Seed 500K–1M USD với định giá 1.5–3M USD pre-money. Nhà đầu tư xác minh danh tính qua Google Login + verify.iai.one, thanh toán qua QR chuyển khoản, và truy cập phòng đầu tư sau khi hoàn tất bảo mật 2 bước.',
+    primaryCta: 'Yêu cầu truy cập phòng đầu tư',
+    secondaryCta: 'Tải hồ sơ đầu tư',
+    sections: [
+      { title: 'Thông tin gọi vốn', body: 'Giai đoạn Seed, nhận đầu tư từ nhà đầu tư chiến lược và thiên thần.', items: ['Giai đoạn: Seed', 'Khoảng gọi vốn: 500.000 – 1.000.000 USD', 'Định giá pre-money: 1.500.000 – 3.000.000 USD', 'Công cụ: SAFE hoặc Convertible Note', 'Tối thiểu đầu tư: 25.000 USD (hoặc tương đương VND)', 'Đóng vòng: theo cam kết, không quá 90 ngày từ xác minh'] },
+      { title: 'Thực thể pháp lý', body: 'Nguyen AI hoạt động qua hai thực thể pháp lý tại Mỹ và Việt Nam.', items: ['Mỹ: VIET CAN NEW CORP — tiếp nhận đầu tư quốc tế (USD)', 'Việt Nam: Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan', 'Mã số thuế VN: 0315521422', 'Tra cứu MST: masothue.com/0315521422', 'Nguyen AI giữ IP và thương hiệu qua thỏa thuận liên thực thể'] },
+      { title: 'Thanh toán đầu tư — Chuyển khoản Việt Nam (VND)', body: 'Nhà đầu tư trong Việt Nam thanh toán qua chuyển khoản ngân hàng. Nội dung chuyển khoản bắt buộc ghi rõ mục đích đầu tư.', items: ['Số tài khoản: 3051378', 'Ngân hàng: ACB — Chi nhánh Hồ Chí Minh', 'Chủ tài khoản: Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan', 'Nội dung CK (bắt buộc): "INVEST NGUYENAI.NET" hoặc "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"', 'Sau khi chuyển khoản, gửi biên lai qua email đầu tư để xác nhận'] },
+      { title: 'Thanh toán đầu tư — Chuyển khoản quốc tế (USD)', body: 'Nhà đầu tư quốc tế thanh toán qua VIET CAN NEW CORP. Thông tin wire transfer được cung cấp sau khi xác minh danh tính.', items: ['Thực thể nhận: VIET CAN NEW CORP (Mỹ)', 'Loại tiền: USD', 'Thông tin wire transfer: cung cấp sau xác minh', 'Nhà đầu tư quốc tế liên hệ invest@nguyenai.net để nhận hướng dẫn'] },
+      { title: 'Quy trình xác minh nhà đầu tư', body: 'Mọi nhà đầu tư phải hoàn tất xác minh danh tính trước khi truy cập phòng đầu tư riêng.', items: ['Bước 1: Đăng nhập bằng Google (OAuth)', 'Bước 2: Khai báo họ tên thật + ngày tháng năm sinh', 'Bước 3: Xác minh danh tính qua verify.iai.one', 'Bước 4: Thanh toán đầu tư (QR chuyển khoản VN hoặc wire USD)', 'Bước 5: Kích hoạt bảo mật 2 bước (TOTP hoặc SMS)', 'Bước 6: Truy cập phòng đầu tư riêng (data room, tài chính, cap table)'] },
+      { title: 'Bảo mật phòng đầu tư', body: 'Phòng đầu tư riêng được bảo vệ nghiêm ngặt theo chính sách quản trị.', items: ['Bắt buộc xác minh danh tính qua verify.iai.one', 'Bắt buộc bảo mật 2 bước (TOTP hoặc SMS)', 'Mọi lượt truy cập được ghi audit log', 'Quyền truy cập có hạn (90 ngày), có thể thu hồi', 'Không công khai cap table, tài khoản ngân hàng hoặc term sheet trên HTML public', 'Trang riêng: noindex, nofollow, noarchive, loại khỏi sitemap'] },
+      { title: 'Cơ hội đầu tư', body: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn toàn cầu — 32 triệu người họ Nguyễn trên thế giới.', items: ['Thị trường: 32 triệu người họ Nguyễn toàn cầu', 'Sản phẩm: 9 Model máy + 9 Functional Products (xem Product Catalog 9×9)', 'Doanh thu: subscription Model + add-on Functional Product + Academy', 'Lợi thế: di sản + tri thức + kết nối cộng đồng + AI Computer runtime', 'Roadmap: MVP 18 tuần, production release sau Sprint P3'] },
+      { title: 'Tuyên bố pháp lý', body: 'Thông tin trên trang này không cấu thành lời chào bán chứng khoán, cam kết lợi nhuận hoặc tư vấn đầu tư. Mọi đầu tư có rủi ro. Chỉ nhà đầu tư đủ điều kiện sau xác minh mới truy cập tài liệu đầy đủ.' }
+    ],
+    faq: [
+      { question: 'Tôi có thể đầu tư bao nhiêu?', answer: 'Tối thiểu 25.000 USD hoặc tương đương VND. Khoảng đầu tư linh hoạt tùy nhà đầu tư chiến lược.' },
+      { question: 'Tôi thanh toán bằng cách nào?', answer: 'Nhà đầu tư Việt Nam: chuyển khoản ngân hàng đến số TK 3051378 (ACB CN HCM) với nội dung "INVEST NGUYENAI.NET". Nhà đầu tư quốc tế: wire transfer USD qua VIET CAN NEW CORP sau khi xác minh.' },
+      { question: 'Tại sao phải xác minh danh tính?', answer: 'Để bảo vệ nhà đầu tư và tuân thủ quy định. Xác minh qua Google Login + verify.iai.one đảm bảo danh tính thật, và bảo mật 2 bước bảo vệ phòng đầu tư khỏi truy cập trái phép.' },
+      { question: 'Phòng đầu tư riêng có gì?', answer: 'Data room, mô hình tài chính 5 năm, cap table, báo cáo audit kỹ thuật, IP ownership, báo cáo security, hợp đồng pháp lý, và lịch họp với founder.' },
+      { question: 'Thực thể pháp lý nào nhận đầu tư?', answer: 'VIET CAN NEW CORP (Mỹ) nhận đầu tư quốc tế USD. Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan (MST 0315521422) nhận đầu tư VND tại Việt Nam.' }
+    ]
   }
 };
 
@@ -295,6 +322,33 @@ const en: Record<RouteKey, PageContent> = {
   contact: {
     key: 'contact', title: 'Contact — Nguyen AI Computer', description: 'Contact to initialize an AI Computer, join a chapter or partner.', eyebrow: 'Contact', heroTitle: 'Contact Nguyen AI.', heroText: 'To initialize an AI Computer, join a chapter or partner, please send information via form or email.', sections: [
       { title: 'Contact channels', body: 'Email, contact form and chapter network.', items: ['Email: hello@nguyenai.net', 'Contact form', 'Chapter network'] }
+    ]
+  },
+  invest: {
+    key: 'invest',
+    title: 'Invest — Nguyen AI Computer | Seed Round Opportunity',
+    description: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Invest via Vietnamese bank transfer or international wire. Identity verification via Google + verify.iai.one, 2FA required for investor room.',
+    eyebrow: 'Invest',
+    heroTitle: 'Seed Round Opportunity — Nguyen AI Computer.',
+    heroText: 'Nguyen AI is raising a Seed round of 500K–1M USD at 1.5–3M USD pre-money. Investors verify identity via Google Login + verify.iai.one, pay via QR bank transfer, and access the investor room after completing 2FA.',
+    primaryCta: 'Request investor room access',
+    secondaryCta: 'Download investor brief',
+    sections: [
+      { title: 'Round details', body: 'Seed stage, accepting strategic and angel investors.', items: ['Stage: Seed', 'Round size: 500,000 – 1,000,000 USD', 'Pre-money valuation: 1,500,000 – 3,000,000 USD', 'Instrument: SAFE or Convertible Note', 'Minimum investment: 25,000 USD (or VND equivalent)', 'Close: rolling, no later than 90 days from verification'] },
+      { title: 'Legal entities', body: 'Nguyen AI operates through two legal entities in the US and Vietnam.', items: ['US: VIET CAN NEW CORP — receives international investment (USD)', 'Vietnam: Kasan Education Investment & Tourism Journey JSC', 'VN Tax ID: 0315521422', 'Tax lookup: masothue.com/0315521422', 'Nguyen AI holds IP and brand via inter-entity agreements'] },
+      { title: 'Payment — Vietnam bank transfer (VND)', body: 'Vietnam-based investors pay via bank transfer. Transfer content must state the investment purpose.', items: ['Account number: 3051378', 'Bank: ACB — Ho Chi Minh Branch', 'Account holder: Kasan Education Investment & Tourism Journey JSC', 'Transfer memo (required): "INVEST NGUYENAI.NET" or "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"', 'After transfer, email the receipt to invest@nguyenai.net for confirmation'] },
+      { title: 'Payment — International wire (USD)', body: 'International investors pay via VIET CAN NEW CORP. Wire transfer details provided after identity verification.', items: ['Receiving entity: VIET CAN NEW CORP (US)', 'Currency: USD', 'Wire details: provided after verification', 'International investors contact invest@nguyenai.net for instructions'] },
+      { title: 'Investor verification flow', body: 'All investors must complete identity verification before accessing the private investor room.', items: ['Step 1: Sign in with Google (OAuth)', 'Step 2: Provide full legal name + date of birth', 'Step 3: Identity verification via verify.iai.one', 'Step 4: Investment payment (VN QR transfer or USD wire)', 'Step 5: Enable 2FA (TOTP or SMS)', 'Step 6: Access private investor room (data room, financials, cap table)'] },
+      { title: 'Investor room security', body: 'The private investor room is strictly protected per governance policy.', items: ['Identity verification required via verify.iai.one', '2FA required (TOTP or SMS)', 'Every access logged in audit trail', 'Access is expiring (90 days) and revocable', 'No cap table, bank account or term sheet in public HTML', 'Private routes: noindex, nofollow, noarchive, excluded from sitemap'] },
+      { title: 'Investment opportunity', body: 'Nguyen AI Computer is a specialized cloud AI Computer line for the global Nguyen ecosystem — 32 million Nguyen people worldwide.', items: ['Market: 32 million Nguyen people worldwide', 'Product: 9 AI Computer Models + 9 Functional Products (see Product Catalog 9×9)', 'Revenue: Model subscription + Functional Product add-on + Academy', 'Moat: heritage + knowledge + community network + AI Computer runtime', 'Roadmap: MVP 18 weeks, production release after Sprint P3'] },
+      { title: 'Legal disclaimer', body: 'Information on this page does not constitute an offer to sell securities, a profit guarantee or investment advice. All investments carry risk. Only qualified investors who complete verification may access full documentation.' }
+    ],
+    faq: [
+      { question: 'How much can I invest?', answer: 'Minimum 25,000 USD or VND equivalent. Investment size is flexible for strategic investors.' },
+      { question: 'How do I pay?', answer: 'Vietnam investors: bank transfer to account 3051378 (ACB HCM Branch) with memo "INVEST NGUYENAI.NET". International investors: USD wire via VIET CAN NEW CORP after verification.' },
+      { question: 'Why is identity verification required?', answer: 'To protect investors and comply with regulations. Google Login + verify.iai.one ensures real identity, and 2FA protects the investor room from unauthorized access.' },
+      { question: 'What is in the private investor room?', answer: 'Data room, 5-year financial model, cap table, technical audit reports, IP ownership, security reports, legal contracts, and meeting scheduling with the founder.' },
+      { question: 'Which legal entity receives the investment?', answer: 'VIET CAN NEW CORP (US) receives international USD investment. Kasan Education Investment & Tourism Journey JSC (Tax ID 0315521422) receives VND investment in Vietnam.' }
     ]
   }
 };

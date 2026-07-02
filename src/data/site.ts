@@ -59,6 +59,7 @@ export const routes = [
   { key: 'docs', vi: '/docs/', en: '/en/docs/', labelVi: 'Tài liệu', labelEn: 'Docs' },
   { key: 'research', vi: '/research/', en: '/en/research/', labelVi: 'Nghiên cứu', labelEn: 'Research' },
   { key: 'about', vi: '/about/', en: '/en/about/', labelVi: 'Giới thiệu', labelEn: 'About' },
+  { key: 'invest', vi: '/invest/', en: '/en/invest/', labelVi: 'Đầu tư', labelEn: 'Invest' },
   { key: 'contact', vi: '/contact/', en: '/en/contact/', labelVi: 'Liên hệ', labelEn: 'Contact' }
 ] as const;
 

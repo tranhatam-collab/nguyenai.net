@@ -1,162 +1,130 @@
 # Nguyen AI — Legal Entity Formation Checklist
 
-**Status:** NOT STARTED — entity not yet formed
-**Target:** Vietnam LLC (Công ty TNHH) or equivalent
-**Timeline:** 0-60 days from approval
+**Status:** ENTITIES IDENTIFIED — dual-entity structure confirmed
+**Date:** 2026-07-02
 **Owner:** Founder + Legal counsel
+
+---
+
+## Confirmed entity structure (dual-entity)
+
+Nguyen AI operates through two legal entities:
+
+### Entity 1 — US: VIET CAN NEW CORP
+
+- **Jurisdiction:** United States
+- **Role:** Receives international investment (USD), holds IP, signs international contracts
+- **Status:** Identified — verify formation status with legal counsel
+- **Use for:**
+  - International investor wire transfers (USD)
+  - SAFE / Convertible Note issuance to international investors
+  - IP holding and licensing to VN entity
+  - International commercial contracts
+
+### Entity 2 — Vietnam: Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan
+
+- **Jurisdiction:** Vietnam
+- **Tax ID (MST):** 0315521422
+- **Tax lookup:** https://masothue.com/0315521422-cong-ty-co-phan-dau-tu-giao-duc-va-du-lich-hanh-trinh-kasan
+- **Role:** Receives Vietnam investment (VND), local operations, local payments, PDPD compliance
+- **Bank account:**
+  - Account number: 3051378
+  - Bank: ACB — Ho Chi Minh Branch (ACB CN HCM)
+  - Account holder: Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan
+- **Use for:**
+  - Vietnam investor bank transfers (VND)
+  - Local subscription payments (VNPay)
+  - Local payroll and operations
+  - PDPD 91/2025/QH15 compliance
+  - VAT invoicing (10%)
+
+### Inter-entity structure
+
+```
+VIET CAN NEW CORP (US)
+  ├─ holds IP (Nguyen AI brand, Gen1/Gen2 integration, product catalog)
+  ├─ licenses IP to VN entity
+  ├─ receives USD investment
+  └─ signs international contracts
+
+Kasan JSC (Vietnam, MST 0315521422)
+  ├─ receives VND investment
+  ├─ local operations (payments, payroll, PDPD)
+  ├─ pays royalty/license fee to US entity for IP use
+  └─ local commercial contracts
+```
 
 ---
 
 ## Why this matters
 
-Per Investment Strategy V2, the 4.5M USD pre-money valuation requires:
-1. A legal entity to accept investment funds
-2. Clear IP ownership (entity owns or licenses Gen1/Gen2)
-3. PDPD 91/2025/QH15 compliance (effective 2026-01-01)
-
-Without a legal entity, Nguyen AI cannot:
-- Accept investor funds
-- Execute IP agreements
-- Sign commercial contracts
-- Process payments
-- Be valued as a company
+Per Investment Strategy V3 and Hồ sơ đầu tư VI V1.0, the Seed round (500K–1M USD, 1.5–3M USD pre-money) requires:
+1. Legal entities to accept investment funds (both USD and VND)
+2. Clear IP ownership (US entity owns or licenses Gen1/Gen2)
+3. PDPD 91/2025/QH15 compliance (VN entity, effective 2026-01-01)
+4. Bank accounts in both jurisdictions
 
 ---
 
-## Option A: Vietnam LLC (Công ty TNHH 1 thành viên or 2+ thành viên)
+## Investment payment instructions
 
-### Pros
-- Native to Vietnam market (primary user base)
-- Lower cost (~5-15M VND setup)
-- PDPD compliance native
-- Government tech startup incentives available
+### Vietnam investors (VND)
 
-### Cons
-- Foreign investment restrictions in some sectors
-- Capital controls for cross-border payments
-- Slower banking setup (2-4 weeks)
+- **Account number:** 3051378
+- **Bank:** ACB — Ho Chi Minh Branch
+- **Account holder:** Công ty Cổ phần Đầu tư Giáo dục và Du lịch Hành trình Kasan
+- **Transfer memo (required):** `INVEST NGUYENAI.NET` or `Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net`
+- **After transfer:** Email receipt to invest@nguyenai.net for confirmation
 
-### Steps
-1. **Reserve company name** — National Business Registration Portal
-2. **Draft company charter (điều lệ công ty)** — with legal counsel
-3. **Identify founding member(s) and capital contribution**
-4. **Register business lines (ngành nghề kinh doanh)**
-   - 6201: Computer programming
-   - 6202: Computer consultancy
-   - 6311: Data processing, hosting
-   - 7220: Research and development
-5. **Submit registration** — Department of Planning and Investment (Sở Kế hoạch và Đầu tư)
-6. **Receive Enterprise Registration Certificate (ERC)** — 5-7 working days
-7. **Open corporate bank account** — 2-4 weeks
-8. **Register for tax code** — automatic with ERC
-9. **Declare initial capital** — within 90 days of ERC
-10. **Register for VAT and FCT** — if applicable
+### International investors (USD)
 
-### Documents needed
-- Founding member ID/passport
-- Company charter
-- Capital contribution proof
-- Registered office address (lease or ownership)
-- Business line descriptions
-
-### Estimated cost
-- Government fees: ~1-3M VND
-- Legal counsel: ~5-10M VND
-- Registered office (virtual): ~1-3M VND/month
-- **Total setup: ~10-20M VND (~400-800 USD)**
-
----
-
-## Option B: Singapore Pte Ltd (with Vietnam subsidiary)
-
-### Pros
-- Investor-friendly jurisdiction
-- No foreign exchange controls
-- Faster banking setup
-- IP holding structure cleaner
-
-### Cons
-- Higher cost (~3,000-5,000 USD setup)
-- Annual compliance costs (~2,000-5,000 USD/year)
-- Vietnam subsidiary still needed for local operations
-
-### Steps
-1. Engage corporate secretary (e.g., Osome, Sleek)
-2. Register company name with ACRA
-3. File constitution
-4. Appoint director (local resident director if needed)
-5. Open corporate bank account
-6. Register for GST (if revenue >1M SGD)
-7. Set up Vietnam subsidiary (branch or subsidiary LLC)
-
-### Estimated cost
-- Setup: ~3,000-5,000 USD
-- Annual: ~2,000-5,000 USD
-- Vietnam subsidiary: additional ~10-20M VND
-
----
-
-## Option C: US Delaware LLC/C-Corp (with Vietnam subsidiary)
-
-### Pros
-- Standard for venture investment
-- SAFE/convertible notes well-understood
-- No state income tax (Delaware)
-- Clear IP assignment practices
-
-### Cons
-- Highest cost (~3,000-8,000 USD setup)
-- Annual franchise tax (~300-500 USD)
-- Foreign qualification needed if operating in other states
-- Vietnam subsidiary still needed
-
-### Steps
-1. Engage registered agent (e.g., Stripe Atlas, Clerky)
-2. File Certificate of Incorporation
-3. Adopt bylaws / operating agreement
-4. Issue founder stock / membership units
-5. Obtain EIN from IRS
-6. Open corporate bank account
-7. Set up Vietnam subsidiary
-
-### Estimated cost
-- Setup: ~3,000-8,000 USD
-- Annual: ~1,000-3,000 USD
-- Vietnam subsidiary: additional ~10-20M VND
-
----
-
-## Recommendation
-
-**For Seed round targeting international investors:** Option B (Singapore Pte Ltd) or Option C (Delaware C-Corp) with Vietnam subsidiary.
-
-**For pre-seed / friends-and-family round:** Option A (Vietnam LLC) is sufficient and lowest cost. Can restructure later.
-
-**For current 750K USD round:** Recommend Option B (Singapore) — investor-friendly, moderate cost, clean IP structure, Vietnam subsidiary for local operations and PDPD compliance.
+- **Receiving entity:** VIET CAN NEW CORP (US)
+- **Currency:** USD
+- **Wire transfer details:** Provided after identity verification via verify.iai.one
+- **Contact:** invest@nguyenai.net for instructions
 
 ---
 
 ## Post-formation checklist
 
-- [ ] Enterprise Registration Certificate received
-- [ ] Corporate bank account opened
-- [ ] Tax registration complete
-- [ ] IP agreement executed (see IP_AGREEMENT_TEMPLATE.md)
-- [ ] Founder employment agreements signed
-- [ ] Cap table finalized
+- [ ] VIET CAN NEW CORP — verify formation status and good standing
+- [ ] VIET CAN NEW CORP — verify EIN and US bank account
+- [ ] Kasan JSC — verify ERC and MST 0315521422 active
+- [ ] Kasan JSC — verify ACB account 3051378 active and corporate
+- [ ] Inter-entity IP agreement executed (US entity licenses IP to VN entity)
+- [ ] Inter-entity service agreement executed (VN entity pays royalty to US entity)
+- [ ] Founder employment agreements signed (with appropriate entity)
+- [ ] Cap table finalized (which entity issues SAFE/notes)
 - [ ] Data room populated (see DATA_ROOM_PLAN.md)
-- [ ] PDPD compliance map created
+- [ ] PDPD compliance map created (VN entity)
+- [ ] VAT registration confirmed (VN entity, 10%)
 - [ ] Insurance (D&O, cyber) obtained
-- [ ] Accounting system set up
+- [ ] Accounting system set up (both entities)
+
+---
+
+## Investor verification flow (BINDING)
+
+All investors must complete this flow before accessing the private investor room:
+
+1. **Google Login (OAuth)** — sign in with Google account
+2. **Identity declaration** — provide full legal name + date of birth
+3. **Identity verification** — verify via verify.iai.one
+4. **Payment** — VN QR bank transfer (VND) or international wire (USD)
+5. **2FA activation** — enable TOTP or SMS 2-factor authentication
+6. **Room access** — access private investor room (data room, financials, cap table)
+
+No investor may access the private room without completing all 6 steps.
 
 ---
 
 ## Important caveats
 
 - This document is a planning checklist, NOT legal advice.
-- Engage a qualified lawyer in the chosen jurisdiction before proceeding.
-- Vietnam PDPD 91/2025/QH15 effective 2026-01-01 — compliance is mandatory.
+- Engage a qualified lawyer in both jurisdictions before proceeding.
+- Vietnam PDPD 91/2025/QH15 effective 2026-01-01 — compliance is mandatory for VN entity.
 - IP ownership must be resolved BEFORE accepting any investment.
 - Do not commingle personal and company funds after formation.
+- Transfer memo must match exactly: `INVEST NGUYENAI.NET` or `Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net`.
 
 _Generated 2026-07-02 by Devin. Status: planning document, not legal advice._

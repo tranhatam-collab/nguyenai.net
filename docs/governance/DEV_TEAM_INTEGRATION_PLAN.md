@@ -420,18 +420,25 @@ nguyenai.net/                          (monorepo root, pnpm workspace)
 
 ### Sprint P2-B — Investor & Academy (tuần 14-16)
 
-**Mục tiêu:** invest.nguyenai.net + academy.nguyenai.net live.
+**Mục tiêu:** invest.nguyenai.net + academy.nguyenai.net live. Investor verification flow đầy đủ: Google Login → identity → verify.iai.one → payment (QR/wire) → 2FA → room.
 
 | Task | Owner | Output |
 |---|---|---|
 | P2-B.1 Build `apps/investor/` — public + private room per `INVESTOR_ACCESS_POLICY.md` | Dev | Investor site |
-| P2-B.2 Implement investor qualification + private room gating + audit log | Dev | Gating |
-| P2-B.3 Build `apps/academy/` — course platform + certification | Dev | Academy |
-| P2-B.4 Implement Academy Pass entitlement + certification fee | Dev | Academy billing |
-| P2-B.5 Build `@nai/email-template` (react-email) — bilingual transactional | Dev | Email |
-| P2-B.6 Tích hợp Resend hoặc Cloudflare Email Routing | Dev | Email service |
-| P2-B.7 Build `@nai/push` — Web Push + FCM | Dev | Push |
-| P2-B.8 Legal review trước publish invest.nguyenai.net | Founder + Legal | Sign-off |
+| P2-B.2 Implement Google OAuth login cho investor site | Dev | Google Login |
+| P2-B.3 Implement identity declaration form (họ tên thật + ngày sinh) | Dev | Identity form |
+| P2-B.4 Integrate verify.iai.one — document check + liveness + name/DOB match | Dev | Identity verification |
+| P2-B.5 Implement VN QR checkout — VietQR standard, pre-filled transfer (TK 3051378, ACB HCM, memo "INVEST NGUYENAI.NET") | Dev | QR checkout |
+| P2-B.6 Implement USD wire transfer flow — VIET CAN NEW CORP details after verification | Dev | Wire flow |
+| P2-B.7 Implement payment receipt upload + matching (memo + amount) | Dev | Receipt matching |
+| P2-B.8 Implement 2FA activation (TOTP + SMS) — required after payment, before room | Dev | 2FA |
+| P2-B.9 Implement private room access — 90-day expiry, revocable, audit log, 2FA gate | Dev | Room access |
+| P2-B.10 Build `apps/academy/` — course platform + certification | Dev | Academy |
+| P2-B.11 Implement Academy Pass entitlement + certification fee | Dev | Academy billing |
+| P2-B.12 Build `@nai/email-template` (react-email) — bilingual transactional (welcome, verification, payment, 2FA, room, expiry) | Dev | Email |
+| P2-B.13 Tích hợp Resend (temporary, founder provides API key) | Dev | Email service |
+| P2-B.14 Build `@nai/push` — Web Push + FCM | Dev | Push |
+| P2-B.15 Legal review trước publish invest.nguyenai.net | Founder + Legal | Sign-off |
 
 ### Sprint P2-C — Infra & Deploy (tuần 14-16, song song P2-B)
 

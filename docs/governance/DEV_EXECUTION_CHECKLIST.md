@@ -546,43 +546,96 @@
 - [ ] Verify: public page indexable + private room noindex
 - [ ] Evidence: HTML check
 
-### P2-B.2 Investor gating
-- [ ] Implement investor qualification flow
-- [ ] Implement private room access (expiring, revocable)
-- [ ] Implement audit log every private room access
-- [ ] Verify: qualification → access → audit E2E
+### P2-B.2 Google OAuth login
+- [ ] Implement Google OAuth login cho investor site
+- [ ] Capture: Google email, verified email status, profile name (reference only)
+- [ ] No password stored — OAuth only
+- [ ] Verify: login → session E2E
 - [ ] Evidence: test pass
 
-### P2-B.3 Academy site
+### P2-B.3 Identity declaration
+- [ ] Implement identity declaration form: full legal name + date of birth
+- [ ] Store encrypted in Neon Postgres
+- [ ] This is legal identity of record, not Google profile name
+- [ ] Verify: form submit → encrypted store E2E
+- [ ] Evidence: test pass
+
+### P2-B.4 verify.iai.one integration
+- [ ] Integrate verify.iai.one — document check (ID/passport) + liveness + name/DOB match
+- [ ] Redirect to verify.iai.one, receive signed verification token
+- [ ] On success: store token in audit log
+- [ ] On failure: allow retry (max 3, then manual review)
+- [ ] Verify: verification flow E2E
+- [ ] Evidence: test pass
+
+### P2-B.5 VN QR checkout
+- [ ] Implement VietQR standard QR code generation
+- [ ] Pre-fill: account 3051378, ACB HCM, Kasan JSC, memo "INVEST NGUYENAI.NET"
+- [ ] Investor specifies amount (min 25K USD equivalent in VND)
+- [ ] Verify: QR scan → pre-filled transfer E2E
+- [ ] Evidence: QR test
+
+### P2-B.6 USD wire transfer
+- [ ] Display VIET CAN NEW CORP wire details (after verification only)
+- [ ] Implement wire confirmation upload
+- [ ] Founder manually confirms receipt
+- [ ] Verify: wire flow E2E
+- [ ] Evidence: test pass
+
+### P2-B.7 Receipt matching
+- [ ] Implement receipt upload + OCR matching (memo + amount)
+- [ ] Match against expected memo: "INVEST NGUYENAI.NET" or "Tiền Việt Đầu tư CP vào cty cùng NguyenAI.net"
+- [ ] On match: payment confirmed
+- [ ] On mismatch: manual review by founder
+- [ ] Verify: match + mismatch E2E
+- [ ] Evidence: test pass
+
+### P2-B.8 2FA activation
+- [ ] Implement 2FA: TOTP (Google Authenticator, Authy) + SMS
+- [ ] TOTP preferred
+- [ ] 2FA secret stored encrypted, recovery codes generated
+- [ ] User must verify 2FA code to complete activation
+- [ ] Verify: 2FA setup + verify E2E
+- [ ] Evidence: test pass
+
+### P2-B.9 Private room access
+- [ ] Implement room access: 90-day expiry, revocable, audit log, 2FA gate
+- [ ] Every access requires 2FA code
+- [ ] Every access logged in audit trail
+- [ ] Access revocable by founder
+- [ ] Verify: access → 2FA → audit E2E
+- [ ] Evidence: test pass
+
+### P2-B.10 Academy site
 - [ ] Build `apps/academy/` — course platform
 - [ ] Course list, course detail, lesson, quiz
 - [ ] Verify: course render E2E
 - [ ] Evidence: screenshot
 
-### P2-B.4 Academy billing
+### P2-B.11 Academy billing
 - [ ] Implement Academy Pass entitlement (separate)
 - [ ] Implement certification fee (per attempt)
 - [ ] Verify: buy Academy Pass → access course E2E
 - [ ] Evidence: test pass
 
-### P2-B.5 Email template
+### P2-B.12 Email template
 - [ ] Build `@nai/email-template` (react-email)
-- [ ] Templates: welcome, password reset, invoice, approval, investor qualification
+- [ ] Templates: welcome, verification, payment confirmation, 2FA, room access, expiry notice
 - [ ] Bilingual VI/EN
 - [ ] Verify: email render E2E
 - [ ] Evidence: email screenshot
 
-### P2-B.6 Email service
-- [ ] Tích hợp Resend hoặc Cloudflare Email Routing
+### P2-B.13 Email service
+- [ ] Tích hợp Resend (temporary — founder provides API key when needed)
 - [ ] Verify: send email E2E (sandbox)
 - [ ] Evidence: sandbox output
 
-### P2-B.7 Push notification
+### P2-B.14 Push notification
 - [ ] Build `@nai/push` — Web Push + FCM
 - [ ] Verify: push E2E
 - [ ] Evidence: test pass
 
-### P2-B.8 Legal sign-off
+### P2-B.15 Legal sign-off
 - [ ] Legal review invest.nguyenai.net trước publish
 - [ ] Founder + Legal sign-off
 - [ ] Evidence: sign-off doc
@@ -670,7 +723,7 @@
 
 ## Summary
 
-- **Total tasks:** 96
+- **Total tasks:** 103
 - **P0-A:** 7 tasks (tuần 1-2)
 - **P0-B:** 8 tasks (tuần 2-4)
 - **P1-A:** 11 tasks (tuần 4-8)
@@ -679,7 +732,7 @@
 - **P1-D:** 10 tasks (tuần 10-12)
 - **P1-E:** 8 tasks (tuần 10-12)
 - **P2-A:** 8 tasks (tuần 12-14)
-- **P2-B:** 8 tasks (tuần 14-16)
+- **P2-B:** 15 tasks (tuần 14-16, gồm Google OAuth + verify.iai.one + QR checkout + 2FA + room)
 - **P2-C:** 8 tasks (tuần 14-16)
 - **P3:** 6 tasks (tuần 16-18)
 
