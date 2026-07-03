@@ -72,6 +72,40 @@ import {
   type CheckoutRequest,
 } from '@nai/billing';
 
+// Phase 3 — Core Runtime imports
+import {
+  resolveEntitlements as resolveEnt,
+  type Entitlements,
+} from '@nai/entitlement';
+import {
+  AGENTS as NAI_AGENTS,
+  listAgents as listNaiAgents,
+  routeAgent as routeNaiAgent,
+  isAgentEnabled as isNaiAgentEnabled,
+  newCommandContext,
+  DefaultAgentRuntime,
+  runCommand,
+  resumeCommand,
+  cancelCommand,
+  type AgentId,
+  type LLMChatFn,
+} from '@nai/conductor';
+import {
+  setModelRegistry as setPrismModelRegistry,
+  configureGen1Adapter,
+  configureMockProvider,
+  chat as prismChat,
+  type ModelDescriptor,
+} from '@nai/prism';
+import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
+import {
+  writeMemory,
+  readMemory,
+  listMemory,
+  deleteMemory,
+  type MemoryType,
+} from '@nai/relic';
+
 // Load prices.json + models.json statically (bundled at build time)
 import pricesData from '../../../packages/product-catalog/prices.json';
 import modelsData from '../../../packages/product-catalog/models.json';
@@ -96,6 +130,10 @@ interface AppEnv {
     // Gen1 upstream gateway (aiagent.iai.one — FROZEN reference, adapter only)
     GEN1_GATEWAY_URL: string;
     GEN1_ADMIN_KEY?: string;
+    // Phase 3 — evidence signing secret (HMAC-SHA256 for evidence packs)
+    EVIDENCE_SIGNING_KEY: string;
+    // Phase 3 — LLM provider mode: 'gen1' | 'mock'
+    LLM_PROVIDER_MODE?: string;
   };
   Variables: {
     session: Session | null;
@@ -135,6 +173,25 @@ function initStores(env: AppEnv['Bindings']): void {
   }
   setEntitlementStore(new InMemoryEntitlementStore());
   setApprovalStore(new InMemoryApprovalStore());
+
+  // Phase 3 — initialize LLM platform (prism)
+  // Load model registry from product-catalog models.json (bundled at build time)
+  setPrismModelRegistry(modelsData as unknown as ModelDescriptor[]);
+
+  // Configure LLM provider: 'gen1' (default) or 'mock' (for tests/dev)
+  const mode = env.LLM_PROVIDER_MODE ?? 'gen1';
+  if (mode === 'mock') {
+    configureMockProvider();
+  } else if (env.GEN1_GATEWAY_URL) {
+    configureGen1Adapter({
+      baseUrl: env.GEN1_GATEWAY_URL,
+      adminKey: env.GEN1_ADMIN_KEY,
+    });
+  } else {
+    // No GEN1 URL configured — fall back to mock so the API still responds.
+    configureMockProvider();
+  }
+
   storesInitialized = true;
 }
 
@@ -421,6 +478,309 @@ app.post('/v1/gen1/tos/accept', (c) => proxyToGen1(c, '/v1/tos/accept', 'POST'))
 
 // POST /v1/workflows — proxy to Gen1 /v1/workflows
 app.post('/v1/workflows', (c) => proxyToGen1(c, '/v1/workflows', 'POST'));
+
+// ============================================================
+// Phase 3 — Core Runtime: /v1/command, /v1/agents, /v1/memory, /v1/evidence
+// ============================================================
+
+/**
+ * LLM chat function adapter — bridges conductor's LLMChatFn to prism's chat().
+ * The conductor calls this to produce agent plan + output; prism handles
+ * model routing + tier gating + GEN1 adapter calls.
+ */
+function makeLLMChatFn(session: Session, planId: PlanId): LLMChatFn {
+  return async (opts) => {
+    // Resolve entitlements to get the user's model tier.
+    const ent = await resolveEnt(session.user_id, session.tenant_id, planId);
+    const userTier = String(ent.machine.model_tier ?? 'free');
+    const result = await prismChat({
+      tenant_id: session.tenant_id,
+      user_id: session.user_id,
+      plan_id: planId,
+      model: 'auto-route',
+      messages: [
+        { role: 'system', content: opts.systemPrompt },
+        { role: 'user', content: opts.userMessage },
+      ],
+    }, userTier);
+    if (result.finish_reason === 'error') {
+      throw new Error(result.tier_reason ?? 'LLM error');
+    }
+    return result.content;
+  };
+}
+
+// GET /v1/agents — list all NAI agents (with enabled flag for current session)
+app.get('/v1/agents', async (c) => {
+  const session = c.get('session');
+  const allAgents = listNaiAgents();
+  if (!session) {
+    // Anonymous: return agent catalog without enabled flags.
+    return c.json({ agents: allAgents.map((a) => ({ ...a, enabled: false })) });
+  }
+  const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
+  const ent = await resolveEnt(session.user_id, session.tenant_id, planId);
+  const enabled = Array.isArray(ent.machine.agents_enabled) ? ent.machine.agents_enabled : [];
+  return c.json({
+    agents: allAgents.map((a) => ({
+      ...a,
+      enabled: isNaiAgentEnabled(a.id, enabled as AgentId[]),
+    })),
+  });
+});
+
+// POST /v1/command — submit a command to the agent runtime
+app.post('/v1/command', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+
+  const body = await c.req.json().catch(() => ({})) as {
+    input: string;
+    agent_id?: AgentId;
+  };
+  if (!body.input || typeof body.input !== 'string') {
+    return c.json({ error: 'input (string) is required' }, 400);
+  }
+
+  const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
+  const ent = await resolveEnt(session.user_id, session.tenant_id, planId);
+  const modelTier = String(ent.machine.model_tier ?? 'free');
+  const agentsEnabled = (Array.isArray(ent.machine.agents_enabled) ? ent.machine.agents_enabled : []) as AgentId[];
+  const approvalRequired = String(ent.machine.approval_required ?? 'all') as 'all' | 'sensitive' | 'none';
+
+  // Route to agent (or use explicit agent_id if provided + enabled)
+  let agentId: AgentId;
+  if (body.agent_id) {
+    if (!isNaiAgentEnabled(body.agent_id, agentsEnabled)) {
+      return c.json({ error: `agent "${body.agent_id}" not enabled for your plan`, enabled_agents: agentsEnabled }, 403);
+    }
+    agentId = body.agent_id;
+  } else {
+    agentId = routeNaiAgent(body.input, agentsEnabled);
+  }
+
+  const commandId = `cmd_${crypto.randomUUID()}`;
+  const ctx = newCommandContext({
+    command_id: commandId,
+    tenant_id: session.tenant_id,
+    user_id: session.user_id,
+    input: body.input,
+    plan_id: planId,
+    model_tier: modelTier,
+    agent_id: agentId,
+    agents_enabled: agentsEnabled,
+    approval_required: approvalRequired,
+  });
+
+  const chatFn = makeLLMChatFn(session, planId);
+  const runtime = new DefaultAgentRuntime(chatFn);
+  const result = await runCommand(ctx, runtime);
+
+  // Record command_executed / command_failed evidence
+  try {
+    await recordEvidence({
+      command_id: commandId,
+      user_id: session.user_id,
+      tenant_id: session.tenant_id,
+      agent_id: agentId,
+      proof_type: result.success ? 'command_executed' : 'command_failed',
+      classification: 'internal',
+      payload: {
+        input: body.input,
+        output: result.context.output,
+        plan: result.context.plan,
+        state: result.context.state,
+        evidence_labels: result.context.evidence_labels,
+        error: result.context.error,
+      },
+    }, c.env.EVIDENCE_SIGNING_KEY ?? 'dev-evidence-key');
+  } catch {
+    // Evidence failure should not mask the command result.
+  }
+
+  // Audit log
+  await logAuditEvent({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    session_id: session.session_id,
+    event_type: 'command_executed',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `command:${commandId}`,
+    result: result.success ? 'success' : 'failure',
+    metadata: {
+      command_id: commandId,
+      agent_id: agentId,
+      state: result.context.state,
+      evidence_labels: result.context.evidence_labels,
+    },
+  });
+
+  if (result.context.state === 'approval_required') {
+    return c.json({
+      command_id: commandId,
+      state: 'approval_required',
+      agent_id: agentId,
+      plan: result.context.plan,
+      message: 'Command requires approval before execution. Approve via POST /v1/approvals/:id/approve then POST /v1/command/:id/resume.',
+    }, 202);
+  }
+
+  return c.json({
+    command_id: commandId,
+    state: result.context.state,
+    agent_id: agentId,
+    plan: result.context.plan,
+    output: result.context.output,
+    evidence_labels: result.context.evidence_labels,
+    error: result.context.error,
+    transitions: result.context.transitions,
+  });
+});
+
+// POST /v1/command/:id/resume — resume a command after approval
+app.post('/v1/command/:id/resume', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const commandId = c.req.param('id');
+
+  // In MVP (InMemory stores), we cannot look up the paused context by id.
+  // The client must send the paused context back in the body.
+  // (Production: store command context in D1/Postgres and look it up.)
+  const body = await c.req.json().catch(() => ({})) as {
+    paused_context: Record<string, unknown>;
+  };
+  if (!body.paused_context) {
+    return c.json({ error: 'paused_context is required to resume (MVP — InMemory store)' }, 400);
+  }
+
+  const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
+  const chatFn = makeLLMChatFn(session, planId);
+  const runtime = new DefaultAgentRuntime(chatFn);
+  // Reconstruct context from body (typed loosely for MVP)
+  const ctx = body.paused_context as never; // CommandContext shape
+  const result = await resumeCommand(ctx, runtime);
+
+  try {
+    await recordEvidence({
+      command_id: commandId,
+      user_id: session.user_id,
+      tenant_id: session.tenant_id,
+      agent_id: (ctx as { agent_id: string }).agent_id,
+      proof_type: result.success ? 'command_executed' : 'command_failed',
+      classification: 'internal',
+      payload: {
+        output: result.context.output,
+        state: result.context.state,
+        evidence_labels: result.context.evidence_labels,
+        error: result.context.error,
+        resumed: true,
+      },
+    }, c.env.EVIDENCE_SIGNING_KEY ?? 'dev-evidence-key');
+  } catch {
+    // ignore
+  }
+
+  return c.json({
+    command_id: commandId,
+    state: result.context.state,
+    output: result.context.output,
+    evidence_labels: result.context.evidence_labels,
+    error: result.context.error,
+  });
+});
+
+// POST /v1/command/:id/cancel — cancel a paused command
+app.post('/v1/command/:id/cancel', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const body = await c.req.json().catch(() => ({})) as {
+    paused_context: Record<string, unknown>;
+  };
+  if (!body.paused_context) {
+    return c.json({ error: 'paused_context is required to cancel (MVP — InMemory store)' }, 400);
+  }
+  const ctx = body.paused_context as never;
+  const cancelled = cancelCommand(ctx);
+  return c.json({ command_id: c.req.param('id'), state: cancelled.state });
+});
+
+// GET /v1/command/:id/evidence — get evidence records for a command
+app.get('/v1/command/:id/evidence', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const commandId = c.req.param('id');
+  const records = await getEvidenceForCommand(commandId);
+  // Tenant isolation: filter by session tenant
+  const filtered = records.filter((r) => r.tenant_id === session.tenant_id);
+  return c.json({ command_id: commandId, evidence: filtered, count: filtered.length });
+});
+
+// GET /v1/memory — list memories for current user
+app.get('/v1/memory', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const type = c.req.query('type') as MemoryType | undefined;
+  const limit = parseInt(c.req.query('limit') ?? '50', 10);
+  const records = await listMemory(session.tenant_id, session.user_id, { type, limit });
+  return c.json({ memories: records, count: records.length });
+});
+
+// GET /v1/memory/:key — read a specific memory
+app.get('/v1/memory/:key', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const key = c.req.param('key');
+  const rec = await readMemory(session.tenant_id, session.user_id, key);
+  if (!rec) return c.json({ error: 'memory not found' }, 404);
+  return c.json(rec);
+});
+
+// POST /v1/memory — write a memory
+app.post('/v1/memory', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const body = await c.req.json().catch(() => ({})) as {
+    memory_type: MemoryType;
+    key: string;
+    value: unknown;
+    tags?: string[];
+    visibility?: 'private' | 'tenant' | 'public';
+  };
+  if (!body.memory_type || !body.key) {
+    return c.json({ error: 'memory_type and key are required' }, 400);
+  }
+  const id = await writeMemory({
+    tenant_id: session.tenant_id,
+    user_id: session.user_id,
+    memory_type: body.memory_type,
+    key: body.key,
+    value: body.value,
+    tags: body.tags,
+    visibility: body.visibility,
+  });
+  await logAuditEvent({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    session_id: session.session_id,
+    event_type: 'tool_called',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `memory:${body.key}`,
+    result: 'success',
+    metadata: { memory_id: id, memory_type: body.memory_type },
+  });
+  return c.json({ memory_id: id, memory_type: body.memory_type, key: body.key }, 201);
+});
+
+// DELETE /v1/memory/:key — delete a memory
+app.delete('/v1/memory/:key', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  const key = c.req.param('key');
+  await deleteMemory(session.tenant_id, session.user_id, key);
+  return c.body(null, 204);
+});
 
 // ============================================================
 // 404 handler

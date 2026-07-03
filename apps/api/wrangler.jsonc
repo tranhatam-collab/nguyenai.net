@@ -9,7 +9,9 @@
     "AUTH_ISSUER": "auth.nguyenai.net",
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
-    "GEN1_GATEWAY_URL": "https://aiagent-iai-one-api-prod.tranhatam.workers.dev"
+    "GEN1_GATEWAY_URL": "https://aiagent-iai-one-api-prod.tranhatam.workers.dev",
+    "EVIDENCE_SIGNING_KEY": "dev-evidence-key-change-in-prod",
+    "LLM_PROVIDER_MODE": "gen1"
   },
   "d1_databases": [
     {

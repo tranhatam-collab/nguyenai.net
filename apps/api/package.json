@@ -21,7 +21,11 @@
     "@nai/approval": "workspace:*",
     "@nai/product-catalog": "workspace:*",
     "@nai/email": "workspace:*",
-    "@nai/billing": "workspace:*"
+    "@nai/billing": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/conductor": "workspace:*",
+    "@nai/prism": "workspace:*",
+    "@nai/relic": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",
