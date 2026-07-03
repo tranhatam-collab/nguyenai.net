@@ -928,3 +928,102 @@ scholarshipRoutes.post('/moderation/reports/:id/review', async (c) => {
     return c.json({ error: (e as Error).message }, 400);
   }
 });
+
+// ============================================================
+// Sprint 5 — Decision Engine: council decision, waitlist
+// ============================================================
+
+import {
+  makeCouncilDecision,
+  getCouncilDecision,
+  addToWaitlist,
+  listWaitlist,
+  offerWaitlistSpot,
+  withdrawFromWaitlist,
+  SCORING_RUBRIC,
+  COUNCIL_CONFIG,
+} from '@nai/scholarship';
+
+// 43. POST /council/decide — aggregate votes and make decision
+scholarshipRoutes.post('/council/decide', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['council_member', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Council member access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.application_id) return c.json({ error: 'application_id required' }, 400);
+  try {
+    const decision = await makeCouncilDecision(body.application_id, session.user_id);
+    return c.json(decision);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 44. GET /council/decision/:id — get council decision for application
+scholarshipRoutes.get('/council/decision/:id', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const decision = await getCouncilDecision(c.req.param('id'));
+    if (!decision) return c.json({ error: 'No decision found' }, 404);
+    return c.json(decision);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 45. GET /council/rubric — get scoring rubric
+scholarshipRoutes.get('/council/rubric', (c) => {
+  return c.json({ rubric: SCORING_RUBRIC, council: COUNCIL_CONFIG });
+});
+
+// 46. GET /waitlist — list waitlist (admin/council)
+scholarshipRoutes.get('/waitlist', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin', 'council_member'].includes(session.role)) {
+    return c.json({ error: 'Admin/council access required' }, 403);
+  }
+  const status = c.req.query('status') as 'waiting' | 'offered' | 'expired' | 'withdrawn' | undefined;
+  const programCode = c.req.query('program_code');
+  try {
+    const entries = await listWaitlist({ status, program_code: programCode });
+    return c.json({ waitlist: entries, count: entries.length });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 47. POST /waitlist/:id/offer — offer waitlist spot (admin)
+scholarshipRoutes.post('/waitlist/:id/offer', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  try {
+    await offerWaitlistSpot(c.req.param('id'), session.user_id);
+    return c.json({ ok: true, status: 'offered' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 48. POST /waitlist/:id/withdraw — applicant withdraws from waitlist
+scholarshipRoutes.post('/waitlist/:id/withdraw', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    await withdrawFromWaitlist(c.req.param('id'), session.user_id);
+    return c.json({ ok: true, status: 'withdrawn' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});

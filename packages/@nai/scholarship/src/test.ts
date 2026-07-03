@@ -65,6 +65,14 @@ import {
   getModerationQueue,
   reviewReport,
   listPublishedPosts,
+  makeCouncilDecision,
+  getCouncilDecision,
+  addToWaitlist,
+  listWaitlist,
+  offerWaitlistSpot,
+  withdrawFromWaitlist,
+  SCORING_RUBRIC,
+  COUNCIL_CONFIG,
   SCHOLARSHIP_AUDIT_EVENTS,
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
@@ -579,6 +587,122 @@ async function testReportAndModeration() {
   assert(events.length === 1, '1 complaint_submitted event');
 }
 
+async function testCouncilDecision() {
+  console.log('Test: Sprint 5 council decision');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Verify rubric
+  assert(SCORING_RUBRIC.length === 7, '7 rubric criteria');
+  assert(COUNCIL_CONFIG.size === 5, 'council size 5');
+  assert(COUNCIL_CONFIG.approvalThreshold === 3, 'threshold 3');
+
+  // Create + submit application
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+  await updateApplication(appId, 'u1', {
+    wish_text: 'Learn',
+    circumstances_text: 'Need',
+    consents_to_data_processing: true,
+    consents_to_audit: true,
+    commits_to_attendance: true,
+    commits_to_graduation: true,
+  });
+  await submitApplication(appId, 'u1');
+
+  // 3 approve votes (meets threshold)
+  await submitVote(appId, 'c1', 'council_member', 'approve');
+  await submitVote(appId, 'c2', 'council_member', 'approve');
+  await submitVote(appId, 'c3', 'council_member', 'approve');
+
+  // Make decision
+  const decision = await makeCouncilDecision(appId, 'c1');
+  assert(decision.outcome === 'approved', 'outcome approved with 3 votes');
+  assert(decision.total_approve === 3, '3 approve votes');
+
+  // Application should be awarded
+  const app = await getApplication(appId, 'u1');
+  assert(app?.status === 'awarded', 'status is awarded');
+
+  // Deny scenario
+  const appId2 = await createApplication('u2', {
+    full_name: 'Test2',
+    email: 'test2@example.com',
+    phone: '+84901234568',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+  await updateApplication(appId2, 'u2', {
+    wish_text: 'Learn',
+    circumstances_text: 'Need',
+    consents_to_data_processing: true,
+    consents_to_audit: true,
+    commits_to_attendance: true,
+    commits_to_graduation: true,
+  });
+  await submitApplication(appId2, 'u2');
+
+  await submitVote(appId2, 'c1', 'council_member', 'deny');
+  await submitVote(appId2, 'c2', 'council_member', 'deny');
+  await submitVote(appId2, 'c3', 'council_member', 'deny');
+
+  const decision2 = await makeCouncilDecision(appId2, 'c1');
+  assert(decision2.outcome === 'denied', 'outcome denied with 3 deny votes');
+}
+
+async function testWaitlist() {
+  console.log('Test: Sprint 5 waitlist');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Create + submit application
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+  await updateApplication(appId, 'u1', {
+    wish_text: 'Learn',
+    circumstances_text: 'Need',
+    consents_to_data_processing: true,
+    consents_to_audit: true,
+    commits_to_attendance: true,
+    commits_to_graduation: true,
+  });
+  await submitApplication(appId, 'u1');
+
+  // Add to waitlist
+  const entryId = await addToWaitlist(appId, 'u1', 'NAO');
+  assert(typeof entryId === 'string', 'waitlist entry created');
+
+  const app = await getApplication(appId, 'u1');
+  assert(app?.status === 'waitlisted', 'status is waitlisted');
+
+  // List waitlist
+  const list = await listWaitlist({ status: 'waiting' });
+  assert(list.length === 1, '1 waiting entry');
+  assert(list[0].position === 1, 'position 1');
+
+  // Offer spot
+  await offerWaitlistSpot(entryId, 'admin1');
+  const offered = await listWaitlist({ status: 'offered' });
+  assert(offered.length === 1, '1 offered entry');
+
+  // Withdraw
+  await withdrawFromWaitlist(entryId, 'u1');
+  const withdrawn = await listWaitlist({ status: 'withdrawn' });
+  assert(withdrawn.length === 1, '1 withdrawn entry');
+}
+
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -599,6 +723,8 @@ async function main() {
   await testAwardAndDecline();
   await testForumComments();
   await testReportAndModeration();
+  await testCouncilDecision();
+  await testWaitlist();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

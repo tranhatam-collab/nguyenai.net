@@ -29,6 +29,8 @@ import type {
   StatusTimelineEntry,
   ForumComment,
   ForumReport,
+  CouncilDecision,
+  WaitlistEntry,
 } from './types';
 
 export interface ScholarshipStore {
@@ -104,6 +106,15 @@ export interface ScholarshipStore {
   updateReport(id: string, patch: Partial<ForumReport>): Promise<void>;
   // Sprint 4: Moderation queue
   listModerationQueue(): Promise<ForumPost[]>;
+  // Sprint 5: Council decisions
+  createCouncilDecision(d: Omit<CouncilDecision, 'decision_id' | 'created_at'>): Promise<string>;
+  getCouncilDecision(id: string): Promise<CouncilDecision | null>;
+  getCouncilDecisionByApplication(appId: string): Promise<CouncilDecision | null>;
+  updateCouncilDecision(id: string, patch: Partial<CouncilDecision>): Promise<void>;
+  // Sprint 5: Waitlist
+  createWaitlistEntry(e: Omit<WaitlistEntry, 'entry_id' | 'created_at'>): Promise<string>;
+  listWaitlist(filter?: { status?: WaitlistEntry['status']; program_code?: string }): Promise<WaitlistEntry[]>;
+  updateWaitlistEntry(id: string, patch: Partial<WaitlistEntry>): Promise<void>;
 }
 
 // ============================================================
@@ -418,6 +429,47 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     return [...this.forumPosts.values()]
       .filter((p) => p.status === 'pending_moderation' || p.status === 'reported' || p.status === 'under_moderation')
       .sort((a, b) => (a.submitted_at ?? '').localeCompare(b.submitted_at ?? ''));
+  }
+
+  // Sprint 5: Council decisions
+  private councilDecisions = new Map<string, CouncilDecision>();
+  async createCouncilDecision(d: Omit<CouncilDecision, 'decision_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.councilDecisions.set(id, { ...d, decision_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async getCouncilDecision(id: string): Promise<CouncilDecision | null> {
+    return this.councilDecisions.get(id) ?? null;
+  }
+  async getCouncilDecisionByApplication(appId: string): Promise<CouncilDecision | null> {
+    for (const d of this.councilDecisions.values()) {
+      if (d.application_id === appId) return d;
+    }
+    return null;
+  }
+  async updateCouncilDecision(id: string, patch: Partial<CouncilDecision>): Promise<void> {
+    const existing = this.councilDecisions.get(id);
+    if (!existing) throw new Error(`Council decision ${id} not found`);
+    this.councilDecisions.set(id, { ...existing, ...patch, decision_id: id });
+  }
+
+  // Sprint 5: Waitlist
+  private waitlist = new Map<string, WaitlistEntry>();
+  async createWaitlistEntry(e: Omit<WaitlistEntry, 'entry_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.waitlist.set(id, { ...e, entry_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async listWaitlist(filter?: { status?: WaitlistEntry['status']; program_code?: string }): Promise<WaitlistEntry[]> {
+    let results = [...this.waitlist.values()];
+    if (filter?.status) results = results.filter((e) => e.status === filter.status);
+    if (filter?.program_code) results = results.filter((e) => e.program_code === filter.program_code);
+    return results.sort((a, b) => a.position - b.position);
+  }
+  async updateWaitlistEntry(id: string, patch: Partial<WaitlistEntry>): Promise<void> {
+    const existing = this.waitlist.get(id);
+    if (!existing) throw new Error(`Waitlist entry ${id} not found`);
+    this.waitlist.set(id, { ...existing, ...patch, entry_id: id });
   }
 }
 

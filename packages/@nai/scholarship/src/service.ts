@@ -1181,3 +1181,165 @@ export async function listPublishedPosts(roomId: string): Promise<ForumPost[]> {
   const posts = await store.listForumPosts(roomId);
   return posts.filter((p) => p.status === 'published');
 }
+
+// ============================================================
+// Sprint 5 — Decision Engine: council decision, waitlist
+// ============================================================
+
+import type { CouncilDecision, WaitlistEntry } from './types';
+import { COUNCIL_CONFIG } from './types';
+
+// Aggregate votes and make council decision
+export async function makeCouncilDecision(
+  applicationId: string,
+  councilMemberId: string,
+): Promise<CouncilDecision> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+
+  // Get all votes for this application
+  const votes = await store.listVotesForApplication(applicationId);
+  const approve = votes.filter((v) => v.decision === 'approve').length;
+  const deny = votes.filter((v) => v.decision === 'deny').length;
+  const abstain = votes.filter((v) => v.decision === 'abstain').length;
+
+  // Determine outcome
+  let outcome: CouncilDecision['outcome'];
+  if (approve >= COUNCIL_CONFIG.approvalThreshold) {
+    outcome = 'approved';
+  } else if (deny >= COUNCIL_CONFIG.approvalThreshold) {
+    outcome = 'denied';
+  } else if (approve > 0 && approve < COUNCIL_CONFIG.approvalThreshold) {
+    outcome = 'waitlisted';
+  } else {
+    outcome = 'pending';
+  }
+
+  // Check if decision already exists
+  const existing = await store.getCouncilDecisionByApplication(applicationId);
+  const decidedAt = outcome !== 'pending' ? new Date().toISOString() : null;
+
+  if (existing) {
+    await store.updateCouncilDecision(existing.decision_id, {
+      total_approve: approve,
+      total_deny: deny,
+      total_abstain: abstain,
+      outcome,
+      decided_at: decidedAt,
+    });
+    return { ...existing, total_approve: approve, total_deny: deny, total_abstain: abstain, outcome, decided_at };
+  }
+
+  const id = await store.createCouncilDecision({
+    application_id: applicationId,
+    total_approve: approve,
+    total_deny: deny,
+    total_abstain: abstain,
+    outcome,
+    threshold: COUNCIL_CONFIG.approvalThreshold,
+    decided_at: decidedAt,
+  });
+
+  // If approved, award scholarship
+  if (outcome === 'approved') {
+    await awardScholarship(applicationId, councilMemberId, app.program_code);
+  } else if (outcome === 'waitlisted') {
+    await addToWaitlist(applicationId, app.user_id, app.program_code);
+  } else if (outcome === 'denied') {
+    await store.updateApplication(applicationId, { status: 'rejected' });
+    await store.createTimelineEntry({
+      application_id: applicationId,
+      from_status: app.status,
+      to_status: 'rejected',
+      changed_by: councilMemberId,
+      changed_by_role: 'council_member',
+      reason: 'Council denied application',
+    });
+  }
+
+  return {
+    decision_id: id,
+    application_id: applicationId,
+    total_approve: approve,
+    total_deny: deny,
+    total_abstain: abstain,
+    outcome,
+    threshold: COUNCIL_CONFIG.approvalThreshold,
+    decided_at: decidedAt,
+    created_at: new Date().toISOString(),
+  };
+}
+
+export async function getCouncilDecision(applicationId: string): Promise<CouncilDecision | null> {
+  const store = getScholarshipStore();
+  return store.getCouncilDecisionByApplication(applicationId);
+}
+
+// Waitlist management
+export async function addToWaitlist(
+  applicationId: string,
+  userId: string,
+  programCode: string,
+): Promise<string> {
+  const store = getScholarshipStore();
+  // Get current max position for this program
+  const current = await store.listWaitlist({ program_code: programCode, status: 'waiting' });
+  const maxPosition = current.reduce((max, e) => Math.max(max, e.position), 0);
+
+  const id = await store.createWaitlistEntry({
+    application_id: applicationId,
+    user_id: userId,
+    program_code: programCode,
+    position: maxPosition + 1,
+    status: 'waiting',
+    offered_at: null,
+  });
+
+  // Update application status
+  await store.updateApplication(applicationId, { status: 'waitlisted' });
+
+  return id;
+}
+
+export async function listWaitlist(filter?: { status?: WaitlistEntry['status']; program_code?: string }): Promise<WaitlistEntry[]> {
+  const store = getScholarshipStore();
+  return store.listWaitlist(filter);
+}
+
+export async function offerWaitlistSpot(entryId: string, adminId: string): Promise<void> {
+  const store = getScholarshipStore();
+  await store.updateWaitlistEntry(entryId, {
+    status: 'offered',
+    offered_at: new Date().toISOString(),
+  });
+
+  const entries = await store.listWaitlist();
+  const entry = entries.find((e) => e.entry_id === entryId);
+  if (entry) {
+    await store.createNotification({
+      user_id: entry.user_id,
+      type: 'waitlist_offered',
+      title: 'Học bổng có chỗ trống!',
+      body: 'Bạn đã được offer từ waitlist. Vui lòng phản hồi trong 7 ngày.',
+      read: false,
+      read_at: null,
+    });
+  }
+}
+
+export async function withdrawFromWaitlist(entryId: string, userId: string): Promise<void> {
+  const store = getScholarshipStore();
+  const entries = await store.listWaitlist();
+  const entry = entries.find((e) => e.entry_id === entryId);
+  if (!entry) throw new Error(`Waitlist entry ${entryId} not found`);
+  if (entry.user_id !== userId) throw new Error('Not authorized');
+
+  await store.updateWaitlistEntry(entryId, { status: 'withdrawn' });
+
+  // Reorder positions
+  const waiting = await store.listWaitlist({ program_code: entry.program_code, status: 'waiting' });
+  for (let i = 0; i < waiting.length; i++) {
+    await store.updateWaitlistEntry(waiting[i].entry_id, { position: i + 1 });
+  }
+}

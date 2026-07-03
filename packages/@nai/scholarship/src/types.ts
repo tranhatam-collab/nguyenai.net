@@ -405,6 +405,131 @@ export type ReportCategory =
   | 'copyright'
   | 'other';
 
+// ============================================================
+// Sprint 5 — Decision Engine: rubric, waitlist, council decision
+// ============================================================
+
+// 24. CouncilDecision — aggregated council decision per application
+export interface CouncilDecision {
+  decision_id: string;
+  application_id: string;
+  total_approve: number;
+  total_deny: number;
+  total_abstain: number;
+  outcome: 'approved' | 'denied' | 'waitlisted' | 'pending';
+  threshold: number; // minimum approve votes needed
+  decided_at: string | null;
+  created_at: string;
+}
+
+// 25. WaitlistEntry — waitlisted applicants
+export interface WaitlistEntry {
+  entry_id: string;
+  application_id: string;
+  user_id: string;
+  program_code: string;
+  position: number; // 1-based rank
+  status: 'waiting' | 'offered' | 'expired' | 'withdrawn';
+  created_at: string;
+  offered_at: string | null;
+}
+
+// Scoring rubric definition (Section XXVIII.2)
+export interface ScoringRubric {
+  criteria: ReviewScoreCriteria;
+  weight: number;
+  description: string;
+  score_0_3: string; // Low
+  score_4_6: string; // Medium
+  score_7_10: string; // High
+}
+
+export const SCORING_RUBRIC: ScoringRubric[] = [
+  {
+    criteria: 'need',
+    weight: 20,
+    description: 'Nhu cầu hỗ trợ tài chính',
+    score_0_3: 'Không có nhu cầu cấp thiết',
+    score_4_6: 'Nhu cầu trung bình',
+    score_7_10: 'Nhu cầu cao, không có hỗ trợ sẽ không thể tham gia',
+  },
+  {
+    criteria: 'clarity',
+    weight: 15,
+    description: 'Mục tiêu rõ ràng',
+    score_0_3: 'Mục tiêu mơ hồ',
+    score_4_6: 'Mục tiêu khá rõ',
+    score_7_10: 'Mục tiêu rất rõ ràng, có kế hoạch cụ thể',
+  },
+  {
+    criteria: 'feasibility',
+    weight: 15,
+    description: 'Khả năng hoàn thành',
+    score_0_3: 'Khó hoàn thành',
+    score_4_6: 'Có thể hoàn thành nếu có hỗ trợ',
+    score_7_10: 'Rất có thể hoàn thành',
+  },
+  {
+    criteria: 'product_value',
+    weight: 20,
+    description: 'Giá trị sản phẩm dự kiến',
+    score_0_3: 'Ít giá trị',
+    score_4_6: 'Có giá trị nhất định',
+    score_7_10: 'Giá trị cao, có tiềm năng ứng dụng',
+  },
+  {
+    criteria: 'commitment',
+    weight: 15,
+    description: 'Cam kết học tập',
+    score_0_3: 'Cam kết thấp',
+    score_4_6: 'Cam kết khá',
+    score_7_10: 'Cam kết cao, có bằng chứng',
+  },
+  {
+    criteria: 'giveback',
+    weight: 10,
+    description: 'Khả năng đóng góp lại cộng đồng',
+    score_0_3: 'Chưa rõ',
+    score_4_6: 'Có ý thức đóng góp',
+    score_7_10: 'Có kế hoạch đóng góp cụ thể',
+  },
+  {
+    criteria: 'integrity',
+    weight: 5,
+    description: 'Tính trung thực và đầy đủ của hồ sơ',
+    score_0_3: 'Có dấu hiệu thiếu trung thực',
+    score_4_6: 'Hồ sơ đầy đủ',
+    score_7_10: 'Hồ sơ rất đầy đủ, trung thực',
+  },
+];
+
+// Council configuration (Section XXVIII.1)
+export const COUNCIL_CONFIG = {
+  size: 5, // 5 council members
+  approvalThreshold: 3, // minimum approve votes (majority of 5)
+  votingSteps: [
+    '1. Đọc hồ sơ và review',
+    '2. Kiểm tra xung đột lợi ích',
+    '3. Thảo luận',
+    '4. Bầu chọn (approve/deny/abstain)',
+    '5. Công bố quyết định',
+  ],
+  conflictCases: [
+    'Họ hàng gia đình',
+    'Quan hệ công việc hiện tại hoặc trong 2 năm qua',
+    'Quan hệ đầu tư hoặc thương mại',
+    'Tranh chấp pháp lý',
+    'Quan hệ đối tác thương mại',
+  ],
+  conflictConsequences: [
+    'Không tham gia bầu chọn',
+    'Không tham gia thảo luận',
+    'Khai báo công khai',
+    'Ghi vào audit log',
+  ],
+} as const;
+
+
 export const SCHOLARSHIP_AUDIT_EVENTS = [
   'scholarship_application_created',
   'scholarship_application_updated',

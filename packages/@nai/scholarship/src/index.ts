@@ -37,7 +37,12 @@ export type {
   ForumComment,
   ForumReport,
   ReportCategory,
+  CouncilDecision,
+  WaitlistEntry,
+  ScoringRubric,
 } from './types';
+
+export { SCORING_RUBRIC, COUNCIL_CONFIG } from './types';
 
 export {
   SCHOLARSHIP_AUDIT_EVENTS,
@@ -102,4 +107,10 @@ export {
   getModerationQueue,
   reviewReport,
   listPublishedPosts,
+  makeCouncilDecision,
+  getCouncilDecision,
+  addToWaitlist,
+  listWaitlist,
+  offerWaitlistSpot,
+  withdrawFromWaitlist,
 } from './service';
