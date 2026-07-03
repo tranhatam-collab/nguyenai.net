@@ -800,3 +800,277 @@ export async function transitionApplicationStatus(
     read_at: null,
   });
 }
+
+// ============================================================
+// Sprint 3 — Investor Room: verification, access grant, feed, email
+// ============================================================
+
+// Investor verification — admin verifies an investor before granting access
+export async function createInvestorProfile(
+  userId: string,
+  displayName: string,
+  roles: InvestorRole[],
+  bio?: string,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const id = await store.createInvestorProfile({
+    user_id: userId,
+    display_name: displayName,
+    bio: bio ?? null,
+    roles,
+    verified: false,
+    verified_at: null,
+    access_expires_at: null,
+  });
+  return id;
+}
+
+export async function verifyInvestor(investorId: string, adminId: string): Promise<void> {
+  const store = getScholarshipStore();
+  await store.updateInvestorProfile(investorId, {
+    verified: true,
+    verified_at: new Date().toISOString(),
+  });
+
+  await logAuditEvent({
+    user_id: adminId,
+    session_id: null,
+    event_type: 'investor_access_granted',
+    actor_ip: null,
+    user_agent: null,
+    target: investorId,
+    result: 'success',
+    metadata: { action: 'investor_verified' },
+  });
+}
+
+export async function grantInvestorAccess(
+  investorId: string,
+  scope: InvestorAccessGrant['scope'],
+  grantedBy: string,
+  durationDays: number = 90,
+  applicationId?: string,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  const id = await store.createAccessGrant({
+    investor_id: investorId,
+    application_id: applicationId ?? null,
+    scope,
+    granted_by: grantedBy,
+    expires_at: expiresAt,
+    revoked_at: null,
+  });
+
+  await logAuditEvent({
+    user_id: grantedBy,
+    session_id: null,
+    event_type: 'investor_access_granted',
+    actor_ip: null,
+    user_agent: null,
+    target: id,
+    result: 'success',
+    metadata: { investor_id: investorId, scope, duration_days: durationDays },
+  });
+
+  return id;
+}
+
+export async function revokeInvestorAccess(grantId: string, revokedBy: string, reason?: string): Promise<void> {
+  const store = getScholarshipStore();
+  await store.revokeAccessGrant(grantId, revokedBy);
+
+  await logAuditEvent({
+    user_id: revokedBy,
+    session_id: null,
+    event_type: 'investor_access_revoked',
+    actor_ip: null,
+    user_agent: null,
+    target: grantId,
+    result: 'success',
+    metadata: { reason: reason ?? 'no reason provided' },
+  });
+}
+
+export async function checkInvestorAccess(investorId: string): Promise<InvestorAccessGrant[]> {
+  const store = getScholarshipStore();
+  const grants = await store.listAccessGrants(investorId);
+  // Filter out expired
+  const now = new Date();
+  return grants.filter((g) => new Date(g.expires_at) > now);
+}
+
+// Helper: find investor profile by user_id, then check access
+async function checkUserInvestorAccess(userId: string): Promise<InvestorAccessGrant[]> {
+  const store = getScholarshipStore();
+  // First try direct (userId might be investor_id)
+  const grants = await checkInvestorAccess(userId);
+  if (grants.length > 0) return grants;
+  // Look up investor profile by user_id
+  const profile = await store.getInvestorProfileByUserId(userId);
+  if (profile) {
+    return checkInvestorAccess(profile.investor_id);
+  }
+  return [];
+}
+
+// Application feed for investors — filtered by access scope
+export async function getInvestorApplicationFeed(investorId: string): Promise<ScholarshipApplication[]> {
+  const store = getScholarshipStore();
+  const grants = await checkUserInvestorAccess(investorId);
+  if (grants.length === 0) return [];
+
+  // If investor has all_applications scope, return all submitted apps
+  const hasAllAccess = grants.some((g) => g.scope === 'all_applications');
+  if (hasAllAccess) {
+    return store.listApplications({ status: 'submitted' });
+  }
+
+  // If investor has single_application scope, return only that app
+  const singleAppGrants = grants.filter((g) => g.scope === 'single_application' && g.application_id);
+  const apps: ScholarshipApplication[] = [];
+  for (const g of singleAppGrants) {
+    const app = await store.getApplication(g.application_id!);
+    if (app) apps.push(app);
+  }
+  return apps;
+}
+
+// Submit review with scores + send email notification to applicant
+export async function submitReviewWithScores(
+  applicationId: string,
+  reviewerId: string,
+  reviewerRole: InvestorRole,
+  scores: { criteria: ReviewScoreCriteria; score: number; notes?: string }[],
+): Promise<{ review_id: string; total_score: number }> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+
+  // Check investor access
+  const grants = await checkUserInvestorAccess(reviewerId);
+  if (grants.length === 0) throw new Error('No investor access');
+
+  // Create review
+  const reviewId = await createReview(applicationId, reviewerId, reviewerRole);
+
+  // Create scores
+  const fullScores: ReviewScore[] = [];
+  for (const s of scores) {
+    const scoreId = await store.createScore({
+      review_id: reviewId,
+      criteria: s.criteria,
+      score: s.score,
+      weight: SCORING_WEIGHTS[s.criteria],
+      notes: s.notes ?? null,
+    });
+    const created = await store.listScoresForReview(reviewId);
+    const score = created.find((sc) => sc.score_id === scoreId);
+    if (score) fullScores.push(score);
+  }
+
+  const totalScore = calculateTotalScore(fullScores);
+
+  // Log audit
+  await logAuditEvent({
+    user_id: reviewerId,
+    session_id: null,
+    event_type: 'scholarship_review_submitted',
+    actor_ip: null,
+    user_agent: null,
+    target: reviewId,
+    result: 'success',
+    metadata: { application_id: applicationId, total_score: totalScore },
+  });
+
+  // Notify applicant
+  await store.createNotification({
+    user_id: app.user_id,
+    type: 'review_submitted',
+    title: 'Đơn của bạn đã được review',
+    body: `Reviewer đã chấm điểm đơn của bạn. Tổng điểm: ${totalScore}/100`,
+    read: false,
+    read_at: null,
+  });
+
+  return { review_id: reviewId, total_score: totalScore };
+}
+
+// Award scholarship — council decision
+export async function awardScholarship(
+  applicationId: string,
+  councilMemberId: string,
+  programCode: string,
+): Promise<void> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+
+  await store.updateApplication(applicationId, { status: 'awarded' });
+  await store.createTimelineEntry({
+    application_id: applicationId,
+    from_status: app.status,
+    to_status: 'awarded',
+    changed_by: councilMemberId,
+    changed_by_role: 'council_member',
+    reason: `Scholarship awarded for program ${programCode}`,
+  });
+
+  await logAuditEvent({
+    user_id: councilMemberId,
+    session_id: null,
+    event_type: 'scholarship_awarded',
+    actor_ip: null,
+    user_agent: null,
+    target: applicationId,
+    result: 'success',
+    metadata: { program_code: programCode },
+  });
+
+  // Notify applicant
+  await store.createNotification({
+    user_id: app.user_id,
+    type: 'scholarship_awarded',
+    title: '🎉 Chúc mừng! Bạn đã nhận học bổng',
+    body: `Đơn đăng ký chương trình ${programCode} đã được duyệt. Vui lòng kiểm tra email để biết bước tiếp theo.`,
+    read: false,
+    read_at: null,
+  });
+}
+
+// Decline scholarship — applicant declines the offer
+export async function declineScholarship(
+  applicationId: string,
+  userId: string,
+  reason: string,
+): Promise<void> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  if (app.user_id !== userId) throw new Error('Not authorized');
+  if (app.status !== 'awarded' && app.status !== 'approved') {
+    throw new Error(`Cannot decline application with status ${app.status}`);
+  }
+
+  await store.updateApplication(applicationId, { status: 'rejected' });
+  await store.createTimelineEntry({
+    application_id: applicationId,
+    from_status: app.status,
+    to_status: 'rejected',
+    changed_by: userId,
+    changed_by_role: 'applicant',
+    reason: `Declined: ${reason}`,
+  });
+
+  await logAuditEvent({
+    user_id: userId,
+    session_id: null,
+    event_type: 'scholarship_declined',
+    actor_ip: null,
+    user_agent: null,
+    target: applicationId,
+    result: 'success',
+    metadata: { reason },
+  });
+}

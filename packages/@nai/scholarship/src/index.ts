@@ -83,4 +83,13 @@ export {
   reviewDocument,
   getApplicationTimeline,
   transitionApplicationStatus,
+  createInvestorProfile,
+  verifyInvestor,
+  grantInvestorAccess,
+  revokeInvestorAccess,
+  checkInvestorAccess,
+  getInvestorApplicationFeed,
+  submitReviewWithScores,
+  awardScholarship,
+  declineScholarship,
 } from './service';

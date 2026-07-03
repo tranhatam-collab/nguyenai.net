@@ -61,6 +61,7 @@ export interface ScholarshipStore {
   // Investor profiles
   createInvestorProfile(p: Omit<InvestorProfile, 'investor_id'>): Promise<string>;
   getInvestorProfile(id: string): Promise<InvestorProfile | null>;
+  getInvestorProfileByUserId(userId: string): Promise<InvestorProfile | null>;
   updateInvestorProfile(id: string, patch: Partial<InvestorProfile>): Promise<void>;
   // Access grants
   createAccessGrant(g: Omit<InvestorAccessGrant, 'grant_id' | 'granted_at'>): Promise<string>;
@@ -232,6 +233,13 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
 
   async getInvestorProfile(id: string): Promise<InvestorProfile | null> {
     return this.investors.get(id) ?? null;
+  }
+
+  async getInvestorProfileByUserId(userId: string): Promise<InvestorProfile | null> {
+    for (const p of this.investors.values()) {
+      if (p.user_id === userId) return p;
+    }
+    return null;
   }
 
   async updateInvestorProfile(id: string, patch: Partial<InvestorProfile>): Promise<void> {

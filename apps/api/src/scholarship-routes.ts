@@ -632,3 +632,169 @@ scholarshipRoutes.post('/applications/:id/status', async (c) => {
     return c.json({ error: (e as Error).message }, 400);
   }
 });
+
+// ============================================================
+// Sprint 3 — Investor Room: verification, access grant, feed, review+scores
+// ============================================================
+
+import {
+  createInvestorProfile,
+  verifyInvestor,
+  grantInvestorAccess,
+  revokeInvestorAccess,
+  checkInvestorAccess,
+  getInvestorApplicationFeed,
+  submitReviewWithScores,
+  awardScholarship,
+  declineScholarship,
+} from '@nai/scholarship';
+
+// 28. POST /investor/profile — create investor profile
+scholarshipRoutes.post('/investor/profile', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.display_name || !body.roles) return c.json({ error: 'display_name and roles required' }, 400);
+  try {
+    const id = await createInvestorProfile(session.user_id, body.display_name, body.roles as InvestorRole[], body.bio);
+    return c.json({ investor_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 29. POST /investor/:id/verify — admin verifies investor
+scholarshipRoutes.post('/investor/:id/verify', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  try {
+    await verifyInvestor(c.req.param('id'), session.user_id);
+    return c.json({ ok: true, verified: true });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 30. POST /investor/:id/access — grant access
+scholarshipRoutes.post('/investor/:id/access', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.scope) return c.json({ error: 'scope required' }, 400);
+  try {
+    const id = await grantInvestorAccess(
+      c.req.param('id'),
+      body.scope,
+      session.user_id,
+      body.duration_days ?? 90,
+      body.application_id,
+    );
+    return c.json({ grant_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 31. DELETE /investor/access/:id — revoke access
+scholarshipRoutes.delete('/investor/access/:id', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json().catch(() => ({}));
+  try {
+    await revokeInvestorAccess(c.req.param('id'), session.user_id, body.reason);
+    return c.json({ ok: true, revoked: true });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 32. GET /investor/feed — application feed for investor
+scholarshipRoutes.get('/investor/feed', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
+  if (!allowedRoles.includes(session.role)) {
+    return c.json({ error: 'Investor access required' }, 403);
+  }
+  try {
+    const apps = await getInvestorApplicationFeed(session.user_id);
+    return c.json({ applications: apps, count: apps.length });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 33. POST /investor/reviews/submit — submit review with scores
+scholarshipRoutes.post('/investor/reviews/submit', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
+  if (!allowedRoles.includes(session.role)) {
+    return c.json({ error: 'Investor access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.application_id || !body.scores || !Array.isArray(body.scores)) {
+    return c.json({ error: 'application_id and scores[] required' }, 400);
+  }
+  try {
+    const result = await submitReviewWithScores(
+      body.application_id,
+      session.user_id,
+      body.reviewer_role ?? 'reviewer',
+      body.scores,
+    );
+    return c.json(result, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 34. POST /council/award — council awards scholarship
+scholarshipRoutes.post('/council/award', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['council_member', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Council member access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.application_id || !body.program_code) {
+    return c.json({ error: 'application_id and program_code required' }, 400);
+  }
+  try {
+    await awardScholarship(body.application_id, session.user_id, body.program_code);
+    return c.json({ ok: true, status: 'awarded' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 35. POST /applications/:id/decline — applicant declines offer
+scholarshipRoutes.post('/applications/:id/decline', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.reason) return c.json({ error: 'reason required' }, 400);
+  try {
+    await declineScholarship(c.req.param('id'), session.user_id, body.reason);
+    return c.json({ ok: true, status: 'rejected' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});

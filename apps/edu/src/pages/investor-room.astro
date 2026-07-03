@@ -1,0 +1,267 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Investor Room — Hồ sơ ứng viên"
+  description="Investor Room — xem hồ sơ ứng viên, review, vote, sponsor học bổng."
+  activeNav="investor"
+>
+  <section class="academy-container py-8 max-w-5xl">
+    <h1 class="text-3xl font-bold mb-2">Investor Room</h1>
+    <p class="text-gray-600 mb-8">Review, vote, và sponsor học bổng ứng viên.</p>
+
+    <!-- Access status -->
+    <div id="access-status" class="bg-white border rounded-lg p-4 mb-6">
+      <p class="text-sm">Trạng thái truy cập: <span id="access-badge" class="font-medium">—</span></p>
+    </div>
+
+    <!-- Application feed -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Hồ sơ ứng viên</h2>
+      <div id="feed-list" class="space-y-3">
+        <p class="text-gray-400">Đang tải...</p>
+      </div>
+    </div>
+
+    <!-- Review modal -->
+    <div id="review-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-xl font-semibold mb-4">Review ứng viên</h2>
+        <form id="review-form" class="space-y-4">
+          <input type="hidden" id="review-app-id" />
+          <p class="text-sm text-gray-600">Chấm điểm 0-10 cho từng tiêu chí:</p>
+
+          <div>
+            <label class="block text-sm font-medium mb-1">Nhu cầu hỗ trợ (20%)</label>
+            <input type="number" id="score-need" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Mục tiêu rõ ràng (15%)</label>
+            <input type="number" id="score-clarity" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Khả năng hoàn thành (15%)</label>
+            <input type="number" id="score-feasibility" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Giá trị sản phẩm (20%)</label>
+            <input type="number" id="score-product_value" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Cam kết học tập (15%)</label>
+            <input type="number" id="score-commitment" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Đóng góp lại (10%)</label>
+            <input type="number" id="score-giveback" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Tính trung thực (5%)</label>
+            <input type="number" id="score-integrity" min="0" max="10" class="w-full px-3 py-2 border rounded" />
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded">Nộp review</button>
+            <button type="button" id="review-cancel" class="px-6 py-2 border rounded">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Vote modal -->
+    <div id="vote-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Bầu chọn</h2>
+        <form id="vote-form" class="space-y-4">
+          <input type="hidden" id="vote-app-id" />
+          <div>
+            <label class="block text-sm font-medium mb-1">Quyết định</label>
+            <select id="vote-decision" class="w-full px-3 py-2 border rounded">
+              <option value="approve">Phê duyệt</option>
+              <option value="deny">Từ chối</option>
+              <option value="abstain">Thành kiếu</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Lý do (tùy chọn)</label>
+            <textarea id="vote-reason" rows="3" class="w-full px-3 py-2 border rounded"></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded">Bầu chọn</button>
+            <button type="button" id="vote-cancel" class="px-6 py-2 border rounded">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sponsor modal -->
+    <div id="sponsor-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full">
+        <h2 class="text-xl font-semibold mb-4">Tài trợ học bổng</h2>
+        <form id="sponsor-form" class="space-y-4">
+          <input type="hidden" id="sponsor-app-id" />
+          <div>
+            <label class="block text-sm font-medium mb-1">Loại tài trợ</label>
+            <select id="sponsor-type" class="w-full px-3 py-2 border rounded">
+              <option value="full_scholarship">Học bổng toàn phần</option>
+              <option value="partial_scholarship">Học bổng một phần</option>
+              <option value="stipend">Hỗ trợ sinh hoạt phí</option>
+              <option value="equipment">Trang thiết bị</option>
+              <option value="mentorship">Mentorship</option>
+              <option value="cohort_sponsor">Tài trợ cohort</option>
+              <option value="program_sponsor">Tài trợ chương trình</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Số tiền (VND)</label>
+            <input type="number" id="sponsor-amount-vnd" class="w-full px-3 py-2 border rounded" placeholder="999000" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Số tiền (USD)</label>
+            <input type="number" id="sponsor-amount-usd" class="w-full px-3 py-2 border rounded" placeholder="40" />
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded">Cam kết tài trợ</button>
+            <button type="button" id="sponsor-cancel" class="px-6 py-2 border rounded">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .app-card { transition: box-shadow 0.2s; }
+    .app-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  </style>
+
+  <script>
+    const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+
+    async function loadFeed() {
+      try {
+        const res = await fetch(`${API_BASE}/investor/feed`, { credentials: 'include' });
+        if (!res.ok) {
+          document.getElementById('access-badge').textContent = 'Không có truy cập';
+          document.getElementById('feed-list').innerHTML = '<p class="text-red-500">Bạn cần truy cập Investor Room.</p>';
+          return;
+        }
+        const { applications, count } = await res.json();
+        document.getElementById('access-badge').textContent = `Đã cấp truy cập — ${count} ứng viên`;
+        const list = document.getElementById('feed-list');
+        if (applications.length === 0) {
+          list.innerHTML = '<p class="text-gray-400">Chưa có ứng viên nào.</p>';
+          return;
+        }
+        list.innerHTML = applications.map(app => `
+          <div class="app-card border rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <h3 class="font-semibold">${app.full_name}</h3>
+                <p class="text-sm text-gray-600">${app.program_code} — ${app.email}</p>
+              </div>
+              <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">${app.status}</span>
+            </div>
+            <p class="text-sm mb-3 line-clamp-2">${app.wish_text || 'Chưa có nguyện vọng'}</p>
+            <div class="flex gap-2">
+              <button onclick="openReview('${app.application_id}')" class="px-3 py-1 text-sm bg-blue-600 text-white rounded">Review</button>
+              <button onclick="openVote('${app.application_id}')" class="px-3 py-1 text-sm bg-purple-600 text-white rounded">Bầu chọn</button>
+              <button onclick="openSponsor('${app.application_id}')" class="px-3 py-1 text-sm bg-green-600 text-white rounded">Tài trợ</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Review modal
+    window.openReview = (appId) => {
+      document.getElementById('review-app-id').value = appId;
+      document.getElementById('review-modal').classList.remove('hidden');
+    };
+    document.getElementById('review-cancel')?.addEventListener('click', () => {
+      document.getElementById('review-modal').classList.add('hidden');
+    });
+    document.getElementById('review-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const appId = document.getElementById('review-app-id').value;
+      const scores = [
+        { criteria: 'need', score: parseInt(document.getElementById('score-need').value) || 0 },
+        { criteria: 'clarity', score: parseInt(document.getElementById('score-clarity').value) || 0 },
+        { criteria: 'feasibility', score: parseInt(document.getElementById('score-feasibility').value) || 0 },
+        { criteria: 'product_value', score: parseInt(document.getElementById('score-product_value').value) || 0 },
+        { criteria: 'commitment', score: parseInt(document.getElementById('score-commitment').value) || 0 },
+        { criteria: 'giveback', score: parseInt(document.getElementById('score-giveback').value) || 0 },
+        { criteria: 'integrity', score: parseInt(document.getElementById('score-integrity').value) || 0 },
+      ];
+      const res = await fetch(`${API_BASE}/investor/reviews/submit`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: appId, scores }),
+      });
+      if (res.ok) {
+        const result = await res.json();
+        alert(`Review nộp thành công! Tổng điểm: ${result.total_score}/100`);
+        document.getElementById('review-modal').classList.add('hidden');
+      } else {
+        const err = await res.json();
+        alert('Lỗi: ' + err.error);
+      }
+    });
+
+    // Vote modal
+    window.openVote = (appId) => {
+      document.getElementById('vote-app-id').value = appId;
+      document.getElementById('vote-modal').classList.remove('hidden');
+    };
+    document.getElementById('vote-cancel')?.addEventListener('click', () => {
+      document.getElementById('vote-modal').classList.add('hidden');
+    });
+    document.getElementById('vote-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const appId = document.getElementById('vote-app-id').value;
+      const decision = document.getElementById('vote-decision').value;
+      const reason = document.getElementById('vote-reason').value;
+      const res = await fetch(`${API_BASE}/investor/votes`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: appId, decision, reason }),
+      });
+      if (res.ok) {
+        alert('Bầu chọn thành công!');
+        document.getElementById('vote-modal').classList.add('hidden');
+      }
+    });
+
+    // Sponsor modal
+    window.openSponsor = (appId) => {
+      document.getElementById('sponsor-app-id').value = appId;
+      document.getElementById('sponsor-modal').classList.remove('hidden');
+    };
+    document.getElementById('sponsor-cancel')?.addEventListener('click', () => {
+      document.getElementById('sponsor-modal').classList.add('hidden');
+    });
+    document.getElementById('sponsor-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const appId = document.getElementById('sponsor-app-id').value;
+      const type = document.getElementById('sponsor-type').value;
+      const amountVnd = parseInt(document.getElementById('sponsor-amount-vnd').value) || 0;
+      const amountUsd = parseFloat(document.getElementById('sponsor-amount-usd').value) || 0;
+      const res = await fetch(`${API_BASE}/investor/sponsorships`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: appId, type, amount_vnd: amountVnd, amount_usd: amountUsd }),
+      });
+      if (res.ok) {
+        alert('Cam kết tài trợ thành công!');
+        document.getElementById('sponsor-modal').classList.add('hidden');
+      }
+    });
+
+    loadFeed();
+  </script>
+</AcademyLayout>
