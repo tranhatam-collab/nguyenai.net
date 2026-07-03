@@ -1,0 +1,134 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import { programs, programCategories, scholarshipConfig } from '../../data/programs';
+
+const categoryColors: Record<string, string> = {
+  technology: 'bg-blue-100 text-blue-700',
+  ai: 'bg-purple-100 text-purple-700',
+  creativity: 'bg-orange-100 text-orange-700',
+  entrepreneurship: 'bg-red-100 text-red-700',
+  heritage: 'bg-amber-100 text-amber-700',
+};
+---
+
+<AcademyLayout
+  title="Programs"
+  description="9 chuỗi chương trình сертификации AI — công nghệ, AI, sáng tạo, khởi nghiệp, di sản. Học bổng 1.000 xuất/năm."
+  activeNav="programs"
+>
+  <section class="academy-container py-12">
+    <!-- Hero -->
+    <div class="max-w-4xl mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-academy-text mb-3">
+        9 Chuỗi Chương trình Certification
+      </h1>
+      <p class="text-academy-muted text-lg">
+        9 certification programs — công nghệ, AI, sáng tạo, khởi nghiệp, di sản.
+        <span class="block mt-1">9 certification programs — technology, AI, creativity, entrepreneurship, heritage.</span>
+      </p>
+    </div>
+
+    <!-- Scholarship banner -->
+    <div class="academy-card p-6 mb-12 border-2 border-academy-accent/30">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🎓</div>
+        <div class="flex-1">
+          <h2 class="text-xl font-bold text-academy-text">
+            Học bổng 1.000 xuất/năm — ưu tiên họ Nguyễn
+          </h2>
+          <p class="text-academy-muted text-sm mt-1">
+            1,000 scholarships/year — prioritizing the Nguyen family in Vietnam.
+            99 học bổng/program, nhóm 11 người, tuổi 20–49.
+          </p>
+          <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            {scholarshipConfig.allocation.map((a) => (
+              <div class="text-center p-3 bg-academy-bg rounded-lg">
+                <div class="text-2xl font-bold text-academy-accent">{a.count}</div>
+                <div class="text-xs text-academy-muted">{a.group}</div>
+              </div>
+            ))}
+          </div>
+          <a href="/scholarship" class="inline-block mt-4 academy-btn academy-btn-primary text-sm">
+            Xem chi tiết học bổng →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category filter -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      <button class="academy-btn academy-btn-secondary text-sm active" data-category="all">Tất cả (9)</button>
+      {programCategories.map((cat) => (
+        <button class="academy-btn academy-btn-secondary text-sm" data-category={cat.id}>
+          {cat.icon} {cat.label.vi}
+        </button>
+      ))}
+    </div>
+
+    <!-- Programs grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {programs.map((program) => (
+        <div class="academy-card p-6 card-hover" data-category={program.category}>
+          <div class="flex items-start justify-between mb-3">
+            <div class="text-3xl">{program.icon}</div>
+            <span class={`px-2 py-1 text-xs font-semibold rounded-full ${categoryColors[program.category]}`}>
+              {programCategories.find((c) => c.id === program.category)?.label.vi}
+            </span>
+          </div>
+          <div class="text-xs text-academy-muted font-mono mb-1">{program.code}</div>
+          <h3 class="text-lg font-bold text-academy-text">{program.title.vi}</h3>
+          <p class="text-sm text-academy-accent">{program.title.en}</p>
+          <p class="text-sm text-academy-muted mt-2">{program.tagline.vi}</p>
+
+          <div class="mt-4 flex items-center gap-4 text-xs text-academy-muted">
+            <span>📚 {program.lessonCount} bài</span>
+            <span>⏱ {program.duration}</span>
+            <span>📊 {program.difficulty}</span>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-academy-border">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-academy-muted">Học phí từ</span>
+              <span class="text-lg font-bold text-academy-accent">
+                {program.pricing.selfPaced.vnd.toLocaleString('vi-VN')}₫
+              </span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-academy-muted">Học bổng</span>
+              <span class="text-sm font-semibold text-green-600">99 xuất</span>
+            </div>
+            <a href={`/programs/${program.slug}`} class="block w-full text-center academy-btn academy-btn-primary text-sm">
+              Xem chương trình →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bundle pricing -->
+    <div class="mt-16">
+      <h2 class="text-2xl font-bold text-academy-text mb-6">Bundle & Subscription</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="academy-card p-6">
+          <h3 class="font-bold text-academy-text">Self-paced Bundle</h3>
+          <p class="text-sm text-academy-muted">Tất cả 9 programs (tự học)</p>
+          <div class="text-2xl font-bold text-academy-accent mt-3">7.999.000₫</div>
+          <p class="text-xs text-academy-muted">~$320 USD · Tiết kiệm ~20%</p>
+        </div>
+        <div class="academy-card p-6 border-2 border-academy-accent/30">
+          <span class="text-xs text-academy-accent font-semibold">PHỔ BIẾN</span>
+          <h3 class="font-bold text-academy-text">Cohort Bundle</h3>
+          <p class="text-sm text-academy-muted">Tất cả 9 programs (lớp học)</p>
+          <div class="text-2xl font-bold text-academy-accent mt-3">19.999.000₫</div>
+          <p class="text-xs text-academy-muted">~$800 USD · Tiết kiệm ~26%</p>
+        </div>
+        <div class="academy-card p-6">
+          <h3 class="font-bold text-academy-text">Academy Pass</h3>
+          <p class="text-sm text-academy-muted">Subscription/tháng</p>
+          <div class="text-2xl font-bold text-academy-accent mt-3">299.000₫/tháng</div>
+          <p class="text-xs text-academy-muted">Tất cả 9 programs (self-paced)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</AcademyLayout>

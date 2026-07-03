@@ -1,0 +1,63 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Đăng ký học bổng"
+  titleVi="Apply for Scholarship"
+  description="Đăng ký học bổng Nguyen AI Academy — 1.000 xuất/năm, ưu tiên họ Nguyễn Việt Nam, tuổi 20–49."
+>
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Đăng ký học bổng</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Apply for Scholarship</p>
+
+    <!-- Redirect notice -->
+    <div class="mt-10 bg-gold/10 border border-gold/30 rounded-xl p-6 text-center">
+      <div class="text-4xl mb-3">🎓</div>
+      <h2 class="text-xl font-bold text-gold mb-2">Đăng ký tại edu.nguyenai.net</h2>
+      <p class="text-sm text-ink-muted mb-4">
+        Quá trình đăng ký học bổng được quản lý tại Academy.
+        <span class="block" lang="vi">Scholarship applications are managed at the Academy.</span>
+      </p>
+      <a href="https://edu.nguyenai.net/scholarship" class="inline-block px-6 py-3 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
+        Đi đến edu.nguyenai.net/scholarship →
+      </a>
+    </div>
+
+    <!-- Quick info -->
+    <div class="mt-8 bg-bg-card border border-bg-border rounded-xl p-6">
+      <h2 class="font-bold text-ink mb-4">Tóm tắt / Summary</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><span class="text-ink-muted">Học bổng/năm:</span> <span class="font-bold text-gold">1.000</span></div>
+        <div><span class="text-ink-muted">Tuổi:</span> <span class="font-bold text-gold">20–49</span></div>
+        <div><span class="text-ink-muted">Ưu tiên:</span> <span class="font-bold text-gold">Họ Nguyễn VN</span></div>
+        <div><span class="text-ink-muted">Programs:</span> <span class="font-bold text-gold">9</span></div>
+        <div><span class="text-ink-muted">Nhóm:</span> <span class="font-bold text-gold">11 người</span></div>
+        <div><span class="text-ink-muted">Cam kết:</span> <span class="font-bold text-gold">12 tháng</span></div>
+      </div>
+    </div>
+
+    <!-- Batches -->
+    <div class="mt-8">
+      <h2 class="font-bold text-ink mb-4">Lịch / Schedule</h2>
+      <div class="space-y-3">
+        {[
+          { name: 'Đợt 1 — Tết Nguyễn', period: 'Jan–Mar', slots: 333, status: 'Sắp mở' },
+          { name: 'Đợt 2 — Hè', period: 'Jun–Aug', slots: 333, status: 'Chưa mở' },
+          { name: 'Đợt 3 — Cuối năm', period: 'Oct–Dec', slots: 334, status: 'Chưa mở' },
+        ].map((b) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold text-ink">{b.name}</h3>
+              <p class="text-xs text-ink-muted">{b.period} · {b.slots} học bổng</p>
+            </div>
+            <span class="text-xs px-2 py-1 text-gold bg-gold/10 rounded border border-gold/30">{b.status}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

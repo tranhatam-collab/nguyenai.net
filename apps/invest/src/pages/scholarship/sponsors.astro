@@ -1,0 +1,52 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Scholarship Sponsors"
+  titleVi="Nhà tài trợ học bổng"
+  description="Danh sách nhà tài trợ quỹ học bổng Nguyen AI Academy."
+>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Nhà tài trợ</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Scholarship Sponsors</p>
+
+    <div class="mt-10 bg-bg-card border border-gold/20 rounded-xl p-8 text-center">
+      <div class="text-5xl mb-4">🤝</div>
+      <h2 class="text-xl font-serif font-bold text-ink mb-2">Chưa có nhà tài trợ</h2>
+      <p class="text-ink-muted text-sm">
+        Danh sách nhà tài trợ sẽ được công bố khi quỹ học bổng chính thức ra mắt.
+        <span class="block mt-1" lang="vi">Sponsor list will be published when the scholarship fund officially launches.</span>
+      </p>
+      <a href="/scholarship/fund" class="inline-block mt-6 px-6 py-2.5 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
+        Trở thành nhà tài trợ đầu tiên →
+      </a>
+    </div>
+
+    <!-- Tier structure (placeholder) -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Tier Structure</h2>
+      <div class="space-y-3">
+        {[
+          { tier: 'Diamond', min: '$100,000+', slots: '50 học bổng danh nghĩa' },
+          { tier: 'Platinum', min: '$50,000+', slots: '25 học bổng danh nghĩa' },
+          { tier: 'Gold', min: '$25,000+', slots: '10 học bổng danh nghĩa' },
+          { tier: 'Silver', min: '$10,000+', slots: '5 học bổng danh nghĩa' },
+          { tier: 'Bronze', min: '$5,000+', slots: 'Logo' },
+          { tier: 'Community', min: 'Bất kỳ', slots: 'Danh sách' },
+        ].map((t) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-ink">◆ {t.tier}</span>
+              <span class="ml-3 text-sm text-ink-muted">{t.slots}</span>
+            </div>
+            <span class="text-sm text-gold">{t.min}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

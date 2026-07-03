@@ -14,9 +14,14 @@ const publicRoutes = [
   '/risks',
   '/impact',
   '/request-access',
+  '/scholarship',
+  '/scholarship/fund',
+  '/scholarship/sponsors',
+  '/scholarship/apply',
+  '/scholarship/impact',
 ];
 
-const enRoutes = publicRoutes.map((r) => `/en${r}`);
+const enRoutes = publicRoutes.filter((r) => !r.startsWith('/scholarship')).map((r) => `/en${r}`);
 
 // Private routes are noindex — excluded from sitemap per AGENTS.md
 
@@ -24,7 +29,7 @@ const allRoutes = [...publicRoutes, ...enRoutes];
 
 const urls = allRoutes.map((path) => {
   const isEn = path.startsWith('/en');
-  const priority = path === '' || path === '/en' ? '1.0' : path.endsWith('/request-access') ? '0.9' : '0.8';
+  const priority = path === '' || path === '/en' ? '1.0' : path.endsWith('/request-access') ? '0.9' : path.startsWith('/scholarship') ? '0.9' : '0.8';
   return `  <url>
     <loc>${site}${path === '' ? '' : path}</loc>
     <changefreq>weekly</changefreq>

@@ -1,0 +1,219 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Scholarship Fund — 1.000/năm"
+  titleVi="Quỹ học bổng — 1.000/năm"
+  description="Nguyen AI Computer cam kết 1.000 học bổng AI mỗi năm — ưu tiên dòng họ Nguyễn tại Việt Nam. Quỹ $400K/năm."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Hero -->
+    <div class="text-center max-w-4xl mx-auto mb-16">
+      <div class="inline-block px-3 py-1 mb-6 text-xs font-semibold text-gold border border-gold/30 rounded-full uppercase tracking-wider">
+        Scholarship Fund / Quỹ học bổng
+      </div>
+      <h1 class="text-4xl md:text-6xl font-serif font-bold text-gold-gradient mb-4">
+        1.000 học bổng AI mỗi năm
+      </h1>
+      <p class="text-xl text-ink-muted">
+        Cam kết trao 1.000 học bổng certification AI hàng năm — ưu tiên dòng họ Nguyễn tại Việt Nam.
+      </p>
+      <p class="text-lg text-ink-dim mt-2">
+        1,000 AI certification scholarships annually — prioritizing the Nguyen family in Vietnam.
+      </p>
+    </div>
+
+    <!-- Key metrics -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6 text-center">
+        <div class="text-4xl font-serif font-bold text-gold">1.000</div>
+        <div class="text-sm text-ink-muted mt-1">Học bổng/năm</div>
+        <div class="text-xs text-ink-dim">Scholarships/year</div>
+      </div>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6 text-center">
+        <div class="text-4xl font-serif font-bold text-gold">$400K</div>
+        <div class="text-sm text-ink-muted mt-1">Quỹ/năm</div>
+        <div class="text-xs text-ink-dim">Fund/year</div>
+      </div>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6 text-center">
+        <div class="text-4xl font-serif font-bold text-gold">9</div>
+        <div class="text-sm text-ink-muted mt-1">Programs</div>
+        <div class="text-xs text-ink-dim">Certification tracks</div>
+      </div>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6 text-center">
+        <div class="text-4xl font-serif font-bold text-gold">60%</div>
+        <div class="text-sm text-ink-muted mt-1">Ưu tiên Nguyễn VN</div>
+        <div class="text-xs text-ink-dim">Priority Nguyen VN</div>
+      </div>
+    </div>
+
+    <!-- Mission statement -->
+    <div class="bg-bg-card border border-gold/20 rounded-xl p-8 mb-12 max-w-4xl mx-auto">
+      <blockquote class="text-xl font-serif text-ink-muted italic text-center">
+        "Chúng tôi tin rằng AI nên trao quyền cho cộng đồng, không chỉ phục vụ cộng đồng.
+        1.000 học bổng mỗi năm là cam kết của Nguyen AI Computer với dòng họ Nguyễn tại Việt Nam —
+        không phải bloodline, mà là cộng đồng chia sẻ một tên, một lịch sử, và một tương lai."
+      </blockquote>
+      <p class="text-center mt-4 text-sm text-gold">— Nguyen AI Founder Statement</p>
+    </div>
+
+    <!-- Allocation -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-serif font-bold text-ink mb-4">Phân bổ học bổng / Allocation</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <div class="space-y-4">
+          {[
+            { group: 'Họ Nguyễn tại Việt Nam', en: 'Nguyen family in Vietnam', count: 600, percent: 60, priority: true },
+            { group: 'Họ Nguyễn diaspora', en: 'Nguyen diaspora', count: 200, percent: 20, priority: true },
+            { group: 'Tên khác tại Việt Nam', en: 'Other names in Vietnam', count: 150, percent: 15, priority: false },
+            { group: 'Đối tác / sponsor', en: 'Partners / sponsors', count: 50, percent: 5, priority: false },
+          ].map((a) => (
+            <div>
+              <div class="flex justify-between mb-1">
+                <div>
+                  <span class="text-sm font-semibold text-ink">{a.group}</span>
+                  {a.priority && <span class="ml-2 text-xs text-gold">Ưu tiên</span>}
+                  <span class="block text-xs text-ink-dim">{a.en}</span>
+                </div>
+                <span class="text-sm text-ink-muted">{a.count} xuất ({a.percent}%)</span>
+              </div>
+              <div class="w-full bg-bg-soft rounded-full h-3 border border-bg-border">
+                <div class="bg-gold h-3 rounded-full" style={`width: ${a.percent}%`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Fund sources -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-serif font-bold text-ink mb-4">Nguồn quỹ / Fund Sources</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { source: 'Founder commitment', vi: 'Founder cam kết', percent: 25, usd: '$100K' },
+          { source: 'Seed investors', vi: 'Nhà đầu tư seed', percent: 50, usd: '$200K' },
+          { source: 'Corporate sponsors', vi: 'Tài trợ doanh nghiệp', percent: 15, usd: '$60K' },
+          { source: 'Community donation', vi: 'Đóng góp cộng đồng', percent: 10, usd: '$40K' },
+        ].map((s) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5">
+            <div class="text-3xl font-serif font-bold text-gold">{s.percent}%</div>
+            <div class="text-sm font-semibold text-ink mt-1">{s.source}</div>
+            <div class="text-xs text-gold" lang="vi">{s.vi}</div>
+            <div class="text-lg font-bold text-ink mt-2">{s.usd}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Sponsor tiers -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-serif font-bold text-ink mb-4">Sponsor Tiers / Hạng tài trợ</h2>
+      <div class="overflow-x-auto bg-bg-card border border-bg-border rounded-xl">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-bg-border">
+              <th class="text-left py-3 px-4 text-ink-muted uppercase text-xs">Tier</th>
+              <th class="text-right py-3 px-4 text-ink-muted uppercase text-xs">Min commitment</th>
+              <th class="text-left py-3 px-4 text-ink-muted uppercase text-xs">Benefits</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-border">
+            {[
+              { tier: 'Diamond', min: '$100,000+', benefits: 'Naming rights 1 program + logo + 50 học bổng danh nghĩa', color: 'text-cyan-400' },
+              { tier: 'Platinum', min: '$50,000+', benefits: 'Logo + 25 học bổng danh nghĩa', color: 'text-purple-400' },
+              { tier: 'Gold', min: '$25,000+', benefits: 'Logo + 10 học bổng danh nghĩa', color: 'text-gold' },
+              { tier: 'Silver', min: '$10,000+', benefits: 'Logo + 5 học bổng danh nghĩa', color: 'text-gray-400' },
+              { tier: 'Bronze', min: '$5,000+', benefits: 'Logo', color: 'text-amber-600' },
+              { tier: 'Community', min: 'Bất kỳ', benefits: 'Danh sách nhà tài trợ', color: 'text-green-400' },
+            ].map((t) => (
+              <tr class="hover:bg-bg-soft/50">
+                <td class="py-3 px-4"><span class={`font-bold ${t.color}`}>◆ {t.tier}</span></td>
+                <td class="py-3 px-4 text-right text-ink-muted">{t.min}</td>
+                <td class="py-3 px-4 text-ink-muted">{t.benefits}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PR timeline -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-serif font-bold text-ink mb-4">PR Timeline</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { phase: 'Pre-launch', period: 'Pre-Tết', activity: 'Press release + media outreach', target: 'Awareness' },
+          { phase: 'Đợt 1', period: 'Jan–Mar (Tết Nguyễn)', activity: 'Launch + 333 học bổng', target: 'First cohort' },
+          { phase: 'Đợt 2', period: 'Jun–Aug (Hè)', activity: 'Impact report Đợt 1 + 333 học bổng', target: 'Trust + scale' },
+          { phase: 'Đợt 3', period: 'Oct–Dec (Cuối năm)', activity: 'Annual report + 334 học bổng', target: 'Retention + renew' },
+          { phase: 'Impact report', period: 'Dec', activity: 'Annual impact report public', target: 'Transparency' },
+          { phase: 'Year 2 planning', period: 'Dec', activity: 'Scale to 2.000 hoặc mở rộng', target: 'Growth' },
+        ].map((p) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5">
+            <div class="text-xs text-gold uppercase tracking-wider">{p.period}</div>
+            <h3 class="font-bold text-ink mt-1">{p.phase}</h3>
+            <p class="text-sm text-ink-muted mt-2">{p.activity}</p>
+            <p class="text-xs text-gold mt-2">→ {p.target}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Impact metrics -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-serif font-bold text-ink mb-4">Impact Metrics (Y1 target) / Chỉ số tác động</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { value: '1.000', label: 'Học bổng trao', vi: 'Scholarships granted' },
+          { value: '>70%', label: 'Tỷ lệ hoàn thành', vi: 'Completion rate' },
+          { value: '>500', label: 'Certificate verify', vi: 'Verified certificates' },
+          { value: '50', label: 'Mentor recruited', vi: 'Mentors' },
+          { value: '10+', label: 'Sponsors', vi: 'Nhà tài trợ' },
+          { value: '$400K', label: 'Quỹ', vi: 'Fund raised' },
+          { value: '1M+', label: 'Media reach', vi: 'Lượt tiếp cận' },
+          { value: '9', label: 'Programs', vi: 'Certification tracks' },
+          { value: '891', label: 'Nhóm học', vi: 'Study groups (9×99)' },
+        ].map((m) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5 text-center">
+            <div class="text-3xl font-serif font-bold text-gold">{m.value}</div>
+            <div class="text-sm text-ink-muted mt-1">{m.label}</div>
+            <div class="text-xs text-ink-dim" lang="vi">{m.vi}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Ethics -->
+    <div class="bg-bg-card border border-gold/20 rounded-xl p-8 mb-12">
+      <h2 class="text-lg font-serif font-bold text-gold mb-2">Ethics & Boundaries</h2>
+      <p class="text-sm text-ink-muted" lang="vi">Đạo đức & ranh giới</p>
+      <ul class="mt-4 space-y-2 text-sm text-ink-muted">
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Học bổng ưu tiên họ Nguyễn nhưng KHÔNG dựa trên bloodline, genetics, hay royal descent.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> "Ưu tiên họ Nguyễn" = ưu tiên cộng đồng chia sẻ tên — không phải ưu tiên huyết thống.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Mở rộng cho tất cả người Việt Nam — 15% dành cho tên khác.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Không phân biệt giới tính, tôn giáo, khu vực, trình độ kinh tế.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Selection process minh bạch, có audit log, có quyền khiếu nại.</li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center py-12">
+      <div class="flex flex-col md:flex-row gap-4 justify-center">
+        <a href="/scholarship/fund" class="inline-block px-8 py-3 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
+          Tài trợ quỹ học bổng →
+        </a>
+        <a href="/scholarship/apply" class="inline-block px-8 py-3 text-sm font-semibold text-gold border border-gold/30 rounded-lg hover:bg-gold/10 transition-colors">
+          Đăng ký học bổng →
+        </a>
+      </div>
+      <p class="mt-4 text-xs text-ink-dim">
+        Quỹ học bổng được quản lý minh bạch. Báo cáo tác động hàng năm công bố công khai.
+      </p>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

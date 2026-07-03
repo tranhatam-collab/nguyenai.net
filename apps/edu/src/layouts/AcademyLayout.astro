@@ -77,6 +77,26 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
               Tracks
             </a>
             <a
+              href="/programs"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'programs'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Programs
+            </a>
+            <a
+              href="/scholarship"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'scholarship'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Học bổng
+            </a>
+            <a
               href="/certification"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'certification'

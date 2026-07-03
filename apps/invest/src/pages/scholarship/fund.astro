@@ -1,0 +1,126 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Scholarship Fund — Tài trợ"
+  titleVi="Quỹ học bổng — Tài trợ"
+  description="Tài trợ quỹ học bổng Nguyen AI — $400K/năm, 1.000 học bổng. Diamond/Platinum/Gold/Silver/Bronze/Community tiers."
+>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Scholarship Fund</span>
+    </div>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Tài trợ Quỹ học bổng</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Sponsor the Scholarship Fund</p>
+
+    <!-- Fund overview -->
+    <div class="mt-10 bg-bg-card border border-gold/20 rounded-xl p-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Tổng quan quỹ / Fund Overview</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="text-3xl font-serif font-bold text-gold">$400K</div>
+          <div class="text-sm text-ink-muted">Mục tiêu/năm</div>
+          <div class="text-xs text-ink-dim" lang="vi">Annual target</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-serif font-bold text-gold">1.000</div>
+          <div class="text-sm text-ink-muted">Học bổng/năm</div>
+          <div class="text-xs text-ink-dim" lang="vi">Scholarships/year</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-serif font-bold text-gold">$320</div>
+          <div class="text-sm text-ink-muted">Giá trị/học bổng</div>
+          <div class="text-xs text-ink-dim" lang="vi">Per scholarship</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="mt-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Cách thức hoạt động / How It Works</h2>
+      <div class="space-y-4">
+        {[
+          { step: '1', title: 'Cam kết tài trợ', vi: 'Sponsor commits', desc: 'Sponsor chọn tier và cam kết số tiền. Ký thỏa thuận tài trợ.' },
+          { step: '2', title: 'Quỹ ring-fenced', vi: 'Quỹ riêng biệt', desc: 'Tiền tách riêng vào quỹ học bổng — không trộn lẫn vốn vận hành.' },
+          { step: '3', title: 'Phát học bổng', vi: 'Grant scholarships', desc: 'Học bổng được phát theo 3 đợt: Tết, Hè, Cuối năm. Ưu tiên họ Nguyễn VN.' },
+          { step: '4', title: 'Báo cáo tác động', vi: 'Impact report', desc: 'Báo cáo hàng năm: số học bổng, tỷ lệ hoàn thành, certificate, stories.' },
+          { step: '5', title: 'Audit', vi: 'Kiểm toán', desc: 'Quỹ được audit độc lập. Sponsor nhận báo cáo tài chính chi tiết.' },
+        ].map((s) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5 flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center font-bold shrink-0">{s.step}</div>
+            <div>
+              <h3 class="font-semibold text-ink">{s.title}</h3>
+              <p class="text-xs text-gold" lang="vi">{s.vi}</p>
+              <p class="text-sm text-ink-muted mt-1">{s.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Sponsor tiers -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Hạng tài trợ / Sponsor Tiers</h2>
+      <div class="space-y-3">
+        {[
+          { tier: 'Diamond', min: '$100,000+', vi: 'Kim Cương', benefits: 'Naming rights 1 program + logo trên invest.nguyenai.net + 50 học bổng danh nghĩa + báo cáo riêng', color: 'border-cyan-400/30 bg-cyan-400/5' },
+          { tier: 'Platinum', min: '$50,000+', vi: 'Bạch Kim', benefits: 'Logo + 25 học bổng danh nghĩa + báo cáo riêng', color: 'border-purple-400/30 bg-purple-400/5' },
+          { tier: 'Gold', min: '$25,000+', vi: 'Vàng', benefits: 'Logo + 10 học bổng danh nghĩa', color: 'border-gold/30 bg-gold/5' },
+          { tier: 'Silver', min: '$10,000+', vi: 'Bạc', benefits: 'Logo + 5 học bổng danh nghĩa', color: 'border-gray-400/30 bg-gray-400/5' },
+          { tier: 'Bronze', min: '$5,000+', vi: 'Đồng', benefits: 'Logo trên trang sponsors', color: 'border-amber-600/30 bg-amber-600/5' },
+          { tier: 'Community', min: 'Bất kỳ', vi: 'Cộng đồng', benefits: 'Tên trong danh sách nhà tài trợ cộng đồng', color: 'border-green-400/30 bg-green-400/5' },
+        ].map((t) => (
+          <div class={`border rounded-xl p-5 ${t.color}`}>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-ink text-lg">◆ {t.tier}</h3>
+                <p class="text-xs text-gold" lang="vi">{t.vi}</p>
+              </div>
+              <div class="text-right">
+                <div class="text-xl font-bold text-gold">{t.min}</div>
+              </div>
+            </div>
+            <p class="text-sm text-ink-muted mt-3">{t.benefits}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Why sponsor -->
+    <div class="mt-12 bg-bg-card border border-bg-border rounded-xl p-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Vì sao tài trợ? / Why Sponsor?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-gold mb-2">CSR Impact</h3>
+          <ul class="space-y-2 text-sm text-ink-muted">
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Trao quyền AI cho 1.000 người/năm</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Ưu tiên cộng đồng Việt Nam</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Certificate verify được</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Báo cáo tác động minh bạch</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gold mb-2">Brand Visibility</h3>
+          <ul class="space-y-2 text-sm text-ink-muted">
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Logo trên invest.nguyenai.net</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Naming rights (Diamond)</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> PR campaign hàng năm</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Media reach 1M+ impressions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-12 text-center">
+      <a href="/request-access" class="inline-block px-8 py-3 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
+        Liên hệ tài trợ →
+      </a>
+      <p class="mt-3 text-xs text-ink-dim">Sponsor agreement cần ký. Chi tiết liên hệ qua investor access.</p>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>
