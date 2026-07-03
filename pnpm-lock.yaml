@@ -34,21 +34,33 @@ importers:
       '@nai/billing':
         specifier: workspace:*
         version: link:../../packages/@nai/billing
+      '@nai/conductor':
+        specifier: workspace:*
+        version: link:../../packages/@nai/conductor
       '@nai/email':
         specifier: workspace:*
         version: link:../../packages/@nai/email
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
+      '@nai/evidence':
+        specifier: workspace:*
+        version: link:../../packages/@nai/evidence
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
       '@nai/policy-fga':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-fga
+      '@nai/prism':
+        specifier: workspace:*
+        version: link:../../packages/@nai/prism
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
+      '@nai/relic':
+        specifier: workspace:*
+        version: link:../../packages/@nai/relic
       hono:
         specifier: ^4.6.0
         version: 4.12.27
@@ -308,9 +320,29 @@ importers:
 
   packages/@nai/catalog-mcp: {}
 
-  packages/@nai/compass: {}
+  packages/@nai/compass:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
-  packages/@nai/conductor: {}
+  packages/@nai/conductor:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/contracts: {}
 
@@ -350,6 +382,22 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/@nai/evidence:
+    dependencies:
+      '@nai/audit':
+        specifier: workspace:*
+        version: link:../audit
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/@nai/forge: {}
 
   packages/@nai/foundation: {}
@@ -360,7 +408,27 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
-  packages/@nai/harness: {}
+  packages/@nai/harness:
+    dependencies:
+      '@nai/approval':
+        specifier: workspace:*
+        version: link:../approval
+      '@nai/evidence':
+        specifier: workspace:*
+        version: link:../evidence
+      '@nai/relic':
+        specifier: workspace:*
+        version: link:../relic
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/hound: {}
 
@@ -407,11 +475,31 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/prism: {}
+  packages/@nai/prism:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/provenance: {}
 
-  packages/@nai/relic: {}
+  packages/@nai/relic:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/runtime-sdk:
     dependencies:
@@ -436,7 +524,24 @@ importers:
 
   packages/@nai/scout: {}
 
-  packages/@nai/scroll: {}
+  packages/@nai/scroll:
+    dependencies:
+      '@nai/compass':
+        specifier: workspace:*
+        version: link:../compass
+      '@nai/evidence':
+        specifier: workspace:*
+        version: link:../evidence
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/seal: {}
 
@@ -479,21 +584,42 @@ importers:
       '@nai/auth':
         specifier: workspace:*
         version: link:../../packages/@nai/auth
+      '@nai/compass':
+        specifier: workspace:*
+        version: link:../../packages/@nai/compass
+      '@nai/conductor':
+        specifier: workspace:*
+        version: link:../../packages/@nai/conductor
       '@nai/email':
         specifier: workspace:*
         version: link:../../packages/@nai/email
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
+      '@nai/evidence':
+        specifier: workspace:*
+        version: link:../../packages/@nai/evidence
+      '@nai/harness':
+        specifier: workspace:*
+        version: link:../../packages/@nai/harness
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
       '@nai/policy-fga':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-fga
+      '@nai/prism':
+        specifier: workspace:*
+        version: link:../../packages/@nai/prism
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
+      '@nai/relic':
+        specifier: workspace:*
+        version: link:../../packages/@nai/relic
+      '@nai/scroll':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scroll
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

@@ -11,7 +11,7 @@
  */
 
 import type { APIContext } from 'astro';
-import { SESSION_COOKIE_NAME, type Session, type Role, type Permission } from '../src/index.ts';
+import { SESSION_COOKIE_NAME, type Session, type Role, type Permission } from '../src/index';
 
 export interface AuthResult {
   session: Session | null;
