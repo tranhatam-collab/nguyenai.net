@@ -798,3 +798,133 @@ scholarshipRoutes.post('/applications/:id/decline', async (c) => {
     return c.json({ error: (e as Error).message }, 400);
   }
 });
+
+// ============================================================
+// Sprint 4 — Forum: comments, reports, moderation queue
+// ============================================================
+
+import {
+  createComment,
+  listComments,
+  deleteComment,
+  reportContent,
+  getModerationQueue,
+  reviewReport,
+  listPublishedPosts,
+  type ReportCategory,
+} from '@nai/scholarship';
+
+// 36. GET /forum/rooms/:id/posts — list published posts in room
+scholarshipRoutes.get('/forum/rooms/:id/posts', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const posts = await listPublishedPosts(c.req.param('id'));
+    return c.json({ posts });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 37. GET /forum/posts/:id/comments — list comments on post
+scholarshipRoutes.get('/forum/posts/:id/comments', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const comments = await listComments(c.req.param('id'));
+    return c.json({ comments });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 38. POST /forum/posts/:id/comments — create comment
+scholarshipRoutes.post('/forum/posts/:id/comments', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.body) return c.json({ error: 'body required' }, 400);
+  try {
+    const id = await createComment(c.req.param('id'), session.user_id, body.body, body.parent_comment_id);
+    return c.json({ comment_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 39. DELETE /forum/comments/:id — delete own comment
+scholarshipRoutes.delete('/forum/comments/:id', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    await deleteComment(c.req.param('id'), session.user_id);
+    return c.json({ ok: true });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 40. POST /reports — report a post or comment
+scholarshipRoutes.post('/reports', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.target_type || !body.target_id || !body.reason || !body.category) {
+    return c.json({ error: 'target_type, target_id, reason, category required' }, 400);
+  }
+  try {
+    const id = await reportContent(
+      body.target_type,
+      body.target_id,
+      session.user_id,
+      body.reason,
+      body.category as ReportCategory,
+    );
+    return c.json({ report_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 41. GET /moderation/queue — moderation queue (moderator/admin only)
+scholarshipRoutes.get('/moderation/queue', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const allowedRoles = ['moderator', 'admin', 'super_admin'];
+  if (!allowedRoles.includes(session.role)) {
+    return c.json({ error: 'Moderator access required' }, 403);
+  }
+  try {
+    const queue = await getModerationQueue();
+    return c.json({ queue, count: queue.length });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 42. POST /moderation/reports/:id/review — review a report
+scholarshipRoutes.post('/moderation/reports/:id/review', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const allowedRoles = ['moderator', 'admin', 'super_admin'];
+  if (!allowedRoles.includes(session.role)) {
+    return c.json({ error: 'Moderator access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.action || !['actioned', 'dismissed'].includes(body.action)) {
+    return c.json({ error: 'action must be actioned or dismissed' }, 400);
+  }
+  try {
+    await reviewReport(c.req.param('id'), session.user_id, body.action);
+    return c.json({ ok: true, status: body.action });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});

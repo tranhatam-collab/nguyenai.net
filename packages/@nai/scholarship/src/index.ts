@@ -34,6 +34,9 @@ export type {
   ApplicationDocument,
   StatusTimelineEntry,
   DocumentType,
+  ForumComment,
+  ForumReport,
+  ReportCategory,
 } from './types';
 
 export {
@@ -92,4 +95,11 @@ export {
   submitReviewWithScores,
   awardScholarship,
   declineScholarship,
+  createComment,
+  listComments,
+  deleteComment,
+  reportContent,
+  getModerationQueue,
+  reviewReport,
+  listPublishedPosts,
 } from './service';

@@ -27,6 +27,8 @@ import type {
   ApplicationMessage,
   ApplicationDocument,
   StatusTimelineEntry,
+  ForumComment,
+  ForumReport,
 } from './types';
 
 export interface ScholarshipStore {
@@ -92,6 +94,16 @@ export interface ScholarshipStore {
   // Sprint 2: Status timeline
   createTimelineEntry(e: Omit<StatusTimelineEntry, 'entry_id' | 'created_at'>): Promise<string>;
   listTimeline(applicationId: string): Promise<StatusTimelineEntry[]>;
+  // Sprint 4: Forum comments
+  createComment(c: Omit<ForumComment, 'comment_id' | 'created_at' | 'updated_at'>): Promise<string>;
+  listComments(postId: string): Promise<ForumComment[]>;
+  updateComment(id: string, patch: Partial<ForumComment>): Promise<void>;
+  // Sprint 4: Forum reports
+  createReport(r: Omit<ForumReport, 'report_id' | 'created_at'>): Promise<string>;
+  listReports(filter?: { status?: ForumReport['status'] }): Promise<ForumReport[]>;
+  updateReport(id: string, patch: Partial<ForumReport>): Promise<void>;
+  // Sprint 4: Moderation queue
+  listModerationQueue(): Promise<ForumPost[]>;
 }
 
 // ============================================================
@@ -362,6 +374,50 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     return [...this.timeline.values()]
       .filter((e) => e.application_id === applicationId)
       .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+
+  // Sprint 4: Forum comments
+  private comments = new Map<string, ForumComment>();
+  async createComment(c: Omit<ForumComment, 'comment_id' | 'created_at' | 'updated_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    this.comments.set(id, { ...c, comment_id: id, created_at: now, updated_at: now });
+    return id;
+  }
+  async listComments(postId: string): Promise<ForumComment[]> {
+    return [...this.comments.values()]
+      .filter((c) => c.post_id === postId && c.status !== 'deleted')
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+  async updateComment(id: string, patch: Partial<ForumComment>): Promise<void> {
+    const existing = this.comments.get(id);
+    if (!existing) throw new Error(`Comment ${id} not found`);
+    this.comments.set(id, { ...existing, ...patch, comment_id: id, updated_at: new Date().toISOString() });
+  }
+
+  // Sprint 4: Forum reports
+  private reports = new Map<string, ForumReport>();
+  async createReport(r: Omit<ForumReport, 'report_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.reports.set(id, { ...r, report_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async listReports(filter?: { status?: ForumReport['status'] }): Promise<ForumReport[]> {
+    let results = [...this.reports.values()];
+    if (filter?.status) results = results.filter((r) => r.status === filter.status);
+    return results.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }
+  async updateReport(id: string, patch: Partial<ForumReport>): Promise<void> {
+    const existing = this.reports.get(id);
+    if (!existing) throw new Error(`Report ${id} not found`);
+    this.reports.set(id, { ...existing, ...patch, report_id: id });
+  }
+
+  // Sprint 4: Moderation queue
+  async listModerationQueue(): Promise<ForumPost[]> {
+    return [...this.forumPosts.values()]
+      .filter((p) => p.status === 'pending_moderation' || p.status === 'reported' || p.status === 'under_moderation')
+      .sort((a, b) => (a.submitted_at ?? '').localeCompare(b.submitted_at ?? ''));
   }
 }
 

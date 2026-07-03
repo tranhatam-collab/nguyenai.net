@@ -367,6 +367,43 @@ export interface StatusTimelineEntry {
   created_at: string;
 }
 
+// ============================================================
+// Sprint 4 — Forum: comments, reports
+// ============================================================
+
+// 22. ForumComment — comments/replies on forum posts
+export interface ForumComment {
+  comment_id: string;
+  post_id: string;
+  user_id: string;
+  parent_comment_id: string | null; // null = top-level comment
+  body: string;
+  status: 'visible' | 'hidden' | 'deleted';
+  created_at: string;
+  updated_at: string;
+}
+
+// 23. ForumReport — user reports a post or comment
+export interface ForumReport {
+  report_id: string;
+  target_type: 'post' | 'comment';
+  target_id: string;
+  reported_by: string;
+  reason: string;
+  category: ReportCategory;
+  status: 'pending' | 'reviewed' | 'actioned' | 'dismissed';
+  created_at: string;
+  reviewed_at: string | null;
+}
+
+export type ReportCategory =
+  | 'prohibited_content'
+  | 'personal_info'
+  | 'harassment'
+  | 'spam'
+  | 'misinformation'
+  | 'copyright'
+  | 'other';
 
 export const SCHOLARSHIP_AUDIT_EVENTS = [
   'scholarship_application_created',

@@ -1074,3 +1074,110 @@ export async function declineScholarship(
     metadata: { reason },
   });
 }
+
+// ============================================================
+// Sprint 4 — Forum: comments, reports, moderation queue
+// ============================================================
+
+import type { ForumComment, ForumReport, ReportCategory, ForumRoom } from './types';
+
+export async function createComment(
+  postId: string,
+  userId: string,
+  body: string,
+  parentCommentId?: string,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const post = await store.getForumPost(postId);
+  if (!post) throw new Error(`Post ${postId} not found`);
+  if (post.status !== 'published') throw new Error('Cannot comment on unpublished post');
+
+  const id = await store.createComment({
+    post_id: postId,
+    user_id: userId,
+    parent_comment_id: parentCommentId ?? null,
+    body,
+    status: 'visible',
+  });
+  return id;
+}
+
+export async function listComments(postId: string): Promise<ForumComment[]> {
+  const store = getScholarshipStore();
+  return store.listComments(postId);
+}
+
+export async function deleteComment(commentId: string, userId: string): Promise<void> {
+  const store = getScholarshipStore();
+  // We need to find the comment — listComments requires a postId
+  // This is a limitation of the in-memory store. In production, use a direct lookup.
+  // For now, we'll try to update directly.
+  try {
+    await store.updateComment(commentId, { status: 'deleted' });
+  } catch {
+    throw new Error(`Comment ${commentId} not found`);
+  }
+}
+
+export async function reportContent(
+  targetType: ForumReport['target_type'],
+  targetId: string,
+  reportedBy: string,
+  reason: string,
+  category: ReportCategory,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const id = await store.createReport({
+    target_type: targetType,
+    target_id: targetId,
+    reported_by: reportedBy,
+    reason,
+    category,
+    status: 'pending',
+    reviewed_at: null,
+  });
+
+  // If reporting a post, mark it as reported
+  if (targetType === 'post') {
+    const post = await store.getForumPost(targetId);
+    if (post && post.status === 'published') {
+      await store.updateForumPost(targetId, { status: 'reported' });
+    }
+  }
+
+  await logAuditEvent({
+    user_id: reportedBy,
+    session_id: null,
+    event_type: 'complaint_submitted',
+    actor_ip: null,
+    user_agent: null,
+    target: id,
+    result: 'success',
+    metadata: { target_type: targetType, target_id: targetId, category },
+  });
+
+  return id;
+}
+
+export async function getModerationQueue(): Promise<ForumPost[]> {
+  const store = getScholarshipStore();
+  return store.listModerationQueue();
+}
+
+export async function reviewReport(
+  reportId: string,
+  moderatorId: string,
+  action: 'actioned' | 'dismissed',
+): Promise<void> {
+  const store = getScholarshipStore();
+  await store.updateReport(reportId, {
+    status: action,
+    reviewed_at: new Date().toISOString(),
+  });
+}
+
+export async function listPublishedPosts(roomId: string): Promise<ForumPost[]> {
+  const store = getScholarshipStore();
+  const posts = await store.listForumPosts(roomId);
+  return posts.filter((p) => p.status === 'published');
+}

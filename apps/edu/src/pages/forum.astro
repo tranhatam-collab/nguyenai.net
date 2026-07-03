@@ -1,0 +1,177 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Forum — Cộng đồng Nguyễn AI"
+  description="Forum cộng đồng — chia sẻ câu chuyện, kinh nghiệm, hỏi đáp."
+  activeNav="forum"
+>
+  <section class="academy-container py-8 max-w-4xl">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Forum</h1>
+      <button id="new-post-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Viết bài</button>
+    </div>
+
+    <!-- Posts list -->
+    <div id="posts-list" class="space-y-4">
+      <p class="text-gray-400">Đang tải...</p>
+    </div>
+
+    <!-- New post modal -->
+    <div id="post-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 class="text-xl font-semibold mb-4">Viết bài mới</h2>
+        <form id="post-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Tiêu đề *</label>
+            <input type="text" id="post-title" class="w-full px-3 py-2 border rounded" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Nội dung *</label>
+            <textarea id="post-content" rows="8" class="w-full px-3 py-2 border rounded" required></textarea>
+          </div>
+          <p class="text-sm text-gray-600">Bài viết sẽ được kiểm duyệt trước khi xuất bản.</p>
+          <div class="flex gap-3">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded">Gửi kiểm duyệt</button>
+            <button type="button" id="post-cancel" class="px-6 py-2 border rounded">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Post detail modal -->
+    <div id="detail-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div id="detail-content"></div>
+        <div class="border-t pt-4 mt-4">
+          <h3 class="font-medium mb-2">Bình luận</h3>
+          <div id="comments-list" class="space-y-2 mb-4"></div>
+          <form id="comment-form" class="space-y-2">
+            <textarea id="comment-body" rows="2" placeholder="Viết bình luận..." class="w-full px-3 py-2 border rounded"></textarea>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Gửi</button>
+          </form>
+        </div>
+        <div class="flex gap-3 mt-4">
+          <button type="button" id="report-btn" class="px-4 py-2 border rounded text-sm text-red-600">Báo cáo</button>
+          <button type="button" id="detail-close" class="px-4 py-2 border rounded text-sm">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+    let currentRoomId = 'general'; // default room
+    let currentPostId = null;
+
+    async function loadPosts() {
+      try {
+        const res = await fetch(`${API_BASE}/forum/rooms/${currentRoomId}/posts`, { credentials: 'include' });
+        if (!res.ok) {
+          document.getElementById('posts-list').innerHTML = '<p class="text-gray-400">Chưa có bài viết nào.</p>';
+          return;
+        }
+        const { posts } = await res.json();
+        const list = document.getElementById('posts-list');
+        if (posts.length === 0) {
+          list.innerHTML = '<p class="text-gray-400">Chưa có bài viết nào.</p>';
+          return;
+        }
+        list.innerHTML = posts.map(p => `
+          <div class="border rounded-lg p-4 hover:shadow cursor-pointer" onclick="openPost('${p.post_id}')">
+            <h3 class="font-semibold text-lg">${p.title}</h3>
+            <p class="text-sm text-gray-600 mt-1">${new Date(p.published_at || p.created_at).toLocaleDateString('vi-VN')}</p>
+            <p class="mt-2 line-clamp-3">${p.content.substring(0, 200)}...</p>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    window.openPost = async (postId) => {
+      currentPostId = postId;
+      const res = await fetch(`${API_BASE}/forum/posts/${postId}/comments`, { credentials: 'include' });
+      const { comments } = await res.ok ? await res.json() : { comments: [] };
+      document.getElementById('detail-content').innerHTML = '<p class="text-gray-400">Đang tải...</p>';
+      document.getElementById('comments-list').innerHTML = comments.map(c => `
+        <div class="border-l-2 pl-3 py-1">
+          <p class="text-sm">${c.body}</p>
+          <p class="text-xs text-gray-400">${new Date(c.created_at).toLocaleString('vi-VN')}</p>
+        </div>
+      `).join('') || '<p class="text-gray-400 text-sm">Chưa có bình luận.</p>';
+      document.getElementById('detail-modal').classList.remove('hidden');
+    };
+
+    document.getElementById('detail-close')?.addEventListener('click', () => {
+      document.getElementById('detail-modal').classList.add('hidden');
+    });
+
+    document.getElementById('new-post-btn')?.addEventListener('click', () => {
+      document.getElementById('post-modal').classList.remove('hidden');
+    });
+    document.getElementById('post-cancel')?.addEventListener('click', () => {
+      document.getElementById('post-modal').classList.add('hidden');
+    });
+
+    document.getElementById('post-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('post-title').value;
+      const content = document.getElementById('post-content').value;
+      // Create post
+      const createRes = await fetch(`${API_BASE}/forum/posts`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_id: currentRoomId, title, content }),
+      });
+      if (!createRes.ok) { alert('Lỗi tạo bài viết'); return; }
+      const { post_id } = await createRes.json();
+      // Submit for moderation
+      const submitRes = await fetch(`${API_BASE}/forum/posts/${post_id}/submit`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (submitRes.ok) {
+        alert('Bài viết đã gửi kiểm duyệt. Sẽ xuất bản sau khi được duyệt.');
+        document.getElementById('post-modal').classList.add('hidden');
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-content').value = '';
+      }
+    });
+
+    document.getElementById('comment-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentPostId) return;
+      const body = document.getElementById('comment-body').value;
+      if (!body) return;
+      const res = await fetch(`${API_BASE}/forum/posts/${currentPostId}/comments`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body }),
+      });
+      if (res.ok) {
+        document.getElementById('comment-body').value = '';
+        window.openPost(currentPostId);
+      }
+    });
+
+    document.getElementById('report-btn')?.addEventListener('click', async () => {
+      if (!currentPostId) return;
+      const reason = prompt('Lý do báo cáo?');
+      if (!reason) return;
+      const category = prompt('Danh mục? (prohibited_content, personal_info, harassment, spam, misinformation, copyright, other)') || 'other';
+      const res = await fetch(`${API_BASE}/reports`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_type: 'post', target_id: currentPostId, reason, category }),
+      });
+      if (res.ok) alert('Đã báo cáo. Moderator sẽ xem xét.');
+    });
+
+    loadPosts();
+  </script>
+</AcademyLayout>
