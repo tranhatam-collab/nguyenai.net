@@ -71,8 +71,9 @@ import {
   type CheckoutRequest,
 } from '@nai/billing';
 
-// Load prices.json statically (bundled at build time)
+// Load prices.json + models.json statically (bundled at build time)
 import pricesData from '../../../packages/product-catalog/prices.json';
+import modelsData from '../../../packages/product-catalog/models.json';
 
 // ============================================================
 // App context
@@ -394,6 +395,19 @@ async function resolveSessionFromCookie(sessionId: string, env: AppEnv['Bindings
 
 app.get('/v1/prices', (c) => {
   return c.json({ prices: pricesData });
+});
+
+// ============================================================
+// Models — GET /v1/models
+// ============================================================
+
+app.get('/v1/models', (c) => {
+  const tier = c.req.query('tier');
+  let models = modelsData as Array<{ id: string; tier: string; displayName: string; provider: string; providerModel: string; freeTier: boolean }>;
+  if (tier) {
+    models = models.filter((m) => m.tier === tier);
+  }
+  return c.json({ models, count: models.length });
 });
 
 // ============================================================
