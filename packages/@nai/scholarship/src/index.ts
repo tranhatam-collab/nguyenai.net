@@ -30,6 +30,10 @@ export type {
   SponsorshipType,
   ModerationAction,
   AppealType,
+  ApplicationMessage,
+  ApplicationDocument,
+  StatusTimelineEntry,
+  DocumentType,
 } from './types';
 
 export {
@@ -72,4 +76,11 @@ export {
   markNotificationRead,
   createAppeal,
   calculateTotalScore,
+  sendMessage,
+  listMessages,
+  uploadDocument,
+  listDocuments,
+  reviewDocument,
+  getApplicationTimeline,
+  transitionApplicationStatus,
 } from './service';

@@ -1,0 +1,268 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Hồ sơ học bổng — Scholarship Room"
+  description="Xem trạng thái đơn đăng ký học bổng, tin nhắn, tài liệu và timeline quyết định."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-2">Scholarship Room</h1>
+    <p class="text-gray-600 mb-8">Trạng thái đơn, tin nhắn, tài liệu bổ sung và timeline quyết định.</p>
+
+    <!-- Status card -->
+    <div class="bg-white border rounded-lg p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Trạng thái đơn</h2>
+        <span id="app-status-badge" class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100">—</span>
+      </div>
+      <div id="app-info" class="space-y-2 text-sm">
+        <p><strong>Mã đơn:</strong> <span id="app-id">—</span></p>
+        <p><strong>Chương trình:</strong> <span id="app-program">—</span></p>
+        <p><strong>Ngày nộp:</strong> <span id="app-submitted">—</span></p>
+        <p><strong>Email xác minh:</strong> <span id="app-email-verified">—</span></p>
+        <p><strong>Điện thoại xác minh:</strong> <span id="app-phone-verified">—</span></p>
+        <p><strong>Danh tính xác minh:</strong> <span id="app-identity-verified">—</span></p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b mb-6">
+      <nav class="flex gap-4">
+        <button class="tab-btn active py-2 px-4 border-b-2 border-blue-600" data-tab="timeline">Timeline</button>
+        <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="messages">Tin nhắn</button>
+        <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="documents">Tài liệu</button>
+      </nav>
+    </div>
+
+    <!-- Timeline tab -->
+    <div id="tab-timeline" class="tab-content">
+      <h2 class="text-lg font-semibold mb-4">Timeline quyết định</h2>
+      <div id="timeline-list" class="space-y-3">
+        <p class="text-gray-400">Chưa có dữ liệu timeline.</p>
+      </div>
+    </div>
+
+    <!-- Messages tab -->
+    <div id="tab-messages" class="tab-content hidden">
+      <h2 class="text-lg font-semibold mb-4">Tin nhắn</h2>
+      <div id="messages-list" class="space-y-3 mb-6">
+        <p class="text-gray-400">Chưa có tin nhắn.</p>
+      </div>
+      <div class="border-t pt-4">
+        <h3 class="font-medium mb-2">Gửi tin nhắn</h3>
+        <form id="message-form" class="space-y-3">
+          <input type="text" id="msg-subject" placeholder="Tiêu đề" class="w-full px-3 py-2 border rounded" />
+          <textarea id="msg-body" rows="3" placeholder="Nội dung" class="w-full px-3 py-2 border rounded"></textarea>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Gửi</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Documents tab -->
+    <div id="tab-documents" class="tab-content hidden">
+      <h2 class="text-lg font-semibold mb-4">Tài liệu bổ sung</h2>
+      <div id="documents-list" class="space-y-3 mb-6">
+        <p class="text-gray-400">Chưa có tài liệu.</p>
+      </div>
+      <div class="border-t pt-4">
+        <h3 class="font-medium mb-2">Tải lên tài liệu</h3>
+        <form id="document-form" class="space-y-3">
+          <select id="doc-type" class="w-full px-3 py-2 border rounded">
+            <option value="">— Loại tài liệu —</option>
+            <option value="income_proof">Chứng minh thu nhập</option>
+            <option value="identity_document">Giấy tờ tùy thân</option>
+            <option value="portfolio">Portfolio</option>
+            <option value="recommendation_letter">Thư giới thiệu</option>
+            <option value="project_screenshot">Ảnh dự án</option>
+            <option value="other">Khác</option>
+          </select>
+          <input type="file" id="doc-file" class="w-full px-3 py-2 border rounded" />
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Tải lên</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .tab-btn { cursor: pointer; }
+    .tab-content.hidden { display: none; }
+    .status-badge { font-weight: 600; }
+    .timeline-entry { border-left: 3px solid #2563eb; padding-left: 12px; }
+  </style>
+
+  <script>
+    const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+    let applicationId = new URLSearchParams(window.location.search).get('id');
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active', 'border-blue-600');
+          b.classList.add('border-transparent');
+        });
+        btn.classList.add('active', 'border-blue-600');
+        btn.classList.remove('border-transparent');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
+      });
+    });
+
+    async function loadApplication() {
+      if (!applicationId) {
+        // Try to find user's application
+        // For now, show empty state
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/applications/${applicationId}`, { credentials: 'include' });
+        if (!res.ok) return;
+        const app = await res.json();
+        document.getElementById('app-id').textContent = app.application_id.slice(0, 8);
+        document.getElementById('app-program').textContent = app.program_code;
+        document.getElementById('app-submitted').textContent = app.submitted_at ? new Date(app.submitted_at).toLocaleDateString('vi-VN') : 'Chưa nộp';
+        document.getElementById('app-email-verified').textContent = app.email_verified ? '✅' : '❌';
+        document.getElementById('app-phone-verified').textContent = app.phone_verified ? '✅' : '❌';
+        document.getElementById('app-identity-verified').textContent = app.identity_verified ? '✅' : '❌';
+        const badge = document.getElementById('app-status-badge');
+        badge.textContent = app.status;
+        badge.className = `px-3 py-1 rounded-full text-sm font-medium ${statusColor(app.status)}`;
+      } catch (e) {
+        console.error('Failed to load application', e);
+      }
+    }
+
+    function statusColor(status) {
+      const colors = {
+        draft: 'bg-gray-100 text-gray-700',
+        submitted: 'bg-blue-100 text-blue-700',
+        pending_verification: 'bg-yellow-100 text-yellow-700',
+        verified: 'bg-green-100 text-green-700',
+        eligible: 'bg-green-100 text-green-700',
+        approved: 'bg-green-600 text-white',
+        awarded: 'bg-green-600 text-white',
+        enrolled: 'bg-green-700 text-white',
+        rejected: 'bg-red-100 text-red-700',
+        waitlisted: 'bg-orange-100 text-orange-700',
+      };
+      return colors[status] || 'bg-gray-100 text-gray-700';
+    }
+
+    async function loadTimeline() {
+      if (!applicationId) return;
+      try {
+        const res = await fetch(`${API_BASE}/applications/${applicationId}/timeline`, { credentials: 'include' });
+        if (!res.ok) return;
+        const { timeline } = await res.json();
+        const list = document.getElementById('timeline-list');
+        if (timeline.length === 0) {
+          list.innerHTML = '<p class="text-gray-400">Chưa có dữ liệu timeline.</p>';
+          return;
+        }
+        list.innerHTML = timeline.map(e => `
+          <div class="timeline-entry">
+            <div class="font-medium">${e.to_status}</div>
+            <div class="text-sm text-gray-600">${new Date(e.created_at).toLocaleString('vi-VN')}</div>
+            ${e.reason ? `<div class="text-sm">${e.reason}</div>` : ''}
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadMessages() {
+      if (!applicationId) return;
+      try {
+        const res = await fetch(`${API_BASE}/applications/${applicationId}/messages`, { credentials: 'include' });
+        if (!res.ok) return;
+        const { messages } = await res.json();
+        const list = document.getElementById('messages-list');
+        if (messages.length === 0) {
+          list.innerHTML = '<p class="text-gray-400">Chưa có tin nhắn.</p>';
+          return;
+        }
+        list.innerHTML = messages.map(m => `
+          <div class="border rounded p-3 ${m.read ? '' : 'bg-blue-50'}">
+            <div class="font-medium">${m.subject}</div>
+            <div class="text-sm text-gray-600">Từ: ${m.from_role} — ${new Date(m.created_at).toLocaleString('vi-VN')}</div>
+            <div class="mt-2 text-sm">${m.body}</div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadDocuments() {
+      if (!applicationId) return;
+      try {
+        const res = await fetch(`${API_BASE}/applications/${applicationId}/documents`, { credentials: 'include' });
+        if (!res.ok) return;
+        const { documents } = await res.json();
+        const list = document.getElementById('documents-list');
+        if (documents.length === 0) {
+          list.innerHTML = '<p class="text-gray-400">Chưa có tài liệu.</p>';
+          return;
+        }
+        list.innerHTML = documents.map(d => `
+          <div class="border rounded p-3">
+            <div class="font-medium">${d.filename}</div>
+            <div class="text-sm text-gray-600">Loại: ${d.type} — ${new Date(d.uploaded_at).toLocaleDateString('vi-VN')}</div>
+            <div class="text-sm">Trạng thái: <span class="font-medium">${d.status}</span></div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    // Message form
+    document.getElementById('message-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!applicationId) return;
+      const subject = document.getElementById('msg-subject').value;
+      const body = document.getElementById('msg-body').value;
+      if (!subject || !body) return;
+      const res = await fetch(`${API_BASE}/applications/${applicationId}/messages`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, body }),
+      });
+      if (res.ok) {
+        document.getElementById('msg-subject').value = '';
+        document.getElementById('msg-body').value = '';
+        loadMessages();
+      }
+    });
+
+    // Document form (mock upload — real upload would use R2 presigned URL)
+    document.getElementById('document-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!applicationId) return;
+      const type = document.getElementById('doc-type').value;
+      const fileInput = document.getElementById('doc-file');
+      if (!type || !fileInput.files?.[0]) return;
+      const file = fileInput.files[0];
+      // Mock: in production, upload to R2 first then register
+      const res = await fetch(`${API_BASE}/applications/${applicationId}/documents`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          filename: file.name,
+          storage_key: `scholarship/${applicationId}/${file.name}`,
+          mime_type: file.type,
+          size_bytes: file.size,
+        }),
+      });
+      if (res.ok) {
+        fileInput.value = '';
+        loadDocuments();
+      }
+    });
+
+    loadApplication();
+    loadTimeline();
+    loadMessages();
+    loadDocuments();
+  </script>
+</AcademyLayout>

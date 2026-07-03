@@ -24,6 +24,9 @@ import type {
   Notification,
   Appeal,
   ApplicationStatus,
+  ApplicationMessage,
+  ApplicationDocument,
+  StatusTimelineEntry,
 } from './types';
 
 export interface ScholarshipStore {
@@ -77,6 +80,17 @@ export interface ScholarshipStore {
   markNotificationRead(id: string): Promise<void>;
   // Appeals
   createAppeal(a: Omit<Appeal, 'appeal_id' | 'created_at'>): Promise<string>;
+  // Sprint 2: Messages
+  createMessage(m: Omit<ApplicationMessage, 'message_id' | 'created_at'>): Promise<string>;
+  listMessages(applicationId: string): Promise<ApplicationMessage[]>;
+  markMessageRead(id: string): Promise<void>;
+  // Sprint 2: Documents
+  createDocument(d: Omit<ApplicationDocument, 'document_id' | 'uploaded_at'>): Promise<string>;
+  listDocuments(applicationId: string): Promise<ApplicationDocument[]>;
+  updateDocument(id: string, patch: Partial<ApplicationDocument>): Promise<void>;
+  // Sprint 2: Status timeline
+  createTimelineEntry(e: Omit<StatusTimelineEntry, 'entry_id' | 'created_at'>): Promise<string>;
+  listTimeline(applicationId: string): Promise<StatusTimelineEntry[]>;
 }
 
 // ============================================================
@@ -295,6 +309,51 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     const id = crypto.randomUUID();
     this.appeals.set(id, { ...a, appeal_id: id, created_at: new Date().toISOString() });
     return id;
+  }
+
+  // Sprint 2: Messages
+  private messages = new Map<string, ApplicationMessage>();
+  async createMessage(m: Omit<ApplicationMessage, 'message_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.messages.set(id, { ...m, message_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async listMessages(applicationId: string): Promise<ApplicationMessage[]> {
+    return [...this.messages.values()].filter((m) => m.application_id === applicationId);
+  }
+  async markMessageRead(id: string): Promise<void> {
+    const existing = this.messages.get(id);
+    if (!existing) throw new Error(`Message ${id} not found`);
+    this.messages.set(id, { ...existing, read: true, read_at: new Date().toISOString() });
+  }
+
+  // Sprint 2: Documents
+  private documents = new Map<string, ApplicationDocument>();
+  async createDocument(d: Omit<ApplicationDocument, 'document_id' | 'uploaded_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.documents.set(id, { ...d, document_id: id, uploaded_at: new Date().toISOString() });
+    return id;
+  }
+  async listDocuments(applicationId: string): Promise<ApplicationDocument[]> {
+    return [...this.documents.values()].filter((d) => d.application_id === applicationId);
+  }
+  async updateDocument(id: string, patch: Partial<ApplicationDocument>): Promise<void> {
+    const existing = this.documents.get(id);
+    if (!existing) throw new Error(`Document ${id} not found`);
+    this.documents.set(id, { ...existing, ...patch, document_id: id });
+  }
+
+  // Sprint 2: Status timeline
+  private timeline = new Map<string, StatusTimelineEntry>();
+  async createTimelineEntry(e: Omit<StatusTimelineEntry, 'entry_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.timeline.set(id, { ...e, entry_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async listTimeline(applicationId: string): Promise<StatusTimelineEntry[]> {
+    return [...this.timeline.values()]
+      .filter((e) => e.application_id === applicationId)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
   }
 }
 

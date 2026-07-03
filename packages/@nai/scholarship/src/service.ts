@@ -671,3 +671,132 @@ export function calculateTotalScore(scores: ReviewScore[]): number {
   }
   return Math.round(total * 100) / 100; // 0-100
 }
+
+// ============================================================
+// Sprint 2 — Scholarship Room: messages, documents, timeline
+// ============================================================
+
+import type { ApplicationMessage, ApplicationDocument, StatusTimelineEntry, DocumentType } from './types';
+
+export async function sendMessage(
+  applicationId: string,
+  fromUserId: string,
+  fromRole: ApplicationMessage['from_role'],
+  toUserId: string | null,
+  subject: string,
+  body: string,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const id = await store.createMessage({
+    application_id: applicationId,
+    from_user_id: fromUserId,
+    from_role: fromRole,
+    to_user_id: toUserId,
+    subject,
+    body,
+    read: false,
+    read_at: null,
+  });
+  return id;
+}
+
+export async function listMessages(applicationId: string, userId: string): Promise<ApplicationMessage[]> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  // Applicant sees their own messages; council/admin sees all
+  if (app.user_id !== userId) {
+    // TODO: check investor/council access
+    throw new Error('Not authorized');
+  }
+  return store.listMessages(applicationId);
+}
+
+export async function uploadDocument(
+  applicationId: string,
+  userId: string,
+  type: DocumentType,
+  filename: string,
+  storageKey: string,
+  mimeType: string,
+  sizeBytes: number,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  if (app.user_id !== userId) throw new Error('Not authorized');
+
+  const id = await store.createDocument({
+    application_id: applicationId,
+    user_id: userId,
+    type,
+    filename,
+    storage_key: storageKey,
+    mime_type: mimeType,
+    size_bytes: sizeBytes,
+    status: 'pending_review',
+    reviewed_at: null,
+  });
+  return id;
+}
+
+export async function listDocuments(applicationId: string, userId: string): Promise<ApplicationDocument[]> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  if (app.user_id !== userId) throw new Error('Not authorized');
+  return store.listDocuments(applicationId);
+}
+
+export async function reviewDocument(
+  documentId: string,
+  reviewerId: string,
+  approved: boolean,
+): Promise<void> {
+  const store = getScholarshipStore();
+  await store.updateDocument(documentId, {
+    status: approved ? 'approved' : 'rejected',
+    reviewed_at: new Date().toISOString(),
+  });
+}
+
+export async function getApplicationTimeline(applicationId: string, userId: string): Promise<StatusTimelineEntry[]> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  if (app.user_id !== userId) throw new Error('Not authorized');
+  return store.listTimeline(applicationId);
+}
+
+export async function transitionApplicationStatus(
+  applicationId: string,
+  changedBy: string,
+  changedByRole: string,
+  toStatus: ApplicationStatus,
+  reason?: string,
+): Promise<void> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+
+  const fromStatus = app.status;
+  await store.updateApplication(applicationId, { status: toStatus });
+  await store.createTimelineEntry({
+    application_id: applicationId,
+    from_status: fromStatus,
+    to_status: toStatus,
+    changed_by: changedBy,
+    changed_by_role: changedByRole,
+    reason: reason ?? null,
+  });
+
+  // Notify applicant
+  await store.createNotification({
+    user_id: app.user_id,
+    type: 'status_change',
+    title: `Trạng thái đơn: ${toStatus}`,
+    body: reason ?? `Đơn của bạn đã chuyển sang trạng thái ${toStatus}`,
+    read: false,
+    read_at: null,
+  });
+}

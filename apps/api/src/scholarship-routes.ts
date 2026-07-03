@@ -499,3 +499,136 @@ scholarshipRoutes.patch('/notifications/:id/read', async (c) => {
     return c.json({ error: (e as Error).message }, 400);
   }
 });
+
+// ============================================================
+// Sprint 2 — Scholarship Room: messages, documents, timeline
+// ============================================================
+
+import {
+  sendMessage,
+  listMessages,
+  uploadDocument,
+  listDocuments,
+  reviewDocument,
+  getApplicationTimeline,
+  transitionApplicationStatus,
+  type DocumentType,
+  type ApplicationStatus,
+} from '@nai/scholarship';
+
+// 22. GET /applications/:id/messages
+scholarshipRoutes.get('/applications/:id/messages', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const msgs = await listMessages(c.req.param('id'), session.user_id);
+    return c.json({ messages: msgs });
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg.includes('Not authorized')) return c.json({ error: msg }, 403);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+// 23. POST /applications/:id/messages
+scholarshipRoutes.post('/applications/:id/messages', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.subject || !body.body) return c.json({ error: 'subject and body required' }, 400);
+  try {
+    const id = await sendMessage(
+      c.req.param('id'),
+      session.user_id,
+      'applicant',
+      null,
+      body.subject,
+      body.body,
+    );
+    return c.json({ message_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 24. GET /applications/:id/documents
+scholarshipRoutes.get('/applications/:id/documents', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const docs = await listDocuments(c.req.param('id'), session.user_id);
+    return c.json({ documents: docs });
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg.includes('Not authorized')) return c.json({ error: msg }, 403);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+// 25. POST /applications/:id/documents
+scholarshipRoutes.post('/applications/:id/documents', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const body = await c.req.json();
+  if (!body.type || !body.filename || !body.storage_key) {
+    return c.json({ error: 'type, filename, storage_key required' }, 400);
+  }
+  try {
+    const id = await uploadDocument(
+      c.req.param('id'),
+      session.user_id,
+      body.type as DocumentType,
+      body.filename,
+      body.storage_key,
+      body.mime_type ?? 'application/octet-stream',
+      body.size_bytes ?? 0,
+    );
+    return c.json({ document_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 26. GET /applications/:id/timeline
+scholarshipRoutes.get('/applications/:id/timeline', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const timeline = await getApplicationTimeline(c.req.param('id'), session.user_id);
+    return c.json({ timeline });
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg.includes('Not authorized')) return c.json({ error: msg }, 403);
+    return c.json({ error: msg }, 400);
+  }
+});
+
+// 27. POST /applications/:id/status — admin/council only
+scholarshipRoutes.post('/applications/:id/status', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const allowedRoles = ['admin', 'super_admin', 'council_member', 'moderator'];
+  if (!allowedRoles.includes(session.role)) {
+    return c.json({ error: 'Admin/council access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.status) return c.json({ error: 'status required' }, 400);
+  try {
+    await transitionApplicationStatus(
+      c.req.param('id'),
+      session.user_id,
+      session.role,
+      body.status as ApplicationStatus,
+      body.reason,
+    );
+    return c.json({ ok: true, status: body.status });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});

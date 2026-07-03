@@ -278,11 +278,11 @@ async function testNotifications() {
 
   const notes = await listNotifications('u1');
   assert(notes.length === 1, '1 notification listed');
-  assert(notes[0].read === false, 'notification is unread');
+  assert(notes[0]?.read === false, 'notification is unread');
 
   await markNotificationRead(id, 'u1');
   const notesAfter = await listNotifications('u1');
-  assert(notesAfter[0].read === true, 'notification marked as read');
+  assert(notesAfter[0]?.read === true, 'notification marked as read');
 }
 
 async function testAppeal() {

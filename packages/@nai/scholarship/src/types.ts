@@ -315,8 +315,58 @@ export interface ScholarshipAuditEvent {
 }
 
 // ============================================================
-// 24 Audit events (Section XXXIV)
+// Sprint 2 — Scholarship Room entities
 // ============================================================
+
+// 19. ApplicationMessage — messages between applicant and council/admin
+export interface ApplicationMessage {
+  message_id: string;
+  application_id: string;
+  from_user_id: string;
+  from_role: 'applicant' | 'council' | 'admin' | 'moderator' | 'system';
+  to_user_id: string | null; // null = broadcast to all parties
+  subject: string;
+  body: string;
+  read: boolean;
+  created_at: string;
+  read_at: string | null;
+}
+
+// 20. ApplicationDocument — supplemental documents uploaded by applicant
+export interface ApplicationDocument {
+  document_id: string;
+  application_id: string;
+  user_id: string;
+  type: DocumentType;
+  filename: string;
+  storage_key: string; // R2 key
+  mime_type: string;
+  size_bytes: number;
+  status: 'pending_review' | 'approved' | 'rejected';
+  uploaded_at: string;
+  reviewed_at: string | null;
+}
+
+export type DocumentType =
+  | 'income_proof'
+  | 'identity_document'
+  | 'portfolio'
+  | 'recommendation_letter'
+  | 'project_screenshot'
+  | 'other';
+
+// 21. StatusTimelineEntry — track status changes for decision timeline
+export interface StatusTimelineEntry {
+  entry_id: string;
+  application_id: string;
+  from_status: ApplicationStatus | null;
+  to_status: ApplicationStatus;
+  changed_by: string;
+  changed_by_role: string;
+  reason: string | null;
+  created_at: string;
+}
+
 
 export const SCHOLARSHIP_AUDIT_EVENTS = [
   'scholarship_application_created',
