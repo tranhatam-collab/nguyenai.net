@@ -1343,3 +1343,242 @@ export async function withdrawFromWaitlist(entryId: string, userId: string): Pro
     await store.updateWaitlistEntry(waiting[i].entry_id, { position: i + 1 });
   }
 }
+
+// ============================================================
+// Sprint 6 — Scholarship Entitlement: grant, suspend, revoke, restore
+// ============================================================
+
+import type { ScholarshipEntitlement, Cohort, EntitlementEvent } from './types';
+import { ENTITLEMENT_LIFECYCLE } from './types';
+
+// Grant entitlement to awarded applicant
+export async function grantEntitlement(
+  applicationId: string,
+  cohortId: string,
+  grantedBy: string,
+  learningPaths: string[] = [],
+  aiComputerInstanceId?: string,
+  durationDays: number = ENTITLEMENT_LIFECYCLE.defaultDurationDays,
+): Promise<string> {
+  const store = getScholarshipStore();
+  const app = await store.getApplication(applicationId);
+  if (!app) throw new Error(`Application ${applicationId} not found`);
+  if (app.status !== 'awarded') throw new Error('Application must be awarded before granting entitlement');
+
+  // Check if entitlement already exists
+  const existing = await store.getEntitlementByApplication(applicationId);
+  if (existing) throw new Error('Entitlement already exists for this application');
+
+  const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  const id = await store.createEntitlement({
+    application_id: applicationId,
+    user_id: app.user_id,
+    program_code: app.program_code,
+    cohort_id: cohortId,
+    status: 'active',
+    expires_at: expiresAt,
+    suspended_at: null,
+    revoked_at: null,
+    completed_at: null,
+    ai_computer_instance_id: aiComputerInstanceId ?? null,
+    learning_paths: learningPaths,
+    suspend_reason: null,
+    revoke_reason: null,
+  });
+
+  // Update application status to enrolled
+  await store.updateApplication(applicationId, { status: 'enrolled' });
+  await store.createTimelineEntry({
+    application_id: applicationId,
+    from_status: 'awarded',
+    to_status: 'enrolled',
+    changed_by: grantedBy,
+    changed_by_role: 'admin',
+    reason: 'Entitlement granted',
+  });
+
+  // Log entitlement event
+  await store.createEntitlementEvent({
+    entitlement_id: id,
+    event_type: 'granted',
+    changed_by: grantedBy,
+    reason: null,
+    metadata: { cohort_id: cohortId, duration_days: durationDays },
+  });
+
+  // Notify applicant
+  await store.createNotification({
+    user_id: app.user_id,
+    type: 'entitlement_granted',
+    title: 'Học bổng đã được cấp',
+    body: `Bạn đã được cấp entitlement cho chương trình ${app.program_code}. Cohort: ${cohortId}. Hạn hạn: ${new Date(expiresAt).toLocaleDateString('vi-VN')}`,
+    read: false,
+    read_at: null,
+  });
+
+  return id;
+}
+
+// Suspend entitlement
+export async function suspendEntitlement(entitlementId: string, suspendedBy: string, reason: string): Promise<void> {
+  const store = getScholarshipStore();
+  const ent = await store.getEntitlement(entitlementId);
+  if (!ent) throw new Error(`Entitlement ${entitlementId} not found`);
+  if (ent.status !== 'active') throw new Error(`Cannot suspend entitlement with status ${ent.status}`);
+
+  await store.updateEntitlement(entitlementId, {
+    status: 'suspended',
+    suspended_at: new Date().toISOString(),
+    suspend_reason: reason,
+  });
+
+  await store.createEntitlementEvent({
+    entitlement_id: entitlementId,
+    event_type: 'suspended',
+    changed_by: suspendedBy,
+    reason,
+    metadata: {},
+  });
+}
+
+// Restore suspended entitlement
+export async function restoreEntitlement(entitlementId: string, restoredBy: string, reason?: string): Promise<void> {
+  const store = getScholarshipStore();
+  const ent = await store.getEntitlement(entitlementId);
+  if (!ent) throw new Error(`Entitlement ${entitlementId} not found`);
+  if (ent.status !== 'suspended') throw new Error(`Cannot restore entitlement with status ${ent.status}`);
+
+  await store.updateEntitlement(entitlementId, {
+    status: 'active',
+    suspended_at: null,
+    suspend_reason: null,
+  });
+
+  await store.createEntitlementEvent({
+    entitlement_id: entitlementId,
+    event_type: 'restored',
+    changed_by: restoredBy,
+    reason: reason ?? null,
+    metadata: {},
+  });
+}
+
+// Revoke entitlement (permanent)
+export async function revokeEntitlement(entitlementId: string, revokedBy: string, reason: string): Promise<void> {
+  const store = getScholarshipStore();
+  const ent = await store.getEntitlement(entitlementId);
+  if (!ent) throw new Error(`Entitlement ${entitlementId} not found`);
+  if (ent.status === 'revoked' || ent.status === 'completed') {
+    throw new Error(`Cannot revoke entitlement with status ${ent.status}`);
+  }
+
+  await store.updateEntitlement(entitlementId, {
+    status: 'revoked',
+    revoked_at: new Date().toISOString(),
+    revoke_reason: reason,
+  });
+
+  await store.createEntitlementEvent({
+    entitlement_id: entitlementId,
+    event_type: 'revoked',
+    changed_by: revokedBy,
+    reason,
+    metadata: {},
+  });
+
+  // Update application status
+  await store.updateApplication(ent.application_id, { status: 'rejected' });
+  await store.createTimelineEntry({
+    application_id: ent.application_id,
+    from_status: 'enrolled',
+    to_status: 'rejected',
+    changed_by: revokedBy,
+    changed_by_role: 'admin',
+    reason: `Entitlement revoked: ${reason}`,
+  });
+}
+
+// Complete entitlement (successful graduation)
+export async function completeEntitlement(entitlementId: string, completedBy: string): Promise<void> {
+  const store = getScholarshipStore();
+  const ent = await store.getEntitlement(entitlementId);
+  if (!ent) throw new Error(`Entitlement ${entitlementId} not found`);
+  if (ent.status !== 'active') throw new Error(`Cannot complete entitlement with status ${ent.status}`);
+
+  await store.updateEntitlement(entitlementId, {
+    status: 'completed',
+    completed_at: new Date().toISOString(),
+  });
+
+  await store.createEntitlementEvent({
+    entitlement_id: entitlementId,
+    event_type: 'completed',
+    changed_by: completedBy,
+    reason: 'Successfully completed program',
+    metadata: {},
+  });
+}
+
+// Add learning path to entitlement
+export async function addLearningPath(entitlementId: string, programId: string, addedBy: string): Promise<void> {
+  const store = getScholarshipStore();
+  const ent = await store.getEntitlement(entitlementId);
+  if (!ent) throw new Error(`Entitlement ${entitlementId} not found`);
+  if (ent.learning_paths.includes(programId)) return;
+
+  await store.updateEntitlement(entitlementId, {
+    learning_paths: [...ent.learning_paths, programId],
+  });
+
+  await store.createEntitlementEvent({
+    entitlement_id: entitlementId,
+    event_type: 'learning_path_added',
+    changed_by: addedBy,
+    reason: null,
+    metadata: { program_id: programId },
+  });
+}
+
+// Get entitlement for user
+export async function getUserEntitlements(userId: string): Promise<ScholarshipEntitlement[]> {
+  const store = getScholarshipStore();
+  return store.getEntitlementsByUser(userId);
+}
+
+// Get entitlement by application
+export async function getEntitlementByApplication(appId: string): Promise<ScholarshipEntitlement | null> {
+  const store = getScholarshipStore();
+  return store.getEntitlementByApplication(appId);
+}
+
+// Get entitlement lifecycle events
+export async function getEntitlementEvents(entitlementId: string): Promise<EntitlementEvent[]> {
+  const store = getScholarshipStore();
+  return store.listEntitlementEvents(entitlementId);
+}
+
+// Cohort management
+export async function createCohort(
+  name: string,
+  programCode: string,
+  startDate: string,
+  endDate: string,
+  capacity: number,
+): Promise<string> {
+  const store = getScholarshipStore();
+  return store.createCohort({
+    name,
+    program_code: programCode,
+    start_date: startDate,
+    end_date: endDate,
+    capacity,
+    enrolled_count: 0,
+    status: 'open',
+  });
+}
+
+export async function listCohorts(filter?: { program_code?: string; status?: Cohort['status'] }): Promise<Cohort[]> {
+  const store = getScholarshipStore();
+  return store.listCohorts(filter);
+}

@@ -1027,3 +1027,197 @@ scholarshipRoutes.post('/waitlist/:id/withdraw', async (c) => {
     return c.json({ error: (e as Error).message }, 400);
   }
 });
+
+// ============================================================
+// Sprint 6 — Scholarship Entitlement: grant, suspend, revoke, restore
+// ============================================================
+
+import {
+  grantEntitlement,
+  suspendEntitlement,
+  restoreEntitlement,
+  revokeEntitlement,
+  completeEntitlement,
+  addLearningPath,
+  getUserEntitlements,
+  getEntitlementByApplication,
+  getEntitlementEvents,
+  createCohort,
+  listCohorts,
+} from '@nai/scholarship';
+
+// 49. POST /entitlements — grant entitlement (admin)
+scholarshipRoutes.post('/entitlements', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.application_id || !body.cohort_id) {
+    return c.json({ error: 'application_id and cohort_id required' }, 400);
+  }
+  try {
+    const id = await grantEntitlement(
+      body.application_id,
+      body.cohort_id,
+      session.user_id,
+      body.learning_paths ?? [],
+      body.ai_computer_instance_id,
+      body.duration_days,
+    );
+    return c.json({ entitlement_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 50. GET /entitlements — get user's entitlements
+scholarshipRoutes.get('/entitlements', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const entitlements = await getUserEntitlements(session.user_id);
+    return c.json({ entitlements });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 51. GET /entitlements/:id — get entitlement detail
+scholarshipRoutes.get('/entitlements/:id', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    // For user, check ownership; for admin, allow all
+    const events = await getEntitlementEvents(c.req.param('id'));
+    return c.json({ events });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 52. POST /entitlements/:id/suspend — suspend (admin)
+scholarshipRoutes.post('/entitlements/:id/suspend', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.reason) return c.json({ error: 'reason required' }, 400);
+  try {
+    await suspendEntitlement(c.req.param('id'), session.user_id, body.reason);
+    return c.json({ ok: true, status: 'suspended' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 53. POST /entitlements/:id/restore — restore (admin)
+scholarshipRoutes.post('/entitlements/:id/restore', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json().catch(() => ({}));
+  try {
+    await restoreEntitlement(c.req.param('id'), session.user_id, body.reason);
+    return c.json({ ok: true, status: 'active' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 54. POST /entitlements/:id/revoke — revoke (admin)
+scholarshipRoutes.post('/entitlements/:id/revoke', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.reason) return c.json({ error: 'reason required' }, 400);
+  try {
+    await revokeEntitlement(c.req.param('id'), session.user_id, body.reason);
+    return c.json({ ok: true, status: 'revoked' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 55. POST /entitlements/:id/complete — mark completed (admin)
+scholarshipRoutes.post('/entitlements/:id/complete', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  try {
+    await completeEntitlement(c.req.param('id'), session.user_id);
+    return c.json({ ok: true, status: 'completed' });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 56. POST /entitlements/:id/learning-paths — add learning path
+scholarshipRoutes.post('/entitlements/:id/learning-paths', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.program_id) return c.json({ error: 'program_id required' }, 400);
+  try {
+    await addLearningPath(c.req.param('id'), body.program_id, session.user_id);
+    return c.json({ ok: true });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 57. GET /cohorts — list cohorts
+scholarshipRoutes.get('/cohorts', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  const programCode = c.req.query('program_code');
+  const status = c.req.query('status') as 'open' | 'in_progress' | 'completed' | 'cancelled' | undefined;
+  try {
+    const cohorts = await listCohorts({ program_code: programCode, status });
+    return c.json({ cohorts });
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// 58. POST /cohorts — create cohort (admin)
+scholarshipRoutes.post('/cohorts', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json();
+  if (!body.name || !body.program_code || !body.start_date || !body.end_date || !body.capacity) {
+    return c.json({ error: 'name, program_code, start_date, end_date, capacity required' }, 400);
+  }
+  try {
+    const id = await createCohort(body.name, body.program_code, body.start_date, body.end_date, body.capacity);
+    return c.json({ cohort_id: id }, 201);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});

@@ -529,6 +529,77 @@ export const COUNCIL_CONFIG = {
   ],
 } as const;
 
+// ============================================================
+// Sprint 6 — Scholarship Entitlement: grant, suspend, revoke, restore
+// ============================================================
+
+// 26. ScholarshipEntitlement — entitlement granted to awarded applicants
+export interface ScholarshipEntitlement {
+  entitlement_id: string;
+  application_id: string;
+  user_id: string;
+  program_code: string;
+  cohort_id: string; // e.g. "cohort-2026-q3"
+  status: 'active' | 'suspended' | 'revoked' | 'completed' | 'expired';
+  granted_at: string;
+  expires_at: string | null;
+  suspended_at: string | null;
+  revoked_at: string | null;
+  completed_at: string | null;
+  ai_computer_instance_id: string | null; // linked AI Computer instance
+  learning_paths: string[]; // program IDs with access
+  suspend_reason: string | null;
+  revoke_reason: string | null;
+}
+
+// 27. Cohort — scholarship cohort tracking
+export interface Cohort {
+  cohort_id: string;
+  name: string;
+  program_code: string;
+  start_date: string;
+  end_date: string;
+  capacity: number;
+  enrolled_count: number;
+  status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+  created_at: string;
+}
+
+// 28. EntitlementEvent — track entitlement lifecycle events
+export interface EntitlementEvent {
+  event_id: string;
+  entitlement_id: string;
+  event_type: 'granted' | 'suspended' | 'restored' | 'revoked' | 'completed' | 'expired' | 'learning_path_added' | 'learning_path_removed';
+  changed_by: string;
+  reason: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export const ENTITLEMENT_LIFECYCLE = {
+  transitions: {
+    active: ['suspended', 'revoked', 'completed', 'expired'],
+    suspended: ['active', 'revoked'],
+    revoked: [],
+    completed: [],
+    expired: [],
+  },
+  defaultDurationDays: 365, // 1 year default
+  suspendReasons: [
+    'Vi phạm nội quy',
+    'Không tham gia học tập',
+    'Kiểm tra lại thông tin',
+    'Yêu cầu từ học viên',
+  ],
+  revokeReasons: [
+    'Gian lận hồ sơ',
+    'Vi phạm nghiêm trọng',
+    'Rút học bổng theo quyết định council',
+    'Yêu cầu từ học viên',
+  ],
+} as const;
+
+
 
 export const SCHOLARSHIP_AUDIT_EVENTS = [
   'scholarship_application_created',

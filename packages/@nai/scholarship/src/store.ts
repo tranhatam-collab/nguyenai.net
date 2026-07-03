@@ -31,6 +31,9 @@ import type {
   ForumReport,
   CouncilDecision,
   WaitlistEntry,
+  ScholarshipEntitlement,
+  Cohort,
+  EntitlementEvent,
 } from './types';
 
 export interface ScholarshipStore {
@@ -115,6 +118,20 @@ export interface ScholarshipStore {
   createWaitlistEntry(e: Omit<WaitlistEntry, 'entry_id' | 'created_at'>): Promise<string>;
   listWaitlist(filter?: { status?: WaitlistEntry['status']; program_code?: string }): Promise<WaitlistEntry[]>;
   updateWaitlistEntry(id: string, patch: Partial<WaitlistEntry>): Promise<void>;
+  // Sprint 6: Entitlements
+  createEntitlement(e: Omit<ScholarshipEntitlement, 'entitlement_id' | 'granted_at'>): Promise<string>;
+  getEntitlement(id: string): Promise<ScholarshipEntitlement | null>;
+  getEntitlementByApplication(appId: string): Promise<ScholarshipEntitlement | null>;
+  getEntitlementsByUser(userId: string): Promise<ScholarshipEntitlement[]>;
+  updateEntitlement(id: string, patch: Partial<ScholarshipEntitlement>): Promise<void>;
+  // Sprint 6: Cohorts
+  createCohort(c: Omit<Cohort, 'cohort_id' | 'created_at'>): Promise<string>;
+  getCohort(id: string): Promise<Cohort | null>;
+  listCohorts(filter?: { program_code?: string; status?: Cohort['status'] }): Promise<Cohort[]>;
+  updateCohort(id: string, patch: Partial<Cohort>): Promise<void>;
+  // Sprint 6: Entitlement events
+  createEntitlementEvent(e: Omit<EntitlementEvent, 'event_id' | 'created_at'>): Promise<string>;
+  listEntitlementEvents(entitlementId: string): Promise<EntitlementEvent[]>;
 }
 
 // ============================================================
@@ -470,6 +487,66 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     const existing = this.waitlist.get(id);
     if (!existing) throw new Error(`Waitlist entry ${id} not found`);
     this.waitlist.set(id, { ...existing, ...patch, entry_id: id });
+  }
+
+  // Sprint 6: Entitlements
+  private entitlements = new Map<string, ScholarshipEntitlement>();
+  async createEntitlement(e: Omit<ScholarshipEntitlement, 'entitlement_id' | 'granted_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.entitlements.set(id, { ...e, entitlement_id: id, granted_at: new Date().toISOString() });
+    return id;
+  }
+  async getEntitlement(id: string): Promise<ScholarshipEntitlement | null> {
+    return this.entitlements.get(id) ?? null;
+  }
+  async getEntitlementByApplication(appId: string): Promise<ScholarshipEntitlement | null> {
+    for (const e of this.entitlements.values()) {
+      if (e.application_id === appId) return e;
+    }
+    return null;
+  }
+  async getEntitlementsByUser(userId: string): Promise<ScholarshipEntitlement[]> {
+    return [...this.entitlements.values()].filter((e) => e.user_id === userId);
+  }
+  async updateEntitlement(id: string, patch: Partial<ScholarshipEntitlement>): Promise<void> {
+    const existing = this.entitlements.get(id);
+    if (!existing) throw new Error(`Entitlement ${id} not found`);
+    this.entitlements.set(id, { ...existing, ...patch, entitlement_id: id });
+  }
+
+  // Sprint 6: Cohorts
+  private cohorts = new Map<string, Cohort>();
+  async createCohort(c: Omit<Cohort, 'cohort_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.cohorts.set(id, { ...c, cohort_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async getCohort(id: string): Promise<Cohort | null> {
+    return this.cohorts.get(id) ?? null;
+  }
+  async listCohorts(filter?: { program_code?: string; status?: Cohort['status'] }): Promise<Cohort[]> {
+    let results = [...this.cohorts.values()];
+    if (filter?.program_code) results = results.filter((c) => c.program_code === filter.program_code);
+    if (filter?.status) results = results.filter((c) => c.status === filter.status);
+    return results.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }
+  async updateCohort(id: string, patch: Partial<Cohort>): Promise<void> {
+    const existing = this.cohorts.get(id);
+    if (!existing) throw new Error(`Cohort ${id} not found`);
+    this.cohorts.set(id, { ...existing, ...patch, cohort_id: id });
+  }
+
+  // Sprint 6: Entitlement events
+  private entitlementEvents = new Map<string, EntitlementEvent>();
+  async createEntitlementEvent(e: Omit<EntitlementEvent, 'event_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    this.entitlementEvents.set(id, { ...e, event_id: id, created_at: new Date().toISOString() });
+    return id;
+  }
+  async listEntitlementEvents(entitlementId: string): Promise<EntitlementEvent[]> {
+    return [...this.entitlementEvents.values()]
+      .filter((e) => e.entitlement_id === entitlementId)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
   }
 }
 

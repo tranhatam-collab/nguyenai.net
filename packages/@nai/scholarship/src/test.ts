@@ -73,6 +73,18 @@ import {
   withdrawFromWaitlist,
   SCORING_RUBRIC,
   COUNCIL_CONFIG,
+  grantEntitlement,
+  suspendEntitlement,
+  restoreEntitlement,
+  revokeEntitlement,
+  completeEntitlement,
+  addLearningPath,
+  getUserEntitlements,
+  getEntitlementByApplication,
+  getEntitlementEvents,
+  createCohort,
+  listCohorts,
+  ENTITLEMENT_LIFECYCLE,
   SCHOLARSHIP_AUDIT_EVENTS,
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
@@ -703,6 +715,90 @@ async function testWaitlist() {
   assert(withdrawn.length === 1, '1 withdrawn entry');
 }
 
+async function testEntitlementLifecycle() {
+  console.log('Test: Sprint 6 entitlement lifecycle');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Create cohort
+  const cohortId = await createCohort('Cohort 2026 Q3', 'NAO', '2026-07-01', '2026-12-31', 20);
+
+  // Create + submit + award application
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+  await updateApplication(appId, 'u1', {
+    wish_text: 'Learn',
+    circumstances_text: 'Need',
+    consents_to_data_processing: true,
+    consents_to_audit: true,
+    commits_to_attendance: true,
+    commits_to_graduation: true,
+  });
+  await submitApplication(appId, 'u1');
+  await awardScholarship(appId, 'council1', 'NAO');
+
+  // Grant entitlement
+  const entId = await grantEntitlement(appId, cohortId, 'admin1', ['nao-module-1', 'nao-module-2']);
+  assert(typeof entId === 'string', 'entitlement granted');
+
+  const app = await getApplication(appId, 'u1');
+  assert(app?.status === 'enrolled', 'status is enrolled');
+
+  // Get user entitlements
+  const userEnts = await getUserEntitlements('u1');
+  assert(userEnts.length === 1, '1 entitlement for user');
+  assert(userEnts[0].status === 'active', 'entitlement active');
+
+  // Add learning path
+  await addLearningPath(entId, 'nao-module-3', 'admin1');
+  const ent = await getEntitlementByApplication(appId);
+  assert(ent?.learning_paths.length === 3, '3 learning paths');
+
+  // Suspend
+  await suspendEntitlement(entId, 'admin1', 'Violation');
+  const suspended = await getEntitlementByApplication(appId);
+  assert(suspended?.status === 'suspended', 'entitlement suspended');
+
+  // Restore
+  await restoreEntitlement(entId, 'admin1', 'Resolved');
+  const restored = await getEntitlementByApplication(appId);
+  assert(restored?.status === 'active', 'entitlement restored');
+
+  // Complete
+  await completeEntitlement(entId, 'admin1');
+  const completed = await getEntitlementByApplication(appId);
+  assert(completed?.status === 'completed', 'entitlement completed');
+
+  // Check events
+  const events = await getEntitlementEvents(entId);
+  assert(events.length >= 5, 'at least 5 entitlement events');
+}
+
+async function testCohorts() {
+  console.log('Test: Sprint 6 cohorts');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+
+  const id1 = await createCohort('Cohort A', 'NAO', '2026-01-01', '2026-06-30', 15);
+  const id2 = await createCohort('Cohort B', 'NAO', '2026-07-01', '2026-12-31', 20);
+  assert(typeof id1 === 'string' && typeof id2 === 'string', 'cohorts created');
+
+  const all = await listCohorts();
+  assert(all.length === 2, '2 cohorts');
+
+  const naoCohorts = await listCohorts({ program_code: 'NAO' });
+  assert(naoCohorts.length === 2, '2 NAO cohorts');
+
+  assert(ENTITLEMENT_LIFECYCLE.defaultDurationDays === 365, 'default 365 days');
+  assert(ENTITLEMENT_LIFECYCLE.transitions.active.includes('suspended'), 'active -> suspended allowed');
+}
+
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -725,6 +821,8 @@ async function main() {
   await testReportAndModeration();
   await testCouncilDecision();
   await testWaitlist();
+  await testEntitlementLifecycle();
+  await testCohorts();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

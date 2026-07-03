@@ -40,9 +40,12 @@ export type {
   CouncilDecision,
   WaitlistEntry,
   ScoringRubric,
+  ScholarshipEntitlement,
+  Cohort,
+  EntitlementEvent,
 } from './types';
 
-export { SCORING_RUBRIC, COUNCIL_CONFIG } from './types';
+export { SCORING_RUBRIC, COUNCIL_CONFIG, ENTITLEMENT_LIFECYCLE } from './types';
 
 export {
   SCHOLARSHIP_AUDIT_EVENTS,
@@ -113,4 +116,15 @@ export {
   listWaitlist,
   offerWaitlistSpot,
   withdrawFromWaitlist,
+  grantEntitlement,
+  suspendEntitlement,
+  restoreEntitlement,
+  revokeEntitlement,
+  completeEntitlement,
+  addLearningPath,
+  getUserEntitlements,
+  getEntitlementByApplication,
+  getEntitlementEvents,
+  createCohort,
+  listCohorts,
 } from './service';
