@@ -58,6 +58,13 @@ import {
   submitReviewWithScores,
   awardScholarship,
   declineScholarship,
+  createComment,
+  listComments,
+  deleteComment,
+  reportContent,
+  getModerationQueue,
+  reviewReport,
+  listPublishedPosts,
   SCHOLARSHIP_AUDIT_EVENTS,
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
@@ -512,6 +519,66 @@ async function testAwardAndDecline() {
   assert(declineEvents.length === 1, '1 scholarship_declined event');
 }
 
+async function testForumComments() {
+  console.log('Test: Sprint 4 forum comments');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Create room + published post
+  const roomId = await store.createForumRoom({ name: 'Test', description: 'Test', is_public: true });
+  const postId = await createForumPost(roomId, 'u1', 'Test Post', 'Content here');
+  await submitForumPost(postId, 'u1');
+  await moderateForumPost(postId, 'mod1', 'approve', 'ok');
+
+  // Create comment
+  const commentId = await createComment(postId, 'u2', 'Great post!');
+  assert(typeof commentId === 'string', 'comment created');
+
+  const comments = await listComments(postId);
+  assert(comments.length === 1, '1 comment listed');
+
+  // Delete comment
+  await deleteComment(commentId, 'u2');
+  const commentsAfter = await listComments(postId);
+  assert(commentsAfter.length === 0, '0 comments after delete (deleted filtered)');
+
+  // List published posts
+  const published = await listPublishedPosts(roomId);
+  assert(published.length === 1, '1 published post');
+  assert(published[0].status === 'published', 'post is published');
+}
+
+async function testReportAndModeration() {
+  console.log('Test: Sprint 4 report + moderation queue');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Create room + published post
+  const roomId = await store.createForumRoom({ name: 'Test', description: 'Test', is_public: true });
+  const postId = await createForumPost(roomId, 'u1', 'Bad Post', 'Bad content');
+  await submitForumPost(postId, 'u1');
+  await moderateForumPost(postId, 'mod1', 'approve', 'ok');
+
+  // Report the post
+  const reportId = await reportContent('post', postId, 'u2', 'Contains personal info', 'personal_info');
+  assert(typeof reportId === 'string', 'report created');
+
+  // Post should be marked as reported
+  const post = await store.getForumPost(postId);
+  assert(post?.status === 'reported', 'post status is reported');
+
+  // Moderation queue should contain the post
+  const queue = await getModerationQueue();
+  assert(queue.length >= 1, 'moderation queue has items');
+
+  // Review report
+  await reviewReport(reportId, 'mod1', 'actioned');
+  const events = await queryAuditLog({ event_type: 'complaint_submitted' });
+  assert(events.length === 1, '1 complaint_submitted event');
+}
+
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -530,6 +597,8 @@ async function main() {
   await testTimelineAndStatusTransition();
   await testInvestorRoom();
   await testAwardAndDecline();
+  await testForumComments();
+  await testReportAndModeration();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }
