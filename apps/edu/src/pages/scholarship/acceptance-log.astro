@@ -1,0 +1,41 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Acceptance Log — Học bổng Nguyễn AI"
+  description="Log mọi thay đổi policy, version, và acceptance."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-2">Acceptance Log</h1>
+    <p class="text-gray-600 mb-8">Ghi nhận mọi thay đổi policy, version, và acceptance.</p>
+
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="border-b">
+          <th class="text-left py-2">Date</th>
+          <th class="text-left py-2">Policy</th>
+          <th class="text-left py-2">Version</th>
+          <th class="text-left py-2">Change</th>
+          <th class="text-left py-2">Approved by</th>
+          <th class="text-left py-2">Effective</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b">
+          <td class="py-2">2026-07-04</td>
+          <td class="py-2">01-12</td>
+          <td class="py-2">1.0.0</td>
+          <td class="py-2">Initial creation of 12 policy docs</td>
+          <td class="py-2">Founder</td>
+          <td class="py-2">2026-07-04</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="mt-8 border-t pt-6">
+      <a href="/scholarship/policies" class="text-blue-600">← Tất cả chính sách</a>
+    </div>
+  </section>
+</AcademyLayout>

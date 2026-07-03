@@ -1,0 +1,52 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Changelog — Học bổng Nguyễn AI"
+  description="Lịch sử thay đổi của scholarship policies và system."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-2">Changelog</h1>
+    <p class="text-gray-600 mb-8">Lịch sử thay đổi của scholarship policies và system.</p>
+
+    <div class="prose max-w-none">
+      <h2>2026-07-04 — Initial Release v1.0.0</h2>
+
+      <h3>Added</h3>
+      <ul>
+        <li>12 policy documents (01-12)</li>
+        <li>Acceptance log</li>
+        <li>Changelog</li>
+      </ul>
+
+      <h3>System</h3>
+      <ul>
+        <li>Sprint 1: Applicant Form (8-part form, 9 programs)</li>
+        <li>Sprint 2: Scholarship Room (messages, documents, timeline)</li>
+        <li>Sprint 3: Investor Room (verify, access, feed, review, award)</li>
+        <li>Sprint 4: Forum (comments, reports, moderation)</li>
+        <li>Sprint 5: Decision Engine (rubric, council, waitlist)</li>
+        <li>Sprint 6: Entitlement lifecycle (grant, suspend, revoke, cohorts)</li>
+      </ul>
+
+      <h3>API</h3>
+      <ul>
+        <li>58 endpoints under /v1/scholarship</li>
+        <li>28 entities in @nai/scholarship</li>
+        <li>101 unit tests passing</li>
+      </ul>
+
+      <h3>Audit</h3>
+      <ul>
+        <li>24 scholarship-specific audit events</li>
+        <li>Registry version: 2026-07-03.1</li>
+      </ul>
+    </div>
+
+    <div class="mt-8 border-t pt-6">
+      <a href="/scholarship/policies" class="text-blue-600">← Tất cả chính sách</a>
+    </div>
+  </section>
+</AcademyLayout>

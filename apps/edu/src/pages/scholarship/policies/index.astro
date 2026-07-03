@@ -1,0 +1,52 @@
+---
+import AcademyLayout from '../../../layouts/AcademyLayout.astro';
+
+const policies = [
+  { id: '01', title: 'Chính sách học bổng', file: '01_SCHOLARSHIP_POLICY.md' },
+  { id: '02', title: 'Tiêu chí và quy trình nộp đơn', file: '02_APPLICATION_CRITERIA.md' },
+  { id: '03', title: 'Quy trình kiểm duyệt nội dung', file: '03_MODERATION_POLICY.md' },
+  { id: '04', title: 'Quyền riêng tư và dữ liệu', file: '04_PRIVACY_AND_DATA.md' },
+  { id: '05', title: 'Hội đồng đánh giá (Council)', file: '05_COUNCIL_GOVERNANCE.md' },
+  { id: '06', title: 'Quy trình tài trợ và đầu tư', file: '06_SPONSORSHIP_POLICY.md' },
+  { id: '07', title: 'Quyền lợi học bổng', file: '07_ENTITLEMENT_RIGHTS.md' },
+  { id: '08', title: 'Quy trình khiếu nại và kháng cáo', file: '08_APPEAL_PROCESS.md' },
+  { id: '09', title: 'Chính sách bảo mật và an ninh', file: '09_SECURITY_POLICY.md' },
+  { id: '10', title: 'Chính sách giữ dữ liệu và xóa', file: '10_DATA_RETENTION.md' },
+  { id: '11', title: 'Điều khoản sử dụng', file: '11_TERMS_OF_SERVICE.md' },
+  { id: '12', title: 'Chính sách thay đổi và phiên bản', file: '12_CHANGE_POLICY.md' },
+];
+---
+
+<AcademyLayout
+  title="Chính sách học bổng — Nguyễn AI"
+  description="12 tài liệu chính sách học bổng Nguyễn AI: quy trình, tiêu chí, bảo mật, council, tài trợ, quyền lợi."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-2">Chính sách học bổng</h1>
+    <p class="text-gray-600 mb-8">12 tài liệu chính sách (v1.0.0, hiệu lực 2026-07-04).</p>
+
+    <div class="grid gap-4">
+      {policies.map((p) => (
+        <a
+          href={`/scholarship/policies/${p.id}`}
+          class="border rounded-lg p-4 hover:shadow transition flex items-center justify-between"
+        >
+          <div>
+            <span class="text-sm text-gray-400">#{p.id}</span>
+            <h2 class="font-semibold text-lg">{p.title}</h2>
+          </div>
+          <span class="text-blue-600">→</span>
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-8 border-t pt-6">
+      <h2 class="text-xl font-semibold mb-4">Tài liệu liên quan</h2>
+      <ul class="space-y-2 text-blue-600">
+        <li><a href="/scholarship/changelog" class="hover:underline">Lịch sử thay đổi (Changelog)</a></li>
+        <li><a href="/scholarship/acceptance-log" class="hover:underline">Acceptance Log</a></li>
+      </ul>
+    </div>
+  </section>
+</AcademyLayout>
