@@ -1,0 +1,108 @@
+---
+title: "Approval Gates và Evidence"
+description: "Cổng phê duyệt (approval gates) và hệ thống bằng chứng (evidence) — hai cơ chế an toàn cốt lõi của AI Computer."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 8
+duration: "7 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={8} max={10} />
+
+## Approval Gate là gì?
+
+**Approval Gate** (cổng phê duyệt) là trạm kiểm soát *human-in-the-loop* — nơi bạn xác nhận trước khi Agent thực hiện một hành động quan trọng. Đây là cơ chế an toàn cốt lõi đảm bảo **bạn luôn kiểm soát** những gì AI Computer làm.
+
+Khi Agent đến một *approval gate*, nó:
+
+1. **Dừng lại** — không tiếp tục cho đến khi bạn phản hồi.
+2. **Hiển thị chi tiết** — hành động sắp thực hiện, lý do, rủi ro.
+3. **Chờ bạn quyết định** — phê duyệt (*approve*), từ chối (*reject*), hoặc yêu cầu chỉnh sửa (*request changes*).
+
+> Nguyên tắc: Không có hành động nhạy cảm nào được thực hiện mà không qua *approval gate*.
+
+## Khi nào cần phê duyệt?
+
+Approval gate được kích hoạt cho các loại hành động sau:
+
+| Loại hành động | Tiếng Anh | Ví dụ |
+|---|---|---|
+| **Tài chính** | *Financial* | Thanh toán, chuyển tiền, lập hoá đơn |
+| **Pháp lý** | *Legal* | Ký tài liệu, đăng ký doanh nghiệp, nộp đơn |
+| **Xuất bản** | *Publishing* | Đăng bài, xuất bản cây gia đình, công khai hồ sơ |
+| **Chia sẻ** | *Sharing* | Chia sẻ file Data Vault, mời người vào Chapter |
+| **Xoá** | *Deletion* | Xoá file, xoá Memory, xoá dữ liệu vĩnh viễn |
+| **Truy cập nhạy cảm** | *Sensitive access* | Truy cập dữ liệu người đang sống |
+
+> Bạn có thể thêm *approval gate* ở bất kỳ bước nào trong Command Pack — không chỉ ở các bước mặc định.
+
+## Evidence là gì?
+
+**Evidence** (bằng chứng) là hệ thống *audit trail* — ghi lại mọi hành động AI thực hiện, kèm nguồn và mức độ tin cậy. Mọi kết quả từ Agent đều có một **nhãn bằng chứng** (*evidence label*) cho bạn biết kết quả đó đáng tin cậy đến đâu.
+
+> Evidence không chỉ là ghi chú — nó là cam kết minh bạch. Bạn luôn biết thông tin đến từ đâu và độ tin cậy bao nhiêu.
+
+## Hệ thống nhãn bằng chứng
+
+Nguyen Verifier sử dụng các nhãn bằng chứng (*evidence labels*) sau:
+
+| Nhãn | Tiếng Anh | Ý nghĩa |
+|---|---|---|
+| `verified` | Đã xác minh | Đã đối chiếu với nguồn chính, đáng tin cậy cao |
+| `primary source` | Nguồn gốc | Bản gốc, ảnh chụp bản gốc, tài liệu первичный |
+| `secondary source` | Nguồn thứ cấp | Trích dẫn, sao chép từ nguồn khác |
+| `oral history` | Truyền miệng | Lời kể, ghi âm phỏng vấn |
+| `insufficient evidence` | Bằng chứng không đủ | Không đủ thông tin để kết luận |
+| `disputed` | Có tranh chấp | Thông tin mâu thuẫn giữa các nguồn |
+| `cannot conclude` | Không thể kết luận | Không thể xác định tính đúng sai |
+
+> ⚠️ **Quan trọng:** AI không thể xác nhận huyết thống, dòng dõi hoàng gia hay nguồn gốc chung của tất cả người họ Nguyễn. Luôn sử dụng ngôn ngữ bất định (*uncertainty language*) và nhãn bằng chứng.
+
+## Cách phê duyệt và từ chối
+
+### Phê duyệt (*Approve*)
+
+Khi Agent gửi yêu cầu phê duyệt:
+
+1. **Đọc chi tiết** — hành động gì, tại sao, rủi ro gì.
+2. **Kiểm tra bằng chứng** — nhãn bằng chứng có đủ tin cậy không?
+3. **Bấm "Phê duyệt"** — Agent tiếp tục thực hiện.
+4. **Hành động được ghi** — vào *evidence trail* với dấu thời gian.
+
+### Từ chối (*Reject*)
+
+1. **Đọc chi tiết** — hiểu lý do Agent muốn thực hiện.
+2. **Bấm "Từ chối"** — Agent dừng, không thực hiện.
+3. **Ghi lý do** (tuỳ chọn) — giúp Agent học cho lần sau.
+4. **Từ chối được ghi** — vào *evidence trail*.
+
+### Yêu cầu chỉnh sửa (*Request changes*)
+
+1. **Đọc chi tiết** — phát hiện cần điều chỉnh.
+2. **Bấm "Yêu cầu chỉnh sửa"** — Agent quay lại bước trước.
+3. **Ghi hướng dẫn** — chỉ rõ cần thay đổi gì.
+4. **Agent sửa và gửi lại** — bạn phê duyệt lại sau khi xem.
+
+## Evidence trail
+
+Mọi hành động — dù được phê duyệt hay từ chối — đều được ghi vào **evidence trail** (dấu vết bằng chứng):
+
+- **Ai** thực hiện (Agent nào).
+- **Cái gì** (hành động cụ thể).
+- **Khi nào** (dấu thời gian).
+- **Bằng chứng gì** (nhãn bằng chứng).
+- **Phê duyệt bởi** (bạn hoặc tự động).
+
+> Bạn có thể xem evidence trail bất cứ lúc nào trong AI Computer Console. Đây là cơ sở cho kiểm toán (*audit*) và minh bạch.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Approval Gate, human-in-the-loop, approve, reject, request changes, Evidence, audit trail, evidence labels, verified, primary source, secondary source, oral history, insufficient evidence, disputed, cannot conclude, uncertainty language, evidence trail, audit.*
+
+⬅️ **Bài trước:** [Memory](/lessons/track-01-lesson-07)
+➡️ **Bài tiếp theo:** [Super Apps](/lessons/track-01-lesson-09) — ứng dụng chuyên biệt cho AI Computer.

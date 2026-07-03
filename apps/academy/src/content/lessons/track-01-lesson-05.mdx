@@ -1,0 +1,81 @@
+---
+title: "Model Mesh: Chọn model phù hợp"
+description: "Model Mesh — lớp định tuyến đa mô hình giúp AI Computer chọn model AI phù hợp cho từng nhiệm vụ."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 5
+duration: "5 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={5} max={10} />
+
+## Model Mesh là gì?
+
+**Model Mesh** (lưới mô hình) là lớp định tuyến đa mô hình (*multi-model routing layer*) trong AI Computer của bạn. Thay vì bị khoá vào một mô hình AI duy nhất, AI Computer có thể truy cập nhiều mô hình cùng lúc và **tự động chọn mô hình phù hợp nhất** cho từng nhiệm vụ.
+
+Điều này có nghĩa là:
+
+- Nhiệm vụ sáng tạo → có thể dùng mô hình mạnh về viết.
+- Nhiệm vụ phân tích → dùng mô hình mạnh về suy luận.
+- Nhiệm vụ đơn giản → dùng mô hình nhanh, tiết kiệm chi phí.
+
+> Bạn không cần phải là chuyên gia AI để chọn mô hình. Model Mesh tự động định tuyến — nhưng bạn luôn có thể ghi đè (*override*) nếu muốn.
+
+## Các mô hình khả dụng
+
+| Mô hình | Điểm mạnh | Phù hợp cho |
+|---|---|---|
+| **GPT-4o** | Suy luận đa modal, tổng hợp tốt | Nghiên cứu, phân tích, lập kế hoạch |
+| **Claude 3.5** | Viết tự nhiên, an toàn, tuân thủ hướng dẫn | Viết nội dung, tài liệu pháp lý, song ngữ |
+| **Gemini** | Xử lý ảnh, video, tích hợp Google | Phân tích hình ảnh, đa modal |
+| **Llama** | Mã nguồn mở, chạy локally được | Nhiệm vụ riêng tư, tự host |
+| **Mistral** | Nhanh, nhẹ, hiệu quả | Nhiệm vụ đơn giản, trả lời nhanh |
+| **Cohere** | Xử lý ngôn ngữ tự nhiên, RAG | Tìm kiếm tài liệu, tổng hợp kiến thức |
+
+## Đánh đổi chi phí và chất lượng
+
+Model Mesh cân bằng hai yếu tố:
+
+- **Chi phí** (*cost*) — mỗi mô hình có giá khác nhau cho mỗi *token*.
+- **Chất lượng** (*quality*) — mô hình mạnh hơn thường đắt hơn.
+
+| Mức | Mô hình ưu tiên | Chi phí | Chất lượng |
+|---|---|---|---|
+| Nhanh & rẻ | Mistral, Llama | Thấp | Tốt cho nhiệm vụ đơn giản |
+| Cân bằng | GPT-4o, Claude 3.5 | Trung bình | Phù hợp đa số nhiệm vụ |
+| Chất lượng cao | GPT-4o, Gemini | Cao | Nhiệm vụ phức tạp, đa modal |
+
+> Trên gói *Nguyen Start* (miễn phí), bạn có quyền truy cập mức Nhanh & rẻ. Gói cao hơn mở khoá thêm mô hình.
+
+## Quy tắc định tuyến tự động
+
+Model Mesh sử dụng các quy tắc (*auto-routing rules*) sau:
+
+1. **Phân loại nhiệm vụ** — Agent xác định loại công việc (viết, phân tích, tìm kiếm...).
+2. **Kiểm tra quyền gói** — lọc mô hình phù hợp với gói đăng ký của bạn.
+3. **Chọn mô hình tối ưu** — cân bằng chi phí và chất lượng theo cài đặt của bạn.
+4. **Thực thi** — gửi yêu cầu đến mô hình đã chọn.
+5. **Ghi nhận** — lưu kết quả và chi phí vào *evidence trail*.
+
+## Khi nào nên chọn mô hình thủ công
+
+Bạn có thể chọn mô hình thủ công (*manual override*) khi:
+
+- **Bạn biết rõ mô hình nào tốt hơn** cho nhiệm vụ cụ thể.
+- **Bạn muốn tiết kiệm chi phí** — chọn mô hình rẻ hơn cho nhiệm vụ đơn giản.
+- **Bạn cần sự nhất quán** — dùng cùng một mô hình cho toàn bộ dự án.
+- **Bạn đang thử nghiệm** — so sánh kết quả giữa các mô hình.
+
+Để chọn thủ công, chỉ cần nói: *"Dùng Claude 3.5 cho nhiệm vụ này"* — hoặc chọn từ menu trong AI Computer Console.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Model Mesh, multi-model routing layer, token, cost, quality, auto-routing rules, manual override, evidence trail, AI Computer Console.*
+
+⬅️ **Bài trước:** [Command Packs](/lessons/track-01-lesson-04)
+➡️ **Bài tiếp theo:** [Data Vault](/lessons/track-01-lesson-06) — kho dữ liệu riêng tư của bạn.

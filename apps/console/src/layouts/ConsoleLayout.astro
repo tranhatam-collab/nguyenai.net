@@ -1,0 +1,50 @@
+---
+/**
+ * ConsoleLayout.astro — Main layout for the authenticated console
+ * Includes sidebar navigation, top bar, and main content slot.
+ */
+import Sidebar from '../components/Sidebar.astro';
+import TopBar from '../components/TopBar.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'Console · Nguyen AI' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="vi" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-bg text-slate-100">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <Sidebar />
+
+      <!-- Main content area -->
+      <div class="flex flex-1 flex-col lg:pl-64">
+        <!-- Top bar -->
+        <TopBar />
+
+        <!-- Page content -->
+        <main class="flex-1 p-4 lg:p-6">
+          <slot />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

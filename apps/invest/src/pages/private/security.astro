@@ -1,0 +1,62 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout title="Security Overview" titleVi="Tổng quan bảo mật" noindex={true}>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+    </div>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Security Overview</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Tổng quan bảo mật</p>
+
+    <!-- PDPD 91/2025 -->
+    <div class="mt-10 bg-bg-card border border-bg-border rounded-xl p-6">
+      <h2 class="text-xl font-serif font-bold text-ink mb-2">PDPD 91/2025 Compliance</h2>
+      <p class="text-sm text-gold mb-4" lang="vi">Tuân thủ Nghị định 91/2025</p>
+      <ul class="space-y-2 text-sm text-ink-muted">
+        <li class="flex items-start gap-2"><span class="text-gold">▸</span> Privacy-by-design architecture</li>
+        <li class="flex items-start gap-2"><span class="text-gold">▸</span> Living-person data private by default</li>
+        <li class="flex items-start gap-2"><span class="text-gold">▸</span> Family trees private by default</li>
+        <li class="flex items-start gap-2"><span class="text-gold">▸</span> User-owned data vault with explicit consent</li>
+        <li class="flex items-start gap-2"><span class="text-gold">▸</span> Data minimization principles</li>
+        <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> Formal compliance audit: pending</li>
+      </ul>
+    </div>
+
+    <!-- Data flow -->
+    <div class="mt-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Data Flow / Luồng dữ liệu</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <div class="space-y-3">
+          {['User → AI Computer Instance (TLS encrypted)', 'Instance → Model Mesh (encrypted routing)', 'Model Mesh → AI providers (API, no PII leakage)', 'Instance → Data vault (encrypted at rest)', 'Instance → Agent team (sandboxed execution)'].map((step, i) => (
+            <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
+              <span class="text-gold font-mono text-xs shrink-0">{String(i + 1).padStart(2, '0')}</span>
+              <span class="text-sm text-ink-muted">{step}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Encryption -->
+    <div class="mt-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Encryption / Mã hóa</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-bg-card border border-bg-border rounded-lg p-5">
+          <h3 class="font-semibold text-ink text-sm">In transit</h3>
+          <p class="text-sm text-ink-muted mt-2">TLS 1.3 via Cloudflare. All API calls encrypted.</p>
+          <span class="inline-block mt-2 text-xs text-gold">Active</span>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-lg p-5">
+          <h3 class="font-semibold text-ink text-sm">At rest</h3>
+          <p class="text-sm text-ink-muted mt-2">AES-256 encryption for data vault storage.</p>
+          <span class="inline-block mt-2 text-xs text-ink-dim">Planned (Phase 2)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

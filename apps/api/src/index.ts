@@ -20,6 +20,7 @@
  */
 
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { cors } from 'hono/cors';
 
 import {
@@ -92,6 +93,9 @@ interface AppEnv {
     VNPAY_HASH_SECRET: string;
     VNPAY_PAY_URL: string;
     VNPAY_RETURN_URL: string;
+    // Gen1 upstream gateway (aiagent.iai.one — FROZEN reference, adapter only)
+    GEN1_GATEWAY_URL: string;
+    GEN1_ADMIN_KEY?: string;
   };
   Variables: {
     session: Session | null;
@@ -329,6 +333,96 @@ app.get('/v1/audit', async (c) => {
 });
 
 // ============================================================
+// Gen1 Gateway Adapter — proxy to aiagent.iai.one (FROZEN reference)
+// Per Founder Architecture Amendment: adapter owned by Nguyen AI,
+// Gen1 stays frozen. We proxy chat/stream/models/workflows.
+// Source of truth remains Nguyen AI (entitlement, billing, audit).
+// ============================================================
+
+/**
+ * Forward request to Gen1 gateway with session propagation.
+ * Gen1 requires X-Session-Id header — we synthesize from Nguyen AI session.
+ */
+async function proxyToGen1(
+  c: Context<AppEnv>,
+  path: string,
+  method: string = 'POST',
+): Promise<Response> {
+  const base = c.env.GEN1_GATEWAY_URL;
+  if (!base) return c.json({ error: 'GEN1_GATEWAY_URL not configured' }, 500);
+
+  const session = c.get('session');
+  // Synthesize Gen1 session ID from Nguyen AI session (deterministic mapping)
+  // For anonymous users, derive stable ID from IP so TOS acceptance persists
+  const gen1SessionId = session
+    ? `nai-${session.tenant_id}-${session.session_id.slice(0, 8)}`
+    : `nai-anon-${(c.req.header('CF-Connecting-IP') ?? 'local').slice(0, 12)}`;
+
+  const url = `${base}${path}`;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'X-Session-Id': gen1SessionId,
+    'X-Tier': 'free-demo', // Nguyen AI maps plan to Gen1 tier in future
+    'X-User-Id': session?.user_id ?? 'anonymous',
+  };
+  if (c.env.GEN1_ADMIN_KEY) headers['X-Admin-Key'] = c.env.GEN1_ADMIN_KEY;
+
+  // Forward Authorization if present
+  const authz = c.req.header('Authorization');
+  if (authz) headers['Authorization'] = authz;
+
+  const init: RequestInit = { method, headers };
+  if (method !== 'GET' && method !== 'HEAD') {
+    const body = await c.req.json().catch(() => ({})) as Record<string, unknown>;
+    // Inject synthesized sessionId for Gen1 endpoints that require it in body
+    if (typeof body === 'object' && body !== null && !body.sessionId) {
+      body.sessionId = gen1SessionId;
+    }
+    init.body = JSON.stringify(body);
+  }
+
+  try {
+    const upstream = await fetch(url, init);
+    const body = await upstream.text();
+    return new Response(body, {
+      status: upstream.status,
+      headers: {
+        'Content-Type': upstream.headers.get('Content-Type') ?? 'application/json',
+        'X-Gen1-Upstream': 'aiagent.iai.one',
+        'X-Gen1-Session': gen1SessionId,
+      },
+    });
+  } catch (err) {
+    console.error('Gen1 proxy error:', err);
+    return c.json({ error: 'gen1 gateway unreachable', upstream: base }, 502);
+  }
+}
+
+// POST /v1/chat — proxy to Gen1 /v1/chat
+app.post('/v1/chat', (c) => proxyToGen1(c, '/v1/chat', 'POST'));
+
+// POST /v1/stream — proxy to Gen1 /v1/stream (SSE passthrough)
+app.post('/v1/stream', (c) => proxyToGen1(c, '/v1/stream', 'POST'));
+
+// GET /v1/gen1/models — list Gen1 native models (separate from local catalog)
+app.get('/v1/gen1/models', (c) => proxyToGen1(c, '/v1/models', 'GET'));
+
+// GET /v1/gen1/health — check Gen1 upstream health
+app.get('/v1/gen1/health', (c) => proxyToGen1(c, '/v1/health', 'GET'));
+
+// GET /v1/gen1/quota — check Gen1 quota for current session
+app.get('/v1/gen1/quota', (c) => proxyToGen1(c, '/v1/quota', 'GET'));
+
+// GET /v1/gen1/tos — fetch Gen1 Terms of Service
+app.get('/v1/gen1/tos', (c) => proxyToGen1(c, '/v1/tos', 'GET'));
+
+// POST /v1/gen1/tos/accept — accept Gen1 TOS on behalf of user
+app.post('/v1/gen1/tos/accept', (c) => proxyToGen1(c, '/v1/tos/accept', 'POST'));
+
+// POST /v1/workflows — proxy to Gen1 /v1/workflows
+app.post('/v1/workflows', (c) => proxyToGen1(c, '/v1/workflows', 'POST'));
+
+// ============================================================
 // 404 handler
 // ============================================================
 
@@ -506,7 +600,11 @@ app.post('/v1/payment/checkout', async (c) => {
 
 app.get('/v1/payment/vnpay/return', async (c) => {
   const params: Record<string, string> = {};
-  c.req.queries().forEach((v, k) => { params[k] = v; });
+  const queries = c.req.queries();
+  for (const key of Object.keys(queries)) {
+    const vals = queries[key];
+    params[key] = Array.isArray(vals) ? vals[0] : vals;
+  }
 
   const valid = await verifyVnPayReturn(
     {

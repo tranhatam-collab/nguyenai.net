@@ -1,0 +1,51 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Impact"
+  titleVi="Tác động"
+  description="Nguyen AI Computer impact: community empowerment, bilingual education, heritage preservation, economic opportunity, and privacy-first values."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Impact</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Tác động</p>
+
+    <p class="mt-6 text-lg text-ink-muted max-w-3xl">
+      Nguyen AI Computer is built to empower one of the world's largest surname communities with AI-native, privacy-first, bilingual tools.
+      <span class="block mt-2" lang="vi">Nguyen AI Computer xây dựng để trao quyền cho một trong những cộng đồng họ lớn nhất thế giới.</span>
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+      {[
+        { icon: '🤝', title: 'Community Empowerment', vi: 'Trao quyền cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders, and Nguyen Network give the community tools to organize, connect, and collaborate — not just consume technology.' },
+        { icon: '📚', title: 'Bilingual Education', vi: 'Giáo dục song ngữ', desc: 'academy.nguyenai.net provides free AI learning in Vietnamese and English. Certification programs build skills and credibility for the community.' },
+        { icon: '🌳', title: 'Heritage Preservation', vi: 'Bảo tồn di sản', desc: 'Nguyen Roots, Nguyen Memory, and Nguyen Knowledge preserve family histories, documents, and oral traditions with evidence-based methodology — no bloodline claims.' },
+        { icon: '💼', title: 'Economic Opportunity', vi: 'Cơ hội kinh tế', desc: 'AI Founder OS, AI Business OS, and AI Sales tools give Nguyen founders and businesses access to enterprise-grade AI at accessible price points.' },
+        { icon: '🔒', title: 'Privacy-First', vi: 'Riêng tư là trên hết', desc: 'Living-person data is private by default. Family trees are private by default. Each user owns their data vault. PDPD 91/2025 compliance is a feature, not a burden.' },
+      ].map((item) => (
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl mb-3">{item.icon}</div>
+          <h3 class="text-lg font-bold text-ink">{item.title}</h3>
+          <p class="text-sm text-gold" lang="vi">{item.vi}</p>
+          <p class="text-sm text-ink-muted mt-3">{item.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Ethics note -->
+    <div class="mt-12 bg-bg-card border border-gold/20 rounded-xl p-6">
+      <h2 class="text-lg font-serif font-bold text-gold mb-2">Ethics & Historical Boundaries</h2>
+      <p class="text-sm text-ink-muted" lang="vi">Đạo đức & ranh giới lịch sử</p>
+      <ul class="mt-4 space-y-2 text-sm text-ink-muted">
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Never imply all Nguyen people share one bloodline, descend from Nguyễn Bặc, or belong to the Nguyễn Phúc imperial lineage.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Never claim AI can confirm ancestry, royal lineage, or bloodline. Use evidence labels and uncertainty language.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> "Nguyen Operating Profile" refers to an operating profile and value system — NOT bloodline, genetics, or superiority.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Required evidence labels: verified, primary source, secondary source, according to branch genealogy, oral history, insufficient evidence, disputed, cannot conclude.</li>
+      </ul>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

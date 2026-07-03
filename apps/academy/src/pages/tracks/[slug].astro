@@ -1,0 +1,109 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import LessonCard from '../../components/LessonCard.astro';
+import ProgressBar from '../../components/ProgressBar.astro';
+import { tracks, getTrackBySlug, type Track } from '../../data/tracks';
+
+export function getStaticPaths() {
+  return tracks.map((track) => ({
+    params: { slug: track.slug },
+    props: { track },
+  }));
+}
+
+interface Props {
+  track: Track;
+}
+
+const { track } = Astro.props;
+
+// Placeholder lessons — in production these come from content collections
+const placeholderLessons = Array.from({ length: track.lessonCount }, (_, i) => ({
+  slug: `track-${String(track.id).padStart(2, '0')}-lesson-${String(i + 1).padStart(2, '0')}`,
+  title: `Bài ${i + 1}`,
+  description: 'Bài học trong track này.',
+  order: i + 1,
+  duration: '5 min read',
+  difficulty: track.difficulty,
+}));
+
+const completedCount = 0;
+---
+
+<AcademyLayout
+  title={`${track.title.en} — Track ${String(track.id).padStart(2, '0')}`}
+  description={track.description.en}
+  activeNav="tracks"
+>
+  <section class="academy-container py-12">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-academy-muted mb-6" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-academy-accent no-underline">Trang chủ</a>
+      <span class="mx-2">/</span>
+      <a href="/tracks" class="hover:text-academy-accent no-underline">Tracks</a>
+      <span class="mx-2">/</span>
+      <span class="text-academy-text">{track.title.en}</span>
+    </nav>
+
+    <!-- Track header -->
+    <div class="academy-card p-8 mb-8">
+      <div class="flex items-start gap-4 mb-6">
+        <div class="text-5xl" aria-hidden="true">{track.icon}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-academy-muted">
+              Track {String(track.id).padStart(2, '0')}
+            </span>
+            {track.isOnboarding && (
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-academy-accent/10 text-academy-accent">
+                Onboarding
+              </span>
+            )}
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-academy-bg text-academy-muted border border-academy-border">
+              {track.difficulty}
+            </span>
+          </div>
+          <h1 class="text-2xl font-bold text-academy-text mb-1">{track.title.en}</h1>
+          <p class="text-base text-academy-muted mb-1">{track.title.vi}</p>
+        </div>
+      </div>
+
+      <p class="text-academy-text/80 mb-6">{track.description.en}</p>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="text-center">
+          <div class="text-xl font-bold text-academy-text">{track.lessonCount}</div>
+          <div class="text-xs text-academy-muted">Bài học</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xl font-bold text-academy-text">{track.duration}</div>
+          <div class="text-xs text-academy-muted">Thời lượng</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xl font-bold text-academy-text">{completedCount}</div>
+          <div class="text-xs text-academy-muted">Đã hoàn thành</div>
+        </div>
+      </div>
+
+      <ProgressBar value={completedCount} max={track.lessonCount} label="Tiến độ track" />
+
+      {completedCount === 0 && (
+        <div class="mt-6">
+          <a href={`/lessons/${placeholderLessons[0].slug}`} class="academy-btn academy-btn-primary">
+            Bắt đầu bài đầu tiên →
+          </a>
+        </div>
+      )}
+    </div>
+
+    <!-- Lessons list -->
+    <div>
+      <h2 class="text-lg font-semibold text-academy-text mb-4">Bài học trong track</h2>
+      <div class="space-y-3">
+        {placeholderLessons.map((lesson) => (
+          <LessonCard lesson={lesson} completed={false} />
+        ))}
+      </div>
+    </div>
+  </section>
+</AcademyLayout>

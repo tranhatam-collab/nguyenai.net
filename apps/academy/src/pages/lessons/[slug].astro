@@ -1,0 +1,130 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import ProgressBar from '../../components/ProgressBar.astro';
+import ProgressTracker from '../../components/react/ProgressTracker.tsx';
+import { getCollection } from 'astro:content';
+import { tracks } from '../../data/tracks';
+
+export async function getStaticPaths() {
+  const lessons = await getCollection('lessons');
+
+  return lessons.map((lesson) => {
+    const track = tracks.find((t) => t.id === lesson.data.trackId);
+    const trackLessons = lessons
+      .filter((l) => l.data.trackId === lesson.data.trackId)
+      .sort((a, b) => a.data.order - b.data.order);
+    const currentIndex = trackLessons.findIndex((l) => l.slug === lesson.slug);
+    const prev = currentIndex > 0 ? trackLessons[currentIndex - 1] : null;
+    const next = currentIndex < trackLessons.length - 1 ? trackLessons[currentIndex + 1] : null;
+    const isLastLesson = currentIndex === trackLessons.length - 1;
+
+    return {
+      params: { slug: lesson.slug },
+      props: {
+        lesson,
+        track,
+        prev: prev ? { slug: prev.slug, title: prev.data.title } : null,
+        next: next ? { slug: next.slug, title: next.data.title } : null,
+        trackLessonCount: trackLessons.length,
+        isLastLesson,
+        lessonOrder: lesson.data.order,
+      },
+    };
+  });
+}
+
+const { lesson, track, prev, next, trackLessonCount, isLastLesson, lessonOrder } = Astro.props;
+const { Content } = await lesson.render();
+const trackIdPadded = track ? String(track.id).padStart(2, '0') : '01';
+---
+
+<AcademyLayout
+  title={lesson.data.title}
+  description={lesson.data.description}
+  activeNav="tracks"
+>
+  <article class="academy-container py-12">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-academy-muted mb-6" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-academy-accent no-underline">Trang chủ</a>
+      <span class="mx-2">/</span>
+      <a href="/tracks" class="hover:text-academy-accent no-underline">Tracks</a>
+      <span class="mx-2">/</span>
+      {track && (
+        <>
+          <a href={`/tracks/${track.slug}`} class="hover:text-academy-accent no-underline">{track.title.en}</a>
+          <span class="mx-2">/</span>
+        </>
+      )}
+      <span class="text-academy-text">{lesson.data.title}</span>
+    </nav>
+
+    <!-- Lesson header -->
+    <header class="max-w-3xl mb-8">
+      <div class="flex items-center gap-3 mb-3 text-sm">
+        {track && (
+          <a href={`/tracks/${track.slug}`} class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-academy-accent/10 text-academy-accent text-xs font-semibold no-underline">
+            {track.icon} {track.title.en}
+          </a>
+        )}
+        <span class="text-academy-muted">{lesson.data.duration}</span>
+        <span class="text-academy-muted">·</span>
+        <span class="text-academy-muted">{lesson.data.difficulty}</span>
+      </div>
+
+      <h1 class="text-3xl font-bold text-academy-text mb-3">{lesson.data.title}</h1>
+      <p class="text-lg text-academy-muted">{lesson.data.description}</p>
+    </header>
+
+    <!-- Lesson content -->
+    <div class="prose-academy max-w-3xl">
+      <Content />
+    </div>
+
+    <!-- Prev / Next navigation -->
+    <nav class="max-w-3xl mt-12 pt-8 border-t border-academy-border flex justify-between gap-4" aria-label="Lesson navigation">
+      {prev ? (
+        <a href={`/lessons/${prev.slug}`} class="academy-card flex-1 p-4 no-underline group">
+          <div class="text-xs text-academy-muted mb-1">← Bài trước</div>
+          <div class="text-sm font-semibold text-academy-text group-hover:text-academy-accent transition-colors">{prev.title}</div>
+        </a>
+      ) : (
+        <div class="flex-1"></div>
+      )}
+
+      {next ? (
+        <a href={`/lessons/${next.slug}`} class="academy-card flex-1 p-4 no-underline group text-right">
+          <div class="text-xs text-academy-muted mb-1">Bài tiếp theo →</div>
+          <div class="text-sm font-semibold text-academy-text group-hover:text-academy-accent transition-colors">{next.title}</div>
+        </a>
+      ) : (
+        <div class="flex-1"></div>
+      )}
+    </nav>
+
+    <!-- Quiz CTA for last lesson in track -->
+    {isLastLesson && (
+      <div class="max-w-3xl mt-6">
+        <div class="academy-card p-6 text-center border-academy-accent/30">
+          <div class="text-3xl mb-3">🎓</div>
+          <h3 class="text-lg font-bold text-academy-text mb-2">Hoàn thành Track {trackIdPadded}!</h3>
+          <p class="text-sm text-academy-muted mb-4">
+            Bạn đã đến bài cuối cùng của track này. Làm bài kiểm tra để nhận chứng chỉ.
+          </p>
+          <a href="/certification" class="academy-btn academy-btn-primary no-underline">
+            Take quiz to get certified →
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- Progress Tracker (React island) -->
+    <div class="max-w-3xl mt-8">
+      <ProgressTracker
+        track={trackIdPadded}
+        currentLessonSlug={lesson.slug}
+        client:load
+      />
+    </div>
+  </article>
+</AcademyLayout>

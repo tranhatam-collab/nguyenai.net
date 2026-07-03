@@ -1,0 +1,54 @@
+---
+export const prerender = false;
+/**
+ * memory.astro — Memory timeline, search bar
+ */
+import ConsoleLayout from '../layouts/ConsoleLayout.astro';
+---
+
+<ConsoleLayout title="Memory · Nguyen AI Console">
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100">Memory</h1>
+    <p class="text-sm text-slate-400">Bộ nhớ · AI Computer memory timeline and search</p>
+  </div>
+
+  <!-- Search bar -->
+  <div class="console-card mb-6">
+    <div class="flex items-center gap-3">
+      <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+      <input
+        type="text"
+        class="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+        placeholder="Search memories... · Tìm kiếm bộ nhớ..."
+      />
+      <button class="console-btn console-btn-primary text-xs">Search · Tìm</button>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="console-card">
+    <h2 class="console-section-title mb-1">Memory Timeline</h2>
+    <p class="console-section-subtitle mb-6">Dòng thời gian bộ nhớ</p>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-4 top-0 h-full w-px bg-slate-800"></div>
+
+      <!-- Timeline entries -->
+      <div class="space-y-6">
+        {[1, 2, 3, 4].map(() => (
+          <div class="relative pl-12">
+            <div class="absolute left-2.5 top-1.5 h-3 w-3 rounded-full border-2 border-slate-700 bg-bg"></div>
+            <div class="rounded-lg border border-slate-800 bg-bg-card/50 p-4">
+              <p class="text-xs text-slate-500">— · No date</p>
+              <p class="mt-1 text-sm text-slate-400">No memories recorded · Chưa có bộ nhớ nào</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</ConsoleLayout>

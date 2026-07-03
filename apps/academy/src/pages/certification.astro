@@ -1,0 +1,107 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import CertBadge from '../components/CertBadge.astro';
+import { tracks } from '../data/tracks';
+---
+
+<AcademyLayout
+  title="Certification"
+  description="How to get certified at Nguyen AI Academy and verify a certificate."
+  activeNav="certification"
+>
+  <section class="academy-container py-12">
+    <div class="max-w-4xl">
+      <h1 class="text-3xl font-bold text-academy-text mb-3">Certification</h1>
+      <p class="text-academy-muted mb-2">
+        Chứng chỉ Nguyen AI Academy — xác minh được, gắn với tài khoản của bạn.
+      </p>
+      <p class="text-academy-muted mb-8">
+        Verifiable certificates linked to your Nguyen AI account.
+      </p>
+    </div>
+
+    <!-- How to get certified -->
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-xl font-bold text-academy-text mb-6">How to Get Certified</h2>
+
+      <div class="space-y-6">
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold">1</div>
+          <div>
+            <h3 class="font-semibold text-academy-text mb-1">Đăng nhập</h3>
+            <p class="text-sm text-academy-muted">
+              Đăng nhập bằng tài khoản Nguyen AI của bạn qua SSO tại <code class="text-xs bg-academy-bg px-1.5 py-0.5 rounded">app.nguyenai.net</code>.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold">2</div>
+          <div>
+            <h3 class="font-semibold text-academy-text mb-1">Hoàn thành tất cả bài học trong track</h3>
+            <p class="text-sm text-academy-muted">
+              Đọc và hoàn thành tất cả bài học (*lessons*) trong track bạn chọn. Mỗi track có từ 5 đến 12 bài học.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold">3</div>
+          <div>
+            <h3 class="font-semibold text-academy-text mb-1">Vượt bài kiểm tra</h3>
+            <p class="text-sm text-academy-muted">
+              Hoàn thành bài kiểm tra cuối track (*final assessment*). Đạt điểm tối thiểu để nhận chứng chỉ.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold">4</div>
+          <div>
+            <h3 class="font-semibold text-academy-text mb-1">Nhận chứng chỉ với ID duy nhất</h3>
+            <p class="text-sm text-academy-muted">
+              Bạn nhận chứng chỉ (*certificate*) với ID duy nhất. Chia sẻ ID để bất kỳ ai cũng có thể xác minh.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certifiable tracks -->
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-academy-text mb-4">Certifiable Tracks</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {tracks.map((track) => (
+          <div class="academy-card p-5">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="text-2xl">{track.icon}</span>
+              <div>
+                <div class="text-xs text-academy-muted">Track {String(track.id).padStart(2, '0')}</div>
+                <div class="font-semibold text-academy-text text-sm">{track.title.en}</div>
+              </div>
+            </div>
+            <p class="text-xs text-academy-muted mb-3">{track.lessonCount} lessons · {track.duration}</p>
+            <a href={`/tracks/${track.slug}`} class="text-sm font-medium text-academy-accent no-underline">Bắt đầu học →</a>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Verify section -->
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-xl font-bold text-academy-text mb-3">Verify a Certificate</h2>
+      <p class="text-sm text-academy-muted mb-4">
+        Có chứng chỉ ID? Nhập vào để xác minh tính hợp lệ.
+      </p>
+      <a href="/verify" class="academy-btn academy-btn-primary">
+        Xác minh chứng chỉ →
+      </a>
+    </div>
+
+    <!-- Sample badge -->
+    <div class="flex flex-col items-center">
+      <h2 class="text-xl font-bold text-academy-text mb-4">Sample Certificate</h2>
+      <CertBadge trackTitle="AI Computer Fundamentals" holder="Nguyen AI Subscriber" issued="2024" size="md" />
+    </div>
+  </section>
+</AcademyLayout>

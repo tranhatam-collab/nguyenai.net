@@ -8,7 +8,8 @@
     "ENVIRONMENT": "development",
     "AUTH_ISSUER": "auth.nguyenai.net",
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-    "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return"
+    "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
+    "GEN1_GATEWAY_URL": "https://aiagent-iai-one-api-prod.tranhatam.workers.dev"
   },
   "d1_databases": [
     {

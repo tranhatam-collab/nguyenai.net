@@ -185,14 +185,20 @@ Financial and legal tools support analysis only, not licensed advisory services.
 
 Current state:
 
-- Public website: scaffolded (Astro static, 24 bilingual routes) — sẽ chuyển vào `apps/web/`.
+- Public website: `apps/web/` (Astro static, 54 bilingual routes) — ✅ build pass.
+- App console: `apps/console/` (Astro + React, 11 trang) — ✅ build pass.
+- Academy: `apps/academy/` (Astro + MDX, 25 trang) — ✅ build pass.
+- Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
+- Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
+- Gen1 gateway adapter: deployed trong `apps/api` — proxy 8 endpoints tới `aiagent.iai-one-api-prod.tranhatam.workers.dev`. See `docs/architecture/GEN1_GATEWAY_ADAPTER.md`.
 - Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
 - Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
-- Live runtime: unverified.
+- Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).
 - Brand and product plan: locked via Master Positioning Gen1–Gen2.
 - Production release: not approved.
 - Sprint 0 governance: **OPEN** — not yet locked. See Sprint 0 Exit Gate requirements.
+- Repo structure: single monorepo `nguyenai.net` với 7 apps + 9 packages. See `docs/REPO_STRUCTURE_AND_MASTER_PLAN.md`.
 
 ## Recommended stack
 

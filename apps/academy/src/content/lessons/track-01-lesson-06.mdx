@@ -1,0 +1,87 @@
+---
+title: "Data Vault: Kho dữ liệu riêng tư"
+description: "Data Vault — kho lưu trữ mã hoá riêng tư cho tài liệu, hình ảnh, âm thanh, video và gia phả của bạn."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 6
+duration: "6 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={6} max={10} />
+
+## Data Vault là gì?
+
+**Data Vault** (kho dữ liệu) là kho lưu trữ riêng tư được mã hoá (*private encrypted storage*) trong AI Computer Instance của bạn. Mọi tài liệu, hình ảnh, âm thanh, video và gia phả bạn tải lên đều được lưu ở đây — **riêng tư theo mặc định** (*private by default*).
+
+Không ai — kể cả đội Agent — có thể truy cập Data Vault của bạn mà không có sự cho phép của bạn. Mọi truy cập đều được ghi vào *evidence trail*.
+
+> Nguyên tắc cốt lõi: Dữ liệu của người đang sống (*living-person data*) luôn riêng tư. Cây gia đình (*family tree*) luôn riêng tư cho đến khi bạn xuất bản.
+
+## Các loại file được hỗ trợ
+
+Data Vault hỗ trợ nhiều loại file (*file types*):
+
+| Loại | Định dạng | Ví dụ |
+|---|---|---|
+| **Tài liệu** (*documents*) | PDF, DOCX, TXT, MD | Sổ hộ khẩu, giấy tờ, ghi chép |
+| **Hình ảnh** (*images*) | JPG, PNG, HEIC, TIFF | Ảnh gia đình, ảnh tư liệu, bản đồ |
+| **Âm thanh** (*audio*) | MP3, WAV, M4A | Ghi âm phỏng vấn, lời kể |
+| **Video** (*video*) | MP4, MOV, WEBM | Phim gia đình, phỏng vấn video |
+| **Dữ liệu có cấu trúc** (*structured*) | JSON, CSV, GEDCOM | Gia phả GEDCOM, bảng dữ liệu |
+
+## Quyền riêng tư theo mặc định
+
+Data Vault áp dụng các quy tắc quyền riêng tư (*privacy defaults*) nghiêm ngặt:
+
+- **Dữ liệu người đang sống** (*living-person data*) — luôn riêng tư, không bao giờ hiển thị công khai.
+- **Cây gia đình** (*family tree*) — riêng tư cho đến khi chủ sở hữu xuất bản.
+- **Tài liệu gia đình** (*family documents*) — riêng tư cho đến khi chủ sở hữu phê duyệt.
+- **Hồ sơ nhà sáng lập** (*founder profiles*) — công khai chỉ sau khi chủ sở hữu phê duyệt.
+
+> Nguyen Guardian — Agent bảo mật — giám sát mọi truy cập Data Vault và cảnh báo nếu có vi phạm.
+
+## Tải lên, tổ chức và chia sẻ
+
+### Tải lên (*upload*)
+
+- Kéo-thả file trực tiếp vào AI Computer Console.
+- Giao cho Agent tải lên: *"Nguyen Archivist, lưu tài liệu này vào Data Vault"*.
+- Tải lên qua Command Pack (ví dụ: Family Archive Pack).
+
+### Tổ chức (*organize*)
+
+- **Thư mục** (*folders*) — phân loại theo gia đình, dự án, năm...
+- **Nhãn** (*tags*) — gắn nhãn để tìm kiếm nhanh.
+- **Bộ sưu tập** (*collections*) — nhóm file liên quan cho một dự án.
+- **Gia phả** (*genealogy*) — file GEDCOM được kết nối với cây gia đình.
+
+### Chia sẻ (*share controls*)
+
+- **Chia sẻ có thời hạn** — tạo liên kết hết hạn sau X ngày.
+- **Chia sẻ có điều kiện** — yêu cầu phê duyệt trước khi xem.
+- **Chia sẻ trong Chapter** — chia sẻ với thành viên Chapter của bạn.
+- **Không chia sẻ** — mặc định; không ai thấy file của bạn.
+
+> Mọi hành động chia sẻ đều yêu cầu *approval gate* và được ghi vào *evidence trail*.
+
+## Quyền xuất và xoá dữ liệu
+
+Bạn có **toàn quyền kiểm soát** dữ liệu của mình:
+
+- **Xuất dữ liệu** (*data export*) — tải xuống toàn bộ Data Vault bất cứ lúc nào, ở định dạng mở.
+- **Xoá dữ liệu** (*data deletion*) — xoá từng file hoặc toàn bộ Data Vault. Việc xoá là vĩnh viễn và không thể hoàn tác.
+- **Quyền bị quên** (*right to be forgotten*) — yêu cầu xoá toàn bộ dữ liệu và bộ nhớ liên quan đến bạn.
+
+> Khi bạn xoá dữ liệu, các nhãn bằng chứng (*evidence labels*) tham chiếu đến dữ liệu đó sẽ được cập nhật thành `insufficient evidence` — không bị xoá âm thầm.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Data Vault, private encrypted storage, private by default, living-person data, family tree, family documents, founder profiles, upload, organize, share controls, data export, data deletion, right to be forgotten, evidence trail, approval gate.*
+
+⬅️ **Bài trước:** [Model Mesh](/lessons/track-01-lesson-05)
+➡️ **Bài tiếp theo:** [Memory](/lessons/track-01-lesson-07) — trí nhớ của AI Computer.

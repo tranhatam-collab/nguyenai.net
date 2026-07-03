@@ -1,0 +1,151 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import TrackCard from '../components/TrackCard.astro';
+import { tracks, getOnboardingTrack } from '../data/tracks';
+
+const onboarding = getOnboardingTrack();
+---
+
+<AcademyLayout
+  title="Nguyen AI Academy"
+  description="Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more at academy.nguyenai.net."
+  activeNav="home"
+>
+  <!-- Hero -->
+  <section class="bg-academy-header border-b border-academy-border">
+    <div class="academy-container py-16 md:py-24">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-academy-accent/10 text-academy-accent text-sm font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-academy-accent"></span>
+          Miễn phí cho mọi người đăng ký
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-bold text-academy-text leading-tight mb-4">
+          Free AI Learning<br />
+          for <span class="text-academy-accent">Nguyen AI</span> Subscribers
+        </h1>
+
+        <p class="text-lg text-academy-muted mb-2">
+          Học AI miễn phí — 10 track học tập, đội Agent và chứng chỉ xác minh.
+        </p>
+        <p class="text-base text-academy-muted mb-8">
+          Learn AI for free with 10 learning tracks, the Agent team and verifiable certification.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href={`/tracks/${onboarding.slug}`} class="academy-btn academy-btn-primary">
+            Bắt đầu Track 1 — {onboarding.title.en}
+          </a>
+          <a href="/tracks" class="academy-btn academy-btn-secondary">
+            Xem tất cả Tracks
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Track cards grid -->
+  <section class="academy-container py-16">
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-academy-text mb-1">10 Learning Tracks</h2>
+        <p class="text-sm text-academy-muted">10 track học tập — từ cơ bản đến nâng cao</p>
+      </div>
+      <a href="/tracks" class="text-sm font-medium text-academy-accent no-underline hidden sm:inline">
+        View all →
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      {tracks.map((track) => (
+        <TrackCard track={track} progress={0} />
+      ))}
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="bg-academy-header border-y border-academy-border">
+    <div class="academy-container py-16">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl font-bold text-academy-text mb-2">How It Works</h2>
+        <p class="text-sm text-academy-muted">Cách học tại Academy</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-2xl bg-academy-accent/10 flex items-center justify-center text-2xl mx-auto mb-4">
+            1️⃣
+          </div>
+          <h3 class="font-semibold text-academy-text mb-2">Đăng nhập với SSO</h3>
+          <p class="text-sm text-academy-muted">
+            Đăng nhập bằng tài khoản Nguyen AI của bạn tại <code class="text-xs bg-academy-bg px-1.5 py-0.5 rounded">app.nguyenai.net</code>.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-2xl bg-academy-accent/10 flex items-center justify-center text-2xl mx-auto mb-4">
+            2️⃣
+          </div>
+          <h3 class="font-semibold text-academy-text mb-2">Học theo Track</h3>
+          <p class="text-sm text-academy-muted">
+            Bắt đầu từ Track 1 (onboarding), rồi chuyển sang các track chuyên sâu theo nhu cầu.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-2xl bg-academy-accent/10 flex items-center justify-center text-2xl mx-auto mb-4">
+            3️⃣
+          </div>
+          <h3 class="font-semibold text-academy-text mb-2">Nhận chứng chỉ</h3>
+          <p class="text-sm text-academy-muted">
+            Hoàn thành track, nhận chứng chỉ xác minh được với ID duy nhất.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certification info -->
+  <section class="academy-container py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-2xl font-bold text-academy-text mb-3">Certification</h2>
+        <p class="text-academy-muted mb-4">
+          Mỗi track hoàn thành cấp một chứng chỉ với ID duy nhất. Bất kỳ ai cũng có thể xác minh chứng chỉ trực tuyến.
+        </p>
+        <ul class="space-y-2 text-sm text-academy-text/80 mb-6">
+          <li class="flex items-start gap-2">
+            <span class="text-academy-accent font-bold">✓</span>
+            <span>ID chứng chỉ duy nhất, có thể xác minh công khai</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-academy-accent font-bold">✓</span>
+            <span>Gắn với tài khoản Nguyen AI của bạn</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-academy-accent font-bold">✓</span>
+            <span>Mỗi track có chứng chỉ riêng</span>
+          </li>
+        </ul>
+        <div class="flex gap-3">
+          <a href="/certification" class="academy-btn academy-btn-primary text-sm">Tìm hiểu thêm</a>
+          <a href="/verify" class="academy-btn academy-btn-secondary text-sm">Xác minh chứng chỉ</a>
+        </div>
+      </div>
+
+      <div class="flex justify-center">
+        <div class="w-64 h-80 rounded-2xl bg-gradient-to-br from-academy-accent to-academy-accentDark text-white flex flex-col items-center justify-center text-center p-6 shadow-xl">
+          <div class="text-5xl mb-3">🎓</div>
+          <div class="text-xs uppercase tracking-widest opacity-80 mb-1">Certificate</div>
+          <div class="text-lg font-bold mb-3">Nguyen AI Academy</div>
+          <div class="w-16 h-px bg-white/40 mb-3"></div>
+          <div class="text-sm opacity-90 mb-1">This certifies that</div>
+          <div class="text-base font-semibold mb-3">Nguyen AI Subscriber</div>
+          <div class="text-sm opacity-90 mb-1">has completed</div>
+          <div class="text-sm font-semibold mb-4">AI Computer Fundamentals</div>
+          <div class="text-xs opacity-70 mt-auto">academy.nguyenai.net</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</AcademyLayout>

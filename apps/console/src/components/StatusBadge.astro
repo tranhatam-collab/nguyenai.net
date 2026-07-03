@@ -1,0 +1,28 @@
+---
+/**
+ * StatusBadge.astro — Status indicator component
+ * Props:
+ *   status: 'active' | 'idle' | 'offline'
+ *   label:  optional custom label text
+ */
+interface Props {
+  status: 'active' | 'idle' | 'offline';
+  label?: string;
+}
+
+const { status, label } = Astro.props;
+
+const config = {
+  active: { color: 'bg-status-active', text: 'Online · Trực tuyến', defaultLabel: 'Active' },
+  idle: { color: 'bg-status-idle', text: 'Idle · Chờ', defaultLabel: 'Idle' },
+  offline: { color: 'bg-status-offline', text: 'Offline · Ngoại tuyến', defaultLabel: 'Offline' },
+};
+
+const cfg = config[status] ?? config.offline;
+const displayLabel = label ?? cfg.defaultLabel;
+---
+
+<span class="inline-flex items-center gap-2 rounded-full bg-bg-card px-3 py-1 text-xs font-medium text-slate-300">
+  <span class={`h-2 w-2 rounded-full ${cfg.color} ${status === 'active' ? 'animate-pulse' : ''}`}></span>
+  {displayLabel}
+</span>

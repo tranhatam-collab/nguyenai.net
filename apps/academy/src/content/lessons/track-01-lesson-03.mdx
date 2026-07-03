@@ -1,0 +1,82 @@
+---
+title: "Đội Agent"
+description: "Tổng quan về 9 Agent trong đội Nguyen AI — vai trò, phân quyền và cách phối hợp."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 3
+duration: "7 min read"
+difficulty: "Beginner"
+lang: "vi"
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={3} max={10} />
+
+## Đội Agent (Agent Team)
+
+Mỗi AI Computer Instance đi kèm một **đội 9 Agent** — 9 chuyên gia AI chuyên biệt, mỗi người phụ trách một lĩnh vực. Bạn không nói chuyện với một chatbot, mà **giao việc cho cả một đội**.
+
+## Chín Agent
+
+| # | Agent | Vai trò |
+|---|---|---|
+| 1 | **Nguyen Guide** | Hướng dẫn, onboarding và trả lời câu hỏi chung |
+| 2 | **Nguyen Researcher** | Nghiên cứu, tổng hợp thông tin và phân tích |
+| 3 | **Nguyen Archivist** | Quản lý tài liệu lưu trữ, gia phả và di sản |
+| 4 | **Nguyen Verifier** | Xác minh bằng chứng, gán nhãn nguồn |
+| 5 | **Nguyen Family Steward** | Quản lý cây gia đình và dữ liệu gia đình |
+| 6 | **Nguyen Founder** | Hỗ trợ nhà sáng lập — AI Founder OS |
+| 7 | **Nguyen Business Operator** | Vận hành doanh nghiệp — AI Business OS |
+| 8 | **Nguyen Global Connector** | Kết nối cộng đồng Nguyen toàn cầu |
+| 9 | **Nguyen Guardian** | Bảo mật, quyền riêng tư và an toàn AI |
+
+## Cách giao việc cho Agent
+
+Bạn có thể:
+
+- **Giao trực tiếp** — nêu tên Agent và nhiệm vụ (ví dụ: "Nguyen Researcher, tổng hợp lịch sử dòng họ Nguyễn ở Quảng Bình").
+- **Giao qua workflow** — một chuỗi nhiều bước, nhiều Agent phối hợp.
+- **Giao tự động** — Command Pack kích hoạt Agent theo điều kiện.
+
+## Phân quyền và cổng phê duyệt
+
+Không phải Agent nào cũng có quyền giống nhau:
+
+- **Nguyen Guardian** có quyền cao nhất về bảo mật — giám sát các Agent khác.
+- **Nguyen Verifier** kiểm soát nhãn bằng chứng — không Agent nào tự gán nhãn *verified*.
+- Các hành động nhạy cảm (xuất bản, xoá, chia sẻ) yêu cầu **cổng phê duyệt** (*approval gate*) từ bạn.
+
+## Hệ thống nhãn bằng chứng
+
+Nguyen Verifier sử dụng các nhãn (*evidence labels*) sau:
+
+- `verified` — đã xác minh với nguồn chính.
+- `primary source` — nguồn gốc (bản gốc, ảnh chụp bản gốc).
+- `secondary source` — nguồn thứ cấp (trích dẫn, sao chép).
+- `according to branch genealogy` — theo gia phả chi nhánh.
+- `oral history` — truyền miệng.
+- `insufficient evidence` — bằng chứng không đủ.
+- `disputed` — có tranh chấp.
+- `cannot conclude` — không thể kết luận.
+
+> ⚠️ **Quan trọng:** AI không thể xác nhận huyết thống, dòng dõi hoàng gia hay nguồn gốc chung của tất cả người họ Nguyễn. Luôn sử dụng ngôn ngữ bất định (*uncertainty language*) và nhãn bằng chứng.
+
+## Phối hợp giữa các Agent
+
+Ví dụ workflow nghiên cứu gia phả:
+
+1. **Nguyen Guide** nhận yêu cầu → phân loại.
+2. **Nguyen Researcher** thu thập thông tin.
+3. **Nguyen Archivist** lưu tài liệu vào *data vault*.
+4. **Nguyen Verifier** gán nhãn bằng chứng.
+5. **Nguyen Family Steward** cập nhật cây gia đình (riêng tư).
+6. **Nguyen Guardian** kiểm tra quyền riêng tư người đang sống.
+7. Bạn phê duyệt trước khi bất cứ thứ gì được xuất bản.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Agent team, approval gate, evidence labels, verified, primary source, secondary source, insufficient evidence, disputed, cannot conclude, data vault, workflow.*
+
+⬅️ **Bài trước:** [Your AI Computer Instance](/lessons/track-01-lesson-02)
+➡️ **Bài tiếp theo:** Bài 4 — Giao việc và phê duyệt (sắp ra mắt).

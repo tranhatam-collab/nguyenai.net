@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# app.nguyenai.net — authenticated console, no public indexing

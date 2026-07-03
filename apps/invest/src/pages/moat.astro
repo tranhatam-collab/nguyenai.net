@@ -1,0 +1,44 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Competitive Moat"
+  titleVi="Lợi thế cạnh tranh"
+  description="Nguyen AI Computer's competitive moat: four-layer architecture, Nguyen Operating Profile, bilingual, community, data vault, and evidence methodology."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Competitive Moat</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Lợi thế cạnh tranh</p>
+
+    <p class="mt-6 text-lg text-ink-muted max-w-3xl">
+      Six interlocking advantages create a defensible position that is difficult for incumbents or new entrants to replicate.
+      <span class="block mt-2" lang="vi">Sáu lợi thế liên kết tạo vị thế phòng thủ khó sao chép.</span>
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+      {[
+        { num: '01', title: 'Four-Layer Architecture', vi: 'Kiến trúc bốn lớp', desc: 'Gen1 core engine → Gen2 product system → Nguyen AI Computer → Academy. Each layer compounds value and creates switching costs. Competitors must build all four layers from scratch.' },
+        { num: '02', title: 'Nguyen Operating Profile', vi: 'Hồ sơ vận hành Nguyễn', desc: 'A purpose-built operating profile, value system, dataset, toolset, Agent team, and workflow for the Nguyen community. Not a generic AI tool — a specialized system.' },
+        { num: '03', title: 'Bilingual VI/EN', vi: 'Song ngữ VI/EN', desc: 'Native Vietnamese and English support with reciprocal hreflang SEO. No global AI or genealogy platform offers this for the Vietnamese diaspora.' },
+        { num: '04', title: 'Community Network', vi: 'Mạng lưới cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders, Nguyen Network — community-embedded distribution that creates organic growth and retention.' },
+        { num: '05', title: 'Private Data Vault', vi: 'Kho dữ liệu riêng tư', desc: 'Each user owns their data vault. Privacy-by-default for living persons and family trees. PDPD 91/2025 compliance creates a regulatory moat.' },
+        { num: '06', title: 'Evidence Methodology', vi: 'Phương pháp bằng chứng', desc: 'Required evidence labels (verified, primary source, secondary source, oral history, insufficient evidence, disputed, cannot conclude). No claims of bloodline or royal descent. Trust through rigor.' },
+      ].map((m) => (
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="flex items-start gap-4">
+            <span class="text-3xl font-serif font-bold text-gold shrink-0">{m.num}</span>
+            <div>
+              <h3 class="text-lg font-bold text-ink">{m.title}</h3>
+              <p class="text-sm text-gold" lang="vi">{m.vi}</p>
+              <p class="text-sm text-ink-muted mt-3">{m.desc}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

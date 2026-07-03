@@ -1,0 +1,60 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout title="Cap Table" titleVi="Bảng cổ phần" noindex={true}>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+      <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Placeholder</span>
+    </div>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Cap Table</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Bảng cổ phần</p>
+
+    <div class="mt-8 bg-bg-card border border-bg-border rounded-xl p-6">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-bg-border">
+            <th class="text-left py-3 text-ink-muted uppercase text-xs">Stakeholder</th>
+            <th class="text-right py-3 text-ink-muted uppercase text-xs">Shares</th>
+            <th class="text-right py-3 text-ink-muted uppercase text-xs">Pre-money %</th>
+            <th class="text-right py-3 text-ink-muted uppercase text-xs">Post-money %</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-bg-border">
+          <tr>
+            <td class="py-3 text-ink">Founder(s) / Nhà sáng lập</td>
+            <td class="py-3 text-right text-ink-muted">TBD</td>
+            <td class="py-3 text-right text-gold">100%</td>
+            <td class="py-3 text-right text-gold">85.71%</td>
+          </tr>
+          <tr>
+            <td class="py-3 text-ink">Seed investors (new)</td>
+            <td class="py-3 text-right text-ink-muted">TBD</td>
+            <td class="py-3 text-right text-ink-muted">0%</td>
+            <td class="py-3 text-right text-gold">14.29%</td>
+          </tr>
+          <tr>
+            <td class="py-3 text-ink">Option pool</td>
+            <td class="py-3 text-right text-ink-muted">TBD</td>
+            <td class="py-3 text-right text-ink-muted">TBD</td>
+            <td class="py-3 text-right text-ink-muted">TBD</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-bg-border">
+        <div><span class="text-xs text-ink-dim uppercase">Pre-money valuation</span><div class="text-xl font-bold text-gold">$4.5M</div></div>
+        <div><span class="text-xs text-ink-dim uppercase">Raise amount</span><div class="text-xl font-bold text-gold">$750K</div></div>
+        <div><span class="text-xs text-ink-dim uppercase">Post-money valuation</span><div class="text-xl font-bold text-gold">$5.25M</div></div>
+      </div>
+    </div>
+
+    <p class="mt-4 text-xs text-ink-dim italic">
+      Detailed cap table with share counts and vesting schedules available upon investment. No real cap table data exposed.
+      <span class="block" lang="vi">Bảng chi tiết có khi đầu tư. Không công bố dữ liệu thật.</span>
+    </p>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

@@ -1,0 +1,106 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import CertBadge from '../components/CertBadge.astro';
+---
+
+<AcademyLayout
+  title="Verify Certificate"
+  description="Verify a Nguyen AI Academy certificate by ID."
+  activeNav="certification"
+>
+  <section class="academy-container py-12 max-w-2xl">
+    <h1 class="text-3xl font-bold text-academy-text mb-3">Xác minh chứng chỉ</h1>
+    <p class="text-academy-muted mb-8">
+      Nhập ID chứng chỉ (*certificate ID*) để kiểm tra tính hợp lệ.
+    </p>
+
+    <!-- Verify form -->
+    <div class="academy-card p-8 mb-8">
+      <form id="verify-form" class="space-y-4">
+        <div>
+          <label for="cert-id" class="block text-sm font-semibold text-academy-text mb-2">
+            Certificate ID
+          </label>
+          <input
+            type="text"
+            id="cert-id"
+            name="id"
+            placeholder="VD: NAI-Academy-XXXX-XXXX"
+            class="w-full px-4 py-3 rounded-lg border border-academy-border bg-academy-bg text-academy-text focus:outline-none focus:ring-2 focus:ring-academy-accent focus:border-transparent"
+            required
+          />
+        </div>
+
+        <button type="submit" class="academy-btn academy-btn-primary w-full">
+          Xác minh
+        </button>
+      </form>
+
+      <!-- Result -->
+      <div id="verify-result" class="hidden mt-6">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="text-sm text-academy-muted space-y-2">
+      <p>
+        <strong class="text-academy-text">Lưu ý:</strong> Đây là hệ thống placeholder. API xác minh đầy đủ sẽ hoạt động sau khi triển khai.
+      </p>
+      <p>
+        <strong class="text-academy-text">Note:</strong> This is a placeholder system. The full verification API will be available after deployment.
+      </p>
+    </div>
+  </section>
+</AcademyLayout>
+
+<script>
+  const form = document.getElementById('verify-form') as HTMLFormElement | null;
+  const result = document.getElementById('verify-result');
+
+  if (form && result) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const id = formData.get('id') as string;
+
+      result.classList.remove('hidden');
+      result.innerHTML = '<p class="text-sm text-academy-muted">Đang xác minh...</p>';
+
+      try {
+        const res = await fetch(`/api/verify?id=${encodeURIComponent(id)}`);
+        const data = await res.json();
+
+        if (data.valid && data.certificate) {
+          const cert = data.certificate;
+          result.innerHTML = `
+            <div class="border border-green-200 bg-green-50 rounded-lg p-5">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-green-600 text-xl">✓</span>
+                <span class="font-semibold text-green-800">Chứng chỉ hợp lệ</span>
+              </div>
+              <dl class="space-y-1 text-sm">
+                <div><dt class="inline font-medium text-gray-700">ID:</dt> <dd class="inline text-gray-600">${cert.id}</dd></div>
+                <div><dt class="inline font-medium text-gray-700">Holder:</dt> <dd class="inline text-gray-600">${cert.holder}</dd></div>
+                <div><dt class="inline font-medium text-gray-700">Track:</dt> <dd class="inline text-gray-600">${cert.trackTitle}</dd></div>
+                <div><dt class="inline font-medium text-gray-700">Issued:</dt> <dd class="inline text-gray-600">${cert.issuedDate}</dd></div>
+              </dl>
+            </div>
+          `;
+        } else {
+          result.innerHTML = `
+            <div class="border border-red-200 bg-red-50 rounded-lg p-5">
+              <div class="flex items-center gap-2">
+                <span class="text-red-600 text-xl">✗</span>
+                <span class="font-semibold text-red-800">Không tìm thấy chứng chỉ</span>
+              </div>
+              <p class="text-sm text-red-600 mt-2">ID "${id}" không hợp lệ hoặc không tồn tại.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        result.innerHTML = '<p class="text-sm text-red-600">Lỗi xác minh. Vui lòng thử lại.</p>';
+      }
+    });
+  }
+</script>

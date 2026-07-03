@@ -1,0 +1,14 @@
+{
+  "name": "@nai/admin",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Admin console for Nguyen AI — admin.nguyenai.net (Phase 2)",
+  "scripts": {
+    "dev": "echo 'admin app not yet implemented — Phase 2'",
+    "build": "echo 'admin app not yet implemented — Phase 2'",
+    "typecheck": "echo 'no source'",
+    "test": "echo 'no test'",
+    "lint": "echo 'no lint'"
+  }
+}

@@ -1,0 +1,125 @@
+---
+export const prerender = false;
+/**
+ * settings.astro — Profile, plan, billing, API keys, security
+ */
+import ConsoleLayout from '../layouts/ConsoleLayout.astro';
+
+const sections = [
+  { id: 'profile', label: 'Profile', labelVi: 'Hồ sơ' },
+  { id: 'plan', label: 'Plan', labelVi: 'Gói dịch vụ' },
+  { id: 'billing', label: 'Billing', labelVi: 'Thanh toán' },
+  { id: 'api-keys', label: 'API Keys', labelVi: 'Khóa API' },
+  { id: 'security', label: 'Security', labelVi: 'Bảo mật' },
+];
+---
+
+<ConsoleLayout title="Settings · Nguyen AI Console">
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100">Settings</h1>
+    <p class="text-sm text-slate-400">Cài đặt · Manage your account and preferences</p>
+  </div>
+
+  <!-- Section navigation -->
+  <div class="mb-6 flex flex-wrap gap-2">
+    {sections.map((section) => (
+      <a href={`#${section.id}`} class="console-btn console-btn-secondary text-xs">
+        {section.label} · {section.labelVi}
+      </a>
+    ))}
+  </div>
+
+  <div class="space-y-6">
+    <!-- Profile -->
+    <div class="console-card" id="profile">
+      <h2 class="console-section-title mb-1">Profile · Hồ sơ</h2>
+      <p class="console-section-subtitle mb-4">Your account information</p>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="console-label">Full Name · Họ tên</label>
+          <input type="text" class="console-input" placeholder="Your name" />
+        </div>
+        <div>
+          <label class="console-label">Email · Email</label>
+          <input type="email" class="console-input" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label class="console-label">Display Name · Tên hiển thị</label>
+          <input type="text" class="console-input" placeholder="Display name" />
+        </div>
+        <div>
+          <label class="console-label">Language · Ngôn ngữ</label>
+          <select class="console-input">
+            <option>Tiếng Việt</option>
+            <option>English</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan -->
+    <div class="console-card" id="plan">
+      <h2 class="console-section-title mb-1">Plan · Gói dịch vụ</h2>
+      <p class="console-section-subtitle mb-4">Your current subscription</p>
+      <div class="flex items-center justify-between rounded-lg border border-accent/30 bg-accent/10 p-4">
+        <div>
+          <p class="font-semibold text-accent">Founder Plan</p>
+          <p class="text-xs text-slate-400">Current plan · Gói hiện tại</p>
+        </div>
+        <button class="console-btn console-btn-primary">Upgrade · Nâng cấp</button>
+      </div>
+    </div>
+
+    <!-- Billing -->
+    <div class="console-card" id="billing">
+      <h2 class="console-section-title mb-1">Billing · Thanh toán</h2>
+      <p class="console-section-subtitle mb-4">Payment methods and invoices</p>
+      <div class="rounded-lg border border-dashed border-slate-700 p-6 text-center">
+        <p class="text-sm text-slate-400">No payment method on file</p>
+        <p class="mt-1 text-xs text-slate-500">Chưa có phương thức thanh toán</p>
+        <button class="console-btn console-btn-primary mt-4">Add Payment Method · Thêm thanh toán</button>
+      </div>
+    </div>
+
+    <!-- API Keys -->
+    <div class="console-card" id="api-keys">
+      <h2 class="console-section-title mb-1">API Keys · Khóa API</h2>
+      <p class="console-section-subtitle mb-4">Manage your API credentials</p>
+      <div class="rounded-lg border border-dashed border-slate-700 p-6 text-center">
+        <p class="text-sm text-slate-400">No API keys generated</p>
+        <p class="mt-1 text-xs text-slate-500">Chưa có khóa API nào</p>
+        <button class="console-btn console-btn-primary mt-4">Generate Key · Tạo khóa</button>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="console-card" id="security">
+      <h2 class="console-section-title mb-1">Security · Bảo mật</h2>
+      <p class="console-section-subtitle mb-4">Account security settings</p>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
+          <div>
+            <p class="text-sm font-medium text-slate-200">Two-Factor Authentication</p>
+            <p class="text-xs text-slate-500">Xác thực hai yếu tố</p>
+          </div>
+          <button class="console-btn console-btn-secondary text-xs">Enable · Bật</button>
+        </div>
+        <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
+          <div>
+            <p class="text-sm font-medium text-slate-200">Change Password</p>
+            <p class="text-xs text-slate-500">Đổi mật khẩu</p>
+          </div>
+          <button class="console-btn console-btn-secondary text-xs">Change · Đổi</button>
+        </div>
+        <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
+          <div>
+            <p class="text-sm font-medium text-slate-200">Active Sessions</p>
+            <p class="text-xs text-slate-500">Phiên đăng nhập hoạt động</p>
+          </div>
+          <button class="console-btn console-btn-secondary text-xs">View · Xem</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ConsoleLayout>

@@ -1,0 +1,110 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import MetricCard from '../components/MetricCard.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Investment Thesis"
+  titleVi="Luận điểm đầu tư"
+  description="Nguyen AI Computer — raising 750K USD at 4.5M pre-money valuation. Specialized cloud AI Computer for the global Nguyen ecosystem."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+    <!-- Hero -->
+    <div class="text-center max-w-4xl mx-auto">
+      <div class="inline-block px-3 py-1 mb-6 text-xs font-semibold text-gold border border-gold/30 rounded-full uppercase tracking-wider">
+        Investor Opportunity / Cơ hội đầu tư
+      </div>
+      <h1 class="text-4xl md:text-6xl font-serif font-bold leading-tight">
+        <span class="text-gold-gradient">Nguyen AI Computer</span>
+      </h1>
+      <p class="mt-4 text-xl md:text-2xl text-ink-muted">
+        A specialized cloud AI Computer for the global Nguyen ecosystem.
+        <span class="block text-lg mt-2" lang="vi">Máy tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn toàn cầu.</span>
+      </p>
+    </div>
+
+    <!-- Key metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+      <MetricCard value="$4.5M" label="Pre-money valuation" sublabel="Định giá trước gọi vốn" />
+      <MetricCard value="$750K" label="Target raise" sublabel="Mục tiêu gọi vốn" />
+      <MetricCard value="14.29%" label="Dilution" sublabel="Suy giảm cổ phần" />
+    </div>
+
+    <!-- Thesis summary -->
+    <div class="mt-20 max-w-4xl mx-auto">
+      <h2 class="text-2xl md:text-3xl font-serif font-bold text-ink mb-2">Investment Thesis</h2>
+      <p class="text-lg text-gold mb-6" lang="vi">Luận điểm đầu tư</p>
+
+      <div class="space-y-6 text-ink-muted">
+        <p>
+          Nguyen AI Computer is building a specialized cloud AI Computer line for the global Nguyen community — an estimated <strong class="text-ink">31.57% of Vietnam's population</strong> plus a global diaspora. Each user owns a private AI Computer Instance with multi-model intelligence, an Agent team, tools, memory, a data vault, workflows, and evidence-based heritage research.
+          <span class="block mt-2" lang="vi">Nguyen AI Computer xây dựng dòng máy tính AI đám mây chuyên biệt cho cộng đồng Nguyễn toàn cầu — ước tính 31,57% dân số Việt Nam cộng với kiều bào toàn cầu.</span>
+        </p>
+        <p>
+          The convergence of three forces creates a unique window: <strong class="text-gold">AI agent adoption</strong> is accelerating (McKinsey 62%, Microsoft 46% of organizations), <strong class="text-gold">Vietnam's privacy law 91/2025</strong> creates demand for privacy-first platforms, and the <strong class="text-gold">Nguyen demographic</strong> represents one of the world's largest surname communities with deep heritage interest.
+          <span class="block mt-2" lang="vi">Sự hội tụ của ba lực lượng tạo cửa sổ cơ hội duy nhất: AI agent, luật bảo vệ dữ liệu 91/2025, và nhân khẩu học Nguyễn.</span>
+        </p>
+        <p>
+          The Ancestry/MyHeritage deals ($4.7B and $600M respectively) validate the genealogy market, but no incumbent serves the Vietnamese diaspora with AI-native, privacy-first, bilingual tools. Nguyen AI Computer fills this gap with a four-layer architecture and a dedicated Nguyen Operating Profile.
+          <span class="block mt-2" lang="vi">Các thương vụ Ancestry/MyHeritage xác nhận thị trường gia phả, nhưng chưa có đối thủ phục vụ kiều bào Việt bằng công cụ AI song ngữ, riêng tư.</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Market opportunity highlights -->
+    <div class="mt-20">
+      <h2 class="text-2xl md:text-3xl font-serif font-bold text-ink mb-2">Market Opportunity</h2>
+      <p class="text-lg text-gold mb-8" lang="vi">Cơ hội thị trường</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$4.7B</div>
+          <p class="mt-2 text-sm text-ink-muted">Ancestry.com acquisition (2020) — validates genealogy market</p>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$600M</div>
+          <p class="mt-2 text-sm text-ink-muted">MyHeritage acquisition (2023) — heritage platform value</p>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">31.57%</div>
+          <p class="mt-2 text-sm text-ink-muted">of Vietnam's population shares the Nguyen surname — ~31M people</p>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">62%</div>
+          <p class="mt-2 text-sm text-ink-muted">McKinsey: organizations using AI agents in at least one function</p>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">46%</div>
+          <p class="mt-2 text-sm text-ink-muted">Microsoft: employees using AI agents at least weekly</p>
+        </div>
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
+          <div class="text-3xl font-serif font-bold text-gold-gradient">91/2025</div>
+          <p class="mt-2 text-sm text-ink-muted">Vietnam PDPD — privacy-first mandate creating demand</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-20 text-center">
+      <div class="bg-bg-card border border-gold/30 rounded-2xl p-8 md:p-12 border-gold-glow">
+        <h2 class="text-2xl md:text-3xl font-serif font-bold text-ink">Request Investor Access</h2>
+        <p class="mt-2 text-ink-muted" lang="vi">Yêu cầu quyền truy cập nhà đầu tư</p>
+        <p class="mt-4 text-ink-muted max-w-2xl mx-auto">
+          Qualified investors can access the private data room with financial models, cap table, technical audit, and legal documents.
+        </p>
+        <a
+          href="/request-access"
+          class="inline-block mt-6 px-8 py-3 text-base font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors"
+        >
+          Request Access →
+        </a>
+      </div>
+    </div>
+
+    <!-- Page disclosure -->
+    <div class="mt-12 max-w-4xl mx-auto">
+      <Disclosure />
+    </div>
+  </section>
+</InvestLayout>

@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #0a0e1a;
+  --color-bg-soft: #111726;
+  --color-bg-card: #161d2e;
+  --color-bg-border: #1f2940;
+  --color-gold: #d4af37;
+  --color-gold-light: #e6c757;
+  --color-gold-dark: #b8941f;
+  --color-ink: #e8ecf4;
+  --color-ink-muted: #9aa6c0;
+  --color-ink-dim: #6b7693;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Gold gradient text for headings */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #e6c757 0%, #d4af37 50%, #b8941f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle gold border glow */
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.08);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Disclosure line styling */
+.disclosure-line {
+  font-size: 0.75rem;
+  color: var(--color-ink-dim);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Section divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+}

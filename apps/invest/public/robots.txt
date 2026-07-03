@@ -1,0 +1,8 @@
+# invest.nguyenai.net — robots.txt
+# Public pages are indexable; private investor room is disallowed
+
+User-agent: *
+Allow: /
+Disallow: /private/
+
+Sitemap: https://invest.nguyenai.net/sitemap.xml

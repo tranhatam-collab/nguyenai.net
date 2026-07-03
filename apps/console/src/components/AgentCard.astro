@@ -1,0 +1,39 @@
+---
+/**
+ * AgentCard.astro — Reusable agent card
+ * Props:
+ *   name:   string — agent display name
+ *   role:   string — agent role / description
+ *   status: 'active' | 'idle' | 'offline'
+ */
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  name: string;
+  role: string;
+  status: 'active' | 'idle' | 'offline';
+}
+
+const { name, role, status } = Astro.props;
+---
+
+<div class="console-card flex flex-col gap-3">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-lg font-bold text-accent">
+        {name.charAt(0)}
+      </div>
+      <div>
+        <h3 class="font-semibold text-slate-100">{name}</h3>
+        <p class="text-xs text-slate-400">{role}</p>
+      </div>
+    </div>
+    <StatusBadge status={status} />
+  </div>
+  <div class="mt-auto flex items-center justify-between border-t border-slate-800 pt-3">
+    <span class="text-xs text-slate-500">Last active · Hoạt động gần đây</span>
+    <button class="text-xs font-medium text-accent hover:text-accent-hover">
+      Configure →
+    </button>
+  </div>
+</div>

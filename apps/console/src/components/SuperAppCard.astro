@@ -1,0 +1,29 @@
+---
+/**
+ * SuperAppCard.astro — Reusable super app launcher card
+ * Props:
+ *   name:        string — app display name
+ *   icon:        string — emoji or short text icon
+ *   description: string — short description
+ */
+interface Props {
+  name: string;
+  icon: string;
+  description: string;
+}
+
+const { name, icon, description } = Astro.props;
+---
+
+<a
+  href="#"
+  class="console-card group flex flex-col items-center gap-3 text-center transition-transform hover:scale-[1.02]"
+>
+  <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10 text-2xl transition-colors group-hover:bg-accent/20">
+    {icon}
+  </div>
+  <div>
+    <h3 class="font-semibold text-slate-100">{name}</h3>
+    <p class="mt-1 text-xs text-slate-400">{description}</p>
+  </div>
+</a>

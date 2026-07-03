@@ -1,0 +1,96 @@
+---
+export const prerender = false;
+/**
+ * data-vault.astro — Vault file list, upload area, privacy controls
+ */
+import ConsoleLayout from '../layouts/ConsoleLayout.astro';
+---
+
+<ConsoleLayout title="Data Vault · Nguyen AI Console">
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100">Data Vault</h1>
+    <p class="text-sm text-slate-400">Kho dữ liệu · Secure private storage for your AI Computer</p>
+  </div>
+
+  <!-- Upload area -->
+  <div class="console-card mb-6">
+    <h2 class="console-section-title mb-1">Upload · Tải lên</h2>
+    <p class="console-section-subtitle mb-4">Drag and drop files or click to browse</p>
+    <div class="rounded-lg border-2 border-dashed border-slate-700 p-12 text-center transition-colors hover:border-accent">
+      <svg class="mx-auto mb-3 h-12 w-12 text-slate-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+      <p class="text-sm text-slate-400">Drop files here · Kéo tệp vào đây</p>
+      <p class="mt-1 text-xs text-slate-500">All files are encrypted at rest</p>
+      <button class="console-btn console-btn-secondary mt-4">Browse Files · Chọn tệp</button>
+    </div>
+  </div>
+
+  <!-- Two column: File list + Privacy controls -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- File list -->
+    <div class="console-card lg:col-span-2">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h2 class="console-section-title">Files · Tệp tin</h2>
+          <p class="console-section-subtitle">0 files stored</p>
+        </div>
+        <input type="text" class="console-input max-w-xs text-sm" placeholder="Search files... · Tìm tệp..." />
+      </div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-800 text-left text-xs text-slate-500">
+            <th class="pb-3 font-medium">Name · Tên</th>
+            <th class="pb-3 font-medium">Size · Dung lượng</th>
+            <th class="pb-3 font-medium">Uploaded · Ngày tải</th>
+            <th class="pb-3 font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="4" class="py-8 text-center text-slate-500">
+              No files in vault · Kho dữ liệu trống
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Privacy controls -->
+    <div class="console-card">
+      <h2 class="console-section-title mb-1">Privacy Controls</h2>
+      <p class="console-section-subtitle mb-4">Kiểm soát quyền riêng tư</p>
+      <div class="space-y-4">
+        <div>
+          <label class="flex items-center justify-between">
+            <span class="text-sm text-slate-300">Encryption at rest</span>
+            <input type="checkbox" checked class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+          </label>
+          <p class="mt-1 text-xs text-slate-500">Mã hóa dữ liệu lưu trữ</p>
+        </div>
+        <div>
+          <label class="flex items-center justify-between">
+            <span class="text-sm text-slate-300">Agent access</span>
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+          </label>
+          <p class="mt-1 text-xs text-slate-500">Cho phép Agent truy cập</p>
+        </div>
+        <div>
+          <label class="flex items-center justify-between">
+            <span class="text-sm text-slate-300">Auto-delete after 30 days</span>
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+          </label>
+          <p class="mt-1 text-xs text-slate-500">Tự xóa sau 30 ngày</p>
+        </div>
+        <div>
+          <label class="flex items-center justify-between">
+            <span class="text-sm text-slate-300">Share with Nguyen Network</span>
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+          </label>
+          <p class="mt-1 text-xs text-slate-500">Chia sẻ với mạng lưới Nguyen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ConsoleLayout>

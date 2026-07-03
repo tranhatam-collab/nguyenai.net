@@ -1,0 +1,72 @@
+---
+// Login page — SSO with app.nguyenai.net (placeholder)
+// Does NOT use AcademyLayout
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Đăng nhập vào Nguyen AI Academy" />
+    <title>Đăng nhập — Nguyen AI Academy</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="min-h-screen bg-academy-bg flex items-center justify-center p-4" style="background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif;">
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <a href="/" class="inline-flex items-center gap-2 no-underline" style="color: #0f172a;">
+          <img src="/favicon.svg" alt="" width="40" height="40" class="rounded-xl" />
+          <span class="text-xl font-bold">
+            Nguyen AI <span style="color: #2563eb;">Academy</span>
+          </span>
+        </a>
+      </div>
+
+      <!-- Login card -->
+      <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Đăng nhập</h1>
+        <p class="text-sm text-gray-500 mb-6">
+          Đăng nhập bằng tài khoản Nguyen AI của bạn để truy cập Academy và lưu tiến độ học.
+        </p>
+
+        <!-- SSO button (placeholder) -->
+        <a
+          href="https://app.nguyenai.net/sso?redirect=academy.nguyenai.net"
+          class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold text-white transition-colors"
+          style="background-color: #2563eb;"
+          onmouseover="this.style.backgroundColor='#1d4ed8'"
+          onmouseout="this.style.backgroundColor='#2563eb'"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+          Đăng nhập qua app.nguyenai.net
+        </a>
+
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-xs text-gray-500 text-center">
+            Chưa có tài khoản? <a href="https://nguyenai.net" class="font-medium" style="color: #2563eb;">Đăng ký tại nguyenai.net</a>
+          </p>
+          <p class="text-xs text-gray-400 text-center mt-3">
+            Academy miễn phí cho mọi người đăng ký — từ gói Nguyen Start trở lên.
+          </p>
+        </div>
+      </div>
+
+      <!-- Back link -->
+      <div class="text-center mt-6">
+        <a href="/" class="text-sm text-gray-500 hover:text-gray-700 no-underline">← Quay lại trang chủ</a>
+      </div>
+
+      <!-- Footer note -->
+      <p class="text-xs text-gray-400 text-center mt-8">
+        © {new Date().getFullYear()} Nguyen AI · academy.nguyenai.net
+      </p>
+    </div>
+  </body>
+</html>

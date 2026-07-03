@@ -1,0 +1,17 @@
+---
+/**
+ * Disclosure.astro — Reusable disclosure line component.
+ * Required on every investor page per AGENTS.md rules.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<p class={`disclosure-line ${className}`}>
+  Financial projections are hypotheses, not commitments. Legal entity and IP ownership pending.
+  <span lang="en" class="block mt-1 opacity-70">
+    Dự phóng tài chính là giả thuyết, không phải cam kết. Thực thể pháp lý và quyền sở hữu IP đang hoàn thiện.
+  </span>
+</p>

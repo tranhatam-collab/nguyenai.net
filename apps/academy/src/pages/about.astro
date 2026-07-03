@@ -1,0 +1,97 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import { tracks } from '../data/tracks';
+
+const totalLessons = tracks.reduce((sum, t) => sum + t.lessonCount, 0);
+---
+
+<AcademyLayout
+  title="About"
+  description="About Nguyen AI Academy — free AI learning for the global Nguyen community."
+  activeNav="about"
+>
+  <section class="academy-container py-12 max-w-3xl">
+    <h1 class="text-3xl font-bold text-academy-text mb-3">About the Academy</h1>
+    <p class="text-academy-muted mb-8">
+      Giới thiệu Nguyen AI Academy — học AI miễn phí cho cộng đồng Nguyen toàn cầu.
+    </p>
+
+    <div class="prose-academy">
+      <h2>Sứ mệnh</h2>
+      <p>
+        <strong>Nguyen AI Academy</strong> (tại <code>academy.nguyenai.net</code>) cung cấp học AI miễn phí cho
+        mọi người đăng ký Nguyen AI. Academy là Layer 4 trong kiến trúc bốn lớp của Nguyen AI Computer,
+        chuyên trách đào tạo và chứng chỉ.
+      </p>
+
+      <h2>Cho ai?</h2>
+      <p>
+        Academy mở cho tất cả người đăng ký — từ gói <em>Nguyen Start</em> miễn phí trở lên. Dù bạn là
+        cá nhân, gia đình, nhà sáng lập hay doanh nghiệp, đều có track phù hợp.
+      </p>
+
+      <h2>10 Learning Tracks</h2>
+      <p>
+        Academy có {tracks.length} track học tập với tổng cộng {totalLessons} bài học, từ cơ bản đến nâng cao:
+      </p>
+      <ul>
+        {tracks.map((track) => (
+          <li>
+            <strong>{track.icon} Track {String(track.id).padStart(2, '0')} — {track.title.en}</strong>
+            : {track.description.en} ({track.lessonCount} lessons)
+          </li>
+        ))}
+      </ul>
+
+      <h2>Track Onboarding</h2>
+      <p>
+        <strong>Track 1 — AI Computer Fundamentals</strong> là track onboarding. Nếu bạn mới đến với
+        Nguyen AI, hãy bắt đầu tại đây. Track này giới thiệu AI Computer, instance cá nhân và đội 9 Agent.
+      </p>
+
+      <h2>Đội Agent</h2>
+      <p>
+        Academy dạy bạn cách làm việc với 9 Agent của Nguyen AI: <em>Nguyen Guide</em>, <em>Nguyen Researcher</em>,
+        <em>Nguyen Archivist</em>, <em>Nguyen Verifier</em>, <em>Nguyen Family Steward</em>,
+        <em>Nguyen Founder</em>, <em>Nguyen Business Operator</em>, <em>Nguyen Global Connector</em>,
+        và <em>Nguyen Guardian</em>.
+      </p>
+
+      <h2>Phương pháp bằng chứng</h2>
+      <p>
+        Academy nhấn mạnh phương pháp xác minh và bằng chứng (*evidence methodology*). Mọi kết quả nghiên cứu
+        đều sử dụng nhãn bằng chứng: <code>verified</code>, <code>primary source</code>,
+        <code>secondary source</code>, <code>insufficient evidence</code>, <code>disputed</code>,
+        <code>cannot conclude</code>.
+      </p>
+
+      <blockquote>
+        AI không thể xác nhận huyết thống, dòng dõi hoàng gia hay nguồn gốc chung của tất cả người họ Nguyễn.
+        Luôn sử dụng ngôn ngữ bất định và nhãn bằng chứng.
+      </blockquote>
+
+      <h2>Quyền riêng tư</h2>
+      <p>
+        Academy tuân thủ nguyên tắc quyền riêng tư của Nguyen AI:
+      </p>
+      <ul>
+        <li>Dữ liệu người đang sống (*living-person data*) luôn riêng tư theo mặc định.</li>
+        <li>Cây gia đình (*family tree*) riêng tư cho đến khi chủ sở hữu xuất bản.</li>
+        <li>Tài liệu gia đình riêng tư cho đến khi chủ sở hữu phê duyệt.</li>
+      </ul>
+
+      <h2>Chứng chỉ</h2>
+      <p>
+        Mỗi track hoàn thành cấp một chứng chỉ với ID duy nhất, có thể xác minh công khai tại
+        <a href="/verify">trang xác minh</a>.
+      </p>
+
+      <h2>Liên hệ</h2>
+      <p>
+        Website công khai: <a href="https://nguyenai.net">nguyenai.net</a><br />
+        AI Computer Console: <a href="https://app.nguyenai.net">app.nguyenai.net</a><br />
+        Academy: <a href="https://academy.nguyenai.net">academy.nguyenai.net</a>
+      </p>
+    </div>
+  </section>
+</AcademyLayout>

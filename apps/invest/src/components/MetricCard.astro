@@ -1,0 +1,26 @@
+---
+/**
+ * MetricCard.astro — Large number + label display.
+ * Props: value, label, sublabel
+ */
+interface Props {
+  value: string;
+  label: string;
+  sublabel?: string;
+}
+const { value, label, sublabel } = Astro.props;
+---
+
+<div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover border-gold-glow">
+  <div class="text-4xl md:text-5xl font-serif font-bold text-gold-gradient leading-tight">
+    {value}
+  </div>
+  <div class="mt-2 text-sm font-semibold text-ink uppercase tracking-wide">
+    {label}
+  </div>
+  {sublabel && (
+    <div class="mt-1 text-xs text-ink-muted">
+      {sublabel}
+    </div>
+  )}
+</div>

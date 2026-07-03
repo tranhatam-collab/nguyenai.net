@@ -1,0 +1,87 @@
+---
+title: "Memory: Trí nhớ của AI Computer"
+description: "Memory — bộ nhớ bền vững giúp AI Computer ghi nhớ ngữ cảnh qua các phiên làm việc và học theo bạn."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 7
+duration: "5 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={7} max={10} />
+
+## Memory là gì?
+
+**Memory** (trí nhớ) là hệ thống bộ nhớ bền vững (*persistent context*) của AI Computer — cho phép AI **ghi nhớ thông tin qua các phiên làm việc** (*sessions*). Khác với chatbot thông thường trả lời rồi quên, AI Computer của bạn tích lũy kiến thức về bạn, gia đình bạn và dự án của bạn theo thời gian.
+
+> Bạn sở hữu Memory của mình. Bạn có thể xem, chỉnh sửa và xoá bất kỳ mục nào, bất cứ lúc nào.
+
+## Các loại Memory
+
+AI Computer sử dụng bốn loại trí nhớ (*memory types*):
+
+| Loại | Tiếng Anh | Phạm vi | Ví dụ |
+|---|---|---|---|
+| **Ngắn hạn** | *Short-term memory* | Trong một phiên làm việc | "Ở phiên này, tôi đang nghiên cứu chi họ Quảng Bình" |
+| **Dài hạn** | *Long-term memory* | Vĩnh viễn, qua tất cả phiên | "Gia đình tôi ở Huế, họ Nguyễn Lưu" |
+| **Tập sự kiện** | *Episodic memory* | Sự kiện cụ thể đã xảy ra | "Ngày 15/09, tôi đã phê duyệt xuất bản bài viết về ông nội" |
+| **Tập khái niệm** | *Semantic memory* | Kiến thức và sự thật | "Dòng họ Nguyễn Lưu khởi đầu từ thế kỷ 18 ở Huế" |
+
+### Short-term memory (Ngắn hạn)
+
+Lưu ngữ cảnh trong phiên làm việc hiện tại. Khi bạn đóng phiên, trí nhớ ngắn hạn bị xoá — trừ khi bạn hoặc Agent quyết định lưu vào trí nhớ dài hạn.
+
+### Long-term memory (Dài hạn)
+
+Lưu thông tin bạn muốn AI ghi nhớ vĩnh viễn. Ví dụ: sở thích, thông tin gia đình, mục tiêu dự án. Bạn chủ động thêm hoặc Agent đề xuất thêm (với *approval gate*).
+
+### Episodic memory (Tập sự kiện)
+
+Ghi lại các sự kiện cụ thể — lần bạn phê duyệt một hành động, lần Agent hoàn thành một Command Pack. Giúp AI hiểu lịch sử tương tác của bạn.
+
+### Semantic memory (Tập khái niệm)
+
+Lưu kiến thức và sự thật đã được xác minh — thường gắn với *evidence labels*. Ví dụ: thông tin lịch sử dòng họ đã qua nghiên cứu và xác minh.
+
+## Memory ảnh hưởng đến hành vi của Agent
+
+Memory trực tiếp ảnh hưởng cách Agent phản hồi và hành động:
+
+- **Cá nhân hoá** — Agent biết bạn thích giao tiếp bằng tiếng Việt, gia đình ở Huế → phản hồi phù hợp.
+- **Không lặp lại** — Agent không hỏi lại thông tin bạn đã cung cấp.
+- **Ngữ cảnh dự án** — Agent nhớ tiến độ dự án và tiếp tục từ nơi bạn dừng.
+- **Kiểm soát quyền riêng tư** — Nguyen Guardian kiểm tra Memory để không tiết lộ dữ liệu người đang sống.
+
+> Nếu Memory chứa thông tin sai, Agent có thể hành động sai. Đó là lý do bạn nên xem xét Memory thường xuyên.
+
+## Xem xét và tìm kiếm Memory
+
+Bạn có toàn quyền kiểm soát Memory:
+
+- **Xem tất cả** — danh sách đầy đủ các mục Memory trong AI Computer Console.
+- **Tìm kiếm** — theo từ khoá, theo loại, theo thời gian.
+- **Chỉnh sửa** — sửa bất kỳ mục nào nếu thông tin sai.
+- **Xoá** — xoá từng mục hoặc xoá toàn bộ Memory.
+- **Xuất** — tải xuống Memory ở định dạng mở (JSON, Markdown).
+
+## Quyền riêng tư: Bạn sở hữu Memory
+
+| Quyền | Mô tả |
+|---|---|
+| **Sở hữu** | Memory thuộc về bạn, không phải AI |
+| **Kiểm soát** | Xem, sửa, xoá bất cứ lúc nào |
+| **Riêng tư** | Memory không bao giờ được chia sẻ mà không có *approval gate* |
+| **Xoá toàn bộ** | Yêu cầu xoá Memory cùng với Data Vault (*right to be forgotten*) |
+
+> Khi bạn xoá một mục Memory, các *evidence labels* tham chiếu đến thông tin đó sẽ được cập nhật — không bị xoá âm thầm.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Memory, persistent context, sessions, short-term memory, long-term memory, episodic memory, semantic memory, evidence labels, approval gate, right to be forgotten, AI Computer Console.*
+
+⬅️ **Bài trước:** [Data Vault](/lessons/track-01-lesson-06)
+➡️ **Bài tiếp theo:** [Approval Gates và Evidence](/lessons/track-01-lesson-08) — cổng phê duyệt và bằng chứng.

@@ -1,0 +1,111 @@
+---
+title: "Super Apps: Ứng dụng chuyên biệt"
+description: "Super Apps — các mô-đun ứng dụng chuyên biệt kết nối với AI Computer Instance, gồm 7 AI tool app và 9 Nguyen app."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 9
+duration: "6 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={9} max={10} />
+
+## Super App là gì?
+
+**Super App** (ứng dụng chuyên biệt) là các mô-đun ứng dụng (*specialized application modules*) kết nối với AI Computer Instance của bạn. Mỗi Super App tập trung vào một lĩnh vực cụ thể — nhưng tất cả đều chia sẻ cùng *Memory*, *Data Vault*, *Agent team* và *evidence system*.
+
+Thay vì dùng hàng chục công cụ rời rạc, bạn có một AI Computer với nhiều Super App — **một bộ nhớ, một kho dữ liệu, một đội Agent**.
+
+> Nguyên tắc: Super App không thay thế AI Computer — chúng là *extension* (phần mở rộng) chạy trên nền AI Computer của bạn.
+
+## 7 AI Tool Super Apps
+
+Đây là các Super App công cụ AI chung, áp dụng cho mọi người dùng:
+
+| # | Super App | Chức năng |
+|---|---|---|
+| 1 | **AI Office** | Soạn thảo văn bản, bảng tính, trình chiếu — thay thế bộ Office truyền thống |
+| 2 | **AI Research** | Nghiên cứu, tổng hợp thông tin, phân tích nguồn với *evidence labels* |
+| 3 | **AI Browser** | Duyệt web thông minh, trích xuất và tổng hợp nội dung |
+| 4 | **AI Content** | Tạo nội dung song ngữ VI/EN — bài viết, blog, mạng xã hội |
+| 5 | **AI Media** | Xử lý hình ảnh, video, âm thanh — tạo và chỉnh sửa đa phương tiện |
+| 6 | **AI Code** | Viết, kiểm tra và triển khai code — cho nhà phát triển |
+| 7 | **AI Automation** | Tự động hoá quy trình, kết nối tool, lập lịch workflow |
+
+## 9 Nguyen Super Apps
+
+Đây là các Super App chuyên biệt cho hệ sinh thái Nguyen — thiết kế cho cá nhân, gia đình, nhà sáng lập và cộng đồng:
+
+| # | Super App | Chức năng |
+|---|---|---|
+| 1 | **Nguyen Roots** | Nghiên cứu gia phả, cây gia đình, nguồn gốc dòng họ |
+| 2 | **Nguyen Memory** | Quản lý Memory, lưu trữ ký ức và lịch sử gia đình |
+| 3 | **Nguyen Knowledge** | Tổng hợp kiến thức về dòng họ Nguyễn, lịch sử, di sản |
+| 4 | **Nguyen Trust** | Quản lý nhãn bằng chứng, xác minh nguồn, audit trail |
+| 5 | **Nguyen Network** | Kết nối cộng đồng Nguyen toàn cầu, đa ngôn ngữ |
+| 6 | **Nguyen Founders** | Hỗ trợ nhà sáng lập — AI Founder OS, gọi vốn, khởi động |
+| 7 | **Nguyen Chapter OS** | Quản lý Chapter, phân quyền, vận hành cộng đồng địa phương |
+
+> *Nguyen Operating Profile* được tích hợp vào tất cả 9 Nguyen Super Apps — đảm bảo chúng phục vụ nhu cầu của cộng đồng Nguyen, không phải công cụ AI chung.
+
+## Super App kết nối với AI Computer Instance
+
+Mỗi Super App hoạt động như một *extension* của AI Computer:
+
+```
+AI Computer Instance
+├── Memory ←──── chia sẻ với tất cả Super App
+├── Data Vault ←─ chia sẻ với tất cả Super App
+├── Agent team ←─ phối hợp qua tất cả Super App
+├── Model Mesh ←─ định tuyến cho tất cả Super App
+└── Super Apps
+    ├── AI Office
+    ├── AI Research
+    ├── AI Browser
+    ├── AI Content
+    ├── AI Media
+    ├── AI Code
+    ├── AI Automation
+    ├── Nguyen Roots
+    ├── Nguyen Memory
+    ├── Nguyen Knowledge
+    ├── Nguyen Trust
+    ├── Nguyen Network
+    ├── Nguyen Founders
+    └── Nguyen Chapter OS
+```
+
+Điều này có nghĩa là:
+
+- **Một lần tải lên** — file trong Data Vault có thể truy cập từ mọi Super App.
+- **Một bộ nhớ** — Memory ghi nhớ cho AI Office cũng dùng được cho Nguyen Roots.
+- **Phối hợp Agent** — Nguyen Researcher (trong AI Research) và Nguyen Archivist (trong Nguyen Roots) làm việc cùng nhau.
+- **Bằng chứng thống nhất** — *evidence labels* áp dụng chung cho mọi Super App.
+
+## Quyền truy cập theo gói
+
+Không phải Super App nào cũng có sẵn trên mọi gói:
+
+| Gói | AI Tool Apps | Nguyen Apps |
+|---|---|---|
+| *Nguyen Start* (free) | AI Office (cơ bản) | Nguyen Roots (cơ bản) |
+| *Nguyen Personal* | + AI Research, AI Content | + Nguyen Memory |
+| *Nguyen Family* | + AI Browser | + Nguyen Knowledge, Nguyen Network |
+| *Nguyen Creator* | + AI Media | — |
+| *Nguyen Founder* | + AI Automation | + Nguyen Founders |
+| *Nguyen Business* | + AI Code | — |
+| *Nguyen Chapter* | Tất cả | + Nguyen Chapter OS |
+| *Nguyen Enterprise* | Tất cả | Tất cả + Nguyen Trust |
+
+> Track 3 (Super App Usage) sẽ hướng dẫn chi tiết cách sử dụng từng Super App.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Super App, specialized application modules, extension, AI Computer Instance, Memory, Data Vault, Agent team, Model Mesh, evidence labels, Nguyen Operating Profile, AI Founder OS, Nguyen Chapter OS.*
+
+⬅️ **Bài trước:** [Approval Gates và Evidence](/lessons/track-01-lesson-08)
+➡️ **Bài tiếp theo:** [Getting Started](/lessons/track-01-lesson-10) — bắt đầu với Nguyen AI.

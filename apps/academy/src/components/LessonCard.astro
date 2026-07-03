@@ -1,0 +1,41 @@
+---
+interface Props {
+  lesson: {
+    slug: string;
+    title: string;
+    description: string;
+    order: number;
+    duration: string;
+    difficulty: string;
+  };
+  completed?: boolean;
+}
+
+const { lesson, completed = false } = Astro.props;
+const href = `/lessons/${lesson.slug}`;
+---
+
+<a href={href} class="academy-card flex items-center gap-4 p-4 group no-underline">
+  <div
+    class={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+      completed
+        ? 'bg-academy-accent text-white'
+        : 'bg-academy-border text-academy-muted'
+    }`}
+    aria-hidden="true"
+  >
+    {completed ? '✓' : lesson.order}
+  </div>
+
+  <div class="flex-1 min-w-0">
+    <h4 class="text-sm font-semibold text-academy-text group-hover:text-academy-accent transition-colors truncate">
+      {lesson.title}
+    </h4>
+    <p class="text-xs text-academy-muted truncate">{lesson.description}</p>
+  </div>
+
+  <div class="flex-shrink-0 text-xs text-academy-muted text-right">
+    <div>{lesson.duration}</div>
+    <div class="mt-0.5">{lesson.difficulty}</div>
+  </div>
+</a>

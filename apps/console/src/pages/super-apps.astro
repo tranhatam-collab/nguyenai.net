@@ -1,0 +1,42 @@
+---
+export const prerender = false;
+/**
+ * super-apps.astro — Super App launcher grid
+ */
+import ConsoleLayout from '../layouts/ConsoleLayout.astro';
+import SuperAppCard from '../components/SuperAppCard.astro';
+
+const superApps = [
+  { name: 'AI Office', icon: '🏢', description: 'Productivity suite · Bộ công cụ văn phòng' },
+  { name: 'AI Research', icon: '🔬', description: 'Research tools · Công cụ nghiên cứu' },
+  { name: 'AI Browser', icon: '🌐', description: 'Web browsing · Duyệt web thông minh' },
+  { name: 'AI Content', icon: '✍️', description: 'Content creation · Sáng tạo nội dung' },
+  { name: 'AI Media', icon: '🎬', description: 'Media production · Sản xuất media' },
+  { name: 'AI Code', icon: '💻', description: 'Code assistant · Trợ lý lập trình' },
+  { name: 'AI Automation', icon: '⚙️', description: 'Workflow automation · Tự động hóa' },
+  { name: 'AI Founder OS', icon: '🚀', description: 'Founder operating system · Hệ điều hành Founder' },
+  { name: 'AI Business OS', icon: '📊', description: 'Business operations · Vận hành doanh nghiệp' },
+  { name: 'Nguyen Roots', icon: '🌳', description: 'Family heritage · Cội nguồn gia đình' },
+  { name: 'Nguyen Memory', icon: '🧠', description: 'Memory vault · Kho bộ nhớ' },
+  { name: 'Nguyen Knowledge', icon: '📚', description: 'Knowledge base · Cơ sở tri thức' },
+  { name: 'Nguyen Trust', icon: '🛡️', description: 'Trust & verification · Xác minh tin cậy' },
+  { name: 'Nguyen Network', icon: '🔗', description: 'Community network · Mạng lưới cộng đồng' },
+  { name: 'Nguyen Founders', icon: '👑', description: 'Founder community · Cộng đồng Founder' },
+  { name: 'Nguyen Chapter OS', icon: '📖', description: 'Chapter management · Quản lý Chapter' },
+];
+---
+
+<ConsoleLayout title="Super Apps · Nguyen AI Console">
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100">Super Apps</h1>
+    <p class="text-sm text-slate-400">Super Apps · Launch specialized AI applications</p>
+  </div>
+
+  <!-- Super App grid -->
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    {superApps.map((app) => (
+      <SuperAppCard name={app.name} icon={app.icon} description={app.description} />
+    ))}
+  </div>
+</ConsoleLayout>

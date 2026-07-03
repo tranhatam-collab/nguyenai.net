@@ -1,0 +1,53 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import TrackCard from '../../components/TrackCard.astro';
+import { tracks } from '../../data/tracks';
+---
+
+<AcademyLayout
+  title="All Tracks"
+  description="Browse all 10 learning tracks at Nguyen AI Academy."
+  activeNav="tracks"
+>
+  <section class="academy-container py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-academy-text mb-2">All Learning Tracks</h1>
+      <p class="text-academy-muted">
+        10 track — từ cơ bản đến nâng cao. Bắt đầu từ Track 1 nếu bạn mới đến.
+      </p>
+    </div>
+
+    <!-- Overall progress summary -->
+    <div class="academy-card p-6 mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-academy-text">Tiến độ tổng thể</h2>
+        <span class="text-sm text-academy-muted">Đăng nhập để lưu tiến độ</span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-bold text-academy-accent">0</div>
+          <div class="text-xs text-academy-muted">Tracks hoàn thành</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-academy-text">0</div>
+          <div class="text-xs text-academy-muted">Bài học đã học</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-academy-text">0</div>
+          <div class="text-xs text-academy-muted">Chứng chỉ</div>
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-academy-text">81</div>
+          <div class="text-xs text-academy-muted">Tổng bài học</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracks grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      {tracks.map((track) => (
+        <TrackCard track={track} progress={0} />
+      ))}
+    </div>
+  </section>
+</AcademyLayout>

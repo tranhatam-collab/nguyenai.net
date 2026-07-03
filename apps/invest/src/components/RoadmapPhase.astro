@@ -1,0 +1,41 @@
+---
+/**
+ * RoadmapPhase.astro — Timeline phase card.
+ * Props: phase, title, items (string[]), status
+ */
+interface Props {
+  phase: string;
+  title: string;
+  titleVi?: string;
+  items: string[];
+  status: 'done' | 'active' | 'planned';
+}
+const { phase, title, titleVi, items, status } = Astro.props;
+
+const statusStyles = {
+  done: { label: 'Done / Hoàn thành', color: 'text-green-400', dot: 'bg-green-400' },
+  active: { label: 'Active / Đang thực hiện', color: 'text-gold', dot: 'bg-gold' },
+  planned: { label: 'Planned / Kế hoạch', color: 'text-ink-dim', dot: 'bg-ink-dim' },
+};
+const s = statusStyles[status];
+---
+
+<div class="relative pl-8 pb-8 border-l-2 border-bg-border last:border-l-transparent">
+  <div class={`absolute -left-[7px] top-1 w-3 h-3 rounded-full ${s.dot} ring-4 ring-bg`}></div>
+  <div class="bg-bg-card border border-bg-border rounded-xl p-5 card-hover">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-mono text-gold uppercase tracking-wider">{phase}</span>
+      <span class={`text-xs font-semibold ${s.color}`}>{s.label}</span>
+    </div>
+    <h3 class="text-lg font-bold text-ink">{title}</h3>
+    {titleVi && <p class="text-sm text-ink-muted" lang="vi">{titleVi}</p>}
+    <ul class="mt-3 space-y-1.5">
+      {items.map((item) => (
+        <li class="text-sm text-ink-muted flex items-start gap-2">
+          <span class="text-gold mt-0.5 text-xs">▸</span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Nguyen AI Console — Global Styles
+   ============================================ */
+
+:root {
+  /* Theme colors as CSS variables */
+  --color-bg: #0a0e1a;
+  --color-sidebar: #111827;
+  --color-card: #1a2235;
+  --color-hover: #243049;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-muted: #3b82f6;
+  --color-status-active: #22c55e;
+  --color-status-idle: #eab308;
+  --color-status-offline: #6b7280;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-border: #1e293b;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
+}
+
+@layer components {
+  .console-card {
+    @apply rounded-xl border border-slate-800 bg-bg-card p-5 transition-colors;
+  }
+
+  .console-card:hover {
+    @apply border-slate-700 bg-bg-hover;
+  }
+
+  .console-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .console-btn-primary {
+    @apply bg-accent text-white hover:bg-accent-hover;
+  }
+
+  .console-btn-secondary {
+    @apply border border-slate-700 bg-bg-card text-slate-200 hover:bg-bg-hover;
+  }
+
+  .console-input {
+    @apply w-full rounded-lg border border-slate-700 bg-bg-card px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent;
+  }
+
+  .console-label {
+    @apply mb-1.5 block text-sm font-medium text-slate-300;
+  }
+
+  .console-section-title {
+    @apply text-lg font-semibold text-slate-100;
+  }
+
+  .console-section-subtitle {
+    @apply text-sm text-slate-400;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

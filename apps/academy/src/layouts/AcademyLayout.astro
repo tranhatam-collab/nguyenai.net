@@ -1,0 +1,207 @@
+---
+import { tracks } from '../data/tracks';
+
+interface Props {
+  title?: string;
+  description?: string;
+  activeNav?: string;
+}
+
+const {
+  title = 'Nguyen AI Academy',
+  description = 'Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more.',
+  activeNav = '',
+} = Astro.props;
+
+const siteName = 'Nguyen AI Academy';
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={`https://academy.nguyenai.net${Astro.url.pathname}`} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" href={`https://academy.nguyenai.net${Astro.url.pathname}`} />
+
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-academy-header border-b border-academy-border">
+      <div class="academy-container">
+        <nav class="flex items-center justify-between h-16" aria-label="Main navigation">
+          <!-- Logo -->
+          <a href="/" class="flex items-center gap-2 no-underline text-academy-text">
+            <img src="/favicon.svg" alt="" width="32" height="32" class="rounded-lg" />
+            <span class="font-bold text-base">
+              Nguyen AI <span class="text-academy-accent">Academy</span>
+            </span>
+          </a>
+
+          <!-- Desktop nav -->
+          <div class="hidden md:flex items-center gap-1">
+            <a
+              href="/"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'home'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Trang chủ
+            </a>
+            <a
+              href="/tracks"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'tracks'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Tracks
+            </a>
+            <a
+              href="/certification"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'certification'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Chứng chỉ
+            </a>
+            <a
+              href="/about"
+              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
+                activeNav === 'about'
+                  ? 'text-academy-accent bg-academy-accent/5'
+                  : 'text-academy-text hover:text-academy-accent'
+              }`}
+            >
+              Giới thiệu
+            </a>
+          </div>
+
+          <!-- Right side: progress + login -->
+          <div class="flex items-center gap-3">
+            <!-- Progress indicator (placeholder) -->
+            <div class="hidden sm:flex items-center gap-2 text-xs text-academy-muted">
+              <span class="w-2 h-2 rounded-full bg-academy-accent"></span>
+              <span>0 / 10 tracks</span>
+            </div>
+
+            <a href="/login" class="academy-btn academy-btn-primary text-sm">
+              Đăng nhập
+            </a>
+
+            <!-- Mobile menu toggle -->
+            <button
+              id="menu-toggle"
+              class="md:hidden p-2 rounded-md text-academy-text hover:bg-academy-bg"
+              aria-label="Toggle menu"
+              aria-expanded="false"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-academy-border">
+          <div class="flex flex-col gap-1 pt-3">
+            <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Trang chủ</a>
+            <a href="/tracks" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Tracks</a>
+            <a href="/certification" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Chứng chỉ</a>
+            <a href="/about" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Giới thiệu</a>
+            <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Xác minh chứng chỉ</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="min-h-[calc(100vh-8rem)]">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-academy-header border-t border-academy-border mt-16">
+      <div class="academy-container py-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Brand -->
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-2 mb-3">
+              <img src="/favicon.svg" alt="" width="28" height="28" class="rounded-lg" />
+              <span class="font-bold text-academy-text">
+                Nguyen AI <span class="text-academy-accent">Academy</span>
+              </span>
+            </div>
+            <p class="text-sm text-academy-muted max-w-md">
+              Học AI miễn phí cho mọi người đăng ký Nguyen AI. 10 track học tập, chứng chỉ xác minh và cộng đồng Nguyen toàn cầu.
+            </p>
+            <p class="text-xs text-academy-muted mt-3">
+              Free AI learning for all Nguyen AI subscribers.
+            </p>
+          </div>
+
+          <!-- Links -->
+          <div>
+            <h4 class="text-sm font-semibold text-academy-text mb-3">Academy</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="/tracks" class="text-academy-muted hover:text-academy-accent no-underline">Tất cả Tracks</a></li>
+              <li><a href="/certification" class="text-academy-muted hover:text-academy-accent no-underline">Chứng chỉ</a></li>
+              <li><a href="/verify" class="text-academy-muted hover:text-academy-accent no-underline">Xác minh</a></li>
+              <li><a href="/about" class="text-academy-muted hover:text-academy-accent no-underline">Giới thiệu</a></li>
+            </ul>
+          </div>
+
+          <!-- External -->
+          <div>
+            <h4 class="text-sm font-semibold text-academy-text mb-3">Nguyen AI</h4>
+            <ul class="space-y-2 text-sm">
+              <li><a href="https://nguyenai.net" class="text-academy-muted hover:text-academy-accent no-underline">nguyenai.net</a></li>
+              <li><a href="https://app.nguyenai.net" class="text-academy-muted hover:text-academy-accent no-underline">AI Computer Console</a></li>
+              <li><a href="/login" class="text-academy-muted hover:text-academy-accent no-underline">Đăng nhập</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-academy-border mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p class="text-xs text-academy-muted">
+            © {new Date().getFullYear()} Nguyen AI. Academy at academy.nguyenai.net.
+          </p>
+          <p class="text-xs text-academy-muted">
+            Dữ liệu người đang sống luôn riêng tư theo mặc định.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      if (toggle && menu) {
+        toggle.addEventListener('click', () => {
+          const isHidden = menu.classList.toggle('hidden');
+          toggle.setAttribute('aria-expanded', String(!isHidden));
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+---
+import InvestLayout from '../../layouts/InvestLayout.astro';
+import Disclosure from '../../components/Disclosure.astro';
+---
+
+<InvestLayout title="Financial Model" titleVi="Mô hình tài chính" noindex={true}>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+    </div>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Financial Model</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Mô hình tài chính</p>
+
+    <div class="mt-6 p-4 bg-gold/10 border border-gold/30 rounded-lg">
+      <p class="text-sm text-gold">
+        ⚠ Financial projections are hypotheses, not commitments or forecasts.
+        <span class="block" lang="vi">Dự phóng tài chính là giả thuyết, không phải cam kết hay dự báo.</span>
+      </p>
+    </div>
+
+    <!-- Revenue hypothesis table -->
+    <div class="mt-10">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Revenue Hypothesis / Giả thuyết doanh thu</h2>
+      <div class="overflow-x-auto bg-bg-card border border-bg-border rounded-xl">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-bg-border">
+              <th class="text-left py-3 px-4 text-ink-muted uppercase text-xs">Plan</th>
+              <th class="text-right py-3 px-4 text-ink-muted uppercase text-xs">Price/mo</th>
+              <th class="text-right py-3 px-4 text-ink-muted uppercase text-xs">Subscribers (Y1)</th>
+              <th class="text-right py-3 px-4 text-ink-muted uppercase text-xs">Annual (hypothesis)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-border">
+            {[
+              { plan: 'Start', price: 'Free', subs: '500', rev: '$0' },
+              { plan: 'Personal', price: '$12', subs: '200', rev: '$28.8K' },
+              { plan: 'Family', price: '$24', subs: '150', rev: '$43.2K' },
+              { plan: 'Creator', price: '$40', subs: '80', rev: '$38.4K' },
+              { plan: 'Founder', price: '$80', subs: '50', rev: '$48K' },
+              { plan: 'Business', price: '$200', subs: '20', rev: '$48K' },
+              { plan: 'Chapter', price: '$320', subs: '10', rev: '$38.4K' },
+              { plan: 'Enterprise', price: 'Custom', subs: '3', rev: '$150K' },
+            ].map((row) => (
+              <tr class="hover:bg-bg-soft/50">
+                <td class="py-3 px-4 text-ink">{row.plan}</td>
+                <td class="py-3 px-4 text-right text-ink-muted">{row.price}</td>
+                <td class="py-3 px-4 text-right text-ink-muted">{row.subs}</td>
+                <td class="py-3 px-4 text-right text-gold font-semibold">{row.rev}</td>
+              </tr>
+            ))}
+            <tr class="border-t-2 border-bg-border">
+              <td class="py-3 px-4 font-bold text-ink" colspan="3">Total Y1 (hypothesis)</td>
+              <td class="py-3 px-4 text-right font-bold text-gold">~$394K</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-3 text-xs text-ink-dim italic">All figures are hypotheses based on comparable SaaS benchmarks. Not a forecast. <span lang="vi">Tất cả là giả thuyết, không phải dự báo.</span></p>
+    </div>
+
+    <!-- Sensitivity analysis -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Sensitivity Analysis / Phân tích độ nhạy</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-bg-border">
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Scenario</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Subscribers</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Y1 Revenue</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Y3 Revenue</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-border">
+            <tr><td class="py-2 text-ink">Conservative / Thận trọng</td><td class="py-2 text-right text-ink-muted">50% of hypothesis</td><td class="py-2 text-right text-gold">~$197K</td><td class="py-2 text-right text-gold">~$1M</td></tr>
+            <tr><td class="py-2 text-ink">Base case / Cơ sở</td><td class="py-2 text-right text-ink-muted">100% of hypothesis</td><td class="py-2 text-right text-gold">~$394K</td><td class="py-2 text-right text-gold">~$2.5M</td></tr>
+            <tr><td class="py-2 text-ink">Optimistic / Lạc quan</td><td class="py-2 text-right text-ink-muted">200% of hypothesis</td><td class="py-2 text-right text-gold">~$788K</td><td class="py-2 text-right text-gold">~$5M</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

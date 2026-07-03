@@ -8,13 +8,15 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'billing tested via E2E suite'",
+    "test": "tsx src/test.ts",
     "lint": "echo 'TODO'"
   },
   "dependencies": {
     "@nai/product-catalog": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
   }
 }

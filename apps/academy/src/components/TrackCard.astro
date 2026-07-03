@@ -1,0 +1,42 @@
+---
+import ProgressBar from './ProgressBar.astro';
+import type { Track } from '../data/tracks';
+
+interface Props {
+  track: Track;
+  progress?: number;
+}
+
+const { track, progress = 0 } = Astro.props;
+const href = `/tracks/${track.slug}`;
+---
+
+<a href={href} class="academy-card block p-6 group no-underline">
+  <div class="flex items-start justify-between mb-4">
+    <div class="text-4xl" aria-hidden="true">{track.icon}</div>
+    {track.isOnboarding && (
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-academy-accent/10 text-academy-accent">
+        Onboarding
+      </span>
+    )}
+  </div>
+
+  <h3 class="text-lg font-bold text-academy-text mb-1 group-hover:text-academy-accent transition-colors">
+    {track.title.en}
+  </h3>
+  <p class="text-sm text-academy-muted mb-1">{track.title.vi}</p>
+
+  <p class="text-sm text-academy-text/80 mb-4 line-clamp-2">
+    {track.description.en}
+  </p>
+
+  <div class="flex items-center gap-3 text-xs text-academy-muted mb-4">
+    <span>{track.lessonCount} lessons</span>
+    <span aria-hidden="true">·</span>
+    <span>{track.duration}</span>
+    <span aria-hidden="true">·</span>
+    <span>{track.difficulty}</span>
+  </div>
+
+  <ProgressBar value={progress} max={track.lessonCount} label="Progress" />
+</a>

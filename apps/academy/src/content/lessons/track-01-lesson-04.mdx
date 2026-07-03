@@ -1,0 +1,87 @@
+---
+title: "Command Packs: Gói lệnh cho AI Computer"
+description: "Tổng quan về 10 Command Pack được phê duyệt — các gói workflow tái sử dụng cho AI Computer Instance của bạn."
+track: "ai-computer-fundamentals"
+trackId: 1
+order: 4
+duration: "6 min read"
+difficulty: "Beginner"
+lang: "vi"
+draft: false
+---
+
+import ProgressBar from '@components/ProgressBar.astro'
+
+<ProgressBar value={4} max={10} />
+
+## Command Pack là gì?
+
+**Command Pack** (gói lệnh) là một bộ workflow được cấu hình sẵn (*pre-configured workflow bundle*) — bạn gọi một lệnh, AI Computer thực hiện cả một chuỗi nhiều bước, phối hợp nhiều Agent, tự động đi qua các *approval gate* cần thiết.
+
+Thay vì phải hướng dẫn Agent từng bước, bạn chỉ cần nói: *"Chạy Founder Launch Pack"* — và toàn bộ quy trình khởi động doanh nghiệp sẽ được thực hiện theo trình tự đã chuẩn hoá.
+
+> Nguyên tắc: Mọi Command Pack đều tôn trọng *approval gate* và *evidence labels*. Không có gói nào có thể bỏ qua phê duyệt của bạn.
+
+## 10 Command Pack được phê duyệt
+
+| # | Command Pack | Mục đích |
+|---|---|---|
+| 1 | **Family Archive** | Lưu trữ và tổ chức tài liệu gia đình, ảnh, gia phả |
+| 2 | **Founder Launch** | Khởi động doanh nghiệp — từ ý tưởng đến đăng ký |
+| 3 | **Investor Readiness** | Chuẩn bị tài liệu gọi vốn cho nhà sáng lập |
+| 4 | **Business Operations** | Vận hành doanh nghiệp hàng ngày — tài chính, nhân sự, báo cáo |
+| 5 | **Global Community** | Kết nối cộng đồng Nguyen toàn cầu, đa ngôn ngữ |
+| 6 | **Bilingual Publishing** | Xuất bản nội dung song ngữ VI/EN |
+| 7 | **Research & Evidence** | Nghiên cứu có phương pháp, gán nhãn bằng chứng |
+| 8 | **Chapter Governance** | Quản lý Chapter, phân quyền, vận hành cộng đồng |
+| 9 | **Legacy Interview** | Phỏng vấn người lớn tuổi, ghi lại lịch sử truyền miệng |
+| 10 | **SME Automation** | Tự động hoá quy trình cho doanh nghiệp nhỏ và vừa |
+
+## Cách gọi Command Pack
+
+Bạn có thể gọi Command Pack theo ba cách:
+
+- **Gọi trực tiếp** — nói hoặc gõ: *"Chạy Founder Launch Pack"*.
+- **Gọi qua menu** — chọn từ danh sách Command Pack trong AI Computer Console tại `app.nguyenai.net`.
+- **Giao cho Agent** — yêu cầu Nguyen Guide hoặc Agent phù hợp kích hoạt gói.
+
+Khi Command Pack chạy, bạn sẽ thấy:
+
+1. **Danh sách các bước** (*step list*) — Agent sẽ thực hiện theo trình tự.
+2. **Cổng phê duyệt** (*approval gate*) — tại các bước nhạy cảm, Agent dừng lại và chờ bạn xác nhận.
+3. **Nhãn bằng chứng** (*evidence labels*) — mọi kết quả đều được gán nhãn nguồn.
+
+## Ví dụ: Founder Launch Pack
+
+Đây là walkthrough của **Founder Launch Pack** — gói phổ biến nhất cho nhà sáng lập Nguyen:
+
+| Bước | Agent thực hiện | Hành động | Phê duyệt? |
+|---|---|---|---|
+| 1 | Nguyen Guide | Phân loại ý tưởng, xác định ngành | Không |
+| 2 | Nguyen Researcher | Phân tích thị trường, đối thủ | Không |
+| 3 | Nguyen Founder | Soạn thảo kế hoạch kinh doanh | Không |
+| 4 | Nguyen Business Operator | Lập mô hình tài chính | **Có** — bạn xem trước |
+| 5 | Nguyen Verifier | Xác minh nguồn thông tin thị trường | Không |
+| 6 | Nguyen Founder | Soạn thảo tài liệu đăng ký doanh nghiệp | **Có** — bạn phê duyệt |
+| 7 | Nguyen Guardian | Kiểm tra tuân thủ pháp lý | Không |
+| 8 | Nguyen Guide | Tổng hợp kết quả, lưu vào Data Vault | Không |
+
+> Sau khi hoàn thành, toàn bộ kết quả được lưu trong *Data Vault* của bạn với nhãn bằng chứng đầy đủ. Bạn có thể xuất bản hoặc giữ riêng tư.
+
+## Tùy chỉnh Command Pack
+
+Mỗi Command Pack có thể được tùy chỉnh:
+
+- **Thêm hoặc bỏ bước** — phù hợp với nhu cầu cụ thể của bạn.
+- **Thay đổi Agent** — chỉ định Agent khác cho một bước.
+- **Điều chỉnh approval gate** — thêm cổng phê duyệt ở bước bạn muốn kiểm soát.
+- **Lưu phiên bản riêng** — tạo biến thể (*variant*) cho dự án cụ thể.
+
+> Track 4 (Command Pack Authoring) sẽ hướng dẫn bạn cách tạo Command Pack riêng từ đầu.
+
+---
+
+**Thuật ngữ tiếng Anh quan trọng:** *Command Pack, pre-configured workflow bundle, approval gate, evidence labels, step list, variant, AI Computer Console, Data Vault.*
+
+⬅️ **Bài trước:** [The Agent Team](/lessons/track-01-lesson-03)
+➡️ **Bài tiếp theo:** [Model Mesh](/lessons/track-01-lesson-05) — chọn mô hình AI phù hợp.

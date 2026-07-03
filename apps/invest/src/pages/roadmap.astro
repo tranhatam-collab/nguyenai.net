@@ -1,0 +1,108 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import RoadmapPhase from '../components/RoadmapPhase.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Roadmap"
+  titleVi="Lộ trình"
+  description="Nguyen AI Computer roadmap: Phase 0 through Phase 6 — from fixing brand and positioning to scaling the platform."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Roadmap</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Lộ trình</p>
+
+    <p class="mt-6 text-lg text-ink-muted max-w-3xl">
+      Seven phases from foundation to scale. The current focus is Phase 0–1: fixing brand, legal entity, and IP ownership.
+      <span class="block mt-2" lang="vi">Bảy giai đoạn từ nền tảng đến mở rộng. Trọng tâm hiện tại là Giai đoạn 0–1.</span>
+    </p>
+
+    <div class="mt-12 max-w-3xl">
+      <RoadmapPhase
+        phase="Phase 0"
+        title="Fix & Align"
+        titleVi="Sửa chữa & căn chỉnh"
+        status="active"
+        items={[
+          'Brand audit and clone contamination cleanup',
+          'Stale brand surfaces removed',
+          'Positioning locked (Master Positioning Gen1–Gen2)',
+          'AGENTS.md rules established',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 1"
+        title="Legal Entity & IP Ownership"
+        titleVi="Thực thể pháp lý & sở hữu IP"
+        status="planned"
+        items={[
+          'Establish legal entity (HoldCo model)',
+          'Transfer IP to entity',
+          'Cap table formalized',
+          'Term sheet and investment documents',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 2"
+        title="App Scaffold"
+        titleVi="Khung ứng dụng"
+        status="planned"
+        items={[
+          'AI Computer Console (app.nguyenai.net)',
+          'Authentication and data vault',
+          'Agent team integration',
+          'Model Mesh routing',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 3"
+        title="Academy Launch"
+        titleVi="Khởi động Academy"
+        status="planned"
+        items={[
+          'academy.nguyenai.net — free AI learning',
+          'Certification programs',
+          'Bilingual curriculum (VI/EN)',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 4"
+        title="Invest & Fundraise"
+        titleVi="Đầu tư & gọi vốn"
+        status="planned"
+        items={[
+          'Investor site live (invest.nguyenai.net)',
+          'Data room access for qualified investors',
+          'Close 750K USD seed round',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 5"
+        title="Beta Program"
+        titleVi="Chương trình beta"
+        status="planned"
+        items={[
+          'Closed beta with Nguyen community members',
+          'Feedback loops and iteration',
+          'Security and privacy audits',
+          'PDPD 91/2025 compliance verification',
+        ]}
+      />
+      <RoadmapPhase
+        phase="Phase 6"
+        title="Scale"
+        titleVi="Mở rộng"
+        status="planned"
+        items={[
+          'Public launch',
+          'Chapter program rollout',
+          'Enterprise sales motion',
+          'International diaspora expansion',
+        ]}
+      />
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

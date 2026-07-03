@@ -1,0 +1,102 @@
+---
+import InvestLayout from '../layouts/InvestLayout.astro';
+import Disclosure from '../components/Disclosure.astro';
+---
+
+<InvestLayout
+  title="Market"
+  titleVi="Thị trường"
+  description="Market size for Nguyen AI Computer: global AI market, Vietnam digital economy, genealogy/heritage market, and AI agent market."
+>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Market</h1>
+    <p class="mt-2 text-xl text-ink-muted" lang="vi">Thị trường</p>
+
+    <p class="mt-6 text-lg text-ink-muted max-w-3xl">
+      Nguyen AI Computer sits at the intersection of four large and growing markets.
+      <span class="block mt-2" lang="vi">Nguyen AI Computer nằm ở giao điểm của bốn thị trường lớn và đang phát triển.</span>
+    </p>
+
+    <!-- Global AI market -->
+    <div class="mt-12 bg-bg-card border border-bg-border rounded-xl p-8 card-hover">
+      <h2 class="text-xl font-serif font-bold text-ink">Global AI Market</h2>
+      <p class="text-gold text-sm" lang="vi">Thị trường AI toàn cầu</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$200B+</div>
+          <p class="text-sm text-ink-muted mt-1">Estimated global AI market size (2024), projected to exceed $1T by 2030.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">36%+ CAGR</div>
+          <p class="text-sm text-ink-muted mt-1">Compound annual growth rate across AI segments.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">Agentic AI</div>
+          <p class="text-sm text-ink-muted mt-1">Fastest-growing segment — autonomous agents executing multi-step workflows.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vietnam digital economy -->
+    <div class="mt-8 bg-bg-card border border-bg-border rounded-xl p-8 card-hover">
+      <h2 class="text-xl font-serif font-bold text-ink">Vietnam Digital Economy</h2>
+      <p class="text-gold text-sm" lang="vi">Kinh tế số Việt Nam</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">~$30B</div>
+          <p class="text-sm text-ink-muted mt-1">Vietnam's digital economy size, among the fastest-growing in Southeast Asia.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">100M+</div>
+          <p class="text-sm text-ink-muted mt-1">Population with high mobile and internet penetration.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">91/2025</div>
+          <p class="text-sm text-ink-muted mt-1">PDPD decree driving demand for privacy-first domestic platforms.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Genealogy / heritage market -->
+    <div class="mt-8 bg-bg-card border border-bg-border rounded-xl p-8 card-hover">
+      <h2 class="text-xl font-serif font-bold text-ink">Genealogy & Heritage Market</h2>
+      <p class="text-gold text-sm" lang="vi">Thị trường gia phả & di sản</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$4.7B</div>
+          <p class="text-sm text-ink-muted mt-1">Ancestry.com acquisition (2020) — market validation at scale.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$600M</div>
+          <p class="text-sm text-ink-muted mt-1">MyHeritage acquisition (2023) — continued investor appetite.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">Gap</div>
+          <p class="text-sm text-ink-muted mt-1">No incumbent serves the Vietnamese diaspora with AI-native, bilingual, privacy-first tools.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI agent market -->
+    <div class="mt-8 bg-bg-card border border-bg-border rounded-xl p-8 card-hover">
+      <h2 class="text-xl font-serif font-bold text-ink">AI Agent Market</h2>
+      <p class="text-gold text-sm" lang="vi">Thị trường AI Agent</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">$50B+</div>
+          <p class="text-sm text-ink-muted mt-1">Projected AI agent market by 2030, emerging from near-zero today.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">62%</div>
+          <p class="text-sm text-ink-muted mt-1">McKinsey: organizations already using AI agents in at least one function.</p>
+        </div>
+        <div>
+          <div class="text-3xl font-serif font-bold text-gold-gradient">46%</div>
+          <p class="text-sm text-ink-muted mt-1">Microsoft: employees using AI agents at least weekly.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12"><Disclosure /></div>
+  </section>
+</InvestLayout>

@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+/**
+ * command-center.astro — Command input, run history, status indicators
+ * Interactive React islands for command input and history.
+ */
+import ConsoleLayout from '../layouts/ConsoleLayout.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import CommandInput from '../components/react/CommandInput.tsx';
+import CommandHistory from '../components/react/CommandHistory.tsx';
+---
+
+<ConsoleLayout title="Command Center · Nguyen AI Console">
+  <!-- Page header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-100">Command Center</h1>
+    <p class="text-sm text-slate-400">Trung tâm chỉ huy · Issue commands to your AI Computer</p>
+  </div>
+
+  <!-- Command input (React island) -->
+  <CommandInput client:load />
+
+  <!-- Status indicators -->
+  <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="console-card flex items-center gap-3">
+      <StatusBadge status="idle" />
+      <div>
+        <p class="text-xs text-slate-400">Queue · Hàng đợi</p>
+        <p class="text-sm font-medium text-slate-200">0 pending</p>
+      </div>
+    </div>
+    <div class="console-card flex items-center gap-3">
+      <StatusBadge status="active" />
+      <div>
+        <p class="text-xs text-slate-400">Processing · Đang xử lý</p>
+        <p class="text-sm font-medium text-slate-200">0 running</p>
+      </div>
+    </div>
+    <div class="console-card flex items-center gap-3">
+      <StatusBadge status="offline" />
+      <div>
+        <p class="text-xs text-slate-400">Completed · Hoàn thành</p>
+        <p class="text-sm font-medium text-slate-200">0 done</p>
+      </div>
+    </div>
+    <div class="console-card flex items-center gap-3">
+      <StatusBadge status="offline" />
+      <div>
+        <p class="text-xs text-slate-400">Failed · Lỗi</p>
+        <p class="text-sm font-medium text-slate-200">0 errors</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Run history (React island) -->
+  <CommandHistory client:load />
+</ConsoleLayout>
