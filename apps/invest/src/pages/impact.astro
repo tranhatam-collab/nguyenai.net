@@ -46,6 +46,57 @@ import Disclosure from '../components/Disclosure.astro';
       </ul>
     </div>
 
+    <!-- Impact metrics (hypothesis) -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Impact Metrics (Hypothesis) / Chỉ số tác động (giả thuyết)</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { value: '4M+', label: 'Nguyen people globally', vi: 'Người họ Nguyễn toàn cầu' },
+          { value: '10', label: 'Edu tracks free', vi: 'Track học miễn phí' },
+          { value: '9', label: 'Specialized Agents', vi: 'Agent chuyên biệt' },
+          { value: '100%', label: 'Privacy-by-default', vi: 'Riêng tư mặc định' },
+        ].map((m) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5 text-center">
+            <div class="text-3xl font-serif font-bold text-gold">{m.value}</div>
+            <div class="text-xs text-ink-muted mt-1">{m.label}</div>
+            <div class="text-xs text-ink-dim" lang="vi">{m.vi}</div>
+          </div>
+        ))}
+      </div>
+      <p class="mt-3 text-xs text-ink-dim italic">All metrics are hypotheses based on public demographic data. Not a forecast. <span lang="vi">Tất cả là giả thuyết, không phải dự báo.</span></p>
+    </div>
+
+    <!-- SDG alignment -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">UN SDG Alignment / Phù hợp SDG Liên Hợp Quốc</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { num: '4', title: 'Quality Education', vi: 'Giáo dục chất lượng', desc: 'Free bilingual AI education at edu.nguyenai.net — 10 tracks, certification, accessible to all subscribers.' },
+          { num: '8', title: 'Decent Work & Economic Growth', vi: 'Việc làm & tăng trưởng', desc: 'AI Founder OS and AI Business OS give Nguyen founders and businesses enterprise-grade tools at accessible prices.' },
+          { num: '9', title: 'Industry, Innovation & Infrastructure', vi: 'Đổi mới & hạ tầng', desc: 'Four-layer AI Computer architecture — a new category of cloud computing specialized for a community.' },
+        ].map((sdg) => (
+          <div class="bg-bg-card border border-bg-border rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center font-bold text-sm">{sdg.num}</span>
+              <div>
+                <h3 class="font-semibold text-ink text-sm">{sdg.title}</h3>
+                <p class="text-xs text-gold" lang="vi">{sdg.vi}</p>
+              </div>
+            </div>
+            <p class="text-sm text-ink-muted">{sdg.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Community quote -->
+    <div class="mt-12 bg-bg-card border border-gold/20 rounded-xl p-8 text-center">
+      <blockquote class="text-xl font-serif text-ink-muted italic max-w-3xl mx-auto">
+        "We build not for bloodline, but for a community that shares a name, a history, and a future. Nguyen AI Computer is a tool for that future — private by default, bilingual by design, evidence-based by principle."
+      </blockquote>
+      <p class="mt-4 text-sm text-gold">— Nguyen AI Founder Statement</p>
+    </div>
+
     <div class="mt-12"><Disclosure /></div>
   </section>
 </InvestLayout>

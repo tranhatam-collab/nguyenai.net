@@ -23,17 +23,118 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
+    <!-- Demo scenarios -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Demo Scenarios / Kịch bản demo</h2>
+      <div class="space-y-4">
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="px-2 py-1 text-xs font-semibold text-gold bg-gold/10 rounded">Scenario 1</span>
+            <h3 class="font-semibold text-ink">Heritage Research / Nghiên cứu di sản</h3>
+          </div>
+          <p class="text-sm text-ink-muted mb-3">
+            User asks: "Tìm hiểu nguồn gốc họ Nguyễn ở Nghệ An."
+            <span class="block mt-1" lang="vi">Người dùng hỏi: "Tìm hiểu nguồn gốc họ Nguyễn ở Nghệ An."</span>
+          </p>
+          <ol class="space-y-2 text-sm text-ink-muted list-decimal list-inside">
+            <li>Coordinator Agent nhận lệnh, lập kế hoạch nghiên cứu</li>
+            <li>Researcher Agent tìm kiếm nguồn sơ cấp và thứ cấp</li>
+            <li>Archivist Agent phân loại bằng chứng (verified, secondary, oral history)</li>
+            <li>Verifier Agent kiểm tra tính nhất quán của nguồn</li>
+            <li>Family Steward Agent tổng hợp báo cáo có nhãn bằng chứng</li>
+          </ol>
+          <p class="mt-3 text-xs text-gold italic">Result: Structured report with evidence labels — no bloodline claims, no royal descent assertions.</p>
+        </div>
+
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="px-2 py-1 text-xs font-semibold text-gold bg-gold/10 rounded">Scenario 2</span>
+            <h3 class="font-semibold text-ink">Founder Workflow / Workflow nhà sáng lập</h3>
+          </div>
+          <p class="text-sm text-ink-muted mb-3">
+            User asks: "Phân tích thị trường AI Computer tại Việt Nam, lập pitch deck."
+            <span class="block mt-1" lang="vi">Người dùng hỏi: "Phân tích thị trường, lập pitch deck."</span>
+          </p>
+          <ol class="space-y-2 text-sm text-ink-muted list-decimal list-inside">
+            <li>Coordinator Agent chia thành: research → analysis → draft → review</li>
+            <li>Researcher Agent thu thập dữ liệu thị trường</li>
+            <li>Analyst Agent phân tích cạnh tranh và định vị</li>
+            <li>Writer Agent soạn pitch deck theo brand guidelines</li>
+            <li>Approval Gate: Founder phê duyệt trước khi export</li>
+          </ol>
+          <p class="mt-3 text-xs text-gold italic">Result: Pitch deck draft with market data, competitive analysis, and brand-compliant design.</p>
+        </div>
+
+        <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="px-2 py-1 text-xs font-semibold text-gold bg-gold/10 rounded">Scenario 3</span>
+            <h3 class="font-semibold text-ink">Family Tree / Cây gia đình</h3>
+          </div>
+          <p class="text-sm text-ink-muted mb-3">
+            User asks: "Xây cây gia đình 3 thế hệ, riêng tư."
+            <span class="block mt-1" lang="vi">Người dùng hỏi: "Xây cây gia đình 3 thế hệ, riêng tư."</span>
+          </p>
+          <ol class="space-y-2 text-sm text-ink-muted list-decimal list-inside">
+            <li>Family Steward Agent tạo cây gia đình trong Data Vault</li>
+            <li>Privacy-by-default: người sống ẩn, chỉ chủ sở hữu xem</li>
+            <li>Archivist Agent gắn nhãn bằng chứng cho mỗi node</li>
+            <li>Verifier Agent kiểm tra tính nhất quán</li>
+            <li>User có thể publish selectively sau khi phê duyệt</li>
+          </ol>
+          <p class="mt-3 text-xs text-gold italic">Result: Private family tree with evidence labels, no public exposure without explicit consent.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Screenshot gallery -->
     <div class="mt-12">
       <h2 class="text-xl font-serif font-bold text-ink mb-4">Screenshot Gallery / Thư viện ảnh chụp</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div class="aspect-video bg-bg-card border border-bg-border rounded-lg flex items-center justify-center">
-            <span class="text-ink-dim text-sm">Screenshot {i}</span>
+        {[
+          { label: 'Console Dashboard', vi: 'Bảng điều khiển' },
+          { label: 'Agent Team', vi: 'Đội Agent' },
+          { label: 'Command Center', vi: 'Trung tâm lệnh' },
+          { label: 'Data Vault', vi: 'Kho dữ liệu' },
+          { label: 'Family Tree', vi: 'Cây gia đình' },
+          { label: 'Evidence Report', vi: 'Báo cáo bằng chứng' },
+        ].map((shot) => (
+          <div class="aspect-video bg-bg-card border border-bg-border rounded-lg flex flex-col items-center justify-center p-4">
+            <div class="text-3xl text-ink-dim mb-2">🖼</div>
+            <span class="text-ink-muted text-sm font-medium">{shot.label}</span>
+            <span class="text-ink-dim text-xs" lang="vi">{shot.vi}</span>
           </div>
         ))}
       </div>
       <p class="mt-4 text-xs text-ink-dim italic">Screenshots to be added upon beta availability. <span lang="vi">Ảnh chụp sẽ được thêm khi có beta.</span></p>
+    </div>
+
+    <!-- Architecture diagram -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Architecture / Kiến trúc</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
+            <span class="text-gold font-mono text-xs shrink-0">Layer 1</span>
+            <span class="text-ink-dim">→</span>
+            <span class="text-ink-muted">Gen1 Core Engine (computer.iai.one) — runtime, agent, model routing, memory, tool, workflow, evidence</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
+            <span class="text-gold font-mono text-xs shrink-0">Layer 2</span>
+            <span class="text-ink-dim">→</span>
+            <span class="text-ink-muted">Gen2 Product System (maytinhai.org) — package, sell, operate AI Computers</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
+            <span class="text-gold font-mono text-xs shrink-0">Layer 3</span>
+            <span class="text-ink-dim">→</span>
+            <span class="text-ink-muted">Nguyen AI Computer (nguyenai.net) — specialized line with Nguyen Operating Profile</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
+            <span class="text-gold font-mono text-xs shrink-0">Layer 4</span>
+            <span class="text-ink-dim">→</span>
+            <span class="text-ink-muted">Edu (edu.nguyenai.net) — Academy and certification</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="mt-12"><Disclosure /></div>

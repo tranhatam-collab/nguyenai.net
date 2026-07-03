@@ -20,9 +20,57 @@ import Disclosure from '../../components/Disclosure.astro';
 
     <div class="mt-10 space-y-4">
       {[
-        { name: 'Term Sheet', vi: 'Bản điều khoản', desc: 'Key terms: valuation, raise, dilution, board, liquidation preferences', status: 'Placeholder' },
-        { name: 'SAFE Agreement', vi: 'Thỏa thuận SAFE', desc: 'Simple Agreement for Future Equity — standard YC SAFE template', status: 'Placeholder' },
-        { name: 'Subscription Agreement', vi: 'Thỏa thuận đăng ký', desc: 'Share subscription terms, conditions, representations', status: 'Placeholder' },
+        { name: 'Term Sheet', vi: 'Bản điều khoản', desc: 'Key terms: valuation, raise, dilution, board, liquidation preferences', status: 'Placeholder', terms: [
+          { k: 'Pre-money valuation', v: '$4.5M USD' },
+          { k: 'Raise amount', v: '$750K USD' },
+          { k: 'Instrument', v: 'SAFE or equity (negotiable)' },
+          { k: 'Discount', v: '20% (SAFE) — negotiable' },
+          { k: 'Valuation cap', v: '$4.5M (SAFE) — negotiable' },
+          { k: 'MFN provision', v: 'Yes — standard' },
+          { k: 'Pro-rata rights', v: 'Yes — for investors > $50K' },
+          { k: 'Board', v: 'Founder-controlled, 1 observer seat for lead investor' },
+          { k: 'Liquidation preference', v: '1x non-participating (equity round)' },
+          { k: 'Anti-dilution', v: 'Broad-based weighted average' },
+          { k: 'Closing conditions', v: 'Entity formation + IP transfer + KYC/AML' },
+        ] },
+        { name: 'SAFE Agreement', vi: 'Thỏa thuận SAFE', desc: 'Simple Agreement for Future Equity — standard YC SAFE template (post-money)', status: 'Placeholder', terms: [
+          { k: 'Template', v: 'Y Combinator Post-Money SAFE (standard)' },
+          { k: 'Cap', v: '$4.5M post-money' },
+          { k: 'Discount', v: '20%' },
+          { k: 'MFN', v: 'Yes — standard provision' },
+          { k: 'Pro-rata', v: 'Side letter for > $50K investors' },
+          { k: 'Governing law', v: 'Singapore or Vietnam (TBD with counsel)' },
+          { k: 'Currency', v: 'USD' },
+          { k: 'Minimum investment', v: '$25K' },
+        ] },
+        { name: 'Subscription Agreement', vi: 'Thỏa thuận đăng ký', desc: 'Share subscription terms, conditions, representations and warranties', status: 'Placeholder', terms: [
+          { k: 'Share type', v: 'Ordinary shares (equity round)' },
+          { k: 'Price per share', v: 'Based on post-money / total shares' },
+          { k: 'Lock-up', v: '12 months post-closing' },
+          { k: 'Transfer restrictions', v: 'Right of first refusal + co-sale' },
+          { k: 'Information rights', v: 'Quarterly + annual reports for > $50K' },
+          { k: 'Representations', v: 'Standard investor reps + company reps' },
+          { k: 'Conditions', v: 'Entity formation + IP transfer + bank account' },
+          { k: 'Closing', v: 'Within 30 days of term sheet signing' },
+        ] },
+        { name: 'IP Assignment Agreement', vi: 'Thỏa thuận chuyển nhượng IP', desc: 'Transfer of all IP from founder to HoldCo — precondition for investment close', status: 'Placeholder', terms: [
+          { k: 'From', v: 'Founder(s) — personal capacity' },
+          { k: 'To', v: 'HoldCo (IP holding entity)' },
+          { k: 'Scope', v: 'All code, brand, trademarks, docs, datasets, Agent designs' },
+          { k: 'Consideration', v: 'Founders shares in HoldCo' },
+          { k: 'Effective date', v: 'Closing date' },
+          { k: 'Warranty', v: 'Founder owns all IP, no third-party claims' },
+          { k: 'Status', v: '⚠ PENDING — precondition for close' },
+        ] },
+        { name: 'Data Processing Agreement', vi: 'Thỏa thuận xử lý dữ liệu', desc: 'PDPD 91/2025 compliant DPA for user data processing', status: 'Placeholder', terms: [
+          { k: 'Controller', v: 'User (data owner)' },
+          { k: 'Processor', v: 'Nguyen AI OpCo' },
+          { k: 'Law', v: 'Vietnam PDPD 91/2025 + GDPR (EU users)' },
+          { k: 'Sub-processors', v: 'Cloudflare, Neon, Stripe — listed in DPA schedule' },
+          { k: 'Data location', v: 'Cloudflare edge + Singapore (Neon primary)' },
+          { k: 'Retention', v: 'Per data classification policy' },
+          { k: 'Breach notification', v: '72 hours' },
+        ] },
       ].map((doc) => (
         <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
           <div class="flex items-start justify-between">
@@ -36,6 +84,18 @@ import Disclosure from '../../components/Disclosure.astro';
             </div>
             <span class="text-ink-dim text-2xl">📄</span>
           </div>
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-sm">
+              <tbody class="divide-y divide-bg-border">
+                {doc.terms.map((t) => (
+                  <tr>
+                    <td class="py-2 text-ink-muted text-xs uppercase">{t.k}</td>
+                    <td class="py-2 text-right text-ink text-sm">{t.v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <div class="mt-4 p-3 bg-bg-soft rounded-lg border border-bg-border">
             <p class="text-xs text-ink-dim italic">
               Document to be prepared with legal counsel upon entity formation. No bank account or executed documents exist yet.
@@ -44,6 +104,31 @@ import Disclosure from '../../components/Disclosure.astro';
           </div>
         </div>
       ))}
+    </div>
+
+    <!-- Legal prerequisites -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Legal Prerequisites / Điều kiện tiên quyết pháp lý</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <ul class="space-y-3 text-sm">
+          {[
+            { item: 'Entity formation (HoldCo + OpCo)', vi: 'Thành lập thực thể', status: 'Pending' },
+            { item: 'IP assignment to HoldCo', vi: 'Chuyển nhượng IP', status: 'Pending — precondition' },
+            { item: 'Bank account (USD + VND)', vi: 'Tài khoản ngân hàng', status: 'Pending' },
+            { item: 'KYC/AML for investors', vi: 'KYC/AML cho nhà đầu tư', status: 'Per investor' },
+            { item: 'Legal counsel engagement', vi: 'Thuê tư vấn pháp lý', status: 'Pending' },
+            { item: 'Governing law determination (SG vs VN)', vi: 'Quyết định luật áp dụng', status: 'Pending' },
+          ].map((p) => (
+            <li class="flex items-center justify-between p-3 bg-bg-soft rounded-lg border border-bg-border">
+              <div>
+                <span class="text-ink">{p.item}</span>
+                <span class="block text-xs text-gold" lang="vi">{p.vi}</span>
+              </div>
+              <span class="text-xs px-2 py-1 text-red-400 bg-red-400/10 rounded border border-red-400/30">{p.status}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
 
     <div class="mt-12"><Disclosure /></div>

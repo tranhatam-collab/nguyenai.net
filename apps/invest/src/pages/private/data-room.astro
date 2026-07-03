@@ -34,6 +34,42 @@ import Disclosure from '../../components/Disclosure.astro';
       ))}
     </div>
 
+    <!-- Access policy -->
+    <div class="mt-12">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Access Policy / Chính sách truy cập</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-6">
+        <ul class="space-y-3 text-sm text-ink-muted">
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Qualification required:</strong> All visitors must complete investor qualification before accessing documents.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Audit log:</strong> Every document access is logged with timestamp, IP, and user identity.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Expiring access:</strong> Access grants expire after 90 days unless renewed.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Revocable:</strong> Founder can revoke access at any time, for any reason.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">No download:</strong> Documents are view-only. No printing, downloading, or screenshotting permitted.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">NDA:</strong> Access implies acceptance of confidentiality terms.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Access log (placeholder) -->
+    <div class="mt-8">
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Recent Access Log / Nhật ký truy cập gần đây</h2>
+      <div class="bg-bg-card border border-bg-border rounded-xl p-5">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-bg-border">
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Timestamp</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Visitor</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Document</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-bg-border">
+            <tr><td class="py-2 text-ink-dim">—</td><td class="py-2 text-ink-dim">No access yet</td><td class="py-2 text-ink-dim">—</td><td class="py-2 text-right text-ink-dim">—</td></tr>
+          </tbody>
+        </table>
+        <p class="mt-3 text-xs text-ink-dim italic">Access log is populated when real investors visit. <span lang="vi">Nhật ký sẽ có khi nhà đầu tư thật truy cập.</span></p>
+      </div>
+    </div>
+
     <div class="mt-12"><Disclosure /></div>
   </section>
 </InvestLayout>
