@@ -13,7 +13,7 @@ import {
   canCrossTenantRead,
   type Relation,
   type ObjectType,
-} from './index.ts';
+} from './index';
 
 let passed = 0;
 let failed = 0;

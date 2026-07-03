@@ -20,7 +20,7 @@ import {
   SESSION_COOKIE_NAME,
   type Role,
   type Permission,
-} from './index.ts';
+} from './index';
 
 let passed = 0;
 let failed = 0;

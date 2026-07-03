@@ -2,20 +2,29 @@
   "name": "@nai/scroll",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for llama_index (https://github.com/run-llama/llama_index). Original source consumed via native package manager.",
+  "description": "RAG framework for NAI — document indexing, retrieval, source synthesis + citation.",
   "license": "MIT",
   "type": "module",
-  "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/llama-index\""
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "keywords": [
-    "llama_index",
-    "nai",
-    "nguyenai",
-    "py"
-  ],
-  "upstream": "https://github.com/run-llama/llama_index"
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'TODO: eslint for @nai/scroll'"
+  },
+  "keywords": ["llama_index", "rag", "nai", "nguyenai"],
+  "upstream": "https://github.com/run-llama/llama_index",
+  "dependencies": {
+    "@nai/compass": "workspace:*",
+    "@nai/evidence": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

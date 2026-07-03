@@ -9,7 +9,7 @@ import {
   checkEntitlementForAction,
   type PolicyContext,
   type ActionType,
-} from './index.ts';
+} from './index';
 import type { Entitlements } from '@nai/entitlement';
 
 let passed = 0;

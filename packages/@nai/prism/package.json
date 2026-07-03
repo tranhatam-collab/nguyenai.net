@@ -2,20 +2,26 @@
   "name": "@nai/prism",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for prism (https://github.com/langgenius/dify). Original source consumed via native package manager.",
+  "description": "LLM platform for NAI — model routing by tier, prompt versioning, GEN1 adapter. InMemory + interface.",
   "license": "Apache-2.0",
   "type": "module",
-  "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/dify\""
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "keywords": [
-    "dify",
-    "nai",
-    "nguyenai",
-    "ts"
-  ],
-  "upstream": "https://github.com/langgenius/dify"
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'TODO: eslint for @nai/prism'"
+  },
+  "keywords": ["dify", "nai", "nguyenai", "llm"],
+  "upstream": "https://github.com/langgenius/dify",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

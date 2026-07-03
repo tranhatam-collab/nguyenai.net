@@ -11,7 +11,7 @@ import {
   checkAcademyAccess,
   checkModelTierAccess,
   canUseModelTier,
-} from './index.ts';
+} from './index';
 
 let passed = 0;
 let failed = 0;

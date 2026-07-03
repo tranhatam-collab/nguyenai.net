@@ -2,20 +2,26 @@
   "name": "@nai/relic",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for relic (https://github.com/mem0ai/mem0). Original source consumed via native package manager.",
+  "description": "Long-term memory layer for NAI — 6 memory types (session, preference, project, decision, family, founder). InMemory + interface.",
   "license": "Apache-2.0",
   "type": "module",
-  "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/mem0\""
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "keywords": [
-    "mem0",
-    "nai",
-    "nguyenai",
-    "py"
-  ],
-  "upstream": "https://github.com/mem0ai/mem0"
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'TODO: eslint for @nai/relic'"
+  },
+  "keywords": ["mem0", "nai", "nguyenai", "memory"],
+  "upstream": "https://github.com/mem0ai/mem0",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

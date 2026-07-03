@@ -2,20 +2,26 @@
   "name": "@nai/conductor",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for conductor (https://github.com/langchain-ai/langgraph). Original source consumed via native package manager.",
+  "description": "Agent orchestration for NAI — 9 NAI Agents + state machine (init→plan→execute→verify→done).",
   "license": "MIT",
   "type": "module",
-  "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/langgraph\""
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "keywords": [
-    "langgraph",
-    "nai",
-    "nguyenai",
-    "ts"
-  ],
-  "upstream": "https://github.com/langchain-ai/langgraph"
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'TODO: eslint for @nai/conductor'"
+  },
+  "keywords": ["langgraph", "nai", "nguyenai", "agent"],
+  "upstream": "https://github.com/langchain-ai/langgraph",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

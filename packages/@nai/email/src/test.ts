@@ -93,11 +93,11 @@ await service.sendTemplate('welcome', {
   verification_token: 'tok123',
 });
 assert(mock.sent.length === 1, 'mock should have 1 sent email');
-assert(mock.sent[0].template_id === 'welcome', 'sent email should have template_id=welcome');
-assert(mock.sent[0].to === 'user@example.com', 'sent email should go to user@example.com');
-assert(mock.sent[0].subject.includes('Chào mừng'), 'VI welcome subject should contain "Chào mừng"');
-assert(mock.sent[0].html.includes('Nguyễn AI'), 'html should contain brand');
-assert(mock.sent[0].text.includes('Chào mừng'), 'text should contain greeting');
+assert(mock.sent[0]!.template_id === 'welcome', 'sent email should have template_id=welcome');
+assert(mock.sent[0]!.to === 'user@example.com', 'sent email should go to user@example.com');
+assert(mock.sent[0]!.subject.includes('Chào mừng'), 'VI welcome subject should contain "Chào mừng"');
+assert(mock.sent[0]!.html.includes('Nguyễn AI'), 'html should contain brand');
+assert(mock.sent[0]!.text.includes('Chào mừng'), 'text should contain greeting');
 console.log(`✓ Test 3: MockEmailClient captures sends`);
 
 // Test 4: EN template renders English
@@ -108,8 +108,8 @@ await service.sendTemplate('welcome', {
   user_name: 'John Nguyen',
   verification_token: 'tok456',
 });
-assert(mock.sent[0].subject.includes('Welcome'), 'EN welcome subject should contain "Welcome"');
-assert(mock.sent[0].text.includes('Welcome'), 'EN text should contain "Welcome"');
+assert(mock.sent[0]!.subject.includes('Welcome'), 'EN welcome subject should contain "Welcome"');
+assert(mock.sent[0]!.text.includes('Welcome'), 'EN text should contain "Welcome"');
 console.log(`✓ Test 4: EN template renders English`);
 
 // Test 5: Audit event → template mapping
@@ -148,8 +148,8 @@ await service.sendTemplate('certificate_issued', {
   certificate_id: 'NGAI-OPR-2026-000001-8F2C',
   program_id: 'OPR',
 });
-assert(mock.sent[0].html.includes('NGAI-OPR-2026-000001-8F2C'), 'certificate email should contain certificate ID');
-assert(mock.sent[0].html.includes('/certificates/NGAI-OPR-2026-000001-8F2C'), 'certificate email should contain verify link');
+assert(mock.sent[0]!.html.includes('NGAI-OPR-2026-000001-8F2C'), 'certificate email should contain certificate ID');
+assert(mock.sent[0]!.html.includes('/certificates/NGAI-OPR-2026-000001-8F2C'), 'certificate email should contain verify link');
 console.log(`✓ Test 8: Certificate ID format in template`);
 
 // Test 9: Account deletion reference code
@@ -159,8 +159,8 @@ await service.sendTemplate('account_deletion_requested', {
   user_email: 'user@example.com',
   reference_code: 'DEL-REF-789',
 });
-assert(mock.sent[0].html.includes('DEL-REF-789'), 'deletion email should contain reference code');
-assert(mock.sent[0].html.includes('30 ngày'), 'VI deletion email should mention 30 days');
+assert(mock.sent[0]!.html.includes('DEL-REF-789'), 'deletion email should contain reference code');
+assert(mock.sent[0]!.html.includes('30 ngày'), 'VI deletion email should mention 30 days');
 console.log(`✓ Test 9: Account deletion reference code`);
 
 // Test 10: HTML email has proper structure
@@ -174,7 +174,7 @@ await service.sendTemplate('payment_received', {
   invoice_id: 'INV-2026-001',
   payment_date: '2026-07-03',
 });
-const html = mock.sent[0].html;
+const html = mock.sent[0]!.html;
 assert(html.includes('<!DOCTYPE html>'), 'html should start with DOCTYPE');
 assert(html.includes('<html'), 'html should have <html> tag');
 assert(html.includes('</html>'), 'html should end with </html>');

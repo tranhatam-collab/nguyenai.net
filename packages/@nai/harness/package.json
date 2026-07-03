@@ -2,20 +2,30 @@
   "name": "@nai/harness",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for harness (https://github.com/OpenHands/software-agent-sdk). Original source consumed via native package manager.",
+  "description": "Agent SDK for NAI — tool call, approval integration, evidence generation.",
   "license": "MIT",
   "type": "module",
-  "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
-    "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/software-agent-sdk\""
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "keywords": [
-    "software-agent-sdk",
-    "nai",
-    "nguyenai",
-    "py"
-  ],
-  "upstream": "https://github.com/OpenHands/software-agent-sdk"
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'TODO: eslint for @nai/harness'"
+  },
+  "keywords": ["agent-sdk", "nai", "nguyenai"],
+  "upstream": "https://github.com/OpenHands/software-agent-sdk",
+  "dependencies": {
+    "@nai/approval": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/relic": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

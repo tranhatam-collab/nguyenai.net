@@ -11,7 +11,7 @@ import {
   markExecuted,
   checkApprovalStatus,
   listPendingApprovals,
-} from './index.ts';
+} from './index';
 import { InMemoryAuditStore, setAuditStore, queryAuditLog } from '@nai/audit';
 
 let passed = 0;

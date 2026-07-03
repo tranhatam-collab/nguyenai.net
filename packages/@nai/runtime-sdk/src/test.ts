@@ -11,7 +11,7 @@ import {
   createOrchestrationPlanForFreeTier,
   getLearningSuggestions,
   type AgentTask,
-} from './index.ts';
+} from './index';
 
 let passed = 0;
 let failed = 0;
