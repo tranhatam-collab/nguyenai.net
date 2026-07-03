@@ -283,7 +283,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     academySection: {
       title: 'Học viện — Academy',
-      body: 'Academy tách biệt tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Nguyen AI Computer. Academy Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
+      body: 'Academy tách biệt tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Nguyen AI Computer. Academy Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
       items: ['Track cơ bản: Làm chủ AI Computer (free)', 'Track Founder: Strategy + Pitch + Fundraising', 'Track Business: Operations + SOP + Automation', 'Track Heritage: Genealogy + Oral History + Evidence', 'Certification: độc lập, có audit, không tự cấp']
     },
     memoryVaultSection: {
@@ -474,7 +474,7 @@ const vi: Record<RouteKey, PageContent> = {
       { question: 'Model và Functional Product khác nhau thế nào?', answer: 'Model là cấp độ máy (năng lực phần cứng: agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt (chức năng). Bạn chọn 1 Model + 1 hoặc nhiều Functional Products.' },
       { question: 'Tôi có thể đổi gói không?', answer: 'Có. Bạn có thể nâng cấp Model bất cứ lúc nào. Functional Products có thể thêm hoặc gỡ theo nhu cầu.' },
       { question: 'Giá có phải cuối cùng không?', answer: 'Không. Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.' },
-      { question: 'Academy có bao gồm trong gói không?', answer: 'Không. Academy là sản phẩm trả phí riêng tại academy.nguyenai.net, mua standalone với Academy Pass.' },
+      { question: 'Academy có bao gồm trong gói không?', answer: 'Không. Academy là sản phẩm trả phí riêng tại edu.nguyenai.net, mua standalone với Academy Pass.' },
       { question: 'Trạng thái Available, Beta, Planned, Enterprise only nghĩa là gì?', answer: 'Available: đã hoạt động. Beta: đang thử nghiệm, có thể thay đổi. Planned: đang kế hoạch, chưa ra mắt. Enterprise only: chỉ cho Enterprise/Sovereign, cần liên hệ.' }
     ]
   },
@@ -527,8 +527,8 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký tại academy.nguyenai.net, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
-      { title: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký', body: 'Academy giữ tại academy.nguyenai.net, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
+    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy giữ tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký tại edu.nguyenai.net, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
+      { title: 'Academy giữ tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký', body: 'Academy giữ tại edu.nguyenai.net, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
     ]
   },
   security: {
@@ -553,7 +553,7 @@ const vi: Record<RouteKey, PageContent> = {
   },
   about: {
     key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc backend độc lập và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ AI Computer đám mây chuyên biệt cho hệ sinh thái Nguyễn, sở hữu backend riêng độc lập với @nai/* packages.', sections: [
-      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — backend độc lập', 'Nguyen Operating Profile — hồ sơ vận hành', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
+      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — backend độc lập', 'Nguyen Operating Profile — hồ sơ vận hành', 'nguyenai.net — Nguyen AI Computer', 'edu.nguyenai.net — Academy & certification'] },
       { title: 'Ranh giới đạo đức', body: 'Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống. Nguyen AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn.' }
     ]
   },
@@ -794,7 +794,7 @@ const en: Record<RouteKey, PageContent> = {
     },
     academySection: {
       title: 'Academy',
-      body: 'Academy is separate at academy.nguyenai.net, offering free AI learning for registrants, with a dedicated track for Nguyen AI Computer. Academy Pass is a separate entitlement, purchased standalone, not granted by default in any plan.',
+      body: 'Academy is separate at edu.nguyenai.net, offering free AI learning for registrants, with a dedicated track for Nguyen AI Computer. Academy Pass is a separate entitlement, purchased standalone, not granted by default in any plan.',
       items: ['Basic track: Master AI Computer (free)', 'Founder track: Strategy + Pitch + Fundraising', 'Business track: Operations + SOP + Automation', 'Heritage track: Genealogy + Oral History + Evidence', 'Certification: independent, audited, no self-issuance']
     },
     memoryVaultSection: {
@@ -985,7 +985,7 @@ const en: Record<RouteKey, PageContent> = {
       { question: 'How are Models and Functional Products different?', answer: 'A Model is a machine tier (hardware capacity: agent, memory, vault, quota). A Functional Product is a specialized tool bundle (function). You choose 1 Model + 1 or more Functional Products.' },
       { question: 'Can I change plans?', answer: 'Yes. You can upgrade your Model at any time. Functional Products can be added or removed as needed.' },
       { question: 'Are prices final?', answer: 'No. Current prices are pilot hypotheses, subject to validation of AI, storage, support and legal costs before commercial launch.' },
-      { question: 'Is Academy included in plans?', answer: 'No. Academy is a separate paid product at academy.nguyenai.net, purchased standalone with an Academy Pass.' },
+      { question: 'Is Academy included in plans?', answer: 'No. Academy is a separate paid product at edu.nguyenai.net, purchased standalone with an Academy Pass.' },
       { question: 'What do Available, Beta, Planned, Enterprise only mean?', answer: 'Available: live. Beta: in testing, may change. Planned: in roadmap, not yet launched. Enterprise only: Enterprise/Sovereign only, contact required.' }
     ]
   },
@@ -1038,8 +1038,8 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Training and certification', description: 'Independent paid Academy at academy.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
-      { title: 'Independent Academy', body: 'Academy is hosted at academy.nguyenai.net and provides a separate paid Academy Pass with independent certification.' }
+    key: 'academy', title: 'Academy — Training and certification', description: 'Independent paid Academy at edu.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
+      { title: 'Independent Academy', body: 'Academy is hosted at edu.nguyenai.net and provides a separate paid Academy Pass with independent certification.' }
     ]
   },
   security: {
@@ -1064,7 +1064,7 @@ const en: Record<RouteKey, PageContent> = {
   },
   about: {
     key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, independent backend architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, owning an independent backend with @nai/* packages.', sections: [
-      { title: 'Four-layer architecture', body: 'Independent backend, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — independent backend', 'Nguyen Operating Profile — operating profile', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
+      { title: 'Four-layer architecture', body: 'Independent backend, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — independent backend', 'Nguyen Operating Profile — operating profile', 'nguyenai.net — Nguyen AI Computer', 'edu.nguyenai.net — Academy & certification'] },
       { title: 'Ethical boundaries', body: 'The Nguyen Operating Profile is an operating profile, not a bloodline. Nguyen AI does not claim a single origin for all Nguyen people.' }
     ]
   },

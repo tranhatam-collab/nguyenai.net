@@ -1,16 +1,16 @@
 {
-  "name": "@nai/academy",
+  "name": "@nai/edu",
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "description": "Nguyen AI Academy — free AI learning for subscribers at academy.nguyenai.net",
+  "description": "Nguyen AI Edu — AI learning academy + certification at edu.nguyenai.net",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "pnpm build && wrangler pages deploy dist",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'academy tested via E2E'",
+    "test": "echo 'edu tested via E2E'",
     "lint": "echo 'no lint'",
     "astro": "astro"
   },

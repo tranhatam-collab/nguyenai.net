@@ -26,14 +26,18 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     <meta name="description" content={description} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={`https://academy.nguyenai.net${Astro.url.pathname}`} />
+    <link rel="canonical" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
+    <link rel="alternate" hreflang="vi" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
+    <link rel="alternate" hreflang="en" href={`https://edu.nguyenai.net/en${Astro.url.pathname}`} />
+    <link rel="alternate" hreflang="x-default" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
+    <link rel="sitemap" href="/sitemap.xml" />
 
     <!-- Open Graph -->
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" href={`https://academy.nguyenai.net${Astro.url.pathname}`} />
+    <meta property="og:url" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
 
     <title>{fullTitle}</title>
   </head>
@@ -184,7 +188,7 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 
         <div class="border-t border-academy-border mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p class="text-xs text-academy-muted">
-            © {new Date().getFullYear()} Nguyen AI. Academy at academy.nguyenai.net.
+            © {new Date().getFullYear()} Nguyen AI. Academy at edu.nguyenai.net.
           </p>
           <p class="text-xs text-academy-muted">
             Dữ liệu người đang sống luôn riêng tư theo mặc định.

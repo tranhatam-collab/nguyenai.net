@@ -121,7 +121,7 @@ Four-layer architecture:
 - Layer 1 — `computer.iai.one` — Gen1 core engine (runtime, agent, model routing, memory, tool, workflow, evidence)
 - Layer 2 — `maytinhai.org` — Gen2 public product system (package, sell, operate AI Computers)
 - Layer 3 — `nguyenai.net` — Nguyen AI Computer (specialized line with Nguyen Operating Profile)
-- Layer 4 — `academy.nguyenai.net` — Academy and certification
+- Layer 4 — `edu.nguyenai.net` — Academy and certification
 
 Approved product pillars (Super Apps + tool families):
 
@@ -144,7 +144,7 @@ Approved domains:
 - `admin.nguyenai.net` — administration
 - `docs.nguyenai.net` — documentation
 - `invest.nguyenai.net` — investors
-- `academy.nguyenai.net` — Academy (paid Academy Pass, separate entitlement)
+- `edu.nguyenai.net` — Academy (paid Academy Pass, separate entitlement)
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 
@@ -187,7 +187,7 @@ Current state:
 
 - Public website: `apps/web/` (Astro static, 54 bilingual routes) — ✅ build pass.
 - App console: `apps/console/` (Astro + React, 11 trang) — ✅ build pass.
-- Academy: `apps/academy/` (Astro + MDX, 25 trang) — ✅ build pass.
+- Edu: `apps/edu/` (Astro + MDX, 25 trang) — ✅ build pass.
 - Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
 - Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.

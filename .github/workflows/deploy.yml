@@ -40,6 +40,27 @@ jobs:
           path: apps/web/dist/
           retention-days: 1
 
+      - name: Upload edu dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-dist
+          path: apps/edu/dist/
+          retention-days: 1
+
+      - name: Upload console dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-dist
+          path: apps/console/dist/
+          retention-days: 1
+
+      - name: Upload invest dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: invest-dist
+          path: apps/invest/dist/
+          retention-days: 1
+
   deploy-web:
     name: Deploy Web to Cloudflare Pages
     needs: verify
@@ -62,6 +83,75 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/web
           command: pages deploy dist --project-name=nai-web
+
+  deploy-edu:
+    name: Deploy Edu to Cloudflare Pages
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: edu-dist
+          path: apps/edu/dist/
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/edu
+          command: pages deploy dist --project-name=nai-edu
+
+  deploy-console:
+    name: Deploy Console to Cloudflare Pages
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: console-dist
+          path: apps/console/dist/
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/console
+          command: pages deploy dist --project-name=nai-console
+
+  deploy-invest:
+    name: Deploy Invest to Cloudflare Pages
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: invest-dist
+          path: apps/invest/dist/
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/invest
+          command: pages deploy dist --project-name=nai-invest
 
   deploy-api:
     name: Deploy API Worker

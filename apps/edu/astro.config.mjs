@@ -6,7 +6,7 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://academy.nguyenai.net',
+  site: 'https://edu.nguyenai.net',
   output: 'hybrid',
   adapter: cloudflare({ mode: 'directory' }),
   integrations: [

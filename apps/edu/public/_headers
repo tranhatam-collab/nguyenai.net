@@ -9,6 +9,6 @@
 
 /api/*
   X-Robots-Tag: noindex, nofollow, noarchive
-  Access-Control-Allow-Origin: https://academy.nguyenai.net
+  Access-Control-Allow-Origin: https://edu.nguyenai.net
   Access-Control-Allow-Methods: GET, OPTIONS
   Access-Control-Allow-Headers: Content-Type

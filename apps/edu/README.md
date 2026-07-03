@@ -1,6 +1,6 @@
 # Nguyen AI Academy
 
-**academy.nguyenai.net** — Free AI learning for all Nguyen AI subscribers.
+**edu.nguyenai.net** — Free AI learning for all Nguyen AI subscribers.
 
 Nguyen AI Academy is Layer 4 in the Nguyen AI Computer four-layer architecture. It provides 10 learning tracks, verifiable certification and bilingual (VI/EN) content for the global Nguyen community.
 
@@ -160,7 +160,7 @@ npx wrangler pages deploy dist
 
 ### Custom domain
 
-Set custom domain `academy.nguyenai.net` in Cloudflare Pages dashboard → Custom domains.
+Set custom domain `edu.nguyenai.net` in Cloudflare Pages dashboard → Custom domains.
 
 ## API
 

@@ -18,43 +18,6 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  apps/academy:
-    dependencies:
-      '@astrojs/cloudflare':
-        specifier: ^11.0.0
-        version: 11.2.0(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
-      '@astrojs/mdx':
-        specifier: ^3.1.0
-        version: 3.1.9(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
-      '@astrojs/react':
-        specifier: ^3.6.0
-        version: 3.6.3(@types/node@22.20.0)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@astrojs/tailwind':
-        specifier: ^5.1.0
-        version: 5.1.5(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))(tailwindcss@3.4.19(tsx@4.22.4)(yaml@2.9.0))
-      astro:
-        specifier: ^4.16.0
-        version: 4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      tailwindcss:
-        specifier: ^3.4.0
-        version: 3.4.19(tsx@4.22.4)(yaml@2.9.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.3.11
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.31)
-      typescript:
-        specifier: ^5.5.0
-        version: 5.9.3
-
   apps/admin: {}
 
   apps/api:
@@ -162,6 +125,43 @@ importers:
         version: 18.3.1(react@18.3.1)
       tailwindcss:
         specifier: ^3.4.13
+        version: 3.4.19(tsx@4.22.4)(yaml@2.9.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.11
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  apps/edu:
+    dependencies:
+      '@astrojs/cloudflare':
+        specifier: ^11.0.0
+        version: 11.2.0(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
+      '@astrojs/mdx':
+        specifier: ^3.1.0
+        version: 3.1.9(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
+      '@astrojs/react':
+        specifier: ^3.6.0
+        version: 3.6.3(@types/node@22.20.0)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@astrojs/tailwind':
+        specifier: ^5.1.0
+        version: 5.1.5(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))(tailwindcss@3.4.19(tsx@4.22.4)(yaml@2.9.0))
+      astro:
+        specifier: ^4.16.0
+        version: 4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      tailwindcss:
+        specifier: ^3.4.0
         version: 3.4.19(tsx@4.22.4)(yaml@2.9.0)
     devDependencies:
       '@types/react':

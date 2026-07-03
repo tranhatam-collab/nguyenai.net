@@ -70,7 +70,7 @@ Tất cả extend `../../tsconfig.base.json`.
 
 | Dir | Files | Lý do |
 |---|---|---|
-| `apps/academy/` | 0 | Academy chưa build — Phase 2 |
+| `apps/edu/` | 0 | Academy chưa build — Phase 2 |
 | `apps/admin/` | 0 | Admin console chưa build — Phase 2 |
 | `apps/console/` | 0 | App console chưa build — Phase 2 |
 | `apps/invest/` | 0 | Investor site chưa build — Phase 2 |
