@@ -6,7 +6,9 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/p0b-e2e.ts && tsx src/audit-registry-e2e.ts",
+    "test": "tsx src/p0b-e2e.ts && tsx src/audit-registry-e2e.ts && tsx src/p1a-e2e.ts",
+    "test:p0b": "tsx src/p0b-e2e.ts && tsx src/audit-registry-e2e.ts",
+    "test:p1a": "tsx src/p1a-e2e.ts",
     "lint": "echo 'TODO'"
   },
   "dependencies": {
@@ -17,7 +19,14 @@
     "@nai/policy-engine": "workspace:*",
     "@nai/approval": "workspace:*",
     "@nai/product-catalog": "workspace:*",
-    "@nai/email": "workspace:*"
+    "@nai/email": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/conductor": "workspace:*",
+    "@nai/prism": "workspace:*",
+    "@nai/harness": "workspace:*",
+    "@nai/relic": "workspace:*",
+    "@nai/compass": "workspace:*",
+    "@nai/scroll": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
