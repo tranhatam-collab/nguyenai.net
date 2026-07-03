@@ -42,6 +42,13 @@ import {
   markNotificationRead,
   createAppeal,
   calculateTotalScore,
+  sendMessage,
+  listMessages,
+  uploadDocument,
+  listDocuments,
+  reviewDocument,
+  getApplicationTimeline,
+  transitionApplicationStatus,
   SCHOLARSHIP_AUDIT_EVENTS,
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
@@ -305,6 +312,89 @@ async function testAppeal() {
   assert(events.length === 1, '1 appeal_submitted event');
 }
 
+async function testMessages() {
+  console.log('Test: Sprint 2 messages');
+  setScholarshipStore(new InMemoryScholarshipStore());
+  setAuditStore(new InMemoryAuditStore());
+
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+
+  const msgId = await sendMessage(appId, 'u1', 'applicant', null, 'Hello', 'I have a question');
+  assert(typeof msgId === 'string', 'message created');
+
+  const msgs = await listMessages(appId, 'u1');
+  assert(msgs.length === 1, '1 message listed');
+  assert(msgs[0]?.subject === 'Hello', 'subject correct');
+
+  // IDOR: other user cannot list
+  try {
+    await listMessages(appId, 'u2');
+    assert(false, 'should throw IDOR');
+  } catch (e) {
+    assert((e as Error).message.includes('Not authorized'), 'IDOR blocked');
+  }
+}
+
+async function testDocuments() {
+  console.log('Test: Sprint 2 documents');
+  setScholarshipStore(new InMemoryScholarshipStore());
+
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+
+  const docId = await uploadDocument(appId, 'u1', 'income_proof', 'income.pdf', 'sch/test/income.pdf', 'application/pdf', 1024);
+  assert(typeof docId === 'string', 'document created');
+
+  const docs = await listDocuments(appId, 'u1');
+  assert(docs.length === 1, '1 document listed');
+  assert(docs[0]?.status === 'pending_review', 'initial status pending_review');
+
+  await reviewDocument(docId, 'admin1', true);
+  const docsAfter = await listDocuments(appId, 'u1');
+  assert(docsAfter[0]?.status === 'approved', 'document approved');
+}
+
+async function testTimelineAndStatusTransition() {
+  console.log('Test: Sprint 2 timeline + status transition');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  const appId = await createApplication('u1', {
+    full_name: 'Test',
+    email: 'test@example.com',
+    phone: '+84901234567',
+    program_code: 'NAO',
+    program_id: 'nao',
+  });
+
+  // Transition status
+  await transitionApplicationStatus(appId, 'admin1', 'admin', 'verified', 'All verifications passed');
+
+  const app = await getApplication(appId, 'u1');
+  assert(app?.status === 'verified', 'status transitioned to verified');
+
+  const timeline = await getApplicationTimeline(appId, 'u1');
+  assert(timeline.length === 1, '1 timeline entry');
+  assert(timeline[0]?.to_status === 'verified', 'timeline to_status correct');
+  assert(timeline[0]?.from_status === 'draft', 'timeline from_status correct');
+
+  // Notification should be created
+  const notes = await store.listNotifications('u1');
+  assert(notes.length === 1, '1 notification created for status change');
+}
+
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -318,6 +408,9 @@ async function main() {
   await testForumModeration();
   await testNotifications();
   await testAppeal();
+  await testMessages();
+  await testDocuments();
+  await testTimelineAndStatusTransition();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

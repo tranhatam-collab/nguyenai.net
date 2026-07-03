@@ -353,7 +353,58 @@ CREATE TABLE IF NOT EXISTS appeals (
 CREATE INDEX IF NOT EXISTS idx_appeals_app ON appeals(application_id);
 
 -- ============================================================
--- Verify: 17 tables created (audit_events is #18, already exists)
+-- Sprint 2 — Scholarship Room: messages, documents, timeline
+-- ============================================================
+
+-- 18. application_messages
+CREATE TABLE IF NOT EXISTS application_messages (
+  message_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  from_user_id UUID NOT NULL,
+  from_role TEXT NOT NULL CHECK (from_role IN ('applicant', 'council', 'admin', 'moderator', 'system')),
+  to_user_id UUID,
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL,
+  read BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  read_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_app ON application_messages(application_id);
+
+-- 19. application_documents
+CREATE TABLE IF NOT EXISTS application_documents (
+  document_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  user_id UUID NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('income_proof', 'identity_document', 'portfolio', 'recommendation_letter', 'project_screenshot', 'other')),
+  filename TEXT NOT NULL,
+  storage_key TEXT NOT NULL,
+  mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+  size_bytes BIGINT NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending_review' CHECK (status IN ('pending_review', 'approved', 'rejected')),
+  uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  reviewed_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_documents_app ON application_documents(application_id);
+
+-- 20. status_timeline_entries
+CREATE TABLE IF NOT EXISTS status_timeline_entries (
+  entry_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  from_status TEXT,
+  to_status TEXT NOT NULL,
+  changed_by UUID NOT NULL,
+  changed_by_role TEXT NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_timeline_app ON status_timeline_entries(application_id);
+
+-- ============================================================
+-- Verify: 20 tables created (audit_events is #18, already exists)
 -- ============================================================
 
 SELECT count(*) AS scholarship_table_count
@@ -363,7 +414,8 @@ SELECT count(*) AS scholarship_table_count
     'scholarship_wishes', 'wish_visibility_consents', 'reviews', 'review_scores',
     'votes', 'conflict_disclosures', 'sponsorships', 'investor_profiles',
     'investor_access_grants', 'forum_rooms', 'forum_posts', 'moderation_decisions',
-    'notifications', 'appeals'
+    'notifications', 'appeals', 'application_messages', 'application_documents',
+    'status_timeline_entries'
   );
 
 COMMIT;
