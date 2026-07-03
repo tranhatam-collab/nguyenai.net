@@ -14,6 +14,8 @@ const VALID_PLAN_IDS = [
   'nguyen-sovereign'
 ] as const;
 
+const VALID_PLAN_IDS_SET: ReadonlySet<string> = new Set(VALID_PLAN_IDS);
+
 const REQUIRED_ENTITLEMENT_KEYS = [
   'machine.plan', 'machine.instance.count', 'machine.model.tier',
   'machine.command.quota', 'machine.tokens.quota', 'machine.agents.enabled',
@@ -38,10 +40,10 @@ if (!validate({ plans })) {
 
 // 2. Cross-check: every plan in plans.json has an entry in entitlements.json
 for (const plan of plans) {
-  if (!VALID_PLAN_IDS.includes(plan.id)) {
+  if (!VALID_PLAN_IDS_SET.has(plan.id)) {
     errors.push(`Unknown plan id: ${plan.id}`);
   }
-  if (!entitlements[plan.id]) {
+  if (!entitlements[plan.id as keyof typeof entitlements]) {
     errors.push(`Missing entitlements for plan: ${plan.id}`);
   }
 }

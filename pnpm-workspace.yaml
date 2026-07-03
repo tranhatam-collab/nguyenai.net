@@ -1,11 +1,11 @@
 packages:
-- apps/*
-- packages/*
-- packages/@nai/*
-- migrations
-- tests/e2e
-- workers/*
-- tools/*
+  - apps/*
+  - packages/*
+  - packages/@nai/*
+  - migrations
+  - tests/e2e
+  - workers/*
+  - tools/*
 catalog:
   '@ai-sdk/amazon-bedrock': ^4.0.113
   '@ai-sdk/anthropic': ^3.0.81
@@ -212,6 +212,8 @@ catalog:
   eslint-plugin-markdown-preferences: ^0.0.0
   eslint-plugin-no-barrel-files: ^0.0.0
   vite-plus: ^0.0.0
+  '@cloudflare/workers-types': ^4.20260629.1
+  astro: ^7.0.6
 catalogs:
   e2e:
     '@currents/playwright': ^2.0.0
@@ -291,15 +293,15 @@ catalogs:
 catalogMode: strict
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-- '@n8n/*'
-- '@n8n_io/*'
-- astro
-- '@astrojs/*'
+  - '@n8n/*'
+  - '@n8n_io/*'
+  - astro
+  - '@astrojs/*'
 allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
 onlyBuiltDependencies:
-- esbuild
-- sharp
-- workerd
+  - esbuild
+  - sharp
+  - workerd

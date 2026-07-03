@@ -52,7 +52,7 @@ import {
 
 import { setAuditStore, logAuditEvent, logLoginSuccess, logLoginFailure, logLogout, logAccessDenied } from '@nai/audit';
 
-import { D1AuditStore } from './d1-audit-store.ts';
+import { D1AuditStore } from './d1-audit-store';
 import {
   findUserByEmail,
   findUserById,
@@ -79,7 +79,7 @@ import {
   findOAuthAccount,
   createOAuthAccount,
   findUserByEmailVerified,
-} from './db.ts';
+} from './db';
 
 import type { Context } from 'hono';
 
@@ -235,7 +235,7 @@ async function resolveSession(c: Context<AuthEnv>): Promise<Session | null> {
   if (!d1Session) return null;
   if (d1Session.revoked_at) return null;
   if (new Date(d1Session.expires_at) < new Date()) return null;
-  return parseD1Session(d1Session);
+  return parseD1Session(d1Session as unknown as Record<string, unknown>);
 }
 
 app.use('/v1/auth/*', async (c, next) => {
@@ -782,7 +782,7 @@ app.get('/v1/auth/audit', async (c) => {
     return c.json({ error: 'unauthorized' }, 401);
   }
 
-  const { queryAuditLogD1 } = await import('./db.ts');
+  const { queryAuditLogD1 } = await import('./db');
   const events = await queryAuditLogD1(c.env.DB, {
     user_id: session.user_id,
     event_type: c.req.query('event_type'),

@@ -303,7 +303,7 @@ export async function createVnPayCheckout(
 
   // Sort params alphabetically and build query string
   const sorted = Object.keys(params).sort();
-  const queryString = sorted.map((k) => `${k}=${encodeURIComponent(params[k])}`).join('&');
+  const queryString = sorted.map((k) => `${k}=${encodeURIComponent(params[k] ?? '')}`).join('&');
 
   // HMAC-SHA512
   const key = await crypto.subtle.importKey(

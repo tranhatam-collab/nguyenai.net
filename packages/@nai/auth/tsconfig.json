@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
-    "lib": ["ES2022"]
+    "lib": ["ES2022"],
+    "types": ["@cloudflare/workers-types", "node"]
   },
   "include": ["src/**/*.ts", "middleware/**/*.ts"]
 }

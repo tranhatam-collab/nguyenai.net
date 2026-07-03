@@ -20,8 +20,10 @@
     "otpauth": "^9.3.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
+    "@cloudflare/workers-types": "catalog:",
+    "@types/node": "^22.0.0",
+    "astro": "catalog:",
     "tsx": "^4.19.0",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.5.0"
   }
 }

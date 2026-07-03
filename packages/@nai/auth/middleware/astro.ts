@@ -26,7 +26,7 @@ export async function resolveSession(ctx: APIContext): Promise<Session | null> {
   const cookie = ctx.cookies.get(SESSION_COOKIE_NAME)?.value;
   if (!cookie) return null;
 
-  const apiBase = import.meta.env.API_BASE ?? 'http://localhost:8787';
+  const apiBase = (import.meta as unknown as { env?: { API_BASE?: string } }).env?.API_BASE ?? 'http://localhost:8787';
   try {
     const res = await fetch(`${apiBase}/v1/session`, {
       headers: { Cookie: `${SESSION_COOKIE_NAME}=${cookie}` },

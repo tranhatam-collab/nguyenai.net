@@ -60,9 +60,12 @@ console.log('\n=== Orchestration Plan (Free Tier) ===');
 const task: AgentTask = {
   id: 'test-task-1',
   type: 'research',
-  prompt: 'Nghiên cứu thị trường AI Computer tại Việt Nam',
-  priority: 'normal',
-  context: { userId: 'user-1', tenantId: 'tenant-1', sessionId: 'session-1' },
+  input: 'Nghiên cứu thị trường AI Computer tại Việt Nam',
+  priority: 1,
+  context: { userId: 'user-1', sessionId: 'session-1', tier: 'nguyen-start', language: 'vi', metadata: {} },
+  requiredSkills: ['research'],
+  reviewRequired: false,
+  maxAgents: 3,
 };
 
 const plan = createOrchestrationPlanForFreeTier(task);

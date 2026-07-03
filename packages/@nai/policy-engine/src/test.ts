@@ -10,7 +10,7 @@ import {
   type PolicyContext,
   type ActionType,
 } from './index';
-import type { Entitlements } from '@nai/entitlement';
+import type { ResolvedEntitlements as Entitlements } from '@nai/entitlement';
 
 let passed = 0;
 let failed = 0;

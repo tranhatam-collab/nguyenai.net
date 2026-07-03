@@ -75,7 +75,6 @@ import {
 // Phase 3 — Core Runtime imports
 import {
   resolveEntitlements as resolveEnt,
-  type Entitlements,
 } from '@nai/entitlement';
 import {
   AGENTS as NAI_AGENTS,
