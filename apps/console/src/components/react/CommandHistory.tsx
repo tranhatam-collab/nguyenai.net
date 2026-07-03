@@ -17,6 +17,7 @@ const STATUS_STYLES: Record<Command['status'], { dot: string; label: string }> =
   running: { dot: 'bg-status-idle animate-pulse', label: 'Running · Đang chạy' },
   completed: { dot: 'bg-status-active', label: 'Completed · Hoàn thành' },
   failed: { dot: 'bg-status-offline', label: 'Failed · Lỗi' },
+  pending: { dot: 'bg-slate-500', label: 'Pending · Chờ' },
 };
 
 const FILTERS: { id: StatusFilter; label: string }[] = [

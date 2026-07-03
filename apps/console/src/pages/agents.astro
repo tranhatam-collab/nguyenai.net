@@ -1,22 +1,10 @@
 ---
 export const prerender = false;
 /**
- * agents.astro — 9 Agent cards with status badges
+ * agents.astro — 9 Agent cards loaded from /v1/agents (real API)
  */
 import ConsoleLayout from '../layouts/ConsoleLayout.astro';
-import AgentCard from '../components/AgentCard.astro';
-
-const agents = [
-  { name: 'Nguyen Guide', role: 'Primary assistant · Trợ lý chính', status: 'idle' as const },
-  { name: 'Researcher', role: 'Deep research · Nghiên cứu chuyên sâu', status: 'idle' as const },
-  { name: 'Archivist', role: 'Knowledge organization · Tổ chức tri thức', status: 'offline' as const },
-  { name: 'Verifier', role: 'Fact-checking · Xác minh thông tin', status: 'offline' as const },
-  { name: 'Family Steward', role: 'Family management · Quản lý gia đình', status: 'offline' as const },
-  { name: 'Founder', role: 'Venture building · Xây dựng dự án', status: 'offline' as const },
-  { name: 'Business Operator', role: 'Operations · Vận hành doanh nghiệp', status: 'offline' as const },
-  { name: 'Global Connector', role: 'Networking · Kết nối toàn cầu', status: 'offline' as const },
-  { name: 'Guardian', role: 'Security & privacy · Bảo mật & riêng tư', status: 'active' as const },
-];
+import AgentList from '../components/react/AgentList.tsx';
 ---
 
 <ConsoleLayout title="Agent Team · Nguyen AI Console">
@@ -26,10 +14,6 @@ const agents = [
     <p class="text-sm text-slate-400">Đội ngũ Agent · Your 9 specialized AI agents</p>
   </div>
 
-  <!-- Agent grid -->
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {agents.map((agent) => (
-      <AgentCard name={agent.name} role={agent.role} status={agent.status} />
-    ))}
-  </div>
+  <!-- Agent list (React island — loads from /v1/agents) -->
+  <AgentList client:load />
 </ConsoleLayout>

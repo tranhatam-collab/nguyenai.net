@@ -4,18 +4,25 @@
  * - Model selector dropdown with cost estimate
  * - Command history dropdown (last 10 from localStorage)
  * - Cmd/Ctrl+Enter to run
- * - Dispatches `command:submit` custom event with { command, model }
+ * - Calls POST /v1/command (real API) and dispatches `command:submit` event
+ * - Handles approval_required state (pauses, shows approval prompt)
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { MODELS, PROVIDER_LABELS, getModelById } from '../../lib/models';
 import { getItem, setItem } from '../../lib/storage';
+import { api, ApiError, type CommandResponse } from '../../lib/api';
 import type { Command } from '../../types/command';
 
 const HISTORY_KEY = 'nguyenai:command-history';
 const MAX_HISTORY = 10;
 
 interface SubmitDetail {
+  response?: CommandResponse;
+  error?: string;
+}
+
+interface SubmitEventPayload extends SubmitDetail {
   command: string;
   model: string;
 }
@@ -26,44 +33,13 @@ export default function CommandInput() {
   const [running, setRunning] = useState(false);
   const [history, setHistory] = useState<Command[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [lastResponse, setLastResponse] = useState<CommandResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Load command history on mount
   useEffect(() => {
     const stored = getItem<Command[]>(HISTORY_KEY, []);
-    if (stored.length === 0) {
-      // Seed sample placeholder entries on first load
-      const now = Date.now();
-      const samples: Command[] = [
-        {
-          id: 'sample-1',
-          text: 'Tóm tắt báo cáo tài chính Q3 2024 / Summarize Q3 2024 financial report',
-          model: 'claude-3-5-sonnet',
-          timestamp: now - 1000 * 60 * 60 * 2,
-          status: 'completed',
-          result: 'Bản tóm tắt đã được tạo. / Summary generated.',
-        },
-        {
-          id: 'sample-2',
-          text: 'Generate Python script to clean CSV data',
-          model: 'gpt-4o',
-          timestamp: now - 1000 * 60 * 60 * 24,
-          status: 'completed',
-          result: 'Script generated.',
-        },
-        {
-          id: 'sample-3',
-          text: 'Translate product description to Vietnamese',
-          model: 'auto-route',
-          timestamp: now - 1000 * 60 * 60 * 48,
-          status: 'failed',
-          result: 'Translation service unavailable.',
-        },
-      ];
-      setItem(HISTORY_KEY, samples);
-      setHistory(samples);
-    } else {
-      setHistory(stored);
-    }
+    setHistory(stored);
   }, []);
 
   const selectedModel = useMemo(() => getModelById(modelId), [modelId]);
@@ -85,27 +61,28 @@ export default function CommandInput() {
   const persistHistory = useCallback((next: Command[]) => {
     setHistory(next);
     setItem(HISTORY_KEY, next);
-    // Notify other islands in the same document (storage event only fires cross-tab)
     window.dispatchEvent(new CustomEvent('command:history:updated'));
   }, []);
 
-  const dispatchSubmit = useCallback((command: string, model: string) => {
+  const dispatchSubmit = useCallback((command: string, model: string, detail?: SubmitDetail) => {
     window.dispatchEvent(
-      new CustomEvent<SubmitDetail>('command:submit', {
-        detail: { command, model },
+      new CustomEvent<SubmitEventPayload>('command:submit', {
+        detail: { command, model, ...detail },
       }),
     );
   }, []);
 
-  const handleRun = useCallback(() => {
+  const handleRun = useCallback(async () => {
     const trimmed = text.trim();
     if (!trimmed || running) return;
     setRunning(true);
-    dispatchSubmit(trimmed, modelId);
+    setError(null);
+    setLastResponse(null);
 
     // Optimistic UI: add a running entry to history
+    const entryId = `cmd-${Date.now()}`;
     const entry: Command = {
-      id: `cmd-${Date.now()}`,
+      id: entryId,
       text: trimmed,
       model: modelId,
       timestamp: Date.now(),
@@ -114,19 +91,42 @@ export default function CommandInput() {
     const next = [entry, ...history].slice(0, MAX_HISTORY);
     persistHistory(next);
 
-    // Simulate completion after a short delay (UI only, no real API)
-    window.setTimeout(() => {
+    try {
+      const resp = await api.submitCommand(trimmed);
+      setLastResponse(resp);
+
+      // Update history entry with real result
       const updated: Command[] = getItem<Command[]>(HISTORY_KEY, []).map((c) =>
-        c.id === entry.id
-          ? { ...c, status: 'completed' as const, result: 'Command processed (demo).' }
+        c.id === entryId
+          ? {
+              ...c,
+              status: resp.state === 'done' ? 'completed' : resp.state === 'failed' ? 'failed' : 'pending',
+              result: resp.output ?? resp.error ?? resp.message ?? `State: ${resp.state}`,
+              commandId: resp.command_id,
+              agentId: resp.agent_id,
+              evidenceLabels: resp.evidence_labels,
+            }
           : c,
       );
       setItem(HISTORY_KEY, updated);
       setHistory(updated);
       window.dispatchEvent(new CustomEvent('command:history:updated'));
-      setRunning(false);
+
+      dispatchSubmit(trimmed, modelId, { response: resp });
       setText('');
-    }, 1200);
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : 'Command failed. · Lệnh thất bại.';
+      setError(msg);
+      const updated: Command[] = getItem<Command[]>(HISTORY_KEY, []).map((c) =>
+        c.id === entryId ? { ...c, status: 'failed' as const, result: msg } : c,
+      );
+      setItem(HISTORY_KEY, updated);
+      setHistory(updated);
+      window.dispatchEvent(new CustomEvent('command:history:updated'));
+      dispatchSubmit(trimmed, modelId, { error: msg });
+    } finally {
+      setRunning(false);
+    }
   }, [text, running, modelId, history, persistHistory, dispatchSubmit]);
 
   const handleKeyDown = useCallback(
@@ -292,6 +292,46 @@ export default function CommandInput() {
           </button>
         </div>
       </div>
+
+      {/* Error display */}
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-800 bg-red-950/40 p-3 text-sm text-red-300">
+          <p className="font-medium">Error · Lỗi:</p>
+          <p className="mt-1 font-mono text-xs">{error}</p>
+        </div>
+      )}
+
+      {/* Response display */}
+      {lastResponse && (
+        <div className="mt-4 rounded-lg border border-slate-700 bg-bg-card p-3 text-sm">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
+              State: {lastResponse.state}
+            </span>
+            {lastResponse.agent_id && (
+              <span className="rounded bg-accent/20 px-2 py-0.5 text-xs text-accent">
+                Agent: {lastResponse.agent_id}
+              </span>
+            )}
+            {lastResponse.evidence_labels?.map((label) => (
+              <span key={label} className="rounded bg-blue-900/40 px-2 py-0.5 text-xs text-blue-300">
+                {label}
+              </span>
+            ))}
+          </div>
+          {lastResponse.output && (
+            <pre className="max-h-48 overflow-y-auto whitespace-pre-wrap font-mono text-xs text-slate-300">
+              {lastResponse.output}
+            </pre>
+          )}
+          {lastResponse.message && (
+            <p className="text-xs text-amber-300">{lastResponse.message}</p>
+          )}
+          {lastResponse.error && (
+            <p className="mt-1 text-xs text-red-300">{lastResponse.error}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

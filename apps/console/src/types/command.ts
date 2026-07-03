@@ -7,8 +7,14 @@ export interface Command {
   text: string;
   model: string;
   timestamp: number;
-  status: 'running' | 'completed' | 'failed';
+  status: 'running' | 'completed' | 'failed' | 'pending';
   result?: string;
+  /** Real command id from the API (when submitted via /v1/command). */
+  commandId?: string;
+  /** Agent that handled the command. */
+  agentId?: string;
+  /** Evidence labels assigned by the verifier. */
+  evidenceLabels?: string[];
 }
 
 export type ModelProvider =
