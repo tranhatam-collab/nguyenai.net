@@ -87,6 +87,7 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/legal/NGUYEN_AI_IP_AGREEMENT_TEMPLATE.md`
 - `docs/legal/NGUYEN_AI_DATA_ROOM_PLAN.md`
 - `docs/architecture/NGUYEN_AI_GEN2_INTEGRATION_PLAN.md`
+- `docs/architecture/UNIFIED_SUBDOMAIN_ARCHITECTURE.md` — 9 subdomains + API mesh + SaaS master plan (BINDING)
 
 ### Superseded (giữ làm tham khảo lịch sử, không sử dụng cho quyết định mới)
 
@@ -139,14 +140,23 @@ Approved plans (V2 pricing):
 
 Approved domains:
 
-- `nguyenai.net` — public brand and product
-- `app.nguyenai.net` — AI Computer Console
-- `admin.nguyenai.net` — administration
-- `docs.nguyenai.net` — documentation
-- `invest.nguyenai.net` — investors
-- `edu.nguyenai.net` — Academy (paid Academy Pass, separate entitlement)
-- `status.nguyenai.net` — service status
-- `api.nguyenai.net` — API gateway
+- `nguyenai.net` — public brand and product (`apps/web`)
+- `app.nguyenai.net` — AI Computer Console (`apps/console`)
+- `edu.nguyenai.net` — Academy (paid Academy Pass, separate entitlement) (`apps/edu`)
+- `invest.nguyenai.net` — investors (`apps/invest`)
+- `docs.nguyenai.net` — documentation (`apps/docs`, Phase 2)
+- `status.nguyenai.net` — service status (`apps/status`, Phase 2)
+- `admin.nguyenai.net` — administration (`apps/admin`, Phase 2)
+- `api.nguyenai.net` — API gateway (`apps/api`, Cloudflare Workers)
+- `auth.nguyenai.net` — Auth service (`apps/auth`, Cloudflare Workers)
+
+Cross-domain binding rules:
+
+- All subdomains share session cookie `Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax`.
+- CORS only allows `https://*.nguyenai.net` + `http://localhost:4321` (dev).
+- API mesh: `api.nguyenai.net` is the REST gateway; `auth.nguyenai.net` is the auth service.
+- Each subdomain has its own DNS record (Cloudflare), its own Pages/Workers project, and its own `_headers` security policy.
+- See `docs/architecture/UNIFIED_SUBDOMAIN_ARCHITECTURE.md` for the full binding architecture.
 
 ## Ethics and historical boundaries
 
