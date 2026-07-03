@@ -1,6 +1,6 @@
 -- 002_audit_event_registry.sql
 -- Replace hardcoded CHECK constraint with versioned event registry.
--- Per AUDIT_EVENT_REGISTRY.md (registry version 2026-07-02.1, 38 event types)
+-- Per AUDIT_EVENT_REGISTRY.md (registry version 2026-07-03.1, 63 event types)
 --
 -- This migration:
 -- 1. Creates audit_event_registry table
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS audit_event_registry (
 );
 
 -- ============================================================
--- 2. Insert all 38 event types (registry version 2026-07-02.1)
+-- 2. Insert all 63 event types (registry version 2026-07-02.1)
 -- ============================================================
 
 INSERT INTO audit_event_registry (event_type, registry_version, description) VALUES
@@ -72,7 +72,32 @@ INSERT INTO audit_event_registry (event_type, registry_version, description) VAL
   ('certificate_revoked', '2026-07-02.1', 'Certificate revoked'),
   -- Billing & investor events (2)
   ('payment_received', '2026-07-02.1', 'Payment received for plan/Product'),
-  ('investor_room_accessed', '2026-07-02.1', 'Investor private room accessed')
+  ('investor_room_accessed', '2026-07-02.1', 'Investor private room accessed'),
+  -- Scholarship events (24) — registry version 2026-07-03.1
+  ('scholarship_application_created', '2026-07-03.1', 'Scholarship application created'),
+  ('scholarship_application_updated', '2026-07-03.1', 'Application fields updated'),
+  ('identity_verification_started', '2026-07-03.1', 'Email/phone/identity verification started'),
+  ('identity_verification_completed', '2026-07-03.1', 'Verification completed'),
+  ('investor_access_granted', '2026-07-03.1', 'Investor granted access to applications'),
+  ('investor_access_revoked', '2026-07-03.1', 'Investor access revoked'),
+  ('scholarship_profile_viewed', '2026-07-03.1', 'Investor viewed applicant profile'),
+  ('wish_shared_with_investors', '2026-07-03.1', 'Wish visibility set to investors_only'),
+  ('wish_publication_requested', '2026-07-03.1', 'Applicant requested public publication'),
+  ('wish_publication_approved', '2026-07-03.1', 'Admin approved wish publication'),
+  ('wish_publication_rejected', '2026-07-03.1', 'Admin rejected wish publication'),
+  ('scholarship_review_submitted', '2026-07-03.1', 'Investor submitted review'),
+  ('scholarship_vote_submitted', '2026-07-03.1', 'Council member voted'),
+  ('conflict_of_interest_declared', '2026-07-03.1', 'Reviewer declared conflict'),
+  ('scholarship_awarded', '2026-07-03.1', 'Scholarship awarded to applicant'),
+  ('scholarship_declined', '2026-07-03.1', 'Scholarship offer declined'),
+  ('sponsorship_committed', '2026-07-03.1', 'Sponsor committed funds'),
+  ('sponsorship_paid', '2026-07-03.1', 'Sponsorship payment completed'),
+  ('scholarship_enrollment_activated', '2026-07-03.1', 'Enrolled in program'),
+  ('forum_post_submitted', '2026-07-03.1', 'Forum post submitted for moderation'),
+  ('forum_post_approved', '2026-07-03.1', 'Moderator approved post'),
+  ('forum_post_rejected', '2026-07-03.1', 'Moderator rejected post'),
+  ('complaint_submitted', '2026-07-03.1', 'User submitted complaint'),
+  ('appeal_submitted', '2026-07-03.1', 'Applicant submitted appeal')
 ON CONFLICT (event_type) DO NOTHING;
 
 -- ============================================================
@@ -109,7 +134,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_event_registry_version
 -- 6. Verify
 -- ============================================================
 
--- Should return 38
+-- Should return 63
 SELECT count(*) AS event_type_count FROM audit_event_registry
-  WHERE registry_version = '2026-07-02.1';
+  WHERE registry_version IN ('2026-07-02.1', '2026-07-03.1');
 COMMIT;

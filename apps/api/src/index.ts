@@ -105,6 +105,9 @@ import {
   type MemoryType,
 } from '@nai/relic';
 
+// Scholarship routes (Sprint 1 — 21 endpoints per EDU_MASTER_PLAN_V4 §XXXV)
+import { scholarshipRoutes } from './scholarship-routes';
+
 // Load prices.json + models.json statically (bundled at build time)
 import pricesData from '../../../packages/product-catalog/prices.json';
 import modelsData from '../../../packages/product-catalog/models.json';
@@ -1033,5 +1036,12 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
 
   return c.json({ received: true, processed: true, payment: result, invoice });
 });
+
+// ============================================================
+// Scholarship routes — 21 endpoints per EDU_MASTER_PLAN_V4 §XXXV
+// Mounted at /v1/scholarship/*
+// ============================================================
+
+app.route('/v1/scholarship', scholarshipRoutes);
 
 export default app;

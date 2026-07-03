@@ -70,6 +70,9 @@ importers:
       '@nai/relic':
         specifier: workspace:*
         version: link:../../packages/@nai/relic
+      '@nai/scholarship':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scholarship
       hono:
         specifier: ^4.6.0
         version: 4.12.27
@@ -542,6 +545,22 @@ importers:
         version: 5.9.3
 
   packages/@nai/scale: {}
+
+  packages/@nai/scholarship:
+    dependencies:
+      '@nai/audit':
+        specifier: workspace:*
+        version: link:../audit
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/scout: {}
 

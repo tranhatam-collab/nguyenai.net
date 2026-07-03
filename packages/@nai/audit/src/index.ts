@@ -60,9 +60,34 @@ export type AuditEventType =
   | 'certificate_revoked'
   // Billing & investor events (2)
   | 'payment_received'
-  | 'investor_room_accessed';
+  | 'investor_room_accessed'
+  // Scholarship events (24) — per EDU_MASTER_PLAN_V4 §XXXIV
+  | 'scholarship_application_created'
+  | 'scholarship_application_updated'
+  | 'identity_verification_started'
+  | 'identity_verification_completed'
+  | 'investor_access_granted'
+  | 'investor_access_revoked'
+  | 'scholarship_profile_viewed'
+  | 'wish_shared_with_investors'
+  | 'wish_publication_requested'
+  | 'wish_publication_approved'
+  | 'wish_publication_rejected'
+  | 'scholarship_review_submitted'
+  | 'scholarship_vote_submitted'
+  | 'conflict_of_interest_declared'
+  | 'scholarship_awarded'
+  | 'scholarship_declined'
+  | 'sponsorship_committed'
+  | 'sponsorship_paid'
+  | 'scholarship_enrollment_activated'
+  | 'forum_post_submitted'
+  | 'forum_post_approved'
+  | 'forum_post_rejected'
+  | 'complaint_submitted'
+  | 'appeal_submitted';
 
-export const AUDIT_REGISTRY_VERSION = '2026-07-02.1';
+export const AUDIT_REGISTRY_VERSION = '2026-07-03.1';
 export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'login_success', 'login_failure', 'logout', 'session_revoked', 'session_expired',
   'passkey_registered', 'passkey_removed', 'mfa_enrolled', 'mfa_removed',
@@ -75,6 +100,19 @@ export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'command_executed', 'command_failed', 'command_cancelled', 'tool_called', 'workflow_completed',
   'academy_lesson_completed', 'proof_submitted', 'certificate_issued', 'certificate_revoked',
   'payment_received', 'investor_room_accessed',
+  'scholarship_application_created', 'scholarship_application_updated',
+  'identity_verification_started', 'identity_verification_completed',
+  'investor_access_granted', 'investor_access_revoked',
+  'scholarship_profile_viewed',
+  'wish_shared_with_investors', 'wish_publication_requested',
+  'wish_publication_approved', 'wish_publication_rejected',
+  'scholarship_review_submitted', 'scholarship_vote_submitted',
+  'conflict_of_interest_declared',
+  'scholarship_awarded', 'scholarship_declined',
+  'sponsorship_committed', 'sponsorship_paid',
+  'scholarship_enrollment_activated',
+  'forum_post_submitted', 'forum_post_approved', 'forum_post_rejected',
+  'complaint_submitted', 'appeal_submitted',
 ] as const;
 
 export type AuditResult = 'success' | 'failure' | 'denied';

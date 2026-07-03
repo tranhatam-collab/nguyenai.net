@@ -1,0 +1,75 @@
+/**
+ * @nai/scholarship — Public API
+ */
+
+export type {
+  ScholarshipApplication,
+  ApplicantProfile,
+  IdentityVerification,
+  ScholarshipWish,
+  WishVisibilityConsent,
+  Review,
+  ReviewScore,
+  Vote,
+  ConflictDisclosure,
+  Sponsorship,
+  InvestorProfile,
+  InvestorAccessGrant,
+  ForumRoom,
+  ForumPost,
+  ModerationDecision,
+  Notification,
+  Appeal,
+  ApplicationStatus,
+  ForumPostStatus,
+  WishVisibility,
+  VerificationType,
+  VerificationStatus,
+  InvestorRole,
+  ReviewScoreCriteria,
+  SponsorshipType,
+  ModerationAction,
+  AppealType,
+} from './types';
+
+export {
+  SCHOLARSHIP_AUDIT_EVENTS,
+  SCORING_WEIGHTS,
+  SCHOLARSHIP_PROGRAMS,
+  MODERATION_PROHIBITED,
+} from './types';
+
+export {
+  InMemoryScholarshipStore,
+  setScholarshipStore,
+  getScholarshipStore,
+  type ScholarshipStore,
+} from './store';
+
+export {
+  createApplication,
+  updateApplication,
+  submitApplication,
+  getApplication,
+  startVerification,
+  completeVerification,
+  createWish,
+  updateWishVisibility,
+  requestWishPublication,
+  approveWishPublication,
+  rejectWishPublication,
+  createReview,
+  submitReviewScores,
+  submitVote,
+  declareConflict,
+  createSponsorship,
+  markSponsorshipPaid,
+  createForumPost,
+  submitForumPost,
+  moderateForumPost,
+  createNotification,
+  listNotifications,
+  markNotificationRead,
+  createAppeal,
+  calculateTotalScore,
+} from './service';

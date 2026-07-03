@@ -25,7 +25,8 @@
     "@nai/evidence": "workspace:*",
     "@nai/conductor": "workspace:*",
     "@nai/prism": "workspace:*",
-    "@nai/relic": "workspace:*"
+    "@nai/relic": "workspace:*",
+    "@nai/scholarship": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

@@ -1,0 +1,416 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import { SCHOLARSHIP_PROGRAMS } from '../data/scholarship-programs';
+
+const programs = SCHOLARSHIP_PROGRAMS;
+---
+
+<AcademyLayout
+  title="Đăng ký học bổng — 8 bước"
+  description="Form đăng ký học bổng Nguyen AI Edu — 8 phần: cơ bản, xác minh, họ Nguyễn, chương trình, nguyện vọng, hoàn cảnh, năng lực, cam kết."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-2">Đăng ký học bổng</h1>
+    <p class="text-gray-600 mb-8">8 bước — bạn có thể lưu nháp và quay lại sau.</p>
+
+    <!-- Progress indicator -->
+    <div class="flex items-center gap-2 mb-8 flex-wrap" id="progress-bar">
+      {Array.from({ length: 8 }, (_, i) => (
+        <div class="flex items-center">
+          <span class={`step-dot ${i === 0 ? 'active' : ''}`} data-step={i + 1}>{i + 1}</span>
+          {i < 7 && <span class="step-line"></span>}
+        </div>
+      ))}
+    </div>
+
+    <form id="scholarship-form" class="space-y-8">
+      <!-- Part 1: Basic Info -->
+      <div class="form-part" data-part="1">
+        <h2 class="text-xl font-semibold mb-4">Phần 1 — Thông tin cơ bản</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="full_name" class="block text-sm font-medium mb-1">Họ và tên *</label>
+            <input type="text" id="full_name" name="full_name" required class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium mb-1">Email *</label>
+            <input type="email" id="email" name="email" required class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-medium mb-1">Số điện thoại *</label>
+            <input type="tel" id="phone" name="phone" required class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label for="birth_year" class="block text-sm font-medium mb-1">Năm sinh</label>
+            <input type="number" id="birth_year" name="birth_year" min="1950" max="2010" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label for="country" class="block text-sm font-medium mb-1">Quốc gia</label>
+            <input type="text" id="country" name="country" value="Việt Nam" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label for="city" class="block text-sm font-medium mb-1">Thành phố</label>
+            <input type="text" id="city" name="city" class="w-full px-3 py-2 border rounded" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2: Identity Verification -->
+      <div class="form-part hidden" data-part="2">
+        <h2 class="text-xl font-semibold mb-4">Phần 2 — Xác minh danh tính</h2>
+        <p class="text-sm text-gray-600 mb-4">Bạn cần xác minh email, số điện thoại và danh tính. Hệ thống sẽ gửi mã OTP.</p>
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <button type="button" id="verify-email-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh email</button>
+            <span id="email-verified-status" class="text-sm">Chưa xác minh</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <button type="button" id="verify-phone-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh số điện thoại</button>
+            <span id="phone-verified-status" class="text-sm">Chưa xác minh</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <button type="button" id="verify-identity-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh danh tính</button>
+            <span id="identity-verified-status" class="text-sm">Chưa xác minh</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3: Nguyen Lineage -->
+      <div class="form-part hidden" data-part="3">
+        <h2 class="text-xl font-semibold mb-4">Phần 3 — Thông tin về dòng họ Nguyễn</h2>
+        <p class="text-sm text-gray-600 mb-4">Việc mang họ Nguyễn là tiêu chí ưu tiên, không phải điều kiện duy nhất.</p>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Bạn có mang họ Nguyễn không? *</label>
+            <div class="flex gap-4">
+              <label><input type="radio" name="has_nguyen_surname" value="true" /> Có</label>
+              <label><input type="radio" name="has_nguyen_surname" value="false" /> Không</label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Họ Nguyễn là họ khai sinh hay họ đang sử dụng?</label>
+            <select name="surname_type" class="w-full px-3 py-2 border rounded">
+              <option value="">— Chọn —</option>
+              <option value="birth">Họ khai sinh</option>
+              <option value="current">Họ đang sử dụng</option>
+              <option value="both">Cả hai</option>
+              <option value="neither">Không phải</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Bạn có mong muốn tham gia cộng đồng Nguyễn AI không?</label>
+            <label><input type="checkbox" name="wants_community" /> Có, tôi muốn tham gia</label>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Bạn có đồng ý chia sẻ câu chuyện về tên họ của mình không?</label>
+            <label><input type="checkbox" name="consents_story_sharing" /> Tôi đồng ý</label>
+          </div>
+        </div>
+        <div class="mt-4 p-3 bg-yellow-50 rounded text-sm">
+          <p><strong>Không yêu cầu:</strong> chứng minh huyết thống, chứng minh cùng tổ tiên, cung cấp gia phả, xác nhận quan hệ chi tộc.</p>
+        </div>
+      </div>
+
+      <!-- Part 4: Program Selection -->
+      <div class="form-part hidden" data-part="4">
+        <h2 class="text-xl font-semibold mb-4">Phần 4 — Chương trình đăng ký</h2>
+        <p class="text-sm text-gray-600 mb-4">Chọn một trong chín chương trình:</p>
+        <div class="space-y-2">
+          {programs.map((p) => (
+            <label class="flex items-start gap-3 p-3 border rounded hover:bg-gray-50 cursor-pointer">
+              <input type="radio" name="program_code" value={p.code} class="mt-1" />
+              <div>
+                <div class="font-medium">{p.code} — {p.name}</div>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <!-- Part 5: Wish -->
+      <div class="form-part hidden" data-part="5">
+        <h2 class="text-xl font-semibold mb-4">Phần 5 — Nguyện vọng</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="wish_text" class="block text-sm font-medium mb-1">Nguyện vọng của bạn *</label>
+            <textarea id="wish_text" name="wish_text" rows="5" required class="w-full px-3 py-2 border rounded" placeholder="Mô tả nguyện vọng học tập của bạn..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Độ hiển thị nguyện vọng</label>
+            <select name="wish_visibility" class="w-full px-3 py-2 border rounded">
+              <option value="private">Riêng tư (chỉ tôi)</option>
+              <option value="investors_only">Chỉ nhà tài trợ/nhà đầu tư</option>
+              <option value="public">Công khai (cần duyệt)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 6: Circumstances -->
+      <div class="form-part hidden" data-part="6">
+        <h2 class="text-xl font-semibold mb-4">Phần 6 — Hoàn cảnh</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="circumstances_text" class="block text-sm font-medium mb-1">Mô tả hoàn cảnh của bạn *</label>
+            <textarea id="circumstances_text" name="circumstances_text" rows="5" required class="w-full px-3 py-2 border rounded" placeholder="Mô tả hoàn cảnh tài chính, gia đình, khó khăn..."></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Mức độ cần hỗ trợ tài chính</label>
+            <select name="financial_need_level" class="w-full px-3 py-2 border rounded">
+              <option value="">— Chọn —</option>
+              <option value="low">Thấp</option>
+              <option value="medium">Trung bình</option>
+              <option value="high">Cao</option>
+              <option value="critical">Rất cao</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 7: Capability -->
+      <div class="form-part hidden" data-part="7">
+        <h2 class="text-xl font-semibold mb-4">Phần 7 — Năng lực</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="capability_text" class="block text-sm font-medium mb-1">Mô tả năng lực của bạn *</label>
+            <textarea id="capability_text" name="capability_text" rows="5" required class="w-full px-3 py-2 border rounded" placeholder="Kỹ năng, kinh nghiệm, dự án đã làm..."></textarea>
+          </div>
+          <div>
+            <label for="portfolio_url" class="block text-sm font-medium mb-1">Link portfolio (nếu có)</label>
+            <input type="url" id="portfolio_url" name="portfolio_url" class="w-full px-3 py-2 border rounded" placeholder="https://..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 8: Commitments -->
+      <div class="form-part hidden" data-part="8">
+        <h2 class="text-xl font-semibold mb-4">Phần 8 — Cam kết</h2>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3">
+            <input type="checkbox" name="commits_to_attendance" class="mt-1" />
+            <span>Tôi cam kết tham gia đầy đủ các buổi học *</span>
+          </label>
+          <label class="flex items-start gap-3">
+            <input type="checkbox" name="commits_to_graduation" class="mt-1" />
+            <span>Tôi cam kết hoàn thành chương trình *</span>
+          </label>
+          <label class="flex items-start gap-3">
+            <input type="checkbox" name="commits_to_community" class="mt-1" />
+            <span>Tôi cam kết đóng góp cho cộng đồng Nguyễn AI</span>
+          </label>
+          <label class="flex items-start gap-3">
+            <input type="checkbox" name="consents_to_data_processing" class="mt-1" />
+            <span>Tôi đồng ý với việc xử lý dữ liệu cá nhân cho mục đích xét học bổng *</span>
+          </label>
+          <label class="flex items-start gap-3">
+            <input type="checkbox" name="consents_to_audit" class="mt-1" />
+            <span>Tôi đồng ý với việc hệ thống ghi lại audit log cho mọi thao tác *</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="flex justify-between pt-4 border-t">
+        <button type="button" id="prev-btn" class="px-6 py-2 border rounded disabled:opacity-50" disabled>← Trước</button>
+        <span id="autosave-status" class="text-sm text-gray-400 self-center"></span>
+        <button type="button" id="next-btn" class="px-6 py-2 bg-blue-600 text-white rounded">Tiếp →</button>
+      </div>
+
+      <!-- Submit (hidden until part 8) -->
+      <div class="hidden" id="submit-section">
+        <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white rounded font-semibold">
+          Nộp đơn đăng ký
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <style>
+    .step-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .step-dot.active { background: #2563eb; color: white; }
+    .step-dot.completed { background: #16a34a; color: white; }
+    .step-line {
+      display: inline-block;
+      width: 24px;
+      height: 2px;
+      background: #e5e7eb;
+    }
+    .form-part.hidden { display: none; }
+  </style>
+
+  <script>
+    const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+    let currentPart = 1;
+    let applicationId = null;
+    let autosaveTimer = null;
+
+    const form = document.getElementById('scholarship-form');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitSection = document.getElementById('submit-section');
+    const autosaveStatus = document.getElementById('autosave-status');
+
+    function showPart(n) {
+      document.querySelectorAll('.form-part').forEach(el => el.classList.add('hidden'));
+      const part = document.querySelector(`.form-part[data-part="${n}"]`);
+      if (part) part.classList.remove('hidden');
+
+      document.querySelectorAll('.step-dot').forEach(el => {
+        const step = parseInt(el.dataset.step);
+        el.classList.remove('active', 'completed');
+        if (step < n) el.classList.add('completed');
+        if (step === n) el.classList.add('active');
+      });
+
+      prevBtn.disabled = n === 1;
+      nextBtn.classList.toggle('hidden', n === 8);
+      submitSection.classList.toggle('hidden', n !== 8);
+      currentPart = n;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPart < 8) showPart(currentPart + 1);
+    });
+    prevBtn.addEventListener('click', () => {
+      if (currentPart > 1) showPart(currentPart - 1);
+    });
+
+    // Autosave
+    function collectFormData() {
+      const formData = new FormData(form);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        if (key === 'has_nguyen_surname') {
+          data[key] = value === 'true';
+        } else if (['wants_community', 'consents_story_sharing', 'commits_to_attendance',
+                     'commits_to_graduation', 'commits_to_community', 'consents_to_data_processing',
+                     'consents_to_audit'].includes(key)) {
+          data[key] = true;
+        } else {
+          data[key] = value;
+        }
+      }
+      return data;
+    }
+
+    async function autosave() {
+      const data = collectFormData();
+      autosaveStatus.textContent = 'Đang lưu...';
+      try {
+        if (!applicationId) {
+          // Create application on first save
+          const res = await fetch(`${API_BASE}/applications`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              full_name: data.full_name || '',
+              email: data.email || '',
+              phone: data.phone || '',
+              program_code: data.program_code || 'NAO',
+              program_id: data.program_code || 'nao',
+            }),
+          });
+          if (res.ok) {
+            const result = await res.json();
+            applicationId = result.application_id;
+          }
+        } else {
+          // Update existing
+          await fetch(`${API_BASE}/applications/${applicationId}`, {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+        }
+        autosaveStatus.textContent = 'Đã lưu ' + new Date().toLocaleTimeString('vi-VN');
+      } catch (e) {
+        autosaveStatus.textContent = 'Lỗi lưu';
+      }
+    }
+
+    form.addEventListener('input', () => {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(autosave, 2000);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await autosave();
+      if (!applicationId) {
+        alert('Vui lòng điền đủ thông tin cơ bản trước khi nộp');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/applications/${applicationId}/submit`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (res.ok) {
+          alert('Đã nộp đơn thành công!');
+          window.location.href = '/scholarship';
+        } else {
+          const err = await res.json();
+          alert('Lỗi: ' + err.error);
+        }
+      } catch (e) {
+        alert('Lỗi kết nối');
+      }
+    });
+
+    // Verification buttons
+    document.getElementById('verify-email-btn')?.addEventListener('click', async () => {
+      if (!applicationId) { alert('Vui lòng lưu form trước'); return; }
+      const res = await fetch(`${API_BASE}/verification/email`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: applicationId }),
+      });
+      if (res.ok) {
+        document.getElementById('email-verified-status').textContent = 'Đã gửi mã — kiểm tra email';
+      }
+    });
+
+    document.getElementById('verify-phone-btn')?.addEventListener('click', async () => {
+      if (!applicationId) { alert('Vui lòng lưu form trước'); return; }
+      const res = await fetch(`${API_BASE}/verification/phone`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: applicationId }),
+      });
+      if (res.ok) {
+        document.getElementById('phone-verified-status').textContent = 'Đã gửi mã — kiểm tra SMS';
+      }
+    });
+
+    document.getElementById('verify-identity-btn')?.addEventListener('click', async () => {
+      if (!applicationId) { alert('Vui lòng lưu form trước'); return; }
+      const res = await fetch(`${API_BASE}/verification/identity`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: applicationId }),
+      });
+      if (res.ok) {
+        document.getElementById('identity-verified-status').textContent = 'Đã bắt đầu xác minh';
+      }
+    });
+
+    showPart(1);
+  </script>
+</AcademyLayout>

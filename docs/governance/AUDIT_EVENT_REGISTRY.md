@@ -16,12 +16,12 @@ Replace ad-hoc audit CHECK constraints with a **versioned event registry**. Ever
 ## 2. Registry version
 
 - **Registry version:** `2026-07-02.1`
-- **Total event types:** 38
+- **Total event types:** 63
 - **Breaking change policy:** Adding new event types is non-breaking. Removing or renaming requires a new registry version + migration.
 
 ---
 
-## 3. Event types (38)
+## 3. Event types (63)
 
 ### 3.1 Identity events (12)
 
@@ -96,6 +96,35 @@ Replace ad-hoc audit CHECK constraints with a **versioned event registry**. Ever
 | 37 | `payment_received` | Payment received for plan/product | success | user_id, amount, currency, invoice_id |
 | 38 | `investor_room_accessed` | Investor private room accessed | success | user_id, room_id, ip |
 
+### 3.8 Scholarship events (24) — per EDU_MASTER_PLAN_V4 §XXXIV
+
+| ID | Event type | Description | Result | Required fields |
+|---|---|---|---|---|
+| 39 | `scholarship_application_created` | Scholarship application created | success | user_id, program_code |
+| 40 | `scholarship_application_updated` | Application fields updated | success | user_id, fields[] |
+| 41 | `identity_verification_started` | Email/phone/identity verification started | success | user_id, type |
+| 42 | `identity_verification_completed` | Verification completed | success | user_id, type |
+| 43 | `investor_access_granted` | Investor granted access to applications | success | investor_id, scope |
+| 44 | `investor_access_revoked` | Investor access revoked | success | investor_id, reason |
+| 45 | `scholarship_profile_viewed` | Investor viewed applicant profile | success | investor_id, application_id |
+| 46 | `wish_shared_with_investors` | Wish visibility set to investors_only | success | user_id, wish_id |
+| 47 | `wish_publication_requested` | Applicant requested public publication | success | user_id, wish_id |
+| 48 | `wish_publication_approved` | Admin approved wish publication | success | admin_id, wish_id |
+| 49 | `wish_publication_rejected` | Admin rejected wish publication | success | admin_id, wish_id, reason |
+| 50 | `scholarship_review_submitted` | Investor submitted review | success | reviewer_id, application_id |
+| 51 | `scholarship_vote_submitted` | Council member voted | success | voter_id, decision |
+| 52 | `conflict_of_interest_declared` | Reviewer declared conflict | success | reviewer_id, conflict_type |
+| 53 | `scholarship_awarded` | Scholarship awarded to applicant | success | application_id, program_code |
+| 54 | `scholarship_declined` | Scholarship offer declined | success | application_id, reason |
+| 55 | `sponsorship_committed` | Sponsor committed funds | success | sponsor_id, amount |
+| 56 | `sponsorship_paid` | Sponsorship payment completed | success | sponsor_id, sponsorship_id |
+| 57 | `scholarship_enrollment_activated` | Enrolled in program | success | application_id, program_code |
+| 58 | `forum_post_submitted` | Forum post submitted for moderation | success | user_id, post_id |
+| 59 | `forum_post_approved` | Moderator approved post | success | moderator_id, post_id |
+| 60 | `forum_post_rejected` | Moderator rejected post | success | moderator_id, post_id, reason |
+| 61 | `complaint_submitted` | User submitted complaint | success | user_id, target_id |
+| 62 | `appeal_submitted` | Applicant submitted appeal | success | user_id, application_id, type |
+
 ---
 
 ## 4. Schema
@@ -105,7 +134,7 @@ Every audit event MUST contain:
 ```sql
 event_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 event_type        TEXT NOT NULL,  -- must exist in registry
-registry_version  TEXT NOT NULL,  -- '2026-07-02.1'
+registry_version  TEXT NOT NULL,  -- '2026-07-03.1'
 user_id           UUID,
 tenant_id         UUID,
 session_id        TEXT,
@@ -135,11 +164,11 @@ CREATE TABLE audit_event_registry (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Insert all 38 event types
+-- Insert all 63 event types
 INSERT INTO audit_event_registry (event_type, registry_version, description) VALUES
-  ('login_success', '2026-07-02.1', 'User logged in successfully'),
-  ('login_failure', '2026-07-02.1', 'Login attempt failed'),
-  ... (all 38);
+  ('login_success', '2026-07-03.1', 'User logged in successfully'),
+  ('login_failure', '2026-07-03.1', 'Login attempt failed'),
+  ... (all 63);
 
 -- FK constraint: audit_log.event_type must exist in registry
 ALTER TABLE audit_log
@@ -162,7 +191,7 @@ This replaces the enum CHECK constraint. New event types can be added via INSERT
 
 ## 7. Test requirements
 
-- All 38 event types must insert successfully
+- All 63 event types must insert successfully
 - Unknown event type must be rejected (FK violation)
 - Registry version must be recorded per event
 - Append-only: UPDATE and DELETE must fail (triggers)
@@ -175,3 +204,4 @@ This replaces the enum CHECK constraint. New event types can be added via INSERT
 | Date | Version | Change |
 |---|---|---|
 | 2026-07-02 | 2026-07-02.1 | Initial registry — 38 event types |
+| 2026-07-03 | 2026-07-03.1 | Added 24 scholarship events — total 63 |
