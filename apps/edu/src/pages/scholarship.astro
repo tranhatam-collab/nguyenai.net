@@ -4,106 +4,110 @@ import { scholarshipConfig, programs } from '../data/programs';
 
 const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
 const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
+const totalAnnual = scholarshipConfig.annualAllocation.reduce((s, a) => s + a.count, 0);
 ---
 
 <AcademyLayout
-  title="Học bổng 1.000 xuất/năm"
-  description="Nguyen AI Academy cam kết 1.000 học bổng AI mỗi năm — ưu tiên dòng họ Nguyễn tại Việt Nam. 99 học bổng/program, nhóm 11 người, tuổi 20–49."
+  title="Học bổng 99 suất đầu — Mục tiêu 1.000 suất/năm"
+  description="Nguyen AI Edu — 99 học bổng toàn phần (9 × 11) khởi động. Mục tiêu 1.000 học bổng/năm, ưu tiên họ Nguyễn tại Việt Nam. Tuổi 20–49."
   activeNav="scholarship"
 >
   <section class="academy-container py-12">
     <!-- Hero -->
     <div class="max-w-4xl mb-12">
       <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold text-green-600 bg-green-50 rounded-full">
-        🎓 Học bổng Nguyen AI Academy
+        🎓 Học bổng Nguyen AI Edu
       </div>
       <h1 class="text-3xl md:text-5xl font-bold text-academy-text mb-4">
-        1.000 học bổng AI mỗi năm
+        99 suất đầu — Mục tiêu 1.000 suất/năm
       </h1>
       <p class="text-xl text-academy-muted">
-        Cam kết trao 1.000 học bổng certification AI hàng năm — ưu tiên dòng họ Nguyễn tại Việt Nam.
+        99 học bổng toàn phần (9 programs × 11 suất) khởi động. Mục tiêu 1.000 học bổng/năm — ưu tiên họ Nguyễn tại Việt Nam.
       </p>
       <p class="text-lg text-academy-muted mt-2">
-        1,000 AI certification scholarships annually — prioritizing the Nguyen family in Vietnam.
+        99 full scholarships (9 × 11) launch batch. Target 1,000 scholarships/year — prioritizing the Nguyen family in Vietnam.
+      </p>
+      <p class="text-sm text-academy-muted mt-4 italic">
+        Lưu ý: 1.000 suất/năm là mục tiêu gây quỹ và triển khai, không phải lời hứa chắc chắn nếu quỹ chưa có đủ nguồn lực.
       </p>
     </div>
 
     <!-- Key numbers -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
       <div class="academy-card p-6 text-center">
-        <div class="text-4xl font-bold text-academy-accent">1.000</div>
-        <div class="text-sm text-academy-muted mt-1">Học bổng/năm</div>
+        <div class="text-4xl font-bold text-academy-accent">{scholarshipConfig.totalLaunchBatch}</div>
+        <div class="text-sm text-academy-muted mt-1">Suất khởi động</div>
       </div>
       <div class="academy-card p-6 text-center">
-        <div class="text-4xl font-bold text-academy-accent">9</div>
-        <div class="text-sm text-academy-muted mt-1">Programs</div>
+        <div class="text-4xl font-bold text-academy-accent">{scholarshipConfig.totalPerYear}</div>
+        <div class="text-sm text-academy-muted mt-1">Mục tiêu/năm</div>
       </div>
       <div class="academy-card p-6 text-center">
-        <div class="text-4xl font-bold text-academy-accent">99</div>
-        <div class="text-sm text-academy-muted mt-1">Học bổng/program</div>
+        <div class="text-4xl font-bold text-academy-accent">{scholarshipConfig.slotsPerProgram}</div>
+        <div class="text-sm text-academy-muted mt-1">Suất/program</div>
       </div>
       <div class="academy-card p-6 text-center">
-        <div class="text-4xl font-bold text-academy-accent">20–49</div>
+        <div class="text-4xl font-bold text-academy-accent">{scholarshipConfig.ageRange.min}–{scholarshipConfig.ageRange.max}</div>
         <div class="text-sm text-academy-muted mt-1">Tuổi</div>
       </div>
     </div>
 
-    <!-- Allocation -->
+    <!-- 99 launch batch: group structure -->
     <div class="academy-card p-8 mb-8">
-      <h2 class="text-xl font-bold text-academy-text mb-2">Phân bổ học bổng</h2>
-      <p class="text-academy-muted text-sm mb-6">Scholarship allocation — ưu tiên họ Nguyễn Việt Nam</p>
+      <h2 class="text-xl font-bold text-academy-text mb-2">Cấu trúc 11 người mỗi chương trình</h2>
+      <p class="text-academy-muted text-sm mb-6">9 programs × 11 suất = 99 học bổng toàn phần</p>
+      <div class="space-y-3">
+        {scholarshipConfig.groupStructure.map((g, i) => (
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold shrink-0">
+              {g.count}
+            </div>
+            <div class="flex-1">
+              <div class="text-sm font-semibold text-academy-text">{g.group}</div>
+            </div>
+          </div>
+        ))}
+        <div class="flex items-center gap-4 pt-3 border-t border-academy-border">
+          <div class="w-10 h-10 rounded-full bg-academy-accent text-white flex items-center justify-center font-bold shrink-0">
+            11
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-bold text-academy-text">Tổng/program</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annual 1,000 allocation -->
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-xl font-bold text-academy-text mb-2">Phân bổ 1.000 suất/năm</h2>
+      <p class="text-academy-muted text-sm mb-6">Mục tiêu gây quỹ — không phải lời hứa chắc chắn</p>
       <div class="space-y-4">
-        {scholarshipConfig.allocation.map((a) => (
+        {scholarshipConfig.annualAllocation.map((a) => (
           <div>
             <div class="flex justify-between mb-1">
               <span class="text-sm font-semibold text-academy-text">{a.group}</span>
-              <span class="text-sm text-academy-muted">{a.count} xuất ({a.percent}%)</span>
+              <span class="text-sm text-academy-muted">{a.count} xuất</span>
             </div>
             <div class="w-full bg-academy-bg rounded-full h-3">
-              <div class="bg-academy-accent h-3 rounded-full" style={`width: ${a.percent}%`}></div>
+              <div class="bg-academy-accent h-3 rounded-full" style={`width: ${(a.count / totalAnnual) * 100}%`}></div>
             </div>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- Group structure -->
+    <!-- Scoring criteria -->
     <div class="academy-card p-8 mb-8">
-      <h2 class="text-xl font-bold text-academy-text mb-2">Cấu trúc nhóm 11 người</h2>
-      <p class="text-academy-muted text-sm mb-6">Mỗi nhóm 11 người nhận tất cả 9 programs (full bundle)</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-4 bg-academy-bg rounded-lg text-center">
-          <div class="text-3xl font-bold text-academy-accent">1</div>
-          <div class="text-sm font-semibold text-academy-text">Team Lead</div>
-          <div class="text-xs text-academy-muted">Cohort + mentor</div>
-        </div>
-        <div class="p-4 bg-academy-bg rounded-lg text-center">
-          <div class="text-3xl font-bold text-academy-accent">8</div>
-          <div class="text-sm font-semibold text-academy-text">Core Member</div>
-          <div class="text-xs text-academy-muted">Self-paced + cohort</div>
-        </div>
-        <div class="p-4 bg-academy-bg rounded-lg text-center">
-          <div class="text-3xl font-bold text-academy-accent">2</div>
-          <div class="text-sm font-semibold text-academy-text">Observer</div>
-          <div class="text-xs text-academy-muted">Self-paced</div>
-        </div>
-      </div>
-      <p class="mt-4 text-sm text-academy-muted">
-        Nhóm học cùng nhau, làm dự án cùng, nhận certificate cùng.
-        <span class="block">Each group learns together, builds projects together, certifies together.</span>
-      </p>
-    </div>
-
-    <!-- Batches -->
-    <div class="mb-8">
-      <h2 class="text-xl font-bold text-academy-text mb-4">Lịch phát học bổng</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {scholarshipConfig.batches.map((batch) => (
-          <div class="academy-card p-6">
-            <h3 class="font-bold text-academy-text">{batch.name}</h3>
-            <p class="text-sm text-academy-muted">{batch.period}</p>
-            <div class="text-2xl font-bold text-academy-accent mt-3">{batch.slots}</div>
-            <p class="text-xs text-academy-muted">học bổng</p>
+      <h2 class="text-xl font-bold text-academy-text mb-2">Tiêu chí chấm điểm</h2>
+      <p class="text-academy-muted text-sm mb-6">Hồ sơ được đánh giá trên năng lực, cam kết và nhu cầu thực tế</p>
+      <div class="space-y-3">
+        {scholarshipConfig.scoringCriteria.map((c) => (
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold shrink-0">
+              {c.weight}%
+            </div>
+            <div class="flex-1 text-sm font-semibold text-academy-text">{c.criteria}</div>
           </div>
         ))}
       </div>
@@ -111,17 +115,17 @@ const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
 
     <!-- Eligibility -->
     <div class="academy-card p-8 mb-8">
-      <h2 class="text-xl font-bold text-academy-text mb-4">Tiêu chí</h2>
+      <h2 class="text-xl font-bold text-academy-text mb-4">Điều kiện xét học bổng</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { label: 'Họ', value: 'Nguyễn (ưu tiên) hoặc tên khác' },
-          { label: 'Quốc tịch', value: 'Việt Nam (ưu tiên) hoặc diaspora' },
-          { label: 'Tuổi', value: '20–49' },
-          { label: 'Trình độ', value: 'Tốt nghiệp THPT trở lên' },
-          { label: 'Cam kết', value: 'Hoàn thành 9 programs trong 12 tháng' },
-          { label: 'Đóng góp', value: 'Chia sẻ kiến thức, mentor người sau' },
-          { label: 'Không yêu cầu', value: 'Không yêu cầu kinh nghiệm AI' },
-          { label: 'Không yêu cầu', value: 'Không yêu cầu tiếng Anh' },
+          { label: 'Độ tuổi', value: '20–49' },
+          { label: 'Khả năng', value: 'Học trực tuyến' },
+          { label: 'Cam kết', value: 'Hoàn thành chương trình' },
+          { label: 'Mục tiêu', value: 'Có đề bài hoặc mục tiêu thực tế' },
+          { label: 'Bằng chứng', value: 'Đồng ý nộp bằng chứng học tập' },
+          { label: 'Tuân thủ', value: 'Quy tắc dữ liệu và công nghệ' },
+          { label: 'Không được', value: 'Mua bán, chuyển nhượng, quảng cáo sai' },
+          { label: 'Hồ sơ', value: 'Video hoặc thư giới thiệu ngắn' },
         ].map((c) => (
           <div class="flex items-start gap-3">
             <span class="text-academy-accent mt-0.5">✓</span>
@@ -132,6 +136,41 @@ const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
           </div>
         ))}
       </div>
+      <div class="mt-6 p-4 bg-academy-bg rounded-lg">
+        <h3 class="text-sm font-bold text-academy-text mb-2">Ưu tiên (không loại trừ)</h3>
+        <ol class="text-sm text-academy-muted space-y-1 list-decimal list-inside">
+          <li>Người mang họ Nguyễn</li>
+          <li>Người có hoàn cảnh khó khăn</li>
+          <li>Người đang thất nghiệp hoặc chuyển nghề</li>
+          <li>Người xây dự án có lợi cho cộng đồng</li>
+          <li>Phụ nữ quay lại thị trường lao động</li>
+          <li>Giáo viên, người làm giáo dục và cộng đồng</li>
+          <li>Người tại khu vực hạn chế cơ hội tiếp cận công nghệ</li>
+        </ol>
+        <p class="text-xs text-academy-muted mt-3 italic">
+          Hồ sơ phải được đánh giá trên năng lực, cam kết và nhu cầu thực tế — không chỉ dựa trên họ tên.
+        </p>
+      </div>
+    </div>
+
+    <!-- Scholarship conditions -->
+    <div class="academy-card p-8 mb-8 border-2 border-amber-500/30">
+      <h2 class="text-xl font-bold text-academy-text mb-2">Học bổng là cơ hội có điều kiện</h2>
+      <p class="text-academy-muted text-sm mb-4">Người nhận học bổng phải:</p>
+      <ul class="space-y-2 text-sm text-academy-text">
+        <li>• Tham gia đúng lịch, hoàn thành bài, vượt bài kiểm tra</li>
+        <li>• Nộp bằng chứng, làm sản phẩm, bảo vệ</li>
+        <li>• Tuân thủ thời hạn, hỗ trợ cộng đồng sau tốt nghiệp</li>
+      </ul>
+      <div class="mt-4 space-y-2 text-sm">
+        <div class="p-3 bg-amber-50 rounded-lg"><strong>Cảnh báo 1:</strong> Nhắc nhở, yêu cầu kế hoạch bù</div>
+        <div class="p-3 bg-amber-50 rounded-lg"><strong>Cảnh báo 2:</strong> Mentor làm việc trực tiếp</div>
+        <div class="p-3 bg-amber-50 rounded-lg"><strong>Cảnh báo 3:</strong> Tạm dừng quyền học bổng</div>
+        <div class="p-3 bg-red-50 rounded-lg"><strong>Thu hồi:</strong> Bỏ học, gian lận, mua bán suất, nộp bài giả, vi phạm dữ liệu</div>
+      </div>
+      <p class="text-xs text-academy-muted mt-3">
+        Quyền bảo lưu: học viên có lý do chính đáng được bảo lưu, chuyển cohort, học lại, điều chỉnh tiến độ.
+      </p>
     </div>
 
     <!-- Programs covered -->
@@ -145,6 +184,7 @@ const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
               <div>
                 <div class="text-xs text-academy-muted font-mono">{p.code}</div>
                 <div class="font-semibold text-academy-text text-sm">{p.title.vi}</div>
+                <div class="text-xs text-green-600 font-semibold">{p.scholarshipSlots} suất</div>
               </div>
             </div>
           </a>
@@ -154,14 +194,31 @@ const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
 
     <!-- Fund info -->
     <div class="academy-card p-8 mb-8 border-2 border-academy-accent/20">
-      <h2 class="text-xl font-bold text-academy-text mb-2">Quỹ học bổng</h2>
-      <p class="text-academy-muted text-sm mb-6">
-        Tổng quỹ: <strong class="text-academy-accent">{formatVND(scholarshipConfig.fund.annualTargetVND)}</strong> (~{formatUSD(scholarshipConfig.fund.annualTargetUSD)})/năm
-      </p>
+      <h2 class="text-xl font-bold text-academy-text mb-2">{scholarshipConfig.fund.nameVi}</h2>
+      <p class="text-academy-muted text-sm mb-1">{scholarshipConfig.fund.name}</p>
+      <p class="text-xs text-academy-muted italic mb-4">{scholarshipConfig.fund.legalDisclaimer}</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div class="p-3 bg-academy-bg rounded-lg text-center">
+          <div class="text-xs text-academy-muted">1 học viên</div>
+          <div class="font-bold text-academy-accent">{formatVND(scholarshipConfig.fund.perScholarshipVND)}</div>
+        </div>
+        <div class="p-3 bg-academy-bg rounded-lg text-center">
+          <div class="text-xs text-academy-muted">1 nhóm 11</div>
+          <div class="font-bold text-academy-accent">{formatVND(scholarshipConfig.fund.perGroup11VND)}</div>
+        </div>
+        <div class="p-3 bg-academy-bg rounded-lg text-center">
+          <div class="text-xs text-academy-muted">1 cohort 30</div>
+          <div class="font-bold text-academy-accent">{formatVND(scholarshipConfig.fund.perCohort30VND)}</div>
+        </div>
+        <div class="p-3 bg-academy-bg rounded-lg text-center">
+          <div class="text-xs text-academy-muted">1 program/năm</div>
+          <div class="font-bold text-academy-accent">{formatVND(scholarshipConfig.fund.perProgramYearVND)}</div>
+        </div>
+      </div>
       <p class="text-sm text-academy-muted mb-4">
-        Quỹ học bổng được quản lý bởi invest.nguyenai.net — kêu gọi từ Founder, nhà đầu tư, nhà tài trợ doanh nghiệp và đóng góp cộng đồng.
+        Quỹ học bổng được huy động và truyền thông bởi invest.nguyenai.net — Founder, nhà đầu tư, nhà tài trợ doanh nghiệp, đóng góp cộng đồng.
       </p>
-      <a href="https://invest.nguyenai.net/scholarship" class="inline-block academy-btn academy-btn-primary text-sm">
+      <a href="https://invest.nguyenai.net/scholarship-fund" class="inline-block academy-btn academy-btn-primary text-sm">
         Xem chiến lược quỹ tại invest.nguyenai.net →
       </a>
     </div>
@@ -171,7 +228,7 @@ const formatUSD = (n: number) => '$' + n.toLocaleString('en-US');
       <a href="/programs" class="inline-block academy-btn academy-btn-primary text-lg px-8 py-3">
         Xem 9 programs →
       </a>
-      <p class="mt-3 text-sm text-academy-muted">Đăng ký học bổng mở khi Đợt 1 bắt đầu (Tết Nguyễn)</p>
+      <p class="mt-3 text-sm text-academy-muted">Đăng ký học bổng mở khi khai giảng tháng 7/2026</p>
     </div>
   </section>
 </AcademyLayout>

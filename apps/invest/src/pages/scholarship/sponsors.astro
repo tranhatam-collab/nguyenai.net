@@ -24,24 +24,23 @@ import Disclosure from '../../components/Disclosure.astro';
       </a>
     </div>
 
-    <!-- Tier structure (placeholder) -->
+    <!-- Sponsorship packages -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Tier Structure</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gói tài trợ / Sponsorship Packages</h2>
       <div class="space-y-3">
         {[
-          { tier: 'Diamond', min: '$100,000+', slots: '50 học bổng danh nghĩa' },
-          { tier: 'Platinum', min: '$50,000+', slots: '25 học bổng danh nghĩa' },
-          { tier: 'Gold', min: '$25,000+', slots: '10 học bổng danh nghĩa' },
-          { tier: 'Silver', min: '$10,000+', slots: '5 học bổng danh nghĩa' },
-          { tier: 'Bronze', min: '$5,000+', slots: 'Logo' },
-          { tier: 'Community', min: 'Bất kỳ', slots: 'Danh sách' },
+          { tier: '1 học viên', vnd: '8.000.000₫', desc: '1 suất học bổng toàn phần' },
+          { tier: '1 nhóm 11 người', vnd: '88.000.000₫', desc: '1 nhóm trong 1 program' },
+          { tier: '1 cohort 30 người', vnd: '240.000.000₫', desc: '1 cohort hoàn chỉnh' },
+          { tier: '1 chương trình/năm', vnd: '720.000.000₫', desc: '1 program trọn năm (90 suất)' },
+          { tier: 'Đối tác 1.000 học bổng', vnd: 'Theo thỏa thuận', desc: 'Đối tác chiến lược toàn hệ sinh thái' },
         ].map((t) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-4 flex items-center justify-between">
             <div>
-              <span class="font-bold text-ink">◆ {t.tier}</span>
-              <span class="ml-3 text-sm text-ink-muted">{t.slots}</span>
+              <span class="font-bold text-ink">{t.tier}</span>
+              <span class="ml-3 text-sm text-ink-muted">{t.desc}</span>
             </div>
-            <span class="text-sm text-gold">{t.min}</span>
+            <span class="text-sm text-gold font-semibold">{t.vnd}</span>
           </div>
         ))}
       </div>

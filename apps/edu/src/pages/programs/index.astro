@@ -1,6 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
-import { programs, programCategories, scholarshipConfig } from '../../data/programs';
+import { programs, programCategories, scholarshipConfig, pricingTiers } from '../../data/programs';
 
 const categoryColors: Record<string, string> = {
   technology: 'bg-blue-100 text-blue-700',
@@ -8,12 +8,16 @@ const categoryColors: Record<string, string> = {
   creativity: 'bg-orange-100 text-orange-700',
   entrepreneurship: 'bg-red-100 text-red-700',
   heritage: 'bg-amber-100 text-amber-700',
+  career: 'bg-emerald-100 text-emerald-700',
+  community: 'bg-indigo-100 text-indigo-700',
 };
+
+const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
 ---
 
 <AcademyLayout
-  title="Programs"
-  description="9 chuỗi chương trình сертификации AI — công nghệ, AI, sáng tạo, khởi nghiệp, di sản. Học bổng 1.000 xuất/năm."
+  title="9 Chuỗi Chương trình Certification"
+  description="9 chuỗi chương trình Nguyễn AI Edu — công nghệ, AI, sáng tạo, khởi nghiệp, di sản, nghề nghiệp, cộng đồng. Học bổng 99 xuất/program, mục tiêu 1.000 xuất/năm."
   activeNav="programs"
 >
   <section class="academy-container py-12">
@@ -23,30 +27,60 @@ const categoryColors: Record<string, string> = {
         9 Chuỗi Chương trình Certification
       </h1>
       <p class="text-academy-muted text-lg">
-        9 certification programs — công nghệ, AI, sáng tạo, khởi nghiệp, di sản.
-        <span class="block mt-1">9 certification programs — technology, AI, creativity, entrepreneurship, heritage.</span>
+        9 certification programs — công nghệ, AI, sáng tạo, khởi nghiệp, di sản, nghề nghiệp, cộng đồng.
+      </p>
+      <p class="text-academy-muted text-base mt-1">
+        9 certification programs — technology, AI, creativity, entrepreneurship, heritage, career, community.
       </p>
     </div>
 
+    <!-- July 2026 launch banner -->
+    <div class="academy-card p-6 mb-8 border-2 border-academy-accent/30">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🚀</div>
+        <div class="flex-1">
+          <h2 class="text-xl font-bold text-academy-text">
+            Khai giảng tháng 7/2026 — Online trực tiếp với chuyên gia
+          </h2>
+          <p class="text-academy-muted text-sm mt-1">
+            Đăng ký trong tháng 7 để học online trực tiếp cùng giảng viên và chuyên gia.
+            Sau tháng 7, chuyển sang online theo giáo trình có kiểm soát.
+          </p>
+          <p class="text-academy-muted text-sm mt-1">
+            July 2026 launch — online live with experts. After July, switch to controlled online curriculum.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Scholarship banner -->
-    <div class="academy-card p-6 mb-12 border-2 border-academy-accent/30">
+    <div class="academy-card p-6 mb-12 border-2 border-green-500/30">
       <div class="flex items-start gap-4">
         <div class="text-4xl">🎓</div>
         <div class="flex-1">
           <h2 class="text-xl font-bold text-academy-text">
-            Học bổng 1.000 xuất/năm — ưu tiên họ Nguyễn
+            Học bổng 99 suất đầu — 9 × 11 · Mục tiêu 1.000 suất/năm
           </h2>
           <p class="text-academy-muted text-sm mt-1">
-            1,000 scholarships/year — prioritizing the Nguyen family in Vietnam.
-            99 học bổng/program, nhóm 11 người, tuổi 20–49.
+            99 học bổng toàn phần (9 programs × 11 suất). Mục tiêu 1.000 học bổng/năm — ưu tiên họ Nguyễn tại Việt Nam.
           </p>
           <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {scholarshipConfig.allocation.map((a) => (
-              <div class="text-center p-3 bg-academy-bg rounded-lg">
-                <div class="text-2xl font-bold text-academy-accent">{a.count}</div>
-                <div class="text-xs text-academy-muted">{a.group}</div>
-              </div>
-            ))}
+            <div class="text-center p-3 bg-academy-bg rounded-lg">
+              <div class="text-2xl font-bold text-academy-accent">99</div>
+              <div class="text-xs text-academy-muted">Suất khởi động</div>
+            </div>
+            <div class="text-center p-3 bg-academy-bg rounded-lg">
+              <div class="text-2xl font-bold text-academy-accent">1.000</div>
+              <div class="text-xs text-academy-muted">Mục tiêu/năm</div>
+            </div>
+            <div class="text-center p-3 bg-academy-bg rounded-lg">
+              <div class="text-2xl font-bold text-academy-accent">20–49</div>
+              <div class="text-xs text-academy-muted">Tuổi</div>
+            </div>
+            <div class="text-center p-3 bg-academy-bg rounded-lg">
+              <div class="text-2xl font-bold text-academy-accent">11</div>
+              <div class="text-xs text-academy-muted">Suất/program</div>
+            </div>
           </div>
           <a href="/scholarship" class="inline-block mt-4 academy-btn academy-btn-primary text-sm">
             Xem chi tiết học bổng →
@@ -81,7 +115,7 @@ const categoryColors: Record<string, string> = {
           <p class="text-sm text-academy-muted mt-2">{program.tagline.vi}</p>
 
           <div class="mt-4 flex items-center gap-4 text-xs text-academy-muted">
-            <span>📚 {program.lessonCount} bài</span>
+            <span>📚 {program.moduleCount} modules</span>
             <span>⏱ {program.duration}</span>
             <span>📊 {program.difficulty}</span>
           </div>
@@ -90,12 +124,12 @@ const categoryColors: Record<string, string> = {
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs text-academy-muted">Học phí từ</span>
               <span class="text-lg font-bold text-academy-accent">
-                {program.pricing.selfPaced.vnd.toLocaleString('vi-VN')}₫
+                {formatVND(program.pricing.khoiDong.vnd)}
               </span>
             </div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs text-academy-muted">Học bổng</span>
-              <span class="text-sm font-semibold text-green-600">99 xuất</span>
+              <span class="text-sm font-semibold text-green-600">{program.scholarshipSlots} suất</span>
             </div>
             <a href={`/programs/${program.slug}`} class="block w-full text-center academy-btn academy-btn-primary text-sm">
               Xem chương trình →
@@ -105,30 +139,37 @@ const categoryColors: Record<string, string> = {
       ))}
     </div>
 
-    <!-- Bundle pricing -->
+    <!-- 4-tier pricing -->
     <div class="mt-16">
-      <h2 class="text-2xl font-bold text-academy-text mb-6">Bundle & Subscription</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="academy-card p-6">
-          <h3 class="font-bold text-academy-text">Self-paced Bundle</h3>
-          <p class="text-sm text-academy-muted">Tất cả 9 programs (tự học)</p>
-          <div class="text-2xl font-bold text-academy-accent mt-3">7.999.000₫</div>
-          <p class="text-xs text-academy-muted">~$320 USD · Tiết kiệm ~20%</p>
-        </div>
-        <div class="academy-card p-6 border-2 border-academy-accent/30">
-          <span class="text-xs text-academy-accent font-semibold">PHỔ BIẾN</span>
-          <h3 class="font-bold text-academy-text">Cohort Bundle</h3>
-          <p class="text-sm text-academy-muted">Tất cả 9 programs (lớp học)</p>
-          <div class="text-2xl font-bold text-academy-accent mt-3">19.999.000₫</div>
-          <p class="text-xs text-academy-muted">~$800 USD · Tiết kiệm ~26%</p>
-        </div>
-        <div class="academy-card p-6">
-          <h3 class="font-bold text-academy-text">Academy Pass</h3>
-          <p class="text-sm text-academy-muted">Subscription/tháng</p>
-          <div class="text-2xl font-bold text-academy-accent mt-3">299.000₫/tháng</div>
-          <p class="text-xs text-academy-muted">Tất cả 9 programs (self-paced)</p>
-        </div>
+      <h2 class="text-2xl font-bold text-academy-text mb-2">4 Gói học</h2>
+      <p class="text-academy-muted text-sm mb-6">Mỗi program có 4 gói: Khởi động → Thực hành → Chuyên nghiệp → Đồng hành</p>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {pricingTiers.map((tier, i) => (
+          <div class={`academy-card p-6 ${i === 1 ? 'border-2 border-academy-accent/30' : ''}`}>
+            {i === 1 && <span class="text-xs text-academy-accent font-semibold">PHỔ BIẾN</span>}
+            <h3 class="font-bold text-academy-text">{tier.name.vi}</h3>
+            <p class="text-sm text-academy-accent">{tier.name.en}</p>
+            <p class="text-xs text-academy-muted mt-2">{tier.duration.vi}</p>
+            <p class="text-xs text-academy-muted">{tier.format.vi}</p>
+            <p class="text-sm text-academy-text mt-3">{tier.purpose.vi}</p>
+          </div>
+        ))}
       </div>
+      <p class="mt-4 text-xs text-academy-muted">
+        Giá niêm yết = Phương án B. Cohort đầu = Phương án A (dễ tiếp cận). Enterprise/nhóm = Phương án C.
+      </p>
+    </div>
+
+    <!-- Curriculum design note -->
+    <div class="mt-12 academy-card p-6">
+      <h2 class="text-xl font-bold text-academy-text mb-3">Quy định giáo trình</h2>
+      <ul class="space-y-2 text-sm text-academy-muted">
+        <li>• Mỗi chuyên đề: tài liệu + thực hành trên Máy Tính AI + bài test</li>
+        <li>• <strong>Thi, test, qua bài</strong> mới được học tiếp — không qua thì <strong>học lại</strong></li>
+        <li>• Điểm qua: kiến thức ≥80%, thao tác ≥80%, tình huống ≥75%, thực hành ≥75%</li>
+        <li>• Tốt nghiệp chỉ khi có <strong>sản phẩm thật</strong> + bằng chứng + hội đồng duyệt</li>
+        <li>• Certificate có mã verify công khai</li>
+      </ul>
     </div>
   </section>
 </AcademyLayout>

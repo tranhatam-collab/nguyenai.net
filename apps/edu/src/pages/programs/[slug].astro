@@ -1,6 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
-import { programs, getProgramBySlug, programCategories } from '../../data/programs';
+import { programs, getProgramBySlug, programCategories, pricingTiers, scholarshipConfig } from '../../data/programs';
 
 export function getStaticPaths() {
   return programs.map((program) => ({
@@ -17,6 +17,7 @@ if (!program) {
 
 const category = programCategories.find((c) => c.id === program.category);
 const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
+const tierKeys = ['khoiDong', 'thucHanh', 'chuyenNghiep', 'dongHanh'] as const;
 ---
 
 <AcademyLayout
@@ -36,79 +37,118 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
         <p class="text-lg text-academy-accent">{program.title.en}</p>
         <p class="text-academy-muted mt-2">{program.tagline.vi}</p>
         <div class="flex flex-wrap gap-3 mt-4 text-sm text-academy-muted">
-          <span class="px-3 py-1 bg-academy-bg rounded-full">📚 {program.lessonCount} bài học</span>
+          <span class="px-3 py-1 bg-academy-bg rounded-full">📚 {program.moduleCount} modules</span>
           <span class="px-3 py-1 bg-academy-bg rounded-full">⏱ {program.duration}</span>
           <span class="px-3 py-1 bg-academy-bg rounded-full">📊 {program.difficulty}</span>
           <span class="px-3 py-1 bg-academy-bg rounded-full">{category?.icon} {category?.label.vi}</span>
+          <span class="px-3 py-1 bg-academy-bg rounded-full">🖥 {program.machineProfile}</span>
         </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Curriculum -->
+      <!-- Curriculum modules -->
       <div class="lg:col-span-2">
-        <h2 class="text-xl font-bold text-academy-text mb-4">Curriculum / Nội dung</h2>
+        <h2 class="text-xl font-bold text-academy-text mb-2">Modules / Chuyên đề</h2>
+        <p class="text-academy-muted text-sm mb-4">
+          {program.moduleCount} modules · Mỗi chuyên đề có 14 thành phần bắt buộc: mục tiêu, tài liệu, bài giảng, thực hành, kiểm tra, rubric, bằng chứng, điều kiện mở bài tiếp.
+        </p>
         <div class="space-y-3">
-          {program.curriculum.map((lesson, i) => (
+          {program.modules.map((mod, i) => (
             <div class="academy-card p-4 flex items-center gap-4">
               <div class="w-8 h-8 rounded-full bg-academy-accent/10 text-academy-accent flex items-center justify-center font-bold text-sm shrink-0">
                 {i + 1}
               </div>
               <div class="flex-1">
-                <div class="font-semibold text-academy-text">{lesson.title.vi}</div>
-                <div class="text-sm text-academy-muted">{lesson.title.en}</div>
+                <div class="font-semibold text-academy-text">{mod.vi}</div>
+                <div class="text-sm text-academy-muted">{mod.en}</div>
               </div>
-              <span class="text-xs text-academy-muted shrink-0">{lesson.duration}</span>
             </div>
           ))}
+        </div>
+
+        <!-- Graduation product -->
+        <div class="academy-card p-6 mt-6 border-2 border-green-500/30">
+          <h3 class="font-bold text-academy-text mb-2">🎓 Sản phẩm tốt nghiệp</h3>
+          <p class="text-sm text-academy-text">{program.graduationProduct.vi}</p>
+          <p class="text-sm text-academy-muted mt-1">{program.graduationProduct.en}</p>
+          <p class="text-xs text-academy-muted mt-3">
+            Tốt nghiệp chỉ khi: sản phẩm đạt rubric + bảo vệ thành công + nộp đủ hồ sơ năng lực + hội đồng phê duyệt.
+          </p>
+        </div>
+
+        <!-- Target audience -->
+        <div class="academy-card p-6 mt-6">
+          <h3 class="font-bold text-academy-text mb-2">Đối tượng</h3>
+          <p class="text-sm text-academy-text">{program.targetAudience.vi}</p>
+          <p class="text-sm text-academy-muted mt-1">{program.targetAudience.en}</p>
+        </div>
+
+        <!-- Pass thresholds -->
+        <div class="academy-card p-6 mt-6">
+          <h3 class="font-bold text-academy-text mb-3">Điểm qua bài</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Kiểm tra kiến thức</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.knowledge}%</div>
+            </div>
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Kiểm tra thao tác</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.operation}%</div>
+            </div>
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Tình huống</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.scenario}%</div>
+            </div>
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Thực hành</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.practice}%</div>
+            </div>
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Mini project</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.miniProject}%</div>
+            </div>
+            <div class="p-3 bg-academy-bg rounded-lg">
+              <div class="text-xs text-academy-muted">Final project</div>
+              <div class="font-bold text-academy-accent">≥ {scholarshipConfig.passThresholds.finalProject}%</div>
+            </div>
+          </div>
+          <p class="text-xs text-academy-muted mt-3">
+            Không qua → học lại (tối đa 4 lần). Sau lần 4: hội đồng học thuật xem xét.
+          </p>
         </div>
       </div>
 
       <!-- Sidebar: pricing + scholarship -->
       <div class="lg:col-span-1">
         <div class="sticky top-20 space-y-6">
-          <!-- Pricing -->
+          <!-- 4-tier pricing -->
           <div class="academy-card p-6">
-            <h3 class="font-bold text-academy-text mb-4">Học phí</h3>
+            <h3 class="font-bold text-academy-text mb-4">Học phí — 4 gói</h3>
             <div class="space-y-3">
-              <div class="p-3 bg-academy-bg rounded-lg">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="font-semibold text-academy-text text-sm">Self-paced</div>
-                    <div class="text-xs text-academy-muted">Tự học + quiz + cert</div>
+              {tierKeys.map((key, i) => {
+                const tier = pricingTiers[i];
+                const price = program.pricing[key];
+                return (
+                  <div class={`p-3 bg-academy-bg rounded-lg ${i === 1 ? 'border border-academy-accent/20' : ''}`}>
+                    <div class="flex justify-between items-center">
+                      <div>
+                        <div class="font-semibold text-academy-text text-sm">{tier.name.vi}</div>
+                        <div class="text-xs text-academy-muted">{tier.duration.vi} · {tier.format.vi}</div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-bold text-academy-accent">{formatVND(price.vnd)}</div>
+                        <div class="text-xs text-academy-muted">~${price.usd}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="text-right">
-                    <div class="font-bold text-academy-accent">{formatVND(program.pricing.selfPaced.vnd)}</div>
-                    <div class="text-xs text-academy-muted">~${program.pricing.selfPaced.usd}</div>
-                  </div>
-                </div>
-              </div>
-              <div class="p-3 bg-academy-bg rounded-lg border border-academy-accent/20">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="font-semibold text-academy-text text-sm">Cohort</div>
-                    <div class="text-xs text-academy-muted">+ Instructor + 8 tuần</div>
-                  </div>
-                  <div class="text-right">
-                    <div class="font-bold text-academy-accent">{formatVND(program.pricing.cohort.vnd)}</div>
-                    <div class="text-xs text-academy-muted">~${program.pricing.cohort.usd}</div>
-                  </div>
-                </div>
-              </div>
-              <div class="p-3 bg-academy-bg rounded-lg">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <div class="font-semibold text-academy-text text-sm">Professional</div>
-                    <div class="text-xs text-academy-muted">+ Mentor 1:1 + career</div>
-                  </div>
-                  <div class="text-right">
-                    <div class="font-bold text-academy-accent">{formatVND(program.pricing.professional.vnd)}</div>
-                    <div class="text-xs text-academy-muted">~${program.pricing.professional.usd}</div>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
             <button class="w-full mt-4 academy-btn academy-btn-primary">Đăng ký học</button>
+            <p class="text-xs text-academy-muted mt-2 text-center">
+              Giá niêm yết (Phương án B). Cohort đầu = Phương án A.
+            </p>
           </div>
 
           <!-- Scholarship -->
@@ -120,19 +160,19 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
                 <span class="text-academy-muted">Học bổng/program</span>
-                <span class="font-bold text-green-600">{program.scholarshipSlots} xuất</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-academy-muted">Nhóm</span>
-                <span class="font-bold text-academy-text">{program.scholarshipGroups} nhóm × {program.groupSize}</span>
+                <span class="font-bold text-green-600">{program.scholarshipSlots} suất</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-academy-muted">Độ tuổi</span>
-                <span class="font-bold text-academy-text">20–49</span>
+                <span class="font-bold text-academy-text">{scholarshipConfig.ageRange.min}–{scholarshipConfig.ageRange.max}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-academy-muted">Ưu tiên</span>
                 <span class="font-bold text-academy-text">Họ Nguyễn VN</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-academy-muted">Giá trị</span>
+                <span class="font-bold text-academy-text">{formatVND(scholarshipConfig.fund.perScholarshipVND)}</span>
               </div>
             </div>
             <a href="/scholarship" class="block w-full mt-4 text-center academy-btn academy-btn-secondary text-sm">
@@ -144,8 +184,10 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
           <div class="academy-card p-6">
             <h3 class="font-bold text-academy-text mb-2">Certificate</h3>
             <p class="text-sm text-academy-muted">
-              Hoàn thành exam ≥ 70% để nhận certificate có mã verify.
-              Certificate verify tại <a href="/verify" class="text-academy-accent underline">/verify</a>.
+              Chỉ cấp khi: hoàn thành 100% bài bắt buộc + đạt điểm tối thiểu + nộp đủ bằng chứng + hội đồng duyệt + bảo vệ sản phẩm.
+            </p>
+            <p class="text-sm text-academy-muted mt-2">
+              Certificate có mã verify công khai tại <a href="/verify" class="text-academy-accent underline">/verify</a>.
             </p>
           </div>
         </div>
