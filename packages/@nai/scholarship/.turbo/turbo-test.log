@@ -1,0 +1,31 @@
+$ tsx src/test.ts
+=== @nai/scholarship unit tests ===
+
+Test: entities + constants
+Test: application create/update/submit
+Test: IDOR — user cannot access other application
+Test: verification flow
+Test: wish management
+Test: review + voting
+Test: scoring calculation
+Test: sponsorship
+Test: forum + moderation
+Test: notifications
+Test: appeal
+Test: Sprint 2 messages
+Test: Sprint 2 documents
+Test: Sprint 2 timeline + status transition
+Test: Sprint 3 investor room
+Test: Sprint 3 award + decline
+Test: Sprint 4 forum comments
+Test: Sprint 4 report + moderation queue
+Test: Sprint 5 council decision
+Test: Sprint 5 waitlist
+Test: Sprint 6 entitlement lifecycle
+Test: Sprint 6 cohorts
+Test: data export (GDPR/PDPD)
+  OK
+Test: retention sweep
+  OK
+
+124 passed, 0 failed

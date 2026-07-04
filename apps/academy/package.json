@@ -1,0 +1,32 @@
+{
+  "name": "@nai/academy",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Nguyen AI Academy — free AI learning for subscribers at academy.nguyenai.net",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "pnpm build && wrangler pages deploy dist",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'academy tested via E2E'",
+    "lint": "echo 'no lint'",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "@astrojs/cloudflare": "^11.0.0",
+    "@astrojs/mdx": "^3.1.0",
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.0"
+  }
+}

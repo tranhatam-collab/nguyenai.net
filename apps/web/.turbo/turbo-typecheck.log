@@ -1,0 +1,8 @@
+$ astro check
+17:19:24 [types] Generated 323ms
+17:19:24 [check] Getting diagnostics for Astro files in /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/web...
+Result (60 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

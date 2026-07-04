@@ -113,15 +113,15 @@ export type PageContent = {
 const vi: Record<RouteKey, PageContent> = {
   home: {
     key: 'home',
-    title: 'Máy Tính AI Nguyễn | AI Computer cho thế hệ Nguyễn toàn cầu',
-    description: 'Máy Tính AI Nguyễn là dòng AI Computer đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 Model máy + 9 Functional Products + 9 Agent chuyên biệt + 7 Super App di sản.',
-    eyebrow: 'Máy Tính AI Nguyễn',
+    title: 'Nguyen AI Computer | AI Computer cho thế hệ Nguyễn toàn cầu',
+    description: 'Nguyen AI Computer là dòng AI Computer đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 Model máy + 9 Functional Products + 9 Agent chuyên biệt + 7 Super App di sản.',
+    eyebrow: 'Nguyen AI Computer',
     heroTitle: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
     heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ 9 AI Agent, bộ nhớ dài hạn, kho dữ liệu, 7 Super App di sản, 12 tool family làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
-    primaryCta: 'Khởi tạo Máy Tính AI Nguyễn',
+    primaryCta: 'Khởi tạo Nguyen AI Computer',
     secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
-      { title: 'Không phải chatbot', body: 'Máy Tính AI Nguyễn là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi một.' },
+      { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi một.' },
       { title: 'Máy Tính AI riêng cho mỗi người', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác. Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' },
       { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
@@ -136,7 +136,7 @@ const vi: Record<RouteKey, PageContent> = {
       ]
     },
     comparisonVsChatbot: {
-      title: 'Chatbot vs Máy Tính AI Nguyễn',
+      title: 'Chatbot vs Nguyen AI Computer',
       rows: [
         { label: 'Bản chất', values: ['Trả lời từng câu', 'Hệ thống Máy Tính AI cá nhân'] },
         { label: 'Bộ nhớ', values: ['Không có / session', 'Bộ nhớ dài hạn, project, decision'] },
@@ -206,7 +206,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     userGroups: {
       title: 'Nhóm người dùng',
-      body: 'Máy Tính AI Nguyễn phục vụ 8 nhóm người dùng từ cá nhân đến tổ chức lớn.',
+      body: 'Nguyen AI Computer phục vụ 8 nhóm người dùng từ cá nhân đến tổ chức lớn.',
       cards: [
         { name: 'Cá nhân', icon: '👤', description: 'Công việc, học tập, sáng tạo, tri thức cá nhân.', plan: 'Personal' },
         { name: 'Gia đình', icon: '👨‍👩‍👧', description: 'Gia phả, di sản, oral history, bộ nhớ gia đình.', plan: 'Family' },
@@ -283,7 +283,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     academySection: {
       title: 'Học viện — Academy',
-      body: 'Academy tách biệt tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Máy Tính AI Nguyễn. Academy Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
+      body: 'Academy tách biệt tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Nguyen AI Computer. Academy Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
       items: ['Track cơ bản: Làm chủ AI Computer (free)', 'Track Founder: Strategy + Pitch + Fundraising', 'Track Business: Operations + SOP + Automation', 'Track Heritage: Genealogy + Oral History + Evidence', 'Certification: độc lập, có audit, không tự cấp']
     },
     memoryVaultSection: {
@@ -298,7 +298,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     useCases: {
       title: 'Ca sử dụng Founder, Business và Family',
-      body: 'Ba ca sử dụng điển hình cho thấy Máy Tính AI Nguyễn phục vụ nhu cầu thực tế.',
+      body: 'Ba ca sử dụng điển hình cho thấy Nguyen AI Computer phục vụ nhu cầu thực tế.',
       cards: [
         { name: 'Founder — Gọi vốn Seed', description: 'Pitch deck, financial model 5 năm, data room, diligence checklist, investor brief, KPI dashboard, board report.', tag: 'Founder' },
         { name: 'Business — Vận hành 90 ngày', description: 'SOP 5 phòng ban, CRM pipeline, automation schedule, finance report, legal contract analysis, audit trail.', tag: 'Business' },
@@ -312,18 +312,18 @@ const vi: Record<RouteKey, PageContent> = {
       secondaryCta: 'Liên hệ tư vấn'
     },
     faq: [
-      { question: 'Máy Tính AI Nguyễn có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ 9 Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow dài hạn.' },
+      { question: 'Nguyen AI Computer có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ 9 Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow dài hạn.' },
       { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Super App quan trọng, nhưng sản phẩm còn bao gồm 12 tool family: AI Office, AI Research, AI Content, AI Media, AI Code, AI Automation, AI Founder OS, AI Business OS, AI Sales, AI Finance, AI Legal, và 7 Super App Nguyễn.' },
       { question: 'Tôi chọn Model và Functional Product thế nào?', answer: 'Model là cấp độ máy (năng lực phần cứng: agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt (chức năng). Bạn chọn 1 Model + 1 hoặc nhiều Functional Products. Ví dụ: Nguyen Founder + Founder Suite.' },
       { question: 'Giá hiện tại có phải giá cuối cùng không?', answer: 'Không. Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.' },
       { question: 'Dữ liệu của tôi có an toàn không?', answer: 'Mỗi người dùng có instance riêng, không chia sẻ memory hay data. Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được audit log, dữ liệu nằm trong boundary của người dùng.' },
-      { question: 'Nguyen AI có phải chỉ cho người họ Nguyễn?', answer: 'Máy Tính AI Nguyễn được thiết kế cho hệ sinh thái Nguyễn toàn cầu, nhưng sản phẩm hoạt động cho mọi cá nhân, gia đình, founder và doanh nghiệp. Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống.' },
+      { question: 'Nguyen AI có phải chỉ cho người họ Nguyễn?', answer: 'Nguyen AI Computer được thiết kế cho hệ sinh thái Nguyễn toàn cầu, nhưng sản phẩm hoạt động cho mọi cá nhân, gia đình, founder và doanh nghiệp. Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống.' },
       { question: 'Demo trên trang có phải sản phẩm thật không?', answer: 'Không. Mỗi demo được ghi rõ nhãn: Live demo, Interactive demo, Simulated demo, Product preview, hoặc Planned. Không giả lập demo như sản phẩm thật.' },
       { question: 'Tính năng nào đã có, đang thử nghiệm hoặc đang kế hoạch?', answer: 'Mỗi gói có trạng thái: Available, Beta, Planned, hoặc Enterprise only. Không công bố tính năng chưa tồn tại là đã hoàn thành.' }
     ]
   },
   'ai-computer': {
-    key: 'ai-computer', title: 'AI Computer — Máy Tính AI Nguyễn', description: 'Kiến trúc AI Computer Instance: 16 thành phần — Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Memory, Workflow, Evidence, Approval Gates, Security, Cost Governor, Audit, Sync, Self-Upgrade.', eyebrow: 'AI Computer', heroTitle: 'Mỗi người có một AI Computer riêng.', heroText: 'Máy Tính AI Nguyễn Instance bao gồm 16 thành phần: Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine, Verification, Approval Gates, Security Boundary, Cost Governor, Audit & Replay, Sync Layer, Self-Upgrade Registry.',
+    key: 'ai-computer', title: 'AI Computer — Nguyen AI Computer', description: 'Kiến trúc AI Computer Instance: 16 thành phần — Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Memory, Workflow, Evidence, Approval Gates, Security, Cost Governor, Audit, Sync, Self-Upgrade.', eyebrow: 'AI Computer', heroTitle: 'Mỗi người có một AI Computer riêng.', heroText: 'Nguyen AI Computer Instance bao gồm 16 thành phần: Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine, Verification, Approval Gates, Security Boundary, Cost Governor, Audit & Replay, Sync Layer, Self-Upgrade Registry.',
     sections: [
       { title: 'Khả năng vận hành', body: 'Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' },
       { title: 'Không chia sẻ', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác. Dữ liệu nằm trong boundary của người dùng.' }
@@ -355,12 +355,12 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   'how-it-works': {
-    key: 'how-it-works', title: 'Cách vận hành — Máy Tính AI Nguyễn', description: 'Luồng vận hành: lệnh người dùng, Command Kernel, Planner, Model Router, Tool Execution, Reviewer, Evidence, Human Approval.', eyebrow: 'Cách vận hành', heroTitle: 'Từ lệnh đến kết quả có chứng cứ.', heroText: 'Người dùng ra lệnh, hệ thống lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, kiểm tra kết quả, lưu evidence và xin phê duyệt trước hành động nhạy cảm.', sections: [
+    key: 'how-it-works', title: 'Cách vận hành — Nguyen AI Computer', description: 'Luồng vận hành: lệnh người dùng, Command Kernel, Planner, Model Router, Tool Execution, Reviewer, Evidence, Human Approval.', eyebrow: 'Cách vận hành', heroTitle: 'Từ lệnh đến kết quả có chứng cứ.', heroText: 'Người dùng ra lệnh, hệ thống lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, kiểm tra kết quả, lưu evidence và xin phê duyệt trước hành động nhạy cảm.', sections: [
       { title: 'Luồng vận hành', body: 'Command Kernel → Planner → Model Router → Tool Execution → Reviewer + Evidence → Human Approval.', items: ['Người dùng ra lệnh', 'Command Kernel tiếp nhận', 'Planner lập kế hoạch', 'Model Router chọn model', 'Tool Execution thực thi', 'Reviewer kiểm tra', 'Evidence lưu chứng cứ', 'Human Approval phê duyệt'] }
     ]
   },
   agents: {
-    key: 'agents', title: 'Agent Team — Máy Tính AI Nguyễn', description: '9 Agent chuyên biệt: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — vận hành trên nền Gen1.', eyebrow: 'Agent Team', heroTitle: '9 AI Agent chuyên biệt cho hệ sinh thái Nguyễn.', heroText: 'Chín Agent mặc định vận hành trên nền tảng Gen1, mỗi Agent có vai trò rõ ràng: điều phối, nghiên cứu, lưu trữ, kiểm chứng, gia đình, sáng lập, kinh doanh, kết nối, bảo mật.',
+    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: '9 Agent chuyên biệt: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — vận hành trên nền Gen1.', eyebrow: 'Agent Team', heroTitle: '9 AI Agent chuyên biệt cho hệ sinh thái Nguyễn.', heroText: 'Chín Agent mặc định vận hành trên nền tảng Gen1, mỗi Agent có vai trò rõ ràng: điều phối, nghiên cứu, lưu trữ, kiểm chứng, gia đình, sáng lập, kinh doanh, kết nối, bảo mật.',
     sections: [
       { title: 'Nền tảng Gen1', body: '9 Agent Nguyễn vận hành trên nền 9 Agent Gen1: Router, Planner, Executor, Reviewer, Security, Cost, Fact Checker, Memory Curator, Human Gate.' }
     ],
@@ -384,9 +384,9 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   'super-apps': {
-    key: 'super-apps', title: 'Super Apps — Máy Tính AI Nguyễn', description: '7 Super App đặc thù Nguyễn + 12 tool family AI. Gia phả, di sản, tri thức, minh chứng, kết nối, sáng lập, chi họ — cùng văn phòng, nghiên cứu, sáng tạo, code, kinh doanh.', eyebrow: 'Super Apps', heroTitle: '7 Super App di sản + 12 tool family AI.', heroText: 'Gia phả và di sản là các Super App quan trọng, nhưng toàn bộ sản phẩm còn bao gồm làm việc, nghiên cứu, sáng tạo, kinh doanh và tự động hóa.',
+    key: 'super-apps', title: 'Super Apps — Nguyen AI Computer', description: '7 Super App đặc thù Nguyễn + 12 tool family AI. Gia phả, di sản, tri thức, minh chứng, kết nối, sáng lập, chi họ — cùng văn phòng, nghiên cứu, sáng tạo, code, kinh doanh.', eyebrow: 'Super Apps', heroTitle: '7 Super App di sản + 12 tool family AI.', heroText: 'Gia phả và di sản là các Super App quan trọng, nhưng toàn bộ sản phẩm còn bao gồm làm việc, nghiên cứu, sáng tạo, kinh doanh và tự động hóa.',
     sections: [
-      { title: 'Không chỉ gia phả', body: 'Máy Tính AI Nguyễn có 7 Super App đặc thù Nguyễn cho di sản và cộng đồng, плюс 12 tool family AI cho công việc hàng ngày.' }
+      { title: 'Không chỉ gia phả', body: 'Nguyen AI Computer có 7 Super App đặc thù Nguyễn cho di sản và cộng đồng, плюс 12 tool family AI cho công việc hàng ngày.' }
     ],
     featureGrid: {
       title: '7 Super App Nguyễn',
@@ -426,17 +426,17 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   models: {
-    key: 'models', title: 'Model Mesh — Máy Tính AI Nguyễn', description: 'Model Mesh đa mô hình: reasoning, research, coding, translation, vision, voice, verification — không khóa vào một model.', eyebrow: 'Model Mesh', heroTitle: 'Đa mô hình, không khóa vào một nhà cung cấp.', heroText: 'Máy chọn model theo reasoning, research, coding, translation, vision, voice, verification, tốc độ, chi phí, quyền riêng tư và trạng thái nhà cung cấp.', sections: [
+    key: 'models', title: 'Model Mesh — Nguyen AI Computer', description: 'Model Mesh đa mô hình: reasoning, research, coding, translation, vision, voice, verification — không khóa vào một model.', eyebrow: 'Model Mesh', heroTitle: 'Đa mô hình, không khóa vào một nhà cung cấp.', heroText: 'Máy chọn model theo reasoning, research, coding, translation, vision, voice, verification, tốc độ, chi phí, quyền riêng tư và trạng thái nhà cung cấp.', sections: [
       { title: 'Tiêu chí chọn model', body: 'Model Router chọn model theo nhiệm vụ và ràng buộc.', items: ['Reasoning', 'Research', 'Coding', 'Translation', 'Document extraction', 'Image understanding', 'Voice', 'Verification', 'Speed', 'Cost', 'Privacy', 'Provider status'] }
     ]
   },
   'command-packs': {
-    key: 'command-packs', title: 'Command Packs — Máy Tính AI Nguyễn', description: 'Các Command Pack: Family Archive, Founder Launch, Investor Readiness, Business Operations, Global Community, Bilingual Publishing, Research & Evidence, Chapter Governance, Legacy Interview, SME Automation.', eyebrow: 'Command Packs', heroTitle: 'Gói lệnh sẵn sàng cho từng nhu cầu.', heroText: 'Command Pack là tập hợp workflow, Agent và công cụ được đóng gói cho từng trường hợp sử dụng cụ thể.', sections: [
+    key: 'command-packs', title: 'Command Packs — Nguyen AI Computer', description: 'Các Command Pack: Family Archive, Founder Launch, Investor Readiness, Business Operations, Global Community, Bilingual Publishing, Research & Evidence, Chapter Governance, Legacy Interview, SME Automation.', eyebrow: 'Command Packs', heroTitle: 'Gói lệnh sẵn sàng cho từng nhu cầu.', heroText: 'Command Pack là tập hợp workflow, Agent và công cụ được đóng gói cho từng trường hợp sử dụng cụ thể.', sections: [
       { title: 'Command Pack sẵn có', body: 'Mỗi Pack giải quyết một nhóm nhu cầu.', items: ['Family Archive Pack', 'Founder Launch Pack', 'Investor Readiness Pack', 'Business Operations Pack', 'Global Community Pack', 'Bilingual Publishing Pack', 'Research & Evidence Pack', 'Chapter Governance Pack', 'Legacy Interview Pack', 'SME Automation Pack'] }
     ]
   },
   plans: {
-    key: 'plans', title: 'Gói dịch vụ — Máy Tính AI Nguyễn', description: '9 Model máy + 9 Functional Products. Model quyết định năng lực phần cứng; Functional Product quyết định bộ tool chuyên biệt. Giá pilot, cần xác minh chi phí trước thương mại.', eyebrow: 'Plans', heroTitle: '9 Model máy + 9 Functional Products.', heroText: 'Hai dòng sản phẩm song song: Model là cấp độ máy (agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt. Chọn 1 Model + 1 hoặc nhiều Functional Products.', primaryCta: 'Khởi tạo AI Computer', secondaryCta: 'Liên hệ tư vấn',
+    key: 'plans', title: 'Gói dịch vụ — Nguyen AI Computer', description: '9 Model máy + 9 Functional Products. Model quyết định năng lực phần cứng; Functional Product quyết định bộ tool chuyên biệt. Giá pilot, cần xác minh chi phí trước thương mại.', eyebrow: 'Plans', heroTitle: '9 Model máy + 9 Functional Products.', heroText: 'Hai dòng sản phẩm song song: Model là cấp độ máy (agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt. Chọn 1 Model + 1 hoặc nhiều Functional Products.', primaryCta: 'Khởi tạo AI Computer', secondaryCta: 'Liên hệ tư vấn',
     sections: [
       { title: 'Hai dòng sản phẩm', body: 'Dòng 1 — 9 Model máy: cấp độ Máy Tính AI từ cơ bản đến enterprise. Dòng 2 — 9 Functional Products: bộ tool chuyên biệt theo chức năng. Hai dòng độc lập nhưng phối hợp.' },
       { title: 'Quy tắc chọn', body: 'Start không mua add-on. Business Pack cần Founder trở lên. Heritage Vault cần Family trở lên. Community OS cần Business trở lên.', items: ['Start: chỉ trải nghiệm, không add-on', 'Personal+: Office, Research, Content, Code, Evidence', 'Family+: Heritage Vault', 'Founder+: Founder Suite, Business Pack', 'Business+: Community OS', 'Enterprise/Sovereign: tất cả + custom'] }
@@ -474,7 +474,7 @@ const vi: Record<RouteKey, PageContent> = {
       { question: 'Model và Functional Product khác nhau thế nào?', answer: 'Model là cấp độ máy (năng lực phần cứng: agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt (chức năng). Bạn chọn 1 Model + 1 hoặc nhiều Functional Products.' },
       { question: 'Tôi có thể đổi gói không?', answer: 'Có. Bạn có thể nâng cấp Model bất cứ lúc nào. Functional Products có thể thêm hoặc gỡ theo nhu cầu.' },
       { question: 'Giá có phải cuối cùng không?', answer: 'Không. Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.' },
-      { question: 'Academy có bao gồm trong gói không?', answer: 'Không. Academy là sản phẩm trả phí riêng tại edu.nguyenai.net, mua standalone với Academy Pass.' },
+      { question: 'Academy có bao gồm trong gói không?', answer: 'Không. Academy là sản phẩm trả phí riêng tại academy.nguyenai.net, mua standalone với Academy Pass.' },
       { question: 'Trạng thái Available, Beta, Planned, Enterprise only nghĩa là gì?', answer: 'Available: đã hoạt động. Beta: đang thử nghiệm, có thể thay đổi. Planned: đang kế hoạch, chưa ra mắt. Enterprise only: chỉ cho Enterprise/Sovereign, cần liên hệ.' }
     ]
   },
@@ -516,7 +516,7 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   heritage: {
-    key: 'heritage', title: 'Heritage — Di sản', description: 'Super App di sản: Nguyen Roots, Nguyen Memory, Nguyen Knowledge — gia phả, tư liệu, tri thức có nguồn.', eyebrow: 'Heritage', heroTitle: 'Di sản là Super App, không phải toàn bộ sản phẩm.', heroText: 'Gia phả, kho tư liệu và tri thức có nguồn là các Super App quan trọng trong Máy Tính AI Nguyễn.', sections: [
+    key: 'heritage', title: 'Heritage — Di sản', description: 'Super App di sản: Nguyen Roots, Nguyen Memory, Nguyen Knowledge — gia phả, tư liệu, tri thức có nguồn.', eyebrow: 'Heritage', heroTitle: 'Di sản là Super App, không phải toàn bộ sản phẩm.', heroText: 'Gia phả, kho tư liệu và tri thức có nguồn là các Super App quan trọng trong Nguyen AI Computer.', sections: [
       { title: 'Super App di sản', body: 'Nguyen Roots, Nguyen Memory và Nguyen Knowledge phục vụ nhu cầu di sản.', items: ['Gia phả riêng tư', 'Kho tư liệu số', 'Tri thức song ngữ', 'Nguồn và evidence', 'Oral history'] },
       { title: 'Nguyên tắc đạo đức', body: 'Nguyen AI không mặc định mọi người họ Nguyễn thuộc cùng một huyết hệ, không tự nhận đại diện toàn bộ cộng đồng và không để AI xác nhận huyết thống hay hoàng tộc khi thiếu bằng chứng.' }
     ]
@@ -527,8 +527,8 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy giữ tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký tại edu.nguyenai.net, với track riêng cho Máy Tính AI Nguyễn.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Máy Tính AI Nguyễn.', sections: [
-      { title: 'Academy giữ tại edu.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký', body: 'Academy giữ tại edu.nguyenai.net, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
+    key: 'academy', title: 'Academy — Đào tạo và certification', description: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký tại academy.nguyenai.net, với track riêng cho Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Học cách làm chủ AI Computer.', heroText: 'Academy dạy người dùng làm chủ, kiểm chứng và vận hành máy, với track riêng cho Nguyen AI Computer.', sections: [
+      { title: 'Academy giữ tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký', body: 'Academy giữ tại academy.nguyenai.net, tách biệt khỏi thương hiệu sản phẩm để đảm bảo tính độc lập của certification.' }
     ]
   },
   security: {
@@ -542,32 +542,32 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   docs: {
-    key: 'docs', title: 'Tài liệu — Máy Tính AI Nguyễn', description: 'Tài liệu kỹ thuật, API, SDK và hướng dẫn sử dụng.', eyebrow: 'Docs', heroTitle: 'Tài liệu kỹ thuật và hướng dẫn.', heroText: 'Tài liệu sẽ nằm tại docs.nguyenai.net khi sẵn sàng.', sections: [
+    key: 'docs', title: 'Tài liệu — Nguyen AI Computer', description: 'Tài liệu kỹ thuật, API, SDK và hướng dẫn sử dụng.', eyebrow: 'Docs', heroTitle: 'Tài liệu kỹ thuật và hướng dẫn.', heroText: 'Tài liệu sẽ nằm tại docs.nguyenai.net khi sẵn sàng.', sections: [
       { title: 'Tài liệu dự kiến', body: 'API reference, SDK, Agent development, Super App development, Command Pack authoring, deployment guide.', items: ['API reference', 'SDK', 'Agent development', 'Super App development', 'Command Pack authoring', 'Deployment guide'] }
     ]
   },
   research: {
-    key: 'research', title: 'Nghiên cứu — Máy Tính AI Nguyễn', description: 'Nghiên cứu có nguồn về lịch sử, văn hóa, gia phả và phương pháp xác minh.', eyebrow: 'Research', heroTitle: 'Nghiên cứu có nguồn và có kiểm chứng.', heroText: 'Mỗi bài nghiên cứu cần có tác giả, người biên tập, ngày xuất bản, ngày kiểm tra lại, danh mục nguồn và citation trong nội dung.', sections: [
+    key: 'research', title: 'Nghiên cứu — Nguyen AI Computer', description: 'Nghiên cứu có nguồn về lịch sử, văn hóa, gia phả và phương pháp xác minh.', eyebrow: 'Research', heroTitle: 'Nghiên cứu có nguồn và có kiểm chứng.', heroText: 'Mỗi bài nghiên cứu cần có tác giả, người biên tập, ngày xuất bản, ngày kiểm tra lại, danh mục nguồn và citation trong nội dung.', sections: [
       { title: 'Chuẩn biên tập', body: 'Mỗi bài nghiên cứu cần có author, editor, publication date, review date, source list, citations, glossary, verified findings, inconclusive findings, structured data, stable URL và revision history.' }
     ]
   },
   about: {
-    key: 'about', title: 'Giới thiệu — Máy Tính AI Nguyễn', description: 'Định vị, lời hứa thương hiệu, kiến trúc backend độc lập và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Máy Tính AI Nguyễn là thế hệ AI Computer đám mây chuyên biệt cho hệ sinh thái Nguyễn, sở hữu backend riêng độc lập với @nai/* packages.', sections: [
-      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập, Nguyen Operating Profile, Máy Tính AI Nguyễn, Academy.', items: ['@nai/* packages — backend độc lập', 'Nguyen Operating Profile — hồ sơ vận hành', 'nguyenai.net — Máy Tính AI Nguyễn', 'edu.nguyenai.net — Academy & certification'] },
+    key: 'about', title: 'Giới thiệu — Nguyen AI Computer', description: 'Định vị, lời hứa thương hiệu, kiến trúc backend độc lập và ranh giới đạo đức.', eyebrow: 'Giới thiệu', heroTitle: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', heroText: 'Nguyen AI Computer là thế hệ AI Computer đám mây chuyên biệt cho hệ sinh thái Nguyễn, sở hữu backend riêng độc lập với @nai/* packages.', sections: [
+      { title: 'Kiến trúc bốn lớp', body: 'Backend độc lập, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — backend độc lập', 'Nguyen Operating Profile — hồ sơ vận hành', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ranh giới đạo đức', body: 'Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống. Nguyen AI không tuyên bố một nguồn gốc duy nhất cho toàn bộ họ Nguyễn.' }
     ]
   },
   contact: {
-    key: 'contact', title: 'Liên hệ — Máy Tính AI Nguyễn', description: 'Liên hệ để khởi tạo AI Computer, tham gia chapter hoặc hợp tác.', eyebrow: 'Liên hệ', heroTitle: 'Liên hệ với Nguyen AI.', heroText: 'Để khởi tạo AI Computer, tham gia chapter hoặc hợp tác, vui lòng gửi thông tin qua form hoặc email.', sections: [
+    key: 'contact', title: 'Liên hệ — Nguyen AI Computer', description: 'Liên hệ để khởi tạo AI Computer, tham gia chapter hoặc hợp tác.', eyebrow: 'Liên hệ', heroTitle: 'Liên hệ với Nguyen AI.', heroText: 'Để khởi tạo AI Computer, tham gia chapter hoặc hợp tác, vui lòng gửi thông tin qua form hoặc email.', sections: [
       { title: 'Kênh liên hệ', body: 'Email, form liên hệ và mạng lưới chapter.', items: ['Email: hello@nguyenai.net', 'Form liên hệ', 'Chapter network'] }
     ]
   },
   invest: {
     key: 'invest',
-    title: 'Đầu tư — Máy Tính AI Nguyễn | Cơ hội đầu tư giai đoạn Seed',
+    title: 'Đầu tư — Nguyen AI Computer | Cơ hội đầu tư giai đoạn Seed',
     description: 'Nguyen AI đang gọi vốn Seed 500K–1M USD, định giá 1.5–3M USD pre-money. Đầu tư qua chuyển khoản ngân hàng Việt Nam hoặc chuyển khoản quốc tế. Xác minh danh tính qua Google + Nguyen AI Identity, bảo mật 2 bước cho phòng đầu tư.',
     eyebrow: 'Đầu tư',
-    heroTitle: 'Cơ hội đầu tư Seed — Máy Tính AI Nguyễn.',
+    heroTitle: 'Cơ hội đầu tư Seed — Nguyen AI Computer.',
     heroText: 'Nguyen AI đang gọi vốn Seed 500K–1M USD với định giá 1.5–3M USD pre-money. Nhà đầu tư xác minh danh tính qua Google Login + Nguyen AI Identity, thanh toán qua QR chuyển khoản, và truy cập phòng đầu tư sau khi hoàn tất bảo mật 2 bước.',
     primaryCta: 'Yêu cầu truy cập phòng đầu tư',
     secondaryCta: 'Tải hồ sơ đầu tư',
@@ -578,7 +578,7 @@ const vi: Record<RouteKey, PageContent> = {
       { title: 'Thanh toán đầu tư — Chuyển khoản quốc tế (USD)', body: 'Nhà đầu tư quốc tế thanh toán trực tiếp VIET CAN NEW CORP — thực thể pháp lý chính.', items: ['Thực thể nhận: VIET CAN NEW CORP (Mỹ) — thực thể pháp lý chính', 'Loại tiền: USD', 'Thông tin wire transfer: cung cấp sau xác minh', 'Nhà đầu tư quốc tế liên hệ invest@nguyenai.net để nhận hướng dẫn'] },
       { title: 'Quy trình xác minh nhà đầu tư', body: 'Mọi nhà đầu tư phải hoàn tất xác minh danh tính trước khi truy cập phòng đầu tư riêng.', items: ['Bước 1: Đăng nhập bằng Google (OAuth)', 'Bước 2: Khai báo họ tên thật + ngày tháng năm sinh', 'Bước 3: Xác minh danh tính qua Nguyen AI Identity', 'Bước 4: Thanh toán đầu tư (QR chuyển khoản VN hoặc wire USD)', 'Bước 5: Kích hoạt bảo mật 2 bước (TOTP hoặc SMS)', 'Bước 6: Truy cập phòng đầu tư riêng (data room, tài chính, cap table)'] },
       { title: 'Bảo mật phòng đầu tư', body: 'Phòng đầu tư riêng được bảo vệ nghiêm ngặt theo chính sách quản trị.', items: ['Bắt buộc xác minh danh tính qua Nguyen AI Identity', 'Bắt buộc bảo mật 2 bước (TOTP hoặc SMS)', 'Mọi lượt truy cập được ghi audit log', 'Quyền truy cập có hạn (90 ngày), có thể thu hồi', 'Không công khai cap table, tài khoản ngân hàng hoặc term sheet trên HTML public', 'Trang riêng: noindex, nofollow, noarchive, loại khỏi sitemap'] },
-      { title: 'Cơ hội đầu tư', body: 'Máy Tính AI Nguyễn là dòng Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn toàn cầu — 32 triệu người họ Nguyễn trên thế giới.', items: ['Thị trường: 32 triệu người họ Nguyễn toàn cầu', 'Sản phẩm: 9 Model máy + 9 Functional Products (xem Product Catalog 9×9)', 'Doanh thu: subscription Model + add-on Functional Product + Academy', 'Lợi thế: di sản + tri thức + kết nối cộng đồng + AI Computer runtime', 'Roadmap: MVP 18 tuần, production release sau Sprint P3'] },
+      { title: 'Cơ hội đầu tư', body: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho hệ sinh thái Nguyễn toàn cầu — 32 triệu người họ Nguyễn trên thế giới.', items: ['Thị trường: 32 triệu người họ Nguyễn toàn cầu', 'Sản phẩm: 9 Model máy + 9 Functional Products (xem Product Catalog 9×9)', 'Doanh thu: subscription Model + add-on Functional Product + Academy', 'Lợi thế: di sản + tri thức + kết nối cộng đồng + AI Computer runtime', 'Roadmap: MVP 18 tuần, production release sau Sprint P3'] },
       { title: 'Tuyên bố pháp lý', body: 'Thông tin trên trang này không cấu thành lời chào bán chứng khoán, cam kết lợi nhuận hoặc tư vấn đầu tư. Mọi đầu tư có rủi ro. Chỉ nhà đầu tư đủ điều kiện sau xác minh mới truy cập tài liệu đầy đủ.' }
     ],
     faq: [
@@ -590,14 +590,14 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   terms: {
-    key: 'terms', title: 'Điều khoản dịch vụ — Máy Tính AI Nguyễn', description: 'Điều khoản dịch vụ Máy Tính AI Nguyễn: chấp nhận, gói dịch vụ, thanh toán, hoàn tiền, giới hạn trách nhiệm, thực thể pháp lý.', eyebrow: 'Điều khoản', heroTitle: 'Điều khoản dịch vụ Máy Tính AI Nguyễn.', heroText: 'Bằng việc sử dụng Máy Tính AI Nguyễn, bạn đồng ý với các điều khoản dưới đây. Vui lòng đọc kỹ trước khi khởi tạo máy hoặc thanh toán.',
+    key: 'terms', title: 'Điều khoản dịch vụ — Nguyen AI Computer', description: 'Điều khoản dịch vụ Nguyen AI Computer: chấp nhận, gói dịch vụ, thanh toán, hoàn tiền, giới hạn trách nhiệm, thực thể pháp lý.', eyebrow: 'Điều khoản', heroTitle: 'Điều khoản dịch vụ Nguyen AI Computer.', heroText: 'Bằng việc sử dụng Nguyen AI Computer, bạn đồng ý với các điều khoản dưới đây. Vui lòng đọc kỹ trước khi khởi tạo máy hoặc thanh toán.',
     sections: [
       { title: '1. Chấp nhận điều khoản', body: 'Khi tạo tài khoản, khởi tạo AI Computer hoặc sử dụng bất kỳ dịch vụ nào của Nguyen AI, bạn đồng ý bị ràng buộc bởi các điều khoản này. Nếu không đồng ý, không sử dụng dịch vụ.' },
-      { title: '2. Định nghĩa', body: 'Máy Tính AI Nguyễn là hệ thống AI Computer cá nhân trên đám mây. Model là cấp độ máy. Functional Product là bộ tool chuyên biệt. Super App là ứng dụng chuyên biệt. Agent là AI agent chuyên biệt.', items: ['Nguyen AI — thương hiệu', 'Máy Tính AI Nguyễn — sản phẩm', 'Model — cấp độ máy', 'Functional Product — bộ tool', 'Super App — ứng dụng chuyên biệt', 'Agent — AI agent chuyên biệt'] },
+      { title: '2. Định nghĩa', body: 'Nguyen AI Computer là hệ thống AI Computer cá nhân trên đám mây. Model là cấp độ máy. Functional Product là bộ tool chuyên biệt. Super App là ứng dụng chuyên biệt. Agent là AI agent chuyên biệt.', items: ['Nguyen AI — thương hiệu', 'Nguyen AI Computer — sản phẩm', 'Model — cấp độ máy', 'Functional Product — bộ tool', 'Super App — ứng dụng chuyên biệt', 'Agent — AI agent chuyên biệt'] },
       { title: '3. Gói dịch vụ và giá', body: 'Giá hiện là giả thuyết pilot, có thể thay đổi sau khi xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý. Mỗi gói có năng lực, giới hạn và trạng thái (Available, Beta, Planned, Enterprise only) rõ ràng. Không công bố tính năng chưa tồn tại là đã hoàn thành.' },
       { title: '4. Thanh toán', body: 'Thanh toán theo tháng hoặc năm. VND qua VNPay hoặc chuyển khoản ngân hàng đến Kasan JSC (đại diện thương mại). USD qua Stripe hoặc wire transfer. Hóa đơn VAT Việt Nam do Kasan JSC phát hành cho khách hàng Việt Nam.' },
       { title: '5. Hoàn tiền', body: 'Hoàn tiền 100% trong 7 ngày đầu nếu chưa sử dụng quá 10 commands. Sau 7 ngày, hoàn tiền theo tỷ lệ thời gian còn lại, trừ chi phí AI đã tiêu thụ. Academy Pass và Certification Fee không hoàn sau khi bắt đầu sử dụng.' },
-      { title: '6. Giới hạn trách nhiệm', body: 'Máy Tính AI Nguyễn cung cấp công cụ phân tích, không phải tư vấn pháp lý, tài chính hay y tế licensed. Agent và AI output là hỗ trợ, không thay thế chuyên gia. Bằng chứng (evidence) là công cụ kiểm chứng, không phải xác nhận huyết thống hay dòng dõi hoàng gia.' },
+      { title: '6. Giới hạn trách nhiệm', body: 'Nguyen AI Computer cung cấp công cụ phân tích, không phải tư vấn pháp lý, tài chính hay y tế licensed. Agent và AI output là hỗ trợ, không thay thế chuyên gia. Bằng chứng (evidence) là công cụ kiểm chứng, không phải xác nhận huyết thống hay dòng dõi hoàng gia.' },
       { title: '7. Quyền riêng tư', body: 'Dữ liệu cá nhân được bảo vệ theo PDPD 91/2025/QH15 (Việt Nam) và chính sách quyền riêng tư riêng. Living-person data private by default. Family trees private by default. Xem trang Quyền riêng tư cho chi tiết.' },
       { title: '8. Thực thể pháp lý', body: 'VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống và sở hữu IP. Kasan JSC (MST 0315521422) là đại diện thương mại tại Việt Nam — phát hành VAT, tuân thủ PDPD, tiếp nhận thanh toán VND. Kasan JSC không sở hữu IP, không chịu trách nhiệm pháp lý chính yếu.', items: ['VIET CAN NEW CORP (US) — thực thể pháp lý chính, đang hoàn tất đăng ký', 'Kasan JSC (VN, MST 0315521422) — đại diện thương mại', 'IP thuộc VIET CAN NEW CORP', 'SAFE / Convertible Note phát hành bởi VIET CAN NEW CORP'] },
       { title: '9. Thay đổi điều khoản', body: 'Chúng tôi có thể cập nhật điều khoản. Thông báo 30 ngày trước khi thay đổi có hiệu lực. Tiếp tục sử dụng sau 30 ngày = đồng ý với điều khoản mới.' },
@@ -605,7 +605,7 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   privacy: {
-    key: 'privacy', title: 'Chính sách quyền riêng tư — Máy Tính AI Nguyễn', description: 'Chính sách quyền riêng tư Máy Tính AI Nguyễn: dữ liệu cá nhân, PDPD 91/2025/QH15, mã hóa, quyền người dùng, living-person data.', eyebrow: 'Quyền riêng tư', heroTitle: 'Chính sách quyền riêng tư Máy Tính AI Nguyễn.', heroText: 'Chúng tôi bảo vệ dữ liệu cá nhân theo PDPD 91/2025/QH15 (Việt Nam) và best practice quốc tế. Mỗi người dùng có instance riêng, dữ liệu không chia sẻ.',
+    key: 'privacy', title: 'Chính sách quyền riêng tư — Nguyen AI Computer', description: 'Chính sách quyền riêng tư Nguyen AI Computer: dữ liệu cá nhân, PDPD 91/2025/QH15, mã hóa, quyền người dùng, living-person data.', eyebrow: 'Quyền riêng tư', heroTitle: 'Chính sách quyền riêng tư Nguyen AI Computer.', heroText: 'Chúng tôi bảo vệ dữ liệu cá nhân theo PDPD 91/2025/QH15 (Việt Nam) và best practice quốc tế. Mỗi người dùng có instance riêng, dữ liệu không chia sẻ.',
     sections: [
       { title: '1. Dữ liệu chúng tôi thu thập', body: 'Dữ liệu tài khoản: email, tên, mật khẩu (hash). Dữ liệu vận hành: commands, memory, vault, audit log. Dữ liệu thanh toán: hóa đơn, giao dịch (không lưu card). Dữ liệu tùy chọn: hồ sơ founder, gia phả, oral history.', items: ['Tài khoản: email, tên, mật khẩu hash (PBKDF2 600K iterations)', 'Vận hành: commands, memory, vault, audit log', 'Thanh toán: hóa đơn, giao dịch (không lưu card number)', 'Tùy chọn: hồ sơ, gia phả, oral history'] },
       { title: '2. Nguyên tắc mặc định', body: 'Living-person data private by default. Family trees private by default. Family documents private until owner publishes. Founder profiles public only after owner approval. Không có dữ liệu nào công khai mặc định.', items: ['Living-person data: private by default', 'Family trees: private by default', 'Family documents: private until publish', 'Founder profiles: public only after approval'] },
@@ -794,7 +794,7 @@ const en: Record<RouteKey, PageContent> = {
     },
     academySection: {
       title: 'Academy',
-      body: 'Academy is separate at edu.nguyenai.net, offering free AI learning for registrants, with a dedicated track for Nguyen AI Computer. Academy Pass is a separate entitlement, purchased standalone, not granted by default in any plan.',
+      body: 'Academy is separate at academy.nguyenai.net, offering free AI learning for registrants, with a dedicated track for Nguyen AI Computer. Academy Pass is a separate entitlement, purchased standalone, not granted by default in any plan.',
       items: ['Basic track: Master AI Computer (free)', 'Founder track: Strategy + Pitch + Fundraising', 'Business track: Operations + SOP + Automation', 'Heritage track: Genealogy + Oral History + Evidence', 'Certification: independent, audited, no self-issuance']
     },
     memoryVaultSection: {
@@ -985,7 +985,7 @@ const en: Record<RouteKey, PageContent> = {
       { question: 'How are Models and Functional Products different?', answer: 'A Model is a machine tier (hardware capacity: agent, memory, vault, quota). A Functional Product is a specialized tool bundle (function). You choose 1 Model + 1 or more Functional Products.' },
       { question: 'Can I change plans?', answer: 'Yes. You can upgrade your Model at any time. Functional Products can be added or removed as needed.' },
       { question: 'Are prices final?', answer: 'No. Current prices are pilot hypotheses, subject to validation of AI, storage, support and legal costs before commercial launch.' },
-      { question: 'Is Academy included in plans?', answer: 'No. Academy is a separate paid product at edu.nguyenai.net, purchased standalone with an Academy Pass.' },
+      { question: 'Is Academy included in plans?', answer: 'No. Academy is a separate paid product at academy.nguyenai.net, purchased standalone with an Academy Pass.' },
       { question: 'What do Available, Beta, Planned, Enterprise only mean?', answer: 'Available: live. Beta: in testing, may change. Planned: in roadmap, not yet launched. Enterprise only: Enterprise/Sovereign only, contact required.' }
     ]
   },
@@ -1038,8 +1038,8 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   academy: {
-    key: 'academy', title: 'Academy — Training and certification', description: 'Independent paid Academy at edu.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
-      { title: 'Independent Academy', body: 'Academy is hosted at edu.nguyenai.net and provides a separate paid Academy Pass with independent certification.' }
+    key: 'academy', title: 'Academy — Training and certification', description: 'Independent paid Academy at academy.nguyenai.net, with a dedicated track for Nguyen AI Computer.', eyebrow: 'Academy', heroTitle: 'Learn to master the AI Computer.', heroText: 'Academy teaches users to master, verify and operate the machine, with a dedicated track for Nguyen AI Computer.', sections: [
+      { title: 'Independent Academy', body: 'Academy is hosted at academy.nguyenai.net and provides a separate paid Academy Pass with independent certification.' }
     ]
   },
   security: {
@@ -1064,7 +1064,7 @@ const en: Record<RouteKey, PageContent> = {
   },
   about: {
     key: 'about', title: 'About — Nguyen AI Computer', description: 'Positioning, brand promise, independent backend architecture and ethical boundaries.', eyebrow: 'About', heroTitle: 'Rooted identity. Powerful intelligence. Global execution.', heroText: 'Nguyen AI Computer is a specialized cloud AI Computer line for the Nguyen ecosystem, owning an independent backend with @nai/* packages.', sections: [
-      { title: 'Four-layer architecture', body: 'Independent backend, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — independent backend', 'Nguyen Operating Profile — operating profile', 'nguyenai.net — Nguyen AI Computer', 'edu.nguyenai.net — Academy & certification'] },
+      { title: 'Four-layer architecture', body: 'Independent backend, Nguyen Operating Profile, Nguyen AI Computer, Academy.', items: ['@nai/* packages — independent backend', 'Nguyen Operating Profile — operating profile', 'nguyenai.net — Nguyen AI Computer', 'academy.nguyenai.net — Academy & certification'] },
       { title: 'Ethical boundaries', body: 'The Nguyen Operating Profile is an operating profile, not a bloodline. Nguyen AI does not claim a single origin for all Nguyen people.' }
     ]
   },

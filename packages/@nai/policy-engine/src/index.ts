@@ -10,7 +10,7 @@
  * Production: swap with OPA or Stytz.
  */
 
-import type { ResolvedEntitlements as Entitlements } from '@nai/entitlement';
+import type { Entitlements } from '@nai/entitlement';
 
 // ============================================================
 // Types

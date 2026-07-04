@@ -27,7 +27,7 @@ import {
   chat,
   type ModelDescriptor,
   type ChatRequest,
-} from './index';
+} from './index.ts';
 
 let passed = 0;
 let failed = 0;

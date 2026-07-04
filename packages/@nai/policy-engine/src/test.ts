@@ -9,8 +9,8 @@ import {
   checkEntitlementForAction,
   type PolicyContext,
   type ActionType,
-} from './index';
-import type { ResolvedEntitlements as Entitlements } from '@nai/entitlement';
+} from './index.ts';
+import type { Entitlements } from '@nai/entitlement';
 
 let passed = 0;
 let failed = 0;

@@ -1,0 +1,18 @@
+$ wrangler deploy --dry-run
+
+ ⛅️ wrangler 4.105.0
+────────────────────
+Total Upload: 396.32 KiB / gzip: 72.72 KiB
+Your Worker has access to the following bindings:
+Binding                                                                    Resource                  
+env.DB (nai-identity)                                                      D1 Database               
+env.AUDIT_ARCHIVE (nai-audit-archive)                                      R2 Bucket                 
+env.ENVIRONMENT ("development")                                            Environment Variable      
+env.AUTH_ISSUER ("auth.nguyenai.net")                                      Environment Variable      
+env.VNPAY_PAY_URL ("https://sandbox.vnpayment.vn/paymentv...")             Environment Variable      
+env.VNPAY_RETURN_URL ("https://api.nguyenai.net/v1/payment/v...")          Environment Variable      
+env.GEN1_GATEWAY_URL ("https://aiagent-iai-one-api-prod.tran...")          Environment Variable      
+env.EVIDENCE_SIGNING_KEY ("dev-evidence-key-change-in-prod")               Environment Variable      
+env.LLM_PROVIDER_MODE ("gen1")                                             Environment Variable      
+
+--dry-run: exiting now.

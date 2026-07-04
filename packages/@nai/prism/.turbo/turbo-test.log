@@ -1,0 +1,51 @@
+$ tsx src/test.ts
+
+@nai/prism test
+---------------
+  ✓ free can use free
+  ✓ free cannot use student
+  ✓ pro can use free
+  ✓ enterprise can use business
+  ✓ student cannot use pro
+  ✓ registry has 4 models
+  ✓ getModelById finds iris-3
+  ✓ getModelById returns null for unknown
+  ✓ free tier sees 1 model (iris-3)
+  ✓ free tier model is iris-3
+  ✓ pro tier sees 3 models (free + student + pro)
+  ✓ auto-route free returns a model
+  ✓ auto-route free picks iris-3
+  ✓ auto-route pro returns a model
+  ✓ auto-route pro picks nova-3 (highest tier)
+  ✓ auto-route student+tool-use picks pulse-7 (has function-calling)
+  ✓ getPrompt finds registered template
+  ✓ getPrompt returns null for unknown
+  ✓ render substitutes user_name
+  ✓ render uses default language
+  ✓ render overrides default language
+  ✓ mock provider returns canned response
+  ✓ mock response served_by = mock
+  ✓ free tier allowed for free model
+  ✓ mock usage total_tokens > 0
+  ✓ mock call count = 1
+  ✓ free tier blocked from business model
+  ✓ blocked response finish_reason = error
+  ✓ blocked reason mentions business tier
+  ✓ blocked request did NOT call provider (still 1 call)
+  ✓ auto-route free allowed
+  ✓ auto-route picked iris-3 for free
+  ✓ auto-route called provider (2 calls)
+  ✓ GEN1 adapter called fetch
+  ✓ GEN1 response served_by = gen1-adapter
+  ✓ GEN1 response content correct
+  ✓ GEN1 usage total_tokens = 9
+  ✓ GEN1 provider_response_id preserved
+  ✓ GEN1 adapter maps nguyen-iris-3 → iris-3
+  ✓ GEN1 adapter sends X-Session-Id
+  ✓ GEN1 session id starts with nai-t_1-
+  ✓ GEN1 adapter sends Authorization header
+  ✓ GEN1 adapter maps nguyen-pulse-7 → pulse-3
+  ✓ GEN1 500 response → finish_reason = error
+  ✓ GEN1 500 response → empty content
+
+45 passed, 0 failed

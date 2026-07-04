@@ -6,9 +6,9 @@
 
 ## Purpose
 
-Academy is the onboarding, certification and retention layer of Nguyen AI Computer. It provides AI learning through a standalone paid Academy Pass, separate from machine subscription, with a dedicated track for Nguyen AI Computer operation.
+Academy is the onboarding, certification and retention layer of Nguyen AI Computer. It provides AI learning through a paid Academy Pass (separate entitlement from machine subscription), with a dedicated track for Nguyen AI Computer operation.
 
-Academy is a separate paid product governed by the `academy.pass` entitlement (see `ENTITLEMENT_MODEL.md` §2.2). It is **not** included with any subscription plan by default. It serves as:
+Academy is a separate paid product governed by the `academy.pass` entitlement (see `ENTITLEMENT_MODEL.md` §2.2). It is **not** included with every subscription plan by default. It serves as:
 
 - onboarding for new users;
 - skill building for Agent operation;
@@ -19,7 +19,7 @@ Academy is a separate paid product governed by the `academy.pass` entitlement (s
 ## Domain
 
 - `academy.nguyenai.net` — Academy platform
-- Integrated with shared identity / SSO via `auth.nguyenai.net` and its relying parties
+- Integrated with `app.nguyenai.net` for subscriber authentication
 - Certification verifiable at `academy.nguyenai.net/verify/`
 
 ## Learning tracks
@@ -171,6 +171,7 @@ Academy is a separate paid product governed by the `academy.pass` entitlement (s
 
 - Academy requires paid Academy Pass (separate entitlement from machine subscription)
 - Certification exams have separate Certification Fee per attempt (see `ENTITLEMENT_MODEL.md` §2.3)
+- Free introductory lessons available without Academy Pass
 - Enterprise and Chapter can request custom tracks
 - Academy is both a retention tool and a revenue line
 
@@ -181,4 +182,5 @@ Academy is a separate paid product governed by the `academy.pass` entitlement (s
 - Certification rate per plan
 - Correlation between Academy progress and retention
 - Chapter certification coverage
+- Enterprise team certification coverage
 - Enterprise team certification coverage

@@ -1,0 +1,72 @@
+$ tsx src/test.ts
+
+@nai/conductor test
+------------------
+  ✓ 9 NAI agents defined
+  ✓ agent nguyen-guide present
+  ✓ agent nguyen-researcher present
+  ✓ agent nguyen-archivist present
+  ✓ agent nguyen-verifier present
+  ✓ agent nguyen-family-steward present
+  ✓ agent nguyen-founder present
+  ✓ agent nguyen-business-operator present
+  ✓ agent nguyen-global-connector present
+  ✓ agent nguyen-guardian present
+  ✓ guide name correct
+  ✓ guide nameVi correct
+  ✓ listAgents returns 9
+  ✓ route help → guide
+  ✓ route research → researcher
+  ✓ route family tree → family-steward
+  ✓ route verify → verifier
+  ✓ route archive → archivist
+  ✓ route founder strategy → founder
+  ✓ route business finance → business-operator
+  ✓ route network → global-connector
+  ✓ route safety → guardian
+  ✓ route Vietnamese gia phả → family-steward
+  ✓ route Vietnamese nghiên cứu → researcher
+  ✓ guide enabled in free plan
+  ✓ researcher NOT enabled in free plan
+  ✓ init → plan valid
+  ✓ plan → execute valid
+  ✓ plan → approval_required valid
+  ✓ approval_required → execute valid
+  ✓ approval_required → cancelled valid
+  ✓ execute → verify valid
+  ✓ verify → done valid
+  ✓ init → done invalid
+  ✓ done → init invalid
+  ✓ execute → plan invalid (no backward)
+  ✓ invalid transition throws
+  ✓ new context state = init
+  ✓ new context has 1 transition (init)
+  ✓ new context plan = null
+  ✓ new context output = null
+  ✓ runCommand succeeds (no approval)
+  ✓ final state = done
+  ✓ plan was produced
+  ✓ output was produced
+  ✓ output from guide agent
+  ✓ evidence labels assigned
+  ✓ verified label inferred
+  ✓ primary-source label inferred
+  ✓ 5 transitions: init, plan, execute, verify, done
+  ✓ runCommand pauses at approval_required (success=false)
+  ✓ state = approval_required
+  ✓ plan was produced before pause
+  ✓ resumeCommand succeeds after approval
+  ✓ resumed final state = done
+  ✓ resumed output produced
+  ✓ business-operator pauses at approval
+  ✓ cancelCommand → cancelled
+  ✓ approval_required=all triggers approval for guide
+  ✓ infer verified
+  ✓ infer oral-history
+  ✓ infer cannot-conclude
+  ✓ default label = insufficient-evidence
+  ✓ runtime error → success=false
+  ✓ runtime error → state=failed
+  ✓ runtime error message preserved
+
+66 passed, 0 failed

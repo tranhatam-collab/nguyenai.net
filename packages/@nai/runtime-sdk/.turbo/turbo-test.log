@@ -1,0 +1,23 @@
+$ tsx src/test.ts
+
+=== Runtime Creation ===
+  ✓ createRuntime() returns instance
+  ✓ Runtime has methods (class instance)
+
+=== Content Safety ===
+  ✓ checkContentSafety returns array
+  ✓ Safe content: 0 violations
+  ✓ Harmful content: violations detected
+
+=== Orchestration Plan (Free Tier) ===
+  ✓ createOrchestrationPlanForFreeTier returns plan
+  ✓ Plan has sequence array
+  ✓ Plan has at least 1 step in sequence
+  ✓ Plan has at least 1 agent
+
+=== Learning Suggestions ===
+  ✓ getLearningSuggestions returns array
+
+=== RUNTIME-SDK TEST SUMMARY ===
+Passed: 10 | Failed: 0
+✅ ALL RUNTIME-SDK TESTS PASSED

@@ -27,7 +27,7 @@ import {
   FamilyMemory,
   FounderMemory,
   type MemoryType,
-} from './index';
+} from './index.ts';
 
 let passed = 0;
 let failed = 0;

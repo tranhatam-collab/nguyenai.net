@@ -15,9 +15,7 @@
 ## 1. Four-layer architecture
 
 ```text
-LAYER 4 — ACADEMY & CERTIFICATION
-academy.nguyenai.net
-Standalone paid Academy Pass, certification and mastery tracks.
+LAYER 4 — ACADEMY & CERTIFICATION`nacademy.nguyenai.net`nFree AI learning for all subscribers. Teach users to master, verify and operate the computer.
 
 LAYER 3 — NGUYEN AI COMPUTER
 nguyenai.net

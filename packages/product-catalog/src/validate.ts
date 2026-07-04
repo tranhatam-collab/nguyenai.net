@@ -14,8 +14,6 @@ const VALID_PLAN_IDS = [
   'nguyen-sovereign'
 ] as const;
 
-const VALID_PLAN_IDS_SET: ReadonlySet<string> = new Set(VALID_PLAN_IDS);
-
 const REQUIRED_ENTITLEMENT_KEYS = [
   'machine.plan', 'machine.instance.count', 'machine.model.tier',
   'machine.command.quota', 'machine.tokens.quota', 'machine.agents.enabled',
@@ -40,10 +38,10 @@ if (!validate({ plans })) {
 
 // 2. Cross-check: every plan in plans.json has an entry in entitlements.json
 for (const plan of plans) {
-  if (!VALID_PLAN_IDS_SET.has(plan.id)) {
+  if (!VALID_PLAN_IDS.includes(plan.id)) {
     errors.push(`Unknown plan id: ${plan.id}`);
   }
-  if (!entitlements[plan.id as keyof typeof entitlements]) {
+  if (!entitlements[plan.id]) {
     errors.push(`Missing entitlements for plan: ${plan.id}`);
   }
 }
@@ -64,14 +62,10 @@ for (const planId of Object.keys(entitlements)) {
   }
 }
 
-// 5. Verify academy.pass is true ONLY for Founder and Chapter (per ENTITLEMENT_MODEL.md §3.1 + Founder decision D-015)
-const ACADEMY_PASS_PLANS = ['nguyen-founder', 'nguyen-chapter'];
+// 5. Verify academy.pass is false for all machine plans (per ENTITLEMENT_MODEL.md §3.1)
 for (const [planId, ent] of Object.entries(entitlements)) {
-  if (ent['academy.pass'] === true && !ACADEMY_PASS_PLANS.includes(planId)) {
-    errors.push(`academy.pass must be false for machine plan: ${planId} (only Founder and Chapter include Academy Pass per D-015)`);
-  }
-  if (ent['academy.pass'] === false && ACADEMY_PASS_PLANS.includes(planId)) {
-    errors.push(`academy.pass must be true for: ${planId} (Founder and Chapter include Academy Pass per D-015)`);
+  if (ent['academy.pass'] === true) {
+    errors.push(`academy.pass must be false for machine plan: ${planId} (Academy Pass is standalone)`);
   }
 }
 

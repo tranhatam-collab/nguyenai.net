@@ -24,7 +24,7 @@ import {
   ragQuery,
   type Document,
   type EmbedFn,
-} from './index';
+} from './index.ts';
 
 import { setVectorStore, InMemoryVectorStore } from '@nai/compass';
 import { setEvidenceStore, InMemoryEvidenceStore, getEvidenceForCommand } from '@nai/evidence';

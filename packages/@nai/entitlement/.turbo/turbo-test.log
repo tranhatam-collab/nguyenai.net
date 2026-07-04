@@ -1,0 +1,12 @@
+$ tsx src/test.ts
+=== @nai/entitlement unit tests ===
+
+Test: resolve Start plan entitlements
+Test: resolve Founder plan entitlements
+Test: command quota enforcement
+Test: token quota enforcement
+Test: academy access
+Test: model tier gating
+Test: model tier access check
+
+39 passed, 0 failed

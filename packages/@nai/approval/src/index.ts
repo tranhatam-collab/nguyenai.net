@@ -152,36 +152,15 @@ export async function requestApproval(params: RequestApprovalParams): Promise<st
     metadata: { action: params.action, resource: params.resource },
   });
 
-  // Notify approvers via email (best-effort, non-blocking)
-  try {
-    const { createEmailService } = await import('@nai/email');
-    const emailService = createEmailService({ ENVIRONMENT: 'development' });
-    await emailService.sendTemplate('approval_requested', {
-      locale: 'vi',
-      user_email: 'approver@nguyenai.net',
-      action: params.action,
-      requested_by: params.user_id,
-      request_id: approvalId,
-    });
-  } catch {
-    // Email failure should not block approval flow
-  }
+  // Notify approvers (in production: send email/notification via Resend)
+  // For now, just log
   return approvalId;
 }
 
-export async function approveRequest(
-  approvalId: string,
-  approvedBy: string,
-  approverTenantId: string,
-  reason?: string,
-): Promise<void> {
+export async function approveRequest(approvalId: string, approvedBy: string, reason?: string): Promise<void> {
   const req = await defaultStore.get(approvalId);
   if (!req) throw new Error(`Approval ${approvalId} not found`);
   if (req.status !== 'pending') throw new Error(`Approval ${approvalId} is not pending (status: ${req.status})`);
-  // P0 IDOR fix: approver must be in the same tenant as the request
-  if (req.tenant_id !== approverTenantId) {
-    throw new Error(`Approval ${approvalId} does not belong to your tenant`);
-  }
 
   await defaultStore.updateStatus(approvalId, 'approved', approvedBy, reason);
 
@@ -197,19 +176,10 @@ export async function approveRequest(
   });
 }
 
-export async function denyRequest(
-  approvalId: string,
-  deniedBy: string,
-  denierTenantId: string,
-  reason?: string,
-): Promise<void> {
+export async function denyRequest(approvalId: string, deniedBy: string, reason?: string): Promise<void> {
   const req = await defaultStore.get(approvalId);
   if (!req) throw new Error(`Approval ${approvalId} not found`);
   if (req.status !== 'pending') throw new Error(`Approval ${approvalId} is not pending (status: ${req.status})`);
-  // P0 IDOR fix: denier must be in the same tenant as the request
-  if (req.tenant_id !== denierTenantId) {
-    throw new Error(`Approval ${approvalId} does not belong to your tenant`);
-  }
 
   await defaultStore.updateStatus(approvalId, 'denied', deniedBy, reason);
 

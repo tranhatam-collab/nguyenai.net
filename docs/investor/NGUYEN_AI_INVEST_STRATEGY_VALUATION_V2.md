@@ -16,9 +16,9 @@
 >
 > Giữ tài liệu này để tham khảo lịch sử. Không sử dụng cho investor conversations mới.
 
-**Version:** 2.0 (SUPERSEDED)
+**Version:** 2.0 (SUPERSEDED)  
 **Date:** 2026-07-01  
-**Status:** SUPERSEDED — see V3.0 and Hồ sơ VI V1.0
+**Status:** SUPERSEDED — see V3.0 and Hồ sơ VI V1.0  
 **Classification:** Confidential — for qualified investors only
 
 ---
@@ -530,7 +530,7 @@ Each AI Computer Instance must default to:
 
 > **⚠️ SUPERSEDED 2026-07-02:** Section này đã cũ. Academy hiện là sản phẩm trả phí riêng, không free cho subscribers. Xem `ENTITLEMENT_MODEL.md` §2.2-2.3 và hồ sơ VI V1.0 §XIV.
 
-Academy is hosted at `academy.nguyenai.net` and provides **paid Academy Pass access with independent certification**. Academy is a separate revenue product with its own Academy Pass entitlement and Certification Fee. See `ENTITLEMENT_MODEL.md` §2.2-2.3.
+Academy is hosted at `academy.nguyenai.net` and provides ~~free AI learning to all subscribers~~ **paid Academy Pass with free introductory tier**. Academy is a separate revenue product with its own Academy Pass entitlement and Certification Fee. See `ENTITLEMENT_MODEL.md` §2.2-2.3.
 
 Academy tracks:
 

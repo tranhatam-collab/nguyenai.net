@@ -1,0 +1,43 @@
+$ tsx src/test.ts
+
+=== VAT Computation ===
+  ✓ VND Vietnam customer: 10% VAT = 19900
+  ✓ VND Vietnam customer: rate = 0.10
+  ✓ VND Vietnam customer: Kasan JSC issues
+  ✓ USD international customer: 0 VAT
+  ✓ USD international customer: rate = 0
+  ✓ USD international customer: VIET CAN NEW CORP issues
+  ✓ VND always Kasan JSC regardless of customer location
+
+=== Invoice Generation ===
+  ✓ Invoice ID starts with INV-
+  ✓ Invoice links to payment
+  ✓ Invoice amount = 8 USD
+  ✓ Invoice currency = USD
+  ✓ USD invoice: 0 VAT
+  ✓ USD invoice: VIET CAN NEW CORP
+  ✓ Invoice status = issued
+  ✓ VND invoice: 19900 VAT
+  ✓ VND invoice: Kasan JSC
+
+=== Stripe Event Parsing ===
+  ✓ checkout.session.completed parsed
+  ✓ Parsed: gateway = stripe
+  ✓ Parsed: amount = 8 (800/100)
+  ✓ Parsed: currency = USD
+  ✓ Parsed: user_id from metadata
+  ✓ Parsed: price_id from metadata
+  ✓ Parsed: status = paid
+  ✓ Irrelevant event returns null
+
+=== VNPay Return Parsing ===
+  ✓ VNPay: gateway = vnpay
+  ✓ VNPay: amount = 199000 (19900000/100)
+  ✓ VNPay: currency = VND
+  ✓ VNPay: status = paid (code 00)
+  ✓ VNPay: txnRef captured
+  ✓ VNPay: failed response code = failed status
+
+=== BILLING TEST SUMMARY ===
+Passed: 30 | Failed: 0
+✅ ALL BILLING TESTS PASSED

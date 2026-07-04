@@ -5,16 +5,11 @@
     "machine.model.tier": "free",
     "machine.command.quota": 10,
     "machine.tokens.quota": 50000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian"],
     "machine.super_apps.enabled": [],
     "machine.approval.required": "all",
     "academy.pass": false,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -25,22 +20,11 @@
     "machine.model.tier": "standard",
     "machine.command.quota": 100,
     "machine.tokens.quota": 500000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content"],
     "machine.approval.required": "sensitive",
     "academy.pass": false,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -51,25 +35,11 @@
     "machine.model.tier": "standard",
     "machine.command.quota": 300,
     "machine.tokens.quota": 1000000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier",
-      "nguyen-family-steward"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content",
-      "nguyen-roots",
-      "nguyen-memory"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-family-steward"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content", "nguyen-roots", "nguyen-memory"],
     "machine.approval.required": "sensitive",
     "academy.pass": false,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -80,25 +50,11 @@
     "machine.model.tier": "standard+",
     "machine.command.quota": 500,
     "machine.tokens.quota": 2000000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier",
-      "nguyen-creator"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content",
-      "ai-media",
-      "ai-browser"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-creator"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content", "ai-media", "ai-browser"],
     "machine.approval.required": "sensitive",
     "academy.pass": false,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -109,30 +65,11 @@
     "machine.model.tier": "pro",
     "machine.command.quota": 1000,
     "machine.tokens.quota": 5000000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier",
-      "nguyen-family-steward",
-      "nguyen-founder",
-      "nguyen-business-operator"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content",
-      "ai-browser",
-      "ai-founder-os",
-      "ai-finance-workspace",
-      "ai-legal-workspace",
-      "nguyen-founders"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-family-steward", "nguyen-founder", "nguyen-business-operator"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content", "ai-browser", "ai-founder-os", "ai-finance-workspace", "ai-legal-workspace", "nguyen-founders"],
     "machine.approval.required": "sensitive",
-    "academy.pass": true,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.pass": false,
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -143,35 +80,11 @@
     "machine.model.tier": "pro",
     "machine.command.quota": 5000,
     "machine.tokens.quota": 20000000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier",
-      "nguyen-family-steward",
-      "nguyen-founder",
-      "nguyen-business-operator",
-      "nguyen-global-connector"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content",
-      "ai-media",
-      "ai-browser",
-      "ai-code",
-      "ai-automation",
-      "ai-founder-os",
-      "ai-business-os",
-      "ai-sales",
-      "ai-finance-workspace",
-      "ai-legal-workspace"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-family-steward", "nguyen-founder", "nguyen-business-operator", "nguyen-global-connector"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content", "ai-media", "ai-browser", "ai-code", "ai-automation", "ai-founder-os", "ai-business-os", "ai-sales", "ai-finance-workspace", "ai-legal-workspace"],
     "machine.approval.required": "per-role",
     "academy.pass": false,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0
@@ -182,43 +95,11 @@
     "machine.model.tier": "pro",
     "machine.command.quota": 10000,
     "machine.tokens.quota": 50000000,
-    "machine.agents.enabled": [
-      "nguyen-guide",
-      "nguyen-guardian",
-      "nguyen-researcher",
-      "nguyen-verifier",
-      "nguyen-family-steward",
-      "nguyen-founder",
-      "nguyen-business-operator",
-      "nguyen-global-connector",
-      "nguyen-archivist"
-    ],
-    "machine.super_apps.enabled": [
-      "ai-office",
-      "ai-research",
-      "ai-content",
-      "ai-media",
-      "ai-browser",
-      "ai-code",
-      "ai-automation",
-      "ai-founder-os",
-      "ai-business-os",
-      "ai-sales",
-      "ai-finance-workspace",
-      "ai-legal-workspace",
-      "nguyen-roots",
-      "nguyen-memory",
-      "nguyen-knowledge",
-      "nguyen-trust",
-      "nguyen-network",
-      "nguyen-founders",
-      "nguyen-chapter-os"
-    ],
+    "machine.agents.enabled": ["nguyen-guide", "nguyen-guardian", "nguyen-researcher", "nguyen-verifier", "nguyen-family-steward", "nguyen-founder", "nguyen-business-operator", "nguyen-global-connector", "nguyen-archivist"],
+    "machine.super_apps.enabled": ["ai-office", "ai-research", "ai-content", "ai-media", "ai-browser", "ai-code", "ai-automation", "ai-founder-os", "ai-business-os", "ai-sales", "ai-finance-workspace", "ai-legal-workspace", "nguyen-roots", "nguyen-memory", "nguyen-knowledge", "nguyen-trust", "nguyen-network", "nguyen-founders", "nguyen-chapter-os"],
     "machine.approval.required": "board",
-    "academy.pass": true,
-    "academy.tracks.enabled": [
-      "free-intro"
-    ],
+    "academy.pass": false,
+    "academy.tracks.enabled": ["free-intro"],
     "academy.lessons.limit": 5,
     "academy.cert.attempts": 0,
     "academy.cert.discount": 0

@@ -16,14 +16,11 @@
     "lint": "echo 'TODO: eslint for @nai/auth'"
   },
   "dependencies": {
-    "@nai/audit": "workspace:*",
     "otpauth": "^9.3.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "catalog:",
-    "@types/node": "^22.0.0",
-    "astro": "catalog:",
+    "typescript": "^5.5.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.5.0"
+    "@types/node": "^22.0.0"
   }
 }

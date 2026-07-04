@@ -2,23 +2,19 @@
  * CommandInput.tsx — Natural language command input island.
  * - Large textarea + Run button with loading state
  * - Model selector dropdown with cost estimate
- * - Command history dropdown (last 10 from server API)
+ * - Command history dropdown (last 10 from localStorage)
  * - Cmd/Ctrl+Enter to run
  * - Calls POST /v1/command (real API) and dispatches `command:submit` event
  * - Handles approval_required state (pauses, shows approval prompt)
- *
- * NOTE: Previously used localStorage for command history (FORBIDDEN per
- * IDENTITY_AND_TENANCY_RFC §2.4). Now uses server-side API via /v1/memory.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import { MODELS, PROVIDER_LABELS, getModelById } from '../../lib/models';
 import { getItem, setItem } from '../../lib/storage';
 import { api, ApiError, type CommandResponse } from '../../lib/api';
-import { fetchCommandHistory, saveCommandRecord, type CommandRecord } from '../../lib/api';
 import type { Command } from '../../types/command';
 
-const MODEL_PREF_KEY = 'nguyenai:preferred-model'; // UI preference — OK for localStorage
+const HISTORY_KEY = 'nguyenai:command-history';
 const MAX_HISTORY = 10;
 
 interface SubmitDetail {
@@ -33,31 +29,38 @@ interface SubmitEventPayload extends SubmitDetail {
 
 export default function CommandInput() {
   const [text, setText] = useState('');
-  const [modelId, setModelId] = useState<string>(() => getItem<string>(MODEL_PREF_KEY, 'auto-route'));
+  const [modelId, setModelId] = useState<string>('auto-route');
   const [running, setRunning] = useState(false);
-  const [history, setHistory] = useState<CommandRecord[]>([]);
+  const [history, setHistory] = useState<Command[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [lastResponse, setLastResponse] = useState<CommandResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Load command history from server API (replaces localStorage)
+  // Load command history on mount
   useEffect(() => {
-    fetchCommandHistory(MAX_HISTORY).then(setHistory).catch(() => setHistory([]));
+    const stored = getItem<Command[]>(HISTORY_KEY, []);
+    setHistory(stored);
   }, []);
 
   const selectedModel = useMemo(() => getModelById(modelId), [modelId]);
 
   const costEstimate = useMemo(() => {
     if (!selectedModel) return null;
+    // Rough estimate: ~1.5K input + ~500 output tokens per command
     const inputTokens = 1500;
     const outputTokens = 500;
     const inputCost = (inputTokens / 1_000_000) * selectedModel.inputCostPer1M;
     const outputCost = (outputTokens / 1_000_000) * selectedModel.outputCostPer1M;
-    return { inputCost, outputCost, total: inputCost + outputCost };
+    return {
+      inputCost,
+      outputCost,
+      total: inputCost + outputCost,
+    };
   }, [selectedModel]);
 
-  const persistHistory = useCallback((next: CommandRecord[]) => {
+  const persistHistory = useCallback((next: Command[]) => {
     setHistory(next);
+    setItem(HISTORY_KEY, next);
     window.dispatchEvent(new CustomEvent('command:history:updated'));
   }, []);
 
@@ -78,7 +81,7 @@ export default function CommandInput() {
 
     // Optimistic UI: add a running entry to history
     const entryId = `cmd-${Date.now()}`;
-    const entry: CommandRecord = {
+    const entry: Command = {
       id: entryId,
       text: trimmed,
       model: modelId,
@@ -87,27 +90,26 @@ export default function CommandInput() {
     };
     const next = [entry, ...history].slice(0, MAX_HISTORY);
     persistHistory(next);
-    // Persist to server (fire-and-forget)
-    saveCommandRecord(entry).catch(() => {});
 
     try {
       const resp = await api.submitCommand(trimmed);
       setLastResponse(resp);
 
       // Update history entry with real result
-      const updated: CommandRecord[] = next.map((c) =>
+      const updated: Command[] = getItem<Command[]>(HISTORY_KEY, []).map((c) =>
         c.id === entryId
           ? {
               ...c,
               status: resp.state === 'done' ? 'completed' : resp.state === 'failed' ? 'failed' : 'pending',
               result: resp.output ?? resp.error ?? resp.message ?? `State: ${resp.state}`,
+              commandId: resp.command_id,
+              agentId: resp.agent_id,
+              evidenceLabels: resp.evidence_labels,
             }
           : c,
       );
+      setItem(HISTORY_KEY, updated);
       setHistory(updated);
-      // Persist updated record to server
-      const updatedEntry = updated.find((c) => c.id === entryId);
-      if (updatedEntry) saveCommandRecord(updatedEntry).catch(() => {});
       window.dispatchEvent(new CustomEvent('command:history:updated'));
 
       dispatchSubmit(trimmed, modelId, { response: resp });
@@ -115,12 +117,11 @@ export default function CommandInput() {
     } catch (err) {
       const msg = err instanceof ApiError ? err.message : 'Command failed. · Lệnh thất bại.';
       setError(msg);
-      const updated: CommandRecord[] = next.map((c) =>
+      const updated: Command[] = getItem<Command[]>(HISTORY_KEY, []).map((c) =>
         c.id === entryId ? { ...c, status: 'failed' as const, result: msg } : c,
       );
+      setItem(HISTORY_KEY, updated);
       setHistory(updated);
-      const failedEntry = updated.find((c) => c.id === entryId);
-      if (failedEntry) saveCommandRecord(failedEntry).catch(() => {});
       window.dispatchEvent(new CustomEvent('command:history:updated'));
       dispatchSubmit(trimmed, modelId, { error: msg });
     } finally {

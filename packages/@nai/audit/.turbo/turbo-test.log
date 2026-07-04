@@ -1,0 +1,10 @@
+$ tsx src/test.ts
+=== @nai/audit unit tests ===
+
+Test: basic log + query
+Test: append-only enforcement (in-memory)
+Test: query filters
+Test: count
+Test: pagination
+
+18 passed, 0 failed

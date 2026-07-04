@@ -1,0 +1,50 @@
+$ tsx src/test.ts
+
+@nai/harness test
+-----------------
+  ✓ echo tool registered
+  ✓ echo does not require approval
+  ✓ family_record_update requires approval
+  ✓ external_action requires approval
+  ✓ external_action evidenceClass = restricted
+  ✓ at least 6 built-in tools registered
+  ✓ echo executeTool success
+  ✓ echo not approval-pending
+  ✓ echo generated evidence record
+  ✓ echo no approval request
+  ✓ evidence store has >=1 record for cmd_test
+  ✓ evidence record for echo exists
+  ✓ evidence proof_type = tool_called
+  ✓ evidence payload success = true
+  ✓ unknown tool returns success=false
+  ✓ unknown tool error mentions "not registered"
+  ✓ unknown tool no evidence generated
+  ✓ sensitive tool blocked (success=false)
+  ✓ sensitive tool approval_pending=true
+  ✓ sensitive tool created approval request
+  ✓ sensitive tool no evidence (blocked before execution)
+  ✓ sensitive tool executes after skipApprovalCheck
+  ✓ skipApprovalCheck not pending
+  ✓ sensitive tool generated evidence after approval
+  ✓ family_record_update evidence classification = sensitive
+  ✓ planRequiresApproval=all triggers approval for echo
+  ✓ plan=all created approval request
+  ✓ gate: echo with none → allowed
+  ✓ gate: echo with none → no request
+  ✓ gate: external with sensitive → blocked
+  ✓ gate: external with sensitive → request created
+  ✓ gate: external with skipApprovalCheck → allowed
+  ✓ AgentSDK listTools returns built-in tools
+  ✓ AgentSDK.call echo success
+  ✓ AgentSDK.call echo generated evidence
+  ✓ AgentSDK.call external_action pending approval
+  ✓ AgentSDK.call external_action has request id
+  ✓ AgentSDK.callAfterApproval external_action success
+  ✓ AgentSDK.callAfterApproval generated evidence
+  ✓ external_action evidence classification = restricted
+  ✓ failing tool returns success=false
+  ✓ failing tool error message captured
+  ✓ failing tool still generated evidence (proof_type=command_failed)
+  ✓ failing tool evidence proof_type = command_failed
+
+44 passed, 0 failed

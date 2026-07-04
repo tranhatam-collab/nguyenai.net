@@ -1,0 +1,15 @@
+$ wrangler deploy --dry-run
+
+ ⛅️ wrangler 4.105.0
+────────────────────
+Total Upload: 224.37 KiB / gzip: 49.00 KiB
+Your Worker has access to the following bindings:
+Binding                                                                   Resource                  
+env.DB (nai-identity)                                                     D1 Database               
+env.ENVIRONMENT ("development")                                           Environment Variable      
+env.AUTH_ISSUER ("auth.nguyenai.net")                                     Environment Variable      
+env.DEFAULT_AUDIENCE ("app.nguyenai.net")                                 Environment Variable      
+env.SESSION_MAX_AGE ("3600")                                              Environment Variable      
+env.GOOGLE_REDIRECT_URI ("https://auth.nguyenai.net/v1/auth/oau...")      Environment Variable      
+
+--dry-run: exiting now.

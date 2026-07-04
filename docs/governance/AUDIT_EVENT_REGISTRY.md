@@ -16,12 +16,12 @@ Replace ad-hoc audit CHECK constraints with a **versioned event registry**. Ever
 ## 2. Registry version
 
 - **Registry version:** `2026-07-02.1`
-- **Total event types:** 63
+- **Total event types:** 38
 - **Breaking change policy:** Adding new event types is non-breaking. Removing or renaming requires a new registry version + migration.
 
 ---
 
-## 3. Event types (63)
+## 3. Event types (38)
 
 ### 3.1 Identity events (12)
 
@@ -134,7 +134,7 @@ Every audit event MUST contain:
 ```sql
 event_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 event_type        TEXT NOT NULL,  -- must exist in registry
-registry_version  TEXT NOT NULL,  -- '2026-07-03.1'
+registry_version  TEXT NOT NULL,  -- '2026-07-02.1'
 user_id           UUID,
 tenant_id         UUID,
 session_id        TEXT,
@@ -164,11 +164,11 @@ CREATE TABLE audit_event_registry (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Insert all 63 event types
+-- Insert all 38 event types
 INSERT INTO audit_event_registry (event_type, registry_version, description) VALUES
-  ('login_success', '2026-07-03.1', 'User logged in successfully'),
-  ('login_failure', '2026-07-03.1', 'Login attempt failed'),
-  ... (all 63);
+  ('login_success', '2026-07-02.1', 'User logged in successfully'),
+  ('login_failure', '2026-07-02.1', 'Login attempt failed'),
+  ... (all 38);
 
 -- FK constraint: audit_log.event_type must exist in registry
 ALTER TABLE audit_log
@@ -191,7 +191,7 @@ This replaces the enum CHECK constraint. New event types can be added via INSERT
 
 ## 7. Test requirements
 
-- All 63 event types must insert successfully
+- All 38 event types must insert successfully
 - Unknown event type must be rejected (FK violation)
 - Registry version must be recorded per event
 - Append-only: UPDATE and DELETE must fail (triggers)
@@ -204,4 +204,3 @@ This replaces the enum CHECK constraint. New event types can be added via INSERT
 | Date | Version | Change |
 |---|---|---|
 | 2026-07-02 | 2026-07-02.1 | Initial registry — 38 event types |
-| 2026-07-03 | 2026-07-03.1 | Added 24 scholarship events — total 63 |

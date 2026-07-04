@@ -1,0 +1,13 @@
+$ tsx src/test.ts
+=== @nai/approval unit tests ===
+
+Test: request approval
+Test: approve flow
+Test: deny flow
+Test: execute flow
+Test: cannot execute without approval
+Test: cannot approve non-pending
+Test: list pending
+Test: IDOR — cross-tenant approve denied
+
+16 passed, 0 failed

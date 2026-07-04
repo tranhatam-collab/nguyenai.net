@@ -1,6 +1,6 @@
 -- 002_audit_event_registry.sql
 -- Replace hardcoded CHECK constraint with versioned event registry.
--- Per AUDIT_EVENT_REGISTRY.md (registry version 2026-07-03.1, 63 event types)
+-- Per AUDIT_EVENT_REGISTRY.md (registry version 2026-07-02.1, 38 event types)
 --
 -- This migration:
 -- 1. Creates audit_event_registry table
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS audit_event_registry (
 );
 
 -- ============================================================
--- 2. Insert all 63 event types (registry version 2026-07-02.1)
+-- 2. Insert all 38 event types (registry version 2026-07-02.1)
 -- ============================================================
 
 INSERT INTO audit_event_registry (event_type, registry_version, description) VALUES
@@ -134,7 +134,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_event_registry_version
 -- 6. Verify
 -- ============================================================
 
--- Should return 63
+-- Should return 38
 SELECT count(*) AS event_type_count FROM audit_event_registry
-  WHERE registry_version IN ('2026-07-02.1', '2026-07-03.1');
+  WHERE registry_version = '2026-07-02.1';
 COMMIT;

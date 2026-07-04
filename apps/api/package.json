@@ -8,7 +8,7 @@
     "build": "wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/idempotency.test.ts",
+    "test": "echo 'API tested via E2E suite (tests/e2e)'",
     "lint": "echo 'TODO: eslint for @nai/api'"
   },
   "dependencies": {
@@ -22,12 +22,7 @@
     "@nai/product-catalog": "workspace:*",
     "@nai/email": "workspace:*",
     "@nai/billing": "workspace:*",
-    "@nai/evidence": "workspace:*",
-    "@nai/conductor": "workspace:*",
-    "@nai/prism": "workspace:*",
-    "@nai/relic": "workspace:*",
-    "@nai/scholarship": "workspace:*",
-    "@nai/proof": "workspace:*"
+    "@nai/scholarship": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

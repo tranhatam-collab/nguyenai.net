@@ -405,202 +405,6 @@ export type ReportCategory =
   | 'copyright'
   | 'other';
 
-// ============================================================
-// Sprint 5 — Decision Engine: rubric, waitlist, council decision
-// ============================================================
-
-// 24. CouncilDecision — aggregated council decision per application
-export interface CouncilDecision {
-  decision_id: string;
-  application_id: string;
-  total_approve: number;
-  total_deny: number;
-  total_abstain: number;
-  outcome: 'approved' | 'denied' | 'waitlisted' | 'pending';
-  threshold: number; // minimum approve votes needed
-  decided_at: string | null;
-  created_at: string;
-}
-
-// 25. WaitlistEntry — waitlisted applicants
-export interface WaitlistEntry {
-  entry_id: string;
-  application_id: string;
-  user_id: string;
-  program_code: string;
-  position: number; // 1-based rank
-  status: 'waiting' | 'offered' | 'expired' | 'withdrawn';
-  created_at: string;
-  offered_at: string | null;
-}
-
-// Scoring rubric definition (Section XXVIII.2)
-export interface ScoringRubric {
-  criteria: ReviewScoreCriteria;
-  weight: number;
-  description: string;
-  score_0_3: string; // Low
-  score_4_6: string; // Medium
-  score_7_10: string; // High
-}
-
-export const SCORING_RUBRIC: ScoringRubric[] = [
-  {
-    criteria: 'need',
-    weight: 20,
-    description: 'Nhu cầu hỗ trợ tài chính',
-    score_0_3: 'Không có nhu cầu cấp thiết',
-    score_4_6: 'Nhu cầu trung bình',
-    score_7_10: 'Nhu cầu cao, không có hỗ trợ sẽ không thể tham gia',
-  },
-  {
-    criteria: 'clarity',
-    weight: 15,
-    description: 'Mục tiêu rõ ràng',
-    score_0_3: 'Mục tiêu mơ hồ',
-    score_4_6: 'Mục tiêu khá rõ',
-    score_7_10: 'Mục tiêu rất rõ ràng, có kế hoạch cụ thể',
-  },
-  {
-    criteria: 'feasibility',
-    weight: 15,
-    description: 'Khả năng hoàn thành',
-    score_0_3: 'Khó hoàn thành',
-    score_4_6: 'Có thể hoàn thành nếu có hỗ trợ',
-    score_7_10: 'Rất có thể hoàn thành',
-  },
-  {
-    criteria: 'product_value',
-    weight: 20,
-    description: 'Giá trị sản phẩm dự kiến',
-    score_0_3: 'Ít giá trị',
-    score_4_6: 'Có giá trị nhất định',
-    score_7_10: 'Giá trị cao, có tiềm năng ứng dụng',
-  },
-  {
-    criteria: 'commitment',
-    weight: 15,
-    description: 'Cam kết học tập',
-    score_0_3: 'Cam kết thấp',
-    score_4_6: 'Cam kết khá',
-    score_7_10: 'Cam kết cao, có bằng chứng',
-  },
-  {
-    criteria: 'giveback',
-    weight: 10,
-    description: 'Khả năng đóng góp lại cộng đồng',
-    score_0_3: 'Chưa rõ',
-    score_4_6: 'Có ý thức đóng góp',
-    score_7_10: 'Có kế hoạch đóng góp cụ thể',
-  },
-  {
-    criteria: 'integrity',
-    weight: 5,
-    description: 'Tính trung thực và đầy đủ của hồ sơ',
-    score_0_3: 'Có dấu hiệu thiếu trung thực',
-    score_4_6: 'Hồ sơ đầy đủ',
-    score_7_10: 'Hồ sơ rất đầy đủ, trung thực',
-  },
-];
-
-// Council configuration (Section XXVIII.1)
-export const COUNCIL_CONFIG = {
-  size: 5, // 5 council members
-  approvalThreshold: 3, // minimum approve votes (majority of 5)
-  votingSteps: [
-    '1. Đọc hồ sơ và review',
-    '2. Kiểm tra xung đột lợi ích',
-    '3. Thảo luận',
-    '4. Bầu chọn (approve/deny/abstain)',
-    '5. Công bố quyết định',
-  ],
-  conflictCases: [
-    'Họ hàng gia đình',
-    'Quan hệ công việc hiện tại hoặc trong 2 năm qua',
-    'Quan hệ đầu tư hoặc thương mại',
-    'Tranh chấp pháp lý',
-    'Quan hệ đối tác thương mại',
-  ],
-  conflictConsequences: [
-    'Không tham gia bầu chọn',
-    'Không tham gia thảo luận',
-    'Khai báo công khai',
-    'Ghi vào audit log',
-  ],
-} as const;
-
-// ============================================================
-// Sprint 6 — Scholarship Entitlement: grant, suspend, revoke, restore
-// ============================================================
-
-// 26. ScholarshipEntitlement — entitlement granted to awarded applicants
-export interface ScholarshipEntitlement {
-  entitlement_id: string;
-  application_id: string;
-  user_id: string;
-  program_code: string;
-  cohort_id: string; // e.g. "cohort-2026-q3"
-  status: 'active' | 'suspended' | 'revoked' | 'completed' | 'expired';
-  granted_at: string;
-  expires_at: string | null;
-  suspended_at: string | null;
-  revoked_at: string | null;
-  completed_at: string | null;
-  ai_computer_instance_id: string | null; // linked AI Computer instance
-  learning_paths: string[]; // program IDs with access
-  suspend_reason: string | null;
-  revoke_reason: string | null;
-}
-
-// 27. Cohort — scholarship cohort tracking
-export interface Cohort {
-  cohort_id: string;
-  name: string;
-  program_code: string;
-  start_date: string;
-  end_date: string;
-  capacity: number;
-  enrolled_count: number;
-  status: 'open' | 'in_progress' | 'completed' | 'cancelled';
-  created_at: string;
-}
-
-// 28. EntitlementEvent — track entitlement lifecycle events
-export interface EntitlementEvent {
-  event_id: string;
-  entitlement_id: string;
-  event_type: 'granted' | 'suspended' | 'restored' | 'revoked' | 'completed' | 'expired' | 'learning_path_added' | 'learning_path_removed';
-  changed_by: string;
-  reason: string | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-}
-
-export const ENTITLEMENT_LIFECYCLE = {
-  transitions: {
-    active: ['suspended', 'revoked', 'completed', 'expired'],
-    suspended: ['active', 'revoked'],
-    revoked: [],
-    completed: [],
-    expired: [],
-  },
-  defaultDurationDays: 365, // 1 year default
-  suspendReasons: [
-    'Vi phạm nội quy',
-    'Không tham gia học tập',
-    'Kiểm tra lại thông tin',
-    'Yêu cầu từ học viên',
-  ],
-  revokeReasons: [
-    'Gian lận hồ sơ',
-    'Vi phạm nghiêm trọng',
-    'Rút học bổng theo quyết định council',
-    'Yêu cầu từ học viên',
-  ],
-} as const;
-
-
-
 export const SCHOLARSHIP_AUDIT_EVENTS = [
   'scholarship_application_created',
   'scholarship_application_updated',
@@ -678,3 +482,142 @@ export const MODERATION_PROHIBITED = [
   'minors_information',
   'third_party_data_without_consent',
 ] as const;
+
+// ============================================================
+// Council + Waitlist + Entitlement lifecycle types
+// (added to satisfy imports in service.ts / d1-store.ts / store.ts)
+// ============================================================
+
+export interface CouncilDecision {
+  decision_id: string;
+  application_id: string;
+  decision: 'award' | 'decline' | 'waitlist' | 'request_info';
+  decided_by: string;
+  decided_at: string;
+  rationale: string;
+  conditions: string[];
+  cohort_id: string | null;
+  amount_awarded: number | null;
+  total_approve?: number;
+  total_deny?: number;
+  total_abstain?: number;
+  outcome?: string;
+  threshold?: number;
+  created_at?: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface WaitlistEntry {
+  entry_id: string;
+  application_id: string;
+  applicant_id: string;
+  user_id?: string;
+  cohort_id: string | null;
+  program_code?: string;
+  position: number;
+  added_at: string;
+  expires_at: string | null;
+  notes: string | null;
+  status?: string;
+  offered_at?: string | null;
+  created_at?: string;
+}
+
+export interface ScholarshipEntitlement {
+  entitlement_id: string;
+  recipient_id: string;
+  user_id?: string;
+  application_id: string;
+  cohort_id: string;
+  program_code?: string;
+  entitlement_type: 'full_scholarship' | 'partial_scholarship' | 'stipend' | 'tool_access';
+  value_amount: number | null;
+  currency: string;
+  granted_at: string;
+  starts_at: string;
+  expires_at: string | null;
+  status: 'active' | 'expired' | 'revoked' | 'pending' | 'suspended' | 'completed';
+  revoked_at: string | null;
+  revoked_reason: string | null;
+  revoke_reason?: string | null;
+  suspended_at?: string | null;
+  suspend_reason?: string | null;
+  completed_at?: string | null;
+  ai_computer_instance_id?: string | null;
+  learning_paths?: string[];
+  metadata: Record<string, unknown>;
+}
+
+export interface Cohort {
+  cohort_id: string;
+  name: string;
+  program_id: string;
+  program_code?: string;
+  start_date: string;
+  end_date: string;
+  capacity: number;
+  filled: number;
+  enrolled_count?: number;
+  status: 'planning' | 'open' | 'closed' | 'in_progress' | 'completed';
+  created_at?: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface EntitlementEvent {
+  event_id: string;
+  entitlement_id: string;
+  event_type: 'granted' | 'activated' | 'expired' | 'revoked' | 'renewed' | 'modified' | 'suspended' | 'completed';
+  triggered_by: string;
+  changed_by?: string;
+  reason?: string | null;
+  occurred_at: string;
+  created_at?: string;
+  previous_status: string | null;
+  new_status: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface ScoringRubric {
+  rubric_id: string;
+  name: string;
+  criteria: Array<{
+    criterion: ReviewScoreCriteria;
+    weight: number;
+    description: string;
+    max_score: number;
+  }>;
+  total_max_score: number;
+  passing_score: number;
+}
+
+export const SCORING_RUBRIC: ScoringRubric = {
+  rubric_id: 'default',
+  name: 'Default Scholarship Scoring Rubric',
+  criteria: [
+    { criterion: 'need', weight: 0.30, description: 'Financial need', max_score: 10 },
+    { criterion: 'clarity', weight: 0.20, description: 'Clarity of purpose', max_score: 10 },
+    { criterion: 'feasibility', weight: 0.20, description: 'Feasibility', max_score: 10 },
+    { criterion: 'product_value', weight: 0.15, description: 'Product value', max_score: 10 },
+    { criterion: 'commitment', weight: 0.10, description: 'Commitment', max_score: 10 },
+    { criterion: 'giveback', weight: 0.05, description: 'Giveback to community', max_score: 10 },
+  ],
+  total_max_score: 10,
+  passing_score: 6,
+};
+
+export const COUNCIL_CONFIG = {
+  min_reviewers: 3,
+  max_reviewers: 7,
+  quorum_percentage: 0.6,
+  conflict_of_interest_cooldown_days: 30,
+  appeal_window_days: 14,
+  decision_timeout_hours: 168,
+} as const;
+
+export const ENTITLEMENT_LIFECYCLE = {
+  pending_activation_days: 7,
+  default_duration_months: 12,
+  expiry_notice_days: 30,
+  grace_period_days: 14,
+  revocation_notice_days: 7,
+} as const;

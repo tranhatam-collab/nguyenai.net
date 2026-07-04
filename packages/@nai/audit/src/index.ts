@@ -15,7 +15,6 @@
 // ============================================================
 
 export type AuditEventType =
-  // Identity events (12)
   | 'login_success'
   | 'login_failure'
   | 'logout'
@@ -29,39 +28,32 @@ export type AuditEventType =
   | 'api_key_revoked'
   | 'email_verified'
   | 'account_deletion_requested'
-  // Authorization events (6)
   | 'role_changed'
   | 'permission_granted'
   | 'permission_revoked'
   | 'org_member_added'
   | 'org_member_removed'
   | 'access_denied'
-  // Entitlement events (5)
   | 'entitlement_granted'
   | 'entitlement_updated'
   | 'entitlement_revoked'
   | 'entitlement_expired'
   | 'entitlement_recalculated'
-  // Approval events (4)
   | 'approval_requested'
   | 'approval_granted'
   | 'approval_denied'
   | 'sensitive_action_executed'
-  // Command & runtime events (5)
   | 'command_executed'
   | 'command_failed'
   | 'command_cancelled'
   | 'tool_called'
   | 'workflow_completed'
-  // Academy & certification events (4)
   | 'academy_lesson_completed'
   | 'proof_submitted'
   | 'certificate_issued'
   | 'certificate_revoked'
-  // Billing & investor events (2)
   | 'payment_received'
   | 'investor_room_accessed'
-  // Scholarship events (24) — per EDU_MASTER_PLAN_V4 §XXXIV
   | 'scholarship_application_created'
   | 'scholarship_application_updated'
   | 'identity_verification_started'
@@ -86,11 +78,9 @@ export type AuditEventType =
   | 'forum_post_rejected'
   | 'complaint_submitted'
   | 'appeal_submitted'
-  // P1-3/P1-4: Data export + retention (GDPR/PDPD compliance)
   | 'scholarship_data_exported'
   | 'scholarship_retention_sweep';
 
-export const AUDIT_REGISTRY_VERSION = '2026-07-03.1';
 export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'login_success', 'login_failure', 'logout', 'session_revoked', 'session_expired',
   'passkey_registered', 'passkey_removed', 'mfa_enrolled', 'mfa_removed',
@@ -119,22 +109,19 @@ export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'scholarship_data_exported', 'scholarship_retention_sweep',
 ] as const;
 
+export const AUDIT_REGISTRY_VERSION = '2026-07-02.1';
+
 export type AuditResult = 'success' | 'failure' | 'denied';
 
 export interface AuditEvent {
   event_id?: string;
   timestamp?: string;
-  registry_version?: string;
   user_id: string | null;
-  tenant_id?: string | null;
   session_id: string | null;
-  actor_id?: string | null;
-  actor_role?: string | null;
   event_type: AuditEventType;
   actor_ip: string | null;
   user_agent: string | null;
   target: string | null;
-  trace_id?: string | null;
   result: AuditResult;
   metadata: Record<string, unknown>;
 }
@@ -160,13 +147,6 @@ export interface AuditStore {
 }
 
 // ============================================================
-// Data classes + retention schedule (15 classes)
-// Per DATA_CLASSIFICATION_AND_RETENTION.md §6 (LOCKED)
-// ============================================================
-
-export * from './data-classes';
-
-// ============================================================
 // In-memory store — for testing and local dev
 // ============================================================
 
@@ -176,12 +156,7 @@ export class InMemoryAuditStore implements AuditStore {
   async log(event: AuditEvent): Promise<string> {
     const event_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    const stored: AuditEvent = {
-      ...event,
-      event_id,
-      timestamp,
-      registry_version: event.registry_version ?? AUDIT_REGISTRY_VERSION,
-    };
+    const stored: AuditEvent = { ...event, event_id, timestamp };
     this.events.push(stored);
     return event_id;
   }

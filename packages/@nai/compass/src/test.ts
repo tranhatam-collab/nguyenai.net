@@ -19,7 +19,7 @@ import {
   searchVectors,
   getVectorStore,
   type CollectionName,
-} from './index';
+} from './index.ts';
 
 let passed = 0;
 let failed = 0;

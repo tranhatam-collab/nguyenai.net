@@ -26,7 +26,7 @@
 - Verticalized AI Computer with Agent team, Model Mesh, Super Apps, evidence and approval gates.
 - Each user owns a private AI Computer Instance.
 - Inherits Gen1 engine + Gen2 commerce system.
-- Separate paid Academy Pass with independent certification.
+- Free Academy for all subscribers.
 
 ## Slide 5 — Product
 

@@ -1,0 +1,24 @@
+$ tsx src/test.ts
+
+@nai/compass test
+------------------
+  ✓ upsert then get returns the point
+  ✓ payload preserved
+  ✓ search returns 2 hits (limit=2)
+  ✓ top hit is ev_1 (exact match, cosine=1)
+  ✓ second hit is ev_2 (closest by cosine)
+  ✓ scores are sorted descending
+  ✓ tenant isolation: t_2 sees only its own 1 point
+  ✓ tenant isolation: t_2 hit is ev_other
+  ✓ metadata filter narrows to 1 hit
+  ✓ metadata filter returns ev_2
+  ✓ dimension mismatch throws
+  ✓ count t_1 evidence = 3
+  ✓ count after delete = 2
+  ✓ deleted point returns null on get
+  ✓ batch upsert adds 2 knowledge points
+  ✓ search on empty memory collection returns []
+  ✓ dot product: [2,0,0] beats [1,1,1] for query [1,0,0]
+  ✓ dot product score = 2
+
+18 passed, 0 failed

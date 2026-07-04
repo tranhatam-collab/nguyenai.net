@@ -1,0 +1,34 @@
+$ astro build
+17:20:03 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
+17:20:03 [types] Generated 153ms
+17:20:03 [build] output: "hybrid"
+17:20:03 [build] directory: /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/console/dist/
+17:20:03 [build] adapter: @astrojs/cloudflare
+17:20:03 [build] Collecting build info...
+17:20:03 [build] ✓ Completed in 333ms.
+17:20:03 [build] Building hybrid entrypoints...
+Generated an empty chunk: "astro/env-setup".
+17:20:08 [vite] ✓ built in 4.89s
+17:20:08 [build] ✓ Completed in 4.94s.
+
+ building client (vite) 
+17:20:08 [vite] transforming...
+17:20:09 [vite] ✓ 47 modules transformed.
+17:20:09 [vite] rendering chunks...
+17:20:09 [vite] computing gzip size...
+17:20:09 [vite] dist/_astro/jsx-runtime.TBa3i5EZ.js       0.92 kB │ gzip:  0.58 kB
+17:20:09 [vite] dist/_astro/api.V32BsjK-.js               1.51 kB │ gzip:  0.83 kB
+17:20:09 [vite] dist/_astro/AgentList.Db6QqaZv.js         1.80 kB │ gzip:  0.83 kB
+17:20:09 [vite] dist/_astro/models.PzZG_d7h.js            2.19 kB │ gzip:  0.77 kB
+17:20:09 [vite] dist/_astro/CommandHistory.BgJF0rUo.js    3.26 kB │ gzip:  1.33 kB
+17:20:09 [vite] dist/_astro/ModelSelector.CMUBPWA7.js     3.62 kB │ gzip:  1.37 kB
+17:20:09 [vite] dist/_astro/RoutingRules.CYni1PTY.js      3.84 kB │ gzip:  1.51 kB
+17:20:09 [vite] dist/_astro/MemoryPanel.zfXdxOY3.js       4.15 kB │ gzip:  1.50 kB
+17:20:09 [vite] dist/_astro/CostEstimator.DOZvw4xd.js     4.87 kB │ gzip:  1.72 kB
+17:20:09 [vite] dist/_astro/CommandInput.v7NpdEug.js      6.19 kB │ gzip:  2.46 kB
+17:20:09 [vite] dist/_astro/index.CVf8TyFT.js             6.72 kB │ gzip:  2.68 kB
+17:20:09 [vite] dist/_astro/client.DrE9CFQR.js          135.60 kB │ gzip: 43.80 kB
+17:20:09 [vite] ✓ built in 560ms
+17:20:09 [build] Rearranging server assets...
+17:20:09 [build] Server built in 5.89s
+17:20:09 [build] Complete!

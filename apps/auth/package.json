@@ -8,7 +8,7 @@
     "build": "wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'auth-worker tested via E2E suite'",
+    "test": "tsx src/test.ts",
     "lint": "echo 'TODO: eslint for @nai/auth-worker'",
     "db:apply": "wrangler d1 execute nai-identity --local --file ../../migrations/001_identity_access.d1.sql",
     "db:apply:remote": "wrangler d1 execute nai-identity --remote --file ../../migrations/001_identity_access.d1.sql",

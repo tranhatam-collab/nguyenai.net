@@ -23,7 +23,7 @@ import {
   checkApprovalGate,
   AgentSDK,
   type ToolCallContext,
-} from './index';
+} from './index.ts';
 
 import { setApprovalStore, InMemoryApprovalStore, approveRequest } from '@nai/approval';
 import { setEvidenceStore, InMemoryEvidenceStore, getEvidenceForCommand } from '@nai/evidence';

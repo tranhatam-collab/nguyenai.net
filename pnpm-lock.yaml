@@ -4,18 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    '@astrojs/cloudflare':
-      specifier: ^11.2.0
-      version: 11.2.0
-    '@cloudflare/workers-types':
-      specifier: ^4.20260629.1
-      version: 4.20260629.1
-    astro:
-      specifier: ^7.0.6
-      version: 7.0.6
-
 importers:
 
   .:
@@ -26,6 +14,43 @@ importers:
       turbo:
         specifier: ^2.0.0
         version: 2.10.0
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  apps/academy:
+    dependencies:
+      '@astrojs/cloudflare':
+        specifier: ^11.0.0
+        version: 11.2.0(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
+      '@astrojs/mdx':
+        specifier: ^3.1.0
+        version: 3.1.9(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
+      '@astrojs/react':
+        specifier: ^3.6.0
+        version: 3.6.3(@types/node@22.20.0)(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@astrojs/tailwind':
+        specifier: ^5.1.0
+        version: 5.1.5(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))(tailwindcss@3.4.19(tsx@4.22.4)(yaml@2.9.0))
+      astro:
+        specifier: ^4.16.0
+        version: 4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      tailwindcss:
+        specifier: ^3.4.0
+        version: 3.4.19(tsx@4.22.4)(yaml@2.9.0)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.11
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
       typescript:
         specifier: ^5.5.0
         version: 5.9.3
@@ -46,36 +71,21 @@ importers:
       '@nai/billing':
         specifier: workspace:*
         version: link:../../packages/@nai/billing
-      '@nai/conductor':
-        specifier: workspace:*
-        version: link:../../packages/@nai/conductor
       '@nai/email':
         specifier: workspace:*
         version: link:../../packages/@nai/email
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
-      '@nai/evidence':
-        specifier: workspace:*
-        version: link:../../packages/@nai/evidence
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
       '@nai/policy-fga':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-fga
-      '@nai/prism':
-        specifier: workspace:*
-        version: link:../../packages/@nai/prism
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
-      '@nai/proof':
-        specifier: workspace:*
-        version: link:../../packages/@nai/proof
-      '@nai/relic':
-        specifier: workspace:*
-        version: link:../../packages/@nai/relic
       '@nai/scholarship':
         specifier: workspace:*
         version: link:../../packages/@nai/scholarship
@@ -207,7 +217,7 @@ importers:
   apps/invest:
     dependencies:
       '@astrojs/cloudflare':
-        specifier: 'catalog:'
+        specifier: ^11.2.0
         version: 11.2.0(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
       '@astrojs/tailwind':
         specifier: ^5.1.0
@@ -260,9 +270,6 @@ importers:
       '@nai/audit':
         specifier: workspace:*
         version: link:../audit
-      '@nai/email':
-        specifier: workspace:*
-        version: link:../email
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -302,22 +309,13 @@ importers:
 
   packages/@nai/auth:
     dependencies:
-      '@nai/audit':
-        specifier: workspace:*
-        version: link:../audit
       otpauth:
         specifier: ^9.3.0
         version: 9.5.1
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: 'catalog:'
-        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
-      astro:
-        specifier: 'catalog:'
-        version: 7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.0)(jiti@1.21.7)(rollup@4.62.2)(tsx@4.22.4)(yaml@2.9.0)
       tsx:
         specifier: ^4.19.0
         version: 4.22.4
@@ -333,9 +331,6 @@ importers:
         specifier: workspace:*
         version: link:../../product-catalog
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: 'catalog:'
-        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
@@ -462,6 +457,22 @@ importers:
 
   packages/@nai/hound: {}
 
+  packages/@nai/investor-verify:
+    dependencies:
+      '@nai/audit':
+        specifier: workspace:*
+        version: link:../audit
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/@nai/keystone: {}
 
   packages/@nai/laboratory: {}
@@ -549,9 +560,6 @@ importers:
         specifier: workspace:*
         version: link:../gateway-sdk
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: 'catalog:'
-        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
@@ -645,49 +653,19 @@ importers:
       '@nai/auth':
         specifier: workspace:*
         version: link:../../packages/@nai/auth
-      '@nai/compass':
-        specifier: workspace:*
-        version: link:../../packages/@nai/compass
-      '@nai/conductor':
-        specifier: workspace:*
-        version: link:../../packages/@nai/conductor
-      '@nai/email':
-        specifier: workspace:*
-        version: link:../../packages/@nai/email
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
-      '@nai/evidence':
-        specifier: workspace:*
-        version: link:../../packages/@nai/evidence
-      '@nai/harness':
-        specifier: workspace:*
-        version: link:../../packages/@nai/harness
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
       '@nai/policy-fga':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-fga
-      '@nai/prism':
-        specifier: workspace:*
-        version: link:../../packages/@nai/prism
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
-      '@nai/relic':
-        specifier: workspace:*
-        version: link:../../packages/@nai/relic
-      '@nai/scholarship':
-        specifier: workspace:*
-        version: link:../../packages/@nai/scholarship
-      '@nai/scroll':
-        specifier: workspace:*
-        version: link:../../packages/@nai/scroll
     devDependencies:
-      '@cloudflare/workers-types':
-        specifier: 'catalog:'
-        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
@@ -786,9 +764,6 @@ packages:
   '@astrojs/internal-helpers@0.10.0':
     resolution: {integrity: sha512-Ry2R3VPeIN4uPCSA4xQc+e+vsJXkalKpEbDc07hV+a/o5Bs2N/s/uDcPJH/05L19DKh9tAy7e6JM3YZ6Cxfezw==}
 
-  '@astrojs/internal-helpers@0.10.1':
-    resolution: {integrity: sha512-5phcroT/vmOOrYuuAxtkbPixy5hePtlz9i8K4OeDv3dNK6/UQRuXPOSRTxIOBbUY5Sonw2UaxjbuVc43Mcir6Q==}
-
   '@astrojs/internal-helpers@0.4.1':
     resolution: {integrity: sha512-bMf9jFihO8YP940uD70SI/RDzIhUHJAolWVcO1v5PUivxGKvfLZTLTVVxEYzGYyPsA3ivdLNqMnL5VgmQySa+g==}
 
@@ -809,9 +784,6 @@ packages:
 
   '@astrojs/markdown-satteri@0.3.2':
     resolution: {integrity: sha512-feXuUPy41gVfeM7EHT1ciUim8ozGr+YHXab9uUBc1Hk8y60DQosO8ldL+AoPXnCAoGj1OChwHfvXmmJ6XVnY9A==}
-
-  '@astrojs/markdown-satteri@0.3.3':
-    resolution: {integrity: sha512-Lje33Ittd8UQGgbIIWQvhPkj5X5c4b1sZnZWX3JQV/AWpfbuQGxVi2ONt6+ScydcwfR4egilslEWyczMclrJ1g==}
 
   '@astrojs/mdx@3.1.9':
     resolution: {integrity: sha512-3jPD4Bff6lIA20RQoonnZkRtZ9T3i0HFm6fcDF7BMsKIZ+xBP2KXzQWiuGu62lrVCmU612N+SQVGl5e0fI+zWg==}
@@ -2609,16 +2581,6 @@ packages:
     hasBin: true
     peerDependencies:
       '@astrojs/markdown-remark': 7.2.0
-    peerDependenciesMeta:
-      '@astrojs/markdown-remark':
-        optional: true
-
-  astro@7.0.6:
-    resolution: {integrity: sha512-Myw0sFia+zs/Y0yqfZEsUYXfDPh3ELcLf1f0Q/qQzVXBh/af1qO62WNT+P89DCcfGVV51nMoQhEfkBYqJmoUOQ==}
-    engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
-    hasBin: true
-    peerDependencies:
-      '@astrojs/markdown-remark': 7.2.1
     peerDependenciesMeta:
       '@astrojs/markdown-remark':
         optional: true
@@ -4912,17 +4874,6 @@ snapshots:
       smol-toml: 1.7.0
       unified: 11.0.5
 
-  '@astrojs/internal-helpers@0.10.1':
-    dependencies:
-      '@types/hast': 3.0.4
-      '@types/mdast': 4.0.4
-      js-yaml: 4.3.0
-      picomatch: 4.0.4
-      retext-smartypants: 6.2.0
-      shiki: 4.3.0
-      smol-toml: 1.7.0
-      unified: 11.0.5
-
   '@astrojs/internal-helpers@0.4.1': {}
 
   '@astrojs/language-server@2.16.10(prettier@3.9.3)(typescript@5.9.3)':
@@ -4976,13 +4927,6 @@ snapshots:
   '@astrojs/markdown-satteri@0.3.2':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
-      '@astrojs/prism': 4.0.2
-      github-slugger: 2.0.0
-      satteri: 0.9.3
-
-  '@astrojs/markdown-satteri@0.3.3':
-    dependencies:
-      '@astrojs/internal-helpers': 0.10.1
       '@astrojs/prism': 4.0.2
       github-slugger: 2.0.0
       satteri: 0.9.3
@@ -6474,98 +6418,6 @@ snapshots:
       '@astrojs/compiler-rs': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/markdown-satteri': 0.3.2
-      '@astrojs/telemetry': 3.3.2
-      '@capsizecss/unpack': 4.0.1
-      '@clack/prompts': 1.6.0
-      '@oslojs/encoding': 1.1.0
-      '@rollup/pluginutils': 5.4.0(rollup@4.62.2)
-      am-i-vibing: 0.4.0
-      aria-query: 5.3.2
-      axobject-query: 4.1.0
-      ci-info: 4.4.0
-      clsx: 2.1.1
-      common-ancestor-path: 2.0.0
-      cookie: 1.1.1
-      devalue: 5.8.1
-      diff: 8.0.4
-      dset: 3.1.4
-      es-module-lexer: 2.2.0
-      esbuild: 0.28.1
-      flattie: 1.1.1
-      fontace: 0.4.1
-      get-tsconfig: 5.0.0-beta.4
-      github-slugger: 2.0.0
-      html-escaper: 3.0.3
-      http-cache-semantics: 4.2.0
-      js-yaml: 4.3.0
-      jsonc-parser: 3.3.1
-      magic-string: 0.30.21
-      magicast: 0.5.3
-      mrmime: 2.0.1
-      neotraverse: 0.6.18
-      obug: 2.1.3
-      p-limit: 7.3.0
-      p-queue: 9.3.0
-      package-manager-detector: 1.6.0
-      piccolore: 0.1.3
-      picomatch: 4.0.4
-      semver: 7.8.5
-      shiki: 4.3.0
-      smol-toml: 1.7.0
-      svgo: 4.0.1
-      tinyclip: 0.1.15
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      ultrahtml: 1.6.0
-      unifont: 0.7.4
-      unstorage: 1.17.5
-      vite: 8.1.0(@types/node@22.20.0)(esbuild@0.28.1)(jiti@1.21.7)(tsx@4.22.4)(yaml@2.9.0)
-      vitefu: 1.1.3(vite@8.1.0(@types/node@22.20.0)(esbuild@0.28.1)(jiti@1.21.7)(tsx@4.22.4)(yaml@2.9.0))
-      xxhash-wasm: 1.1.0
-      yargs-parser: 22.0.0
-      zod: 4.4.3
-    optionalDependencies:
-      sharp: 0.35.2
-    transitivePeerDependencies:
-      - '@azure/app-configuration'
-      - '@azure/cosmos'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/keyvault-secrets'
-      - '@azure/storage-blob'
-      - '@capacitor/preferences'
-      - '@deno/kv'
-      - '@emnapi/core'
-      - '@emnapi/runtime'
-      - '@netlify/blobs'
-      - '@planetscale/database'
-      - '@types/node'
-      - '@upstash/redis'
-      - '@vercel/blob'
-      - '@vercel/functions'
-      - '@vercel/kv'
-      - '@vitejs/devtools'
-      - aws4fetch
-      - db0
-      - idb-keyval
-      - ioredis
-      - jiti
-      - less
-      - rollup
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - terser
-      - tsx
-      - uploadthing
-      - yaml
-
-  astro@7.0.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@22.20.0)(jiti@1.21.7)(rollup@4.62.2)(tsx@4.22.4)(yaml@2.9.0):
-    dependencies:
-      '@astrojs/compiler-rs': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
-      '@astrojs/internal-helpers': 0.10.1
-      '@astrojs/markdown-satteri': 0.3.3
       '@astrojs/telemetry': 3.3.2
       '@capsizecss/unpack': 4.0.1
       '@clack/prompts': 1.6.0

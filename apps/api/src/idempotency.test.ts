@@ -76,7 +76,7 @@ async function main(): Promise<void> {
       body: JSON.stringify({ data: 'test' }),
     });
     ok(res.status === 400, `POST without key returns 400 (got ${res.status})`);
-    const body = await res.json() as any;
+    const body = await res.json() as any as any;
     ok(body.error.includes('idempotency_key'), `Error mentions idempotency_key: ${body.error}`);
   }
 
@@ -90,7 +90,7 @@ async function main(): Promise<void> {
       body: JSON.stringify({ data: 'test', idempotency_key: 'test-key-1' }),
     });
     ok(res.status === 200, `POST with key returns 200 (got ${res.status})`);
-    const body = await res.json() as any;
+    const body = await res.json() as any as any;
     ok(body.received === true, `Response body correct: ${JSON.stringify(body)}`);
   }
 

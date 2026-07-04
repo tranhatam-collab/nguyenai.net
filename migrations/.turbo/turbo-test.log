@@ -1,0 +1,2 @@
+$ tsx src/validate.ts
+✅ Migration validation PASSED — 4 file(s), all required tables and roles present, audit_log append-only enforced
