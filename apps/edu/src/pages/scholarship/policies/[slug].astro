@@ -1,0 +1,55 @@
+---
+import AcademyLayout from '../../../layouts/AcademyLayout.astro';
+
+export function getStaticPaths() {
+  const policies = [
+    { slug: 'program-terms', id: '01', title: 'Điều khoản chương trình học bổng', file: '01_SCHOLARSHIP_POLICY.md' },
+    { slug: 'privacy', id: '04', title: 'Quyền riêng tư ứng viên', file: '04_PRIVACY_AND_DATA.md' },
+    { slug: 'wish-sharing', id: '02', title: 'Chính sách chia sẻ nguyện vọng', file: '02_APPLICATION_CRITERIA.md' },
+    { slug: 'investor-review', id: '05', title: 'Chính sách đánh giá của nhà đầu tư', file: '05_COUNCIL_GOVERNANCE.md' },
+    { slug: 'decision-policy', id: '05b', title: 'Chính sách quyết định', file: '05_COUNCIL_GOVERNANCE.md' },
+    { slug: 'forum-guidelines', id: '03', title: 'Hướng dẫn cộng đồng diễn đàn', file: '03_MODERATION_POLICY.md' },
+    { slug: 'moderation-policy', id: '03b', title: 'Chính sách kiểm duyệt nội dung', file: '03_MODERATION_POLICY.md' },
+    { slug: 'retention', id: '10', title: 'Chính sách giữ dữ liệu và xóa', file: '10_DATA_RETENTION.md' },
+    { slug: 'sponsorship-terms', id: '06', title: 'Điều khoản tài trợ', file: '06_SPONSORSHIP_POLICY.md' },
+    { slug: 'appeals', id: '08', title: 'Quy trình khiếu nại và kháng cáo', file: '08_APPEAL_PROCESS.md' },
+    { slug: 'code-of-conduct', id: '11', title: 'Quy tắc ứng xử', file: '11_TERMS_OF_SERVICE.md' },
+    { slug: 'conflict-of-interest', id: '12', title: 'Chính sách xung đột lợi ích', file: '12_CHANGE_POLICY.md' },
+  ];
+  return policies.map((p) => ({ params: { slug: p.slug }, props: p }));
+}
+
+const { slug, id, title, file } = Astro.props;
+---
+
+<AcademyLayout
+  title={`${title} — Nguyễn AI`}
+  description={title}
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-3xl">
+    <a href="/scholarship/policies" class="text-blue-600 text-sm mb-4 inline-block">← Tất cả chính sách</a>
+    <h1 class="text-3xl font-bold mb-2">{title}</h1>
+    <p class="text-gray-600 mb-8">Phiên bản 1.0.0 — Hiệu lực 2026-07-04 — BINDING</p>
+
+    <div class="prose max-w-none">
+      <p class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        Đây là tài liệu chính thức. Nội dung đầy đủ xem tại file markdown:
+        <code class="bg-gray-100 px-2 py-1 rounded">docs/scholarship/policies/{file}</code>
+      </p>
+
+      <h2>Tóm tắt</h2>
+      <p>
+        {title}. Chi tiết đầy đủ trong file markdown.
+        Mọi thay đổi phải tuân thủ chính sách thay đổi và phiên bản.
+      </p>
+
+      <h2>Liên kết</h2>
+      <ul>
+        <li><a href="/scholarship/policies">Tất cả 12 chính sách</a></li>
+        <li><a href="/scholarship/changelog">Changelog</a></li>
+        <li><a href="/scholarship/acceptance-log">Acceptance Log</a></li>
+      </ul>
+    </div>
+  </section>
+</AcademyLayout>

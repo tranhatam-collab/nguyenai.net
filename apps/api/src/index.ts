@@ -88,6 +88,8 @@ function logError(scope: string, err: unknown): void {
 import pricesData from '../../../packages/product-catalog/prices.json';
 import { scholarshipRoutes } from './scholarship-routes';
 import { createNguyenTools, type NguyenTools } from '@nai/nguyen-tools';
+import { idempotencyMiddleware } from './idempotency';
+import { defaultRateLimit, cleanupBuckets } from './rate-limiter';
 
 import modelsData from '../../../packages/product-catalog/models.json';
 
@@ -164,6 +166,13 @@ app.use('/v1/*', async (c, next) => {
   c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie, c.env) : null);
   await next();
 });
+
+// Idempotency middleware — requires idempotency_key on write endpoints
+// Per ENTITLEMENT_API_RFC §5 (BINDING)
+app.use('/v1/*', idempotencyMiddleware);
+
+// Rate limiting — 60 req/min per IP on all API routes
+app.use('/v1/*', defaultRateLimit);
 
 // ============================================================
 // Health check — no auth

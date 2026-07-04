@@ -1,0 +1,55 @@
+---
+import AcademyLayout from '../../../../layouts/AcademyLayout.astro';
+
+export function getStaticPaths() {
+  const policies = [
+    { slug: 'program-terms', id: '01', title: 'Scholarship Program Terms', file: '01_SCHOLARSHIP_POLICY.md' },
+    { slug: 'privacy', id: '04', title: 'Applicant Privacy Policy', file: '04_PRIVACY_AND_DATA.md' },
+    { slug: 'wish-sharing', id: '02', title: 'Public Wish Sharing Policy', file: '02_APPLICATION_CRITERIA.md' },
+    { slug: 'investor-review', id: '05', title: 'Investor Scholarship Review Policy', file: '05_COUNCIL_GOVERNANCE.md' },
+    { slug: 'decision-policy', id: '05b', title: 'Scholarship Decision Policy', file: '05_COUNCIL_GOVERNANCE.md' },
+    { slug: 'forum-guidelines', id: '03', title: 'Learning Forum Community Guidelines', file: '03_MODERATION_POLICY.md' },
+    { slug: 'moderation-policy', id: '03b', title: 'Content Moderation Policy', file: '03_MODERATION_POLICY.md' },
+    { slug: 'retention', id: '10', title: 'Data Retention and Deletion Policy', file: '10_DATA_RETENTION.md' },
+    { slug: 'sponsorship-terms', id: '06', title: 'Scholarship Sponsorship Terms', file: '06_SPONSORSHIP_POLICY.md' },
+    { slug: 'appeals', id: '08', title: 'Appeals and Complaints Policy', file: '08_APPEAL_PROCESS.md' },
+    { slug: 'code-of-conduct', id: '11', title: 'Code of Conduct', file: '11_TERMS_OF_SERVICE.md' },
+    { slug: 'conflict-of-interest', id: '12', title: 'Conflict of Interest Policy', file: '12_CHANGE_POLICY.md' },
+  ];
+  return policies.map((p) => ({ params: { slug: p.slug }, props: p }));
+}
+
+const { slug, id, title, file } = Astro.props;
+---
+
+<AcademyLayout
+  title={`${title} — Nguyen AI`}
+  description={title}
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-3xl">
+    <a href="/en/scholarship/policies" class="text-blue-600 text-sm mb-4 inline-block">← All policies</a>
+    <h1 class="text-3xl font-bold mb-2">{title}</h1>
+    <p class="text-gray-600 mb-8">Version 1.0.0 — Effective 2026-07-04 — BINDING</p>
+
+    <div class="prose max-w-none">
+      <p class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        This is an official document. Full content available in markdown file:
+        <code class="bg-gray-100 px-2 py-1 rounded">docs/scholarship/policies/{file}</code>
+      </p>
+
+      <h2>Summary</h2>
+      <p>
+        {title}. Full details in markdown file.
+        Any changes must follow the change policy.
+      </p>
+
+      <h2>Links</h2>
+      <ul>
+        <li><a href="/en/scholarship/policies">All 12 policies</a></li>
+        <li><a href="/en/scholarship/changelog">Changelog</a></li>
+        <li><a href="/en/scholarship/acceptance-log">Acceptance Log</a></li>
+      </ul>
+    </div>
+  </section>
+</AcademyLayout>

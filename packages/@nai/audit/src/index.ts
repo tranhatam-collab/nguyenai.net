@@ -54,6 +54,7 @@ export type AuditEventType =
   | 'certificate_revoked'
   | 'payment_received'
   | 'payment_checkout_created'
+  | 'account_deleted'
   | 'investor_room_accessed'
   | 'scholarship_application_created'
   | 'scholarship_application_updated'
@@ -93,7 +94,7 @@ export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'approval_requested', 'approval_granted', 'approval_denied', 'sensitive_action_executed',
   'command_executed', 'command_failed', 'command_cancelled', 'tool_called', 'workflow_completed',
   'academy_lesson_completed', 'proof_submitted', 'certificate_issued', 'certificate_revoked',
-  'payment_received', 'payment_checkout_created', 'investor_room_accessed',
+  'payment_received', 'payment_checkout_created', 'account_deleted', 'investor_room_accessed',
   'scholarship_application_created', 'scholarship_application_updated',
   'identity_verification_started', 'identity_verification_completed',
   'investor_access_granted', 'investor_access_revoked',

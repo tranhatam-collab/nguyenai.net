@@ -184,5 +184,35 @@
     "compatible_plans": ["nguyen-personal", "nguyen-family", "nguyen-creator", "nguyen-founder", "nguyen-business", "nguyen-chapter", "nguyen-enterprise"],
     "description_vi": "Nguyen Trust + AI Research + proof engine: verification, audit, compliance",
     "description_en": "Nguyen Trust + AI Research + proof engine: verification, audit, compliance"
+  },
+  {
+    "id": "sme-deployment",
+    "name": "SME Deployment",
+    "name_vi": "Triển khai Doanh nghiệp vừa",
+    "name_en": "SME Deployment",
+    "price_vnd": null,
+    "price_usd": null,
+    "currency": "VND",
+    "period": "contract",
+    "status": "Planned",
+    "entitlement_key": "sme.deployment",
+    "entitlement_value": true,
+    "description_vi": "Triển khai Máy Tính AI Nguyễn cho doanh nghiệp vừa — hợp đồng riêng",
+    "description_en": "Nguyen AI Computer deployment for SMEs — custom contract"
+  },
+  {
+    "id": "marketplace-purchase",
+    "name": "Marketplace Purchase",
+    "name_vi": "Mua sắm Marketplace",
+    "name_en": "Marketplace Purchase",
+    "price_vnd": null,
+    "price_usd": null,
+    "currency": "VND",
+    "period": "one-time",
+    "status": "Planned",
+    "entitlement_key": "marketplace.purchase",
+    "entitlement_value": true,
+    "description_vi": "Mua công cụ, agent, template từ Marketplace — giá theo từng item",
+    "description_en": "Purchase tools, agents, templates from Marketplace — per item pricing"
   }
 ]

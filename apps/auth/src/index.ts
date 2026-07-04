@@ -808,6 +808,235 @@ app.get('/v1/auth/audit', async (c) => {
 });
 
 // ============================================================
+// Magic link — POST /v1/auth/magic-link
+// ============================================================
+
+app.post('/v1/auth/magic-link', async (c) => {
+  const { email } = await c.req.json() as { email?: string };
+  if (!email) return c.json({ error: 'email is required' }, 400);
+  const user = await findUserByEmail(c.env.DB, email);
+  if (!user) return c.json({ ok: true }); // don't leak existence
+  const token = crypto.randomUUID();
+  const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  await c.env.DB.prepare(
+    'INSERT INTO magic_links (token, user_id, expires_at) VALUES (?1, ?2, ?3)'
+  ).bind(token, user.user_id, expires).run();
+  // TODO: send email with link containing token
+  return c.json({ ok: true });
+});
+
+// ============================================================
+// Magic link verify — POST /v1/auth/magic-link/verify
+// ============================================================
+
+app.post('/v1/auth/magic-link/verify', async (c) => {
+  const { token } = await c.req.json() as { token?: string };
+  if (!token) return c.json({ error: 'token is required' }, 400);
+  const link = await c.env.DB.prepare(
+    'SELECT * FROM magic_links WHERE token = ?1 AND expires_at > ?2 AND used = 0'
+  ).bind(token, new Date().toISOString()).first<{ user_id: string }>();
+  if (!link) return c.json({ error: 'invalid or expired token' }, 400);
+  await c.env.DB.prepare('UPDATE magic_links SET used = 1 WHERE token = ?1').bind(token).run();
+  const sessionId = crypto.randomUUID();
+  const user = await findUserById(c.env.DB, link.user_id);
+  if (!user) return c.json({ error: 'user not found' }, 404);
+  await createSession(c.env.DB, sessionId, user.user_id, c.req.header('CF-Connecting-IP') ?? null, c.req.header('User-Agent') ?? null);
+  await logLoginSuccess(c.env, user.user_id, c.req.header('CF-Connecting-IP') ?? 'unknown');
+  c.header('Set-Cookie', `${SESSION_COOKIE_NAME}=${sessionId}; Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/`);
+  return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
+});
+
+// ============================================================
+// Passkey enroll — POST /v1/auth/passkey/enroll
+// ============================================================
+
+app.post('/v1/auth/passkey/enroll', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const { credential_id, public_key } = await c.req.json() as { credential_id?: string; public_key?: string };
+  if (!credential_id || !public_key) return c.json({ error: 'credential_id and public_key required' }, 400);
+  const passkeyId = crypto.randomUUID();
+  await c.env.DB.prepare(
+    'INSERT INTO passkeys (passkey_id, user_id, credential_id, public_key) VALUES (?1, ?2, ?3, ?4)'
+  ).bind(passkeyId, session.user_id, credential_id, public_key).run();
+  return c.json({ ok: true, passkey_id: passkeyId });
+});
+
+// ============================================================
+// Passkey verify — POST /v1/auth/passkey/verify
+// ============================================================
+
+app.post('/v1/auth/passkey/verify', async (c) => {
+  const { credential_id, challenge } = await c.req.json() as { credential_id?: string; challenge?: string };
+  if (!credential_id) return c.json({ error: 'credential_id required' }, 400);
+  const passkey = await c.env.DB.prepare(
+    'SELECT * FROM passkeys WHERE credential_id = ?1'
+  ).bind(credential_id).first<{ user_id: string }>();
+  if (!passkey) return c.json({ error: 'invalid credential' }, 400);
+  // TODO: verify WebAuthn assertion signature
+  const sessionId = crypto.randomUUID();
+  const user = await findUserById(c.env.DB, passkey.user_id);
+  if (!user) return c.json({ error: 'user not found' }, 404);
+  await createSession(c.env.DB, sessionId, user.user_id, c.req.header('CF-Connecting-IP') ?? null, c.req.header('User-Agent') ?? null);
+  await logLoginSuccess(c.env, user.user_id, c.req.header('CF-Connecting-IP') ?? 'unknown');
+  c.header('Set-Cookie', `${SESSION_COOKIE_NAME}=${sessionId}; Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/`);
+  return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
+});
+
+// ============================================================
+// Passkey list — GET /v1/auth/passkeys
+// ============================================================
+
+app.get('/v1/auth/passkeys', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const passkeys = await c.env.DB.prepare(
+    'SELECT passkey_id, credential_id, created_at FROM passkeys WHERE user_id = ?1'
+  ).bind(session.user_id).all();
+  return c.json({ passkeys: passkeys.results });
+});
+
+// ============================================================
+// Passkey delete — DELETE /v1/auth/passkeys/:id
+// ============================================================
+
+app.delete('/v1/auth/passkeys/:id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const passkeyId = c.req.param('id');
+  const existing = await c.env.DB.prepare(
+    'SELECT * FROM passkeys WHERE passkey_id = ?1 AND user_id = ?2'
+  ).bind(passkeyId, session.user_id).first();
+  if (!existing) return c.json({ error: 'not found' }, 404);
+  await c.env.DB.prepare('DELETE FROM passkeys WHERE passkey_id = ?1').bind(passkeyId).run();
+  return c.json({ ok: true });
+});
+
+// ============================================================
+// Organization list — GET /v1/auth/orgs
+// ============================================================
+
+app.get('/v1/auth/orgs', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  return c.json({ orgs });
+});
+
+// ============================================================
+// Organization create — POST /v1/auth/orgs
+// ============================================================
+
+app.post('/v1/auth/orgs', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const { name, slug } = await c.req.json() as { name?: string; slug?: string };
+  if (!name || !slug) return c.json({ error: 'name and slug required' }, 400);
+  const orgId = crypto.randomUUID();
+  await createOrganization(c.env.DB, orgId, name, slug);
+  await createMembership(c.env.DB, crypto.randomUUID(), session.user_id, orgId, 'owner');
+  return c.json({ ok: true, org_id: orgId });
+});
+
+// ============================================================
+// Organization members — GET /v1/auth/orgs/:id/members
+// ============================================================
+
+app.get('/v1/auth/orgs/:id/members', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const orgId = c.req.param('id');
+  const memberships = await c.env.DB.prepare(
+    'SELECT m.*, u.email FROM memberships m JOIN users u ON m.user_id = u.user_id WHERE m.org_id = ?1'
+  ).bind(orgId).all();
+  return c.json({ members: memberships.results });
+});
+
+// ============================================================
+// Organization invite — POST /v1/auth/orgs/:id/invite
+// ============================================================
+
+app.post('/v1/auth/orgs/:id/invite', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const orgId = c.req.param('id');
+  const { email, role } = await c.req.json() as { email?: string; role?: string };
+  if (!email || !role) return c.json({ error: 'email and role required' }, 400);
+  const invitee = await findUserByEmail(c.env.DB, email);
+  if (!invitee) return c.json({ error: 'user not found' }, 404);
+  await createMembership(c.env.DB, crypto.randomUUID(), invitee.user_id, orgId, role);
+  return c.json({ ok: true });
+});
+
+// ============================================================
+// Organization remove member — DELETE /v1/auth/orgs/:id/members/:userId
+// ============================================================
+
+app.delete('/v1/auth/orgs/:id/members/:userId', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const orgId = c.req.param('id');
+  const userId = c.req.param('userId');
+  await c.env.DB.prepare('DELETE FROM memberships WHERE org_id = ?1 AND user_id = ?2').bind(orgId, userId).run();
+  return c.json({ ok: true });
+});
+
+// ============================================================
+// Sessions list — GET /v1/auth/sessions
+// ============================================================
+
+app.get('/v1/auth/sessions', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const sessions = await c.env.DB.prepare(
+    'SELECT session_id, ip_address, user_agent, created_at, last_used_at, expires_at FROM sessions WHERE user_id = ?1 ORDER BY created_at DESC'
+  ).bind(session.user_id).all();
+  return c.json({ sessions: sessions.results });
+});
+
+// ============================================================
+// Session revoke — DELETE /v1/auth/sessions/:id
+// ============================================================
+
+app.delete('/v1/auth/sessions/:id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const sessionId = c.req.param('id');
+  const existing = await findSessionById(c.env.DB, sessionId);
+  if (!existing || existing.user_id !== session.user_id) return c.json({ error: 'not found' }, 404);
+  await revokeSession(c.env.DB, sessionId);
+  return c.json({ ok: true });
+});
+
+// ============================================================
+// Delete account — DELETE /v1/auth/me
+// ============================================================
+
+app.delete('/v1/auth/me', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  const { password } = await c.req.json() as { password?: string };
+  if (!password) return c.json({ error: 'password required to delete account' }, 400);
+  const user = await findUserById(c.env.DB, session.user_id);
+  if (!user || !user.password_hash) return c.json({ error: 'cannot verify' }, 400);
+  const valid = await verifyPassword(password, user.password_hash);
+  if (!valid) return c.json({ error: 'invalid password' }, 401);
+  await revokeAllUserSessions(c.env.DB, session.user_id);
+  await c.env.DB.prepare('DELETE FROM users WHERE user_id = ?1').bind(session.user_id).run();
+  await logAuditEvent({
+    user_id: session.user_id,
+    session_id: session.session_id,
+    event_type: 'account_deleted',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+    user_agent: c.req.header('User-Agent') ?? 'unknown',
+    target: session.user_id,
+    result: 'success',
+    metadata: {},
+  });
+  return c.json({ ok: true });
+});
+
+// ============================================================
 // Google OAuth — GET /v1/auth/oauth/google/begin
 // ============================================================
 
