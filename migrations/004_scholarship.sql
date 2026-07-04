@@ -1,6 +1,6 @@
 -- 004_scholarship.sql
--- Scholarship system schema — 18 entities per EDU_MASTER_PLAN_V4 §XXXV
--- Registry version: 2026-07-03.1
+-- Scholarship system schema — 28 entities per EDU_MASTER_PLAN_V4 §XXXV
+-- Registry version: 2026-07-04.1
 --
 -- Entities:
 --  1. scholarship_applications
@@ -21,6 +21,17 @@
 -- 16. notifications
 -- 17. appeals
 -- (18. audit_events — already in 001_audit_log.sql)
+-- 19. application_messages (Sprint 2)
+-- 20. application_documents (Sprint 2)
+-- 21. status_timeline_entries (Sprint 2)
+-- 22. forum_comments (Sprint 4)
+-- 23. forum_reports (Sprint 4)
+-- 24. council_decisions (Sprint 5)
+-- 25. waitlist_entries (Sprint 5)
+-- 26. scholarship_entitlements (Sprint 6)
+-- 27. entitlement_events (Sprint 6)
+-- 28. cohorts (Sprint 6)
+-- 29. program_access (Sprint 6)
 
 BEGIN;
 
@@ -404,7 +415,143 @@ CREATE TABLE IF NOT EXISTS status_timeline_entries (
 CREATE INDEX IF NOT EXISTS idx_timeline_app ON status_timeline_entries(application_id);
 
 -- ============================================================
--- Verify: 20 tables created (audit_events is #18, already exists)
+-- Sprint 4 — Forum: comments, reports
+-- ============================================================
+
+-- 21. forum_comments
+CREATE TABLE IF NOT EXISTS forum_comments (
+  comment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID NOT NULL REFERENCES forum_posts(post_id),
+  user_id UUID NOT NULL,
+  parent_comment_id UUID REFERENCES forum_comments(comment_id),
+  body TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'visible' CHECK (status IN ('visible', 'hidden', 'deleted')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_comments_post ON forum_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_comments_user ON forum_comments(user_id);
+
+-- 22. forum_reports
+CREATE TABLE IF NOT EXISTS forum_reports (
+  report_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  target_type TEXT NOT NULL CHECK (target_type IN ('post', 'comment')),
+  target_id UUID NOT NULL,
+  reported_by UUID NOT NULL,
+  reason TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('prohibited_content', 'personal_info', 'harassment', 'spam', 'misinformation', 'copyright', 'other')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'actioned', 'dismissed')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  reviewed_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_reports_target ON forum_reports(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON forum_reports(status);
+
+-- ============================================================
+-- Sprint 5 — Decision Engine: council decisions, waitlist
+-- ============================================================
+
+-- 23. council_decisions
+CREATE TABLE IF NOT EXISTS council_decisions (
+  decision_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  total_approve INTEGER NOT NULL DEFAULT 0,
+  total_deny INTEGER NOT NULL DEFAULT 0,
+  total_abstain INTEGER NOT NULL DEFAULT 0,
+  outcome TEXT NOT NULL DEFAULT 'pending' CHECK (outcome IN ('approved', 'denied', 'waitlisted', 'pending')),
+  threshold INTEGER NOT NULL,
+  decided_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_council_decisions_app ON council_decisions(application_id);
+
+-- 24. waitlist_entries
+CREATE TABLE IF NOT EXISTS waitlist_entries (
+  entry_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  user_id UUID NOT NULL,
+  program_code TEXT NOT NULL,
+  position INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'waiting' CHECK (status IN ('waiting', 'offered', 'expired', 'withdrawn')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  offered_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_waitlist_app ON waitlist_entries(application_id);
+CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist_entries(status);
+
+-- ============================================================
+-- Sprint 6 — Entitlement lifecycle: entitlements, events, cohorts, program access
+-- ============================================================
+
+-- 25. scholarship_entitlements
+CREATE TABLE IF NOT EXISTS scholarship_entitlements (
+  entitlement_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES scholarship_applications(application_id),
+  user_id UUID NOT NULL,
+  program_code TEXT NOT NULL,
+  cohort_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'revoked', 'completed', 'expired')),
+  granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ,
+  suspended_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  ai_computer_instance_id UUID,
+  learning_paths TEXT[] NOT NULL DEFAULT '{}',
+  suspend_reason TEXT,
+  revoke_reason TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_entitlements_user ON scholarship_entitlements(user_id);
+CREATE INDEX IF NOT EXISTS idx_entitlements_app ON scholarship_entitlements(application_id);
+CREATE INDEX IF NOT EXISTS idx_entitlements_status ON scholarship_entitlements(status);
+
+-- 26. entitlement_events
+CREATE TABLE IF NOT EXISTS entitlement_events (
+  event_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entitlement_id UUID NOT NULL REFERENCES scholarship_entitlements(entitlement_id),
+  event_type TEXT NOT NULL CHECK (event_type IN ('granted', 'suspended', 'restored', 'revoked', 'completed', 'expired', 'learning_path_added', 'learning_path_removed')),
+  changed_by UUID NOT NULL,
+  reason TEXT,
+  metadata JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_entitlement_events_ent ON entitlement_events(entitlement_id);
+
+-- 27. cohorts
+CREATE TABLE IF NOT EXISTS cohorts (
+  cohort_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  program_code TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  capacity INTEGER NOT NULL DEFAULT 0,
+  enrolled_count INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'completed', 'cancelled')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cohorts_program ON cohorts(program_code);
+CREATE INDEX IF NOT EXISTS idx_cohorts_status ON cohorts(status);
+
+-- 28. program_access
+CREATE TABLE IF NOT EXISTS program_access (
+  access_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entitlement_id UUID NOT NULL REFERENCES scholarship_entitlements(entitlement_id),
+  program_id TEXT NOT NULL,
+  granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  revoked_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_program_access_ent ON program_access(entitlement_id);
+
+-- ============================================================
+-- Verify: 28 tables created (audit_events is #18, already exists)
 -- ============================================================
 
 SELECT count(*) AS scholarship_table_count
@@ -415,7 +562,13 @@ SELECT count(*) AS scholarship_table_count
     'votes', 'conflict_disclosures', 'sponsorships', 'investor_profiles',
     'investor_access_grants', 'forum_rooms', 'forum_posts', 'moderation_decisions',
     'notifications', 'appeals', 'application_messages', 'application_documents',
-    'status_timeline_entries'
+    'status_timeline_entries',
+    -- Sprint 4
+    'forum_comments', 'forum_reports',
+    -- Sprint 5
+    'council_decisions', 'waitlist_entries',
+    -- Sprint 6
+    'scholarship_entitlements', 'entitlement_events', 'cohorts', 'program_access'
   );
 
 COMMIT;
