@@ -2,7 +2,7 @@
  * @nai/email — Unit tests
  *
  * Verifies:
- * - 20 templates exist + render (VI + EN)
+ * - 25 templates exist + render (VI + EN)
  * - MockEmailClient captures sends
  * - EmailService.sendTemplate renders + sends
  * - Audit event → template mapping covers 18/38 events
@@ -21,9 +21,9 @@ const TEMPLATE_IDS = listTemplates();
 console.log(`=== @nai/email unit tests ===\n`);
 console.log(`Templates: ${TEMPLATE_IDS.length}`);
 
-// Test 1: 20 templates exist
-assert(TEMPLATE_IDS.length === 20, `should have 20 templates, got ${TEMPLATE_IDS.length}`);
-console.log(`✓ Test 1: 20 templates exist`);
+// Test 1: 25 templates exist
+assert(TEMPLATE_IDS.length === 25, `should have 25 templates, got ${TEMPLATE_IDS.length}`);
+console.log(`✓ Test 1: 25 templates exist`);
 
 // Test 2: Each template renders VI + EN with subject, html, text
 let renderCount = 0;
@@ -77,7 +77,7 @@ for (const id of TEMPLATE_IDS) {
     renderCount++;
   }
 }
-console.log(`✓ Test 2: ${renderCount} template renders (20 templates × 2 locales) all valid`);
+console.log(`✓ Test 2: ${renderCount} template renders (25 templates × 2 locales) all valid`);
 
 // Test 3: MockEmailClient captures sends
 const mock = new MockEmailClient();
@@ -114,7 +114,7 @@ console.log(`✓ Test 4: EN template renders English`);
 
 // Test 5: Audit event → template mapping
 const mappedEvents = Object.keys(AUDIT_EVENT_TO_TEMPLATE);
-assert(mappedEvents.length === 18, `should map 18 audit events, got ${mappedEvents.length}`);
+assert(mappedEvents.length === 24, `should map 24 audit events, got ${mappedEvents.length}`);
 assert(AUDIT_EVENT_TO_TEMPLATE['login_success'] === 'login_alert', 'login_success → login_alert');
 assert(AUDIT_EVENT_TO_TEMPLATE['approval_requested'] === 'approval_requested', 'approval_requested → approval_requested');
 assert(AUDIT_EVENT_TO_TEMPLATE['certificate_issued'] === 'certificate_issued', 'certificate_issued → certificate_issued');

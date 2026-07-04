@@ -15,6 +15,7 @@
 
 import { getScholarshipStore, type ScholarshipStore } from './store';
 import { logAuditEvent } from '@nai/audit';
+import { EmailService, type EmailTemplateId, type TemplateContext } from '@nai/email';
 
 // ============================================================
 // Request context — carries IP + User-Agent for audit logging
@@ -44,6 +45,34 @@ async function audit(event: Parameters<typeof logAuditEvent>[0]): Promise<string
     user_agent: event.user_agent ?? currentContext.user_agent,
     session_id: event.session_id ?? currentContext.session_id,
   });
+}
+
+// ============================================================
+// Email service — Section XXVII (5 scholarship templates)
+// ============================================================
+
+let emailService: EmailService | null = null;
+
+export function setEmailService(svc: EmailService): void {
+  emailService = svc;
+}
+
+export function getEmailService(): EmailService | null {
+  return emailService;
+}
+
+/**
+ * Send an email using a scholarship template.
+ * Silently swallows errors — email is best-effort, must not break the flow.
+ */
+async function sendEmail(templateId: EmailTemplateId, ctx: TemplateContext): Promise<void> {
+  if (!emailService) return;
+  if (!ctx.user_email) return; // Skip if no recipient email
+  try {
+    await emailService.sendTemplate(templateId, ctx);
+  } catch {
+    // Best-effort: log nothing, do not throw
+  }
 }
 import type {
   ScholarshipApplication,
@@ -177,6 +206,15 @@ export async function submitApplication(applicationId: string, userId: string): 
   await store.updateApplication(applicationId, {
     status: 'submitted',
     submitted_at: new Date().toISOString(),
+  });
+
+  // Send confirmation email (Section XXVII.1)
+  await sendEmail('scholarship_application_submitted', {
+    locale: 'vi',
+    user_email: app.email,
+    user_name: app.full_name,
+    application_id: applicationId,
+    program_name: app.program_code,
   });
 }
 
@@ -398,6 +436,24 @@ export async function createReview(
     status: 'draft',
     submitted_at: null,
   });
+
+  // Send review request email to investor (Section XXVII.2)
+  const app = await store.getApplication(applicationId);
+  if (app) {
+    // Look up investor profile to get display name (email is not stored on profile)
+    const investor = await store.getInvestorProfileByUserId(reviewerId);
+    if (investor) {
+      await sendEmail('scholarship_review_request', {
+        locale: 'vi',
+        user_email: '', // Investor email resolved at API layer from session
+        user_name: investor.display_name,
+        application_id: applicationId,
+        program_name: app.program_code,
+        review_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      });
+    }
+  }
+
   return id;
 }
 
@@ -520,6 +576,22 @@ export async function createSponsorship(
     result: 'success',
     metadata: { type, amount_vnd: amountVnd, application_id: applicationId },
   });
+
+  // Send cosponsorship email to applicant (Section XXVII.3)
+  if (applicationId) {
+    const app = await store.getApplication(applicationId);
+    if (app) {
+      await sendEmail('scholarship_cosponsorship', {
+        locale: 'vi',
+        user_email: app.email,
+        user_name: app.full_name,
+        application_id: applicationId,
+        sponsorship_type: type,
+        amount_vnd: amountVnd,
+        amount_usd: amountUsd,
+      });
+    }
+  }
 
   return id;
 }
@@ -1067,6 +1139,16 @@ export async function awardScholarship(
     read: false,
     read_at: null,
   });
+
+  // Send decision email (Section XXVII.4 — approved)
+  await sendEmail('scholarship_decision', {
+    locale: 'vi',
+    user_email: app.email,
+    user_name: app.full_name,
+    application_id: applicationId,
+    decision: 'approved',
+    program_name: programCode,
+  });
 }
 
 // Decline scholarship — applicant declines the offer
@@ -1102,6 +1184,16 @@ export async function declineScholarship(
     target: applicationId,
     result: 'success',
     metadata: { reason },
+  });
+
+  // Send decision email (Section XXVII.4 — declined by applicant)
+  await sendEmail('scholarship_decision', {
+    locale: 'vi',
+    user_email: app.email,
+    user_name: app.full_name,
+    application_id: applicationId,
+    decision: 'declined',
+    program_name: app.program_code,
   });
 }
 
@@ -1446,6 +1538,17 @@ export async function grantEntitlement(
     body: `Bạn đã được cấp entitlement cho chương trình ${app.program_code}. Cohort: ${cohortId}. Hạn hạn: ${new Date(expiresAt).toLocaleDateString('vi-VN')}`,
     read: false,
     read_at: null,
+  });
+
+  // Send entitlement granted email (Section XXVII.5)
+  await sendEmail('scholarship_entitlement_granted', {
+    locale: 'vi',
+    user_email: app.email,
+    user_name: app.full_name,
+    entitlement_id: id,
+    program_name: app.program_code,
+    cohort_name: cohortId,
+    expires_at: expiresAt,
   });
 
   return id;

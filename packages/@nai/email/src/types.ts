@@ -27,7 +27,13 @@ export type EmailTemplateId =
   | 'certificate_issued'
   | 'certificate_revoked'
   | 'account_deletion_requested'
-  | 'investor_access_granted';
+  | 'investor_access_granted'
+  // Scholarship (5) — Section XXVII
+  | 'scholarship_application_submitted'
+  | 'scholarship_cosponsorship'
+  | 'scholarship_review_request'
+  | 'scholarship_decision'
+  | 'scholarship_entitlement_granted';
 
 export interface EmailAddress {
   email: string;
@@ -70,5 +76,5 @@ export interface EmailTemplate {
   subject: (ctx: TemplateContext) => string;
   html: (ctx: TemplateContext) => string;
   text: (ctx: TemplateContext) => string;
-  category: 'identity' | 'authorization' | 'approval' | 'entitlement' | 'billing' | 'academy' | 'investor' | 'security';
+  category: 'identity' | 'authorization' | 'approval' | 'entitlement' | 'billing' | 'academy' | 'investor' | 'security' | 'scholarship';
 }

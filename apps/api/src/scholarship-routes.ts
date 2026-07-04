@@ -29,6 +29,7 @@
 
 import { Hono } from 'hono';
 import { defaultRateLimit, formSubmitRateLimit, cleanupBuckets } from './rate-limiter';
+import { EmailService } from '@nai/email';
 import {
   InMemoryScholarshipStore,
   setScholarshipStore,
@@ -62,11 +63,14 @@ import {
   type SponsorshipType,
   setRequestContext,
   clearRequestContext,
+  setEmailService,
+  getEmailService,
 } from '@nai/scholarship';
 
 export interface ScholarshipEnv {
   Bindings: {
     DB?: D1Database;
+    RESEND_API_KEY?: string;
   };
   Variables: {
     session: { user_id: string; role: string } | null;
@@ -78,6 +82,15 @@ let scholarshipStoreInitialized = false;
 function initScholarshipStore(env: ScholarshipEnv['Bindings']): void {
   if (scholarshipStoreInitialized) return;
   setScholarshipStore(new InMemoryScholarshipStore());
+  // Initialize email service (mock in dev, real when RESEND_API_KEY is set)
+  if (!getEmailService()) {
+    setEmailService(new EmailService({
+      apiKey: env.RESEND_API_KEY,
+      from: { email: 'scholarship@nguyenai.net', name: 'Nguyen AI Scholarship' },
+      replyTo: { email: 'hello@nguyenai.net', name: 'Nguyen AI' },
+      mock: !env.RESEND_API_KEY,
+    }));
+  }
   scholarshipStoreInitialized = true;
 }
 

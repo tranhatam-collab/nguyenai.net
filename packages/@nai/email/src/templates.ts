@@ -1,5 +1,5 @@
 /**
- * @nai/email — Email templates (20 templates)
+ * @nai/email — Email templates (25 templates)
  *
  * Mapped to AUDIT_EVENT_REGISTRY.md event types + transactional flows.
  * Each template has VI + EN variants, HTML + text versions.
@@ -25,6 +25,11 @@
  * 18. certificate_revoked  — certificate revoked
  * 19. account_deletion_requested — deletion requested
  * 20. investor_access_granted — investor room access
+ * 21. scholarship_application_submitted — application submitted (Section XXVII.1)
+ * 22. scholarship_cosponsorship — sponsorship committed (Section XXVII.3)
+ * 23. scholarship_review_request — review assigned to investor (Section XXVII.2)
+ * 24. scholarship_decision — council decision (approved/denied) (Section XXVII.4)
+ * 25. scholarship_entitlement_granted — entitlement activated (Section XXVII.5)
  */
 
 import type { EmailTemplate, EmailTemplateId, TemplateContext } from './types';
@@ -560,6 +565,130 @@ export const TEMPLATES: Record<EmailTemplateId, EmailTemplate> = {
     text: (ctx) => ctx.locale === 'vi'
       ? `Truy cập phòng đầu tư\nPhòng: ${ctx.room_id ?? 'invest'}\nHết hạn: ${ctx.access_expires ?? 'unknown'}\n\nVào: https://${BRAND_DOMAIN}/invest/room\n\n— ${BRAND_NAME}`
       : `Investor room access\nRoom: ${ctx.room_id ?? 'invest'}\nExpires: ${ctx.access_expires ?? 'unknown'}\n\nEnter: https://${BRAND_DOMAIN}/invest/room\n\n— ${BRAND_NAME}`,
+  },
+
+  // ── Scholarship (5) — Section XXVII ───────────────────────
+
+  scholarship_application_submitted: {
+    id: 'scholarship_application_submitted',
+    category: 'scholarship',
+    subject: (ctx) => ctx.locale === 'vi' ? 'Đơn học bổng đã nộp — Nguyen AI' : 'Scholarship application submitted — Nguyen AI',
+    html: (ctx) => baseHtml({
+      locale: ctx.locale,
+      title: ctx.locale === 'vi' ? 'Đơn học bổng đã nộp' : 'Scholarship application submitted',
+      preheader: ctx.locale === 'vi' ? 'Chúng tôi đã nhận đơn đăng ký học bổng của bạn' : 'We have received your scholarship application',
+      bodyHtml: `
+        <h1>${ctx.locale === 'vi' ? 'Đã nhận đơn đăng ký học bổng' : 'Scholarship application received'}</h1>
+        <p>${ctx.locale === 'vi' ? 'Cảm ơn bạn đã nộp đơn. Đơn của bạn đang được xem xét.' : 'Thank you for applying. Your application is under review.'}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Mã đơn' : 'Application ID', String(ctx.application_id ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Chương trình' : 'Program', String(ctx.program_name ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Bạn sẽ nhận email thông báo khi có kết quả. Vui lòng không nộp lại đơn.' : 'You will be notified by email when a decision is made. Please do not resubmit.')}
+        ${ctaButton(`https://edu.${BRAND_DOMAIN}/room`, ctx.locale === 'vi' ? 'Xem đơn của tôi' : 'View my application')}
+      `,
+    }),
+    text: (ctx) => ctx.locale === 'vi'
+      ? `Đơn học bổng đã nộp\nMã đơn: ${ctx.application_id ?? ''}\nChương trình: ${ctx.program_name ?? ''}\n\nXem: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`
+      : `Scholarship application submitted\nApplication ID: ${ctx.application_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\n\nView: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`,
+  },
+
+  scholarship_cosponsorship: {
+    id: 'scholarship_cosponsorship',
+    category: 'scholarship',
+    subject: (ctx) => ctx.locale === 'vi' ? 'Đơn học bổng của bạn nhận được tài trợ — Nguyen AI' : 'Your application received sponsorship — Nguyen AI',
+    html: (ctx) => baseHtml({
+      locale: ctx.locale,
+      title: ctx.locale === 'vi' ? 'Đơn nhận tài trợ' : 'Application sponsored',
+      preheader: ctx.locale === 'vi' ? 'Một nhà tài trợ đã cam kết hỗ trợ đơn của bạn' : 'A sponsor has committed to support your application',
+      bodyHtml: `
+        <h1>${ctx.locale === 'vi' ? 'Đơn của bạn nhận được tài trợ' : 'Your application received sponsorship'}</h1>
+        <p>${ctx.locale === 'vi' ? 'Một nhà tài trợ đã cam kết hỗ trợ đơn học bổng của bạn.' : 'A sponsor has committed to support your scholarship application.'}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Mã đơn' : 'Application ID', String(ctx.application_id ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Loại tài trợ' : 'Sponsorship type', String(ctx.sponsorship_type ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Số tiền (VND)' : 'Amount (VND)', String(ctx.amount_vnd ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Tên nhà tài trợ được ẩn danh theo chính sách quyền riêng tư.' : 'Sponsor name is anonymized per privacy policy.')}
+        ${ctaButton(`https://edu.${BRAND_DOMAIN}/room`, ctx.locale === 'vi' ? 'Xem đơn của tôi' : 'View my application')}
+      `,
+    }),
+    text: (ctx) => ctx.locale === 'vi'
+      ? `Đơn nhận tài trợ\nMã đơn: ${ctx.application_id ?? ''}\nLoại: ${ctx.sponsorship_type ?? ''}\nSố tiền: ${ctx.amount_vnd ?? ''} VND\n\nXem: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`
+      : `Application sponsored\nApplication ID: ${ctx.application_id ?? ''}\nType: ${ctx.sponsorship_type ?? ''}\nAmount: ${ctx.amount_vnd ?? ''} VND\n\nView: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`,
+  },
+
+  scholarship_review_request: {
+    id: 'scholarship_review_request',
+    category: 'scholarship',
+    subject: (ctx) => ctx.locale === 'vi' ? 'Yêu cầu đánh giá đơn học bổng — Nguyen AI' : 'Scholarship review request — Nguyen AI',
+    html: (ctx) => baseHtml({
+      locale: ctx.locale,
+      title: ctx.locale === 'vi' ? 'Yêu cầu đánh giá đơn' : 'Review request',
+      preheader: ctx.locale === 'vi' ? 'Có đơn học bổng mới cần bạn đánh giá' : 'A new scholarship application needs your review',
+      bodyHtml: `
+        <h1>${ctx.locale === 'vi' ? 'Đơn cần đánh giá' : 'Application awaiting review'}</h1>
+        <p>${ctx.locale === 'vi' ? 'Một đơn học bổng mới đã được phân công cho bạn đánh giá.' : 'A new scholarship application has been assigned to you for review.'}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Mã đơn' : 'Application ID', String(ctx.application_id ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Chương trình' : 'Program', String(ctx.program_name ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Hạn đánh giá' : 'Review deadline', String(ctx.review_deadline ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Vui lòng hoàn tất đánh giá trước hạn. Mọi đánh giá được audit log.' : 'Please complete the review before the deadline. All reviews are audit logged.')}
+        ${ctaButton(`https://edu.${BRAND_DOMAIN}/investor-room`, ctx.locale === 'vi' ? 'Đánh giá đơn' : 'Review application')}
+      `,
+    }),
+    text: (ctx) => ctx.locale === 'vi'
+      ? `Yêu cầu đánh giá đơn\nMã đơn: ${ctx.application_id ?? ''}\nChương trình: ${ctx.program_name ?? ''}\nHạn: ${ctx.review_deadline ?? ''}\n\nĐánh giá: https://edu.${BRAND_DOMAIN}/investor-room\n\n— ${BRAND_NAME}`
+      : `Review request\nApplication ID: ${ctx.application_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\nDeadline: ${ctx.review_deadline ?? ''}\n\nReview: https://edu.${BRAND_DOMAIN}/investor-room\n\n— ${BRAND_NAME}`,
+  },
+
+  scholarship_decision: {
+    id: 'scholarship_decision',
+    category: 'scholarship',
+    subject: (ctx) => {
+      const approved = ctx.decision === 'approved';
+      return ctx.locale === 'vi'
+        ? (approved ? 'Học bổng được duyệt — Nguyen AI' : 'Kết quả đơn học bổng — Nguyen AI')
+        : (approved ? 'Scholarship approved — Nguyen AI' : 'Scholarship decision — Nguyen AI');
+    },
+    html: (ctx) => baseHtml({
+      locale: ctx.locale,
+      title: ctx.locale === 'vi' ? 'Kết quả đơn học bổng' : 'Scholarship decision',
+      preheader: ctx.locale === 'vi' ? 'Đơn học bổng của bạn đã có kết quả' : 'A decision has been made on your application',
+      bodyHtml: `
+        <h1>${ctx.locale === 'vi' ? 'Kết quả đơn học bổng' : 'Scholarship decision'}</h1>
+        <p>${ctx.locale === 'vi'
+          ? (ctx.decision === 'approved' ? 'Chúc mừng! Đơn học bổng của bạn đã được duyệt.' : 'Đơn học bổng của bạn chưa được duyệt ở lần này.')
+          : (ctx.decision === 'approved' ? 'Congratulations! Your scholarship application has been approved.' : 'Your scholarship application was not approved at this time.')}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Mã đơn' : 'Application ID', String(ctx.application_id ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Chương trình' : 'Program', String(ctx.program_name ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Kết quả' : 'Decision', String(ctx.decision ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Nếu được duyệt, bạn sẽ nhận email hướng dẫn kích hoạt entitlement.' : 'If approved, you will receive an email with entitlement activation instructions.')}
+        ${ctaButton(`https://edu.${BRAND_DOMAIN}/room`, ctx.locale === 'vi' ? 'Xem đơn của tôi' : 'View my application')}
+      `,
+    }),
+    text: (ctx) => ctx.locale === 'vi'
+      ? `Kết quả đơn học bổng\nMã đơn: ${ctx.application_id ?? ''}\nChương trình: ${ctx.program_name ?? ''}\nKết quả: ${ctx.decision ?? ''}\n\nXem: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`
+      : `Scholarship decision\nApplication ID: ${ctx.application_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\nDecision: ${ctx.decision ?? ''}\n\nView: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`,
+  },
+
+  scholarship_entitlement_granted: {
+    id: 'scholarship_entitlement_granted',
+    category: 'scholarship',
+    subject: (ctx) => ctx.locale === 'vi' ? 'Entitlement học bổng đã cấp — Nguyen AI' : 'Scholarship entitlement granted — Nguyen AI',
+    html: (ctx) => baseHtml({
+      locale: ctx.locale,
+      title: ctx.locale === 'vi' ? 'Entitlement đã cấp' : 'Entitlement granted',
+      preheader: ctx.locale === 'vi' ? 'Bạn đã được cấp quyền lợi học bổng' : 'Your scholarship entitlement has been granted',
+      bodyHtml: `
+        <h1>${ctx.locale === 'vi' ? 'Entitlement học bổng đã được cấp' : 'Scholarship entitlement granted'}</h1>
+        <p>${ctx.locale === 'vi' ? 'Bạn đã được cấp quyền lợi học bổng. Vui lòng kích hoạt trước hạn.' : 'Your scholarship entitlement has been granted. Please activate before the expiry date.'}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Entitlement ID' : 'Entitlement ID', String(ctx.entitlement_id ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Chương trình' : 'Program', String(ctx.program_name ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Cohort' : 'Cohort', String(ctx.cohort_name ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Hết hạn' : 'Expires', String(ctx.expires_at ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Vui lòng không chia sẻ entitlement ID với người khác.' : 'Do not share your entitlement ID with others.')}
+        ${ctaButton(`https://app.${BRAND_DOMAIN}`, ctx.locale === 'vi' ? 'Kích hoạt entitlement' : 'Activate entitlement')}
+      `,
+    }),
+    text: (ctx) => ctx.locale === 'vi'
+      ? `Entitlement học bổng đã cấp\nEntitlement ID: ${ctx.entitlement_id ?? ''}\nChương trình: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nHết hạn: ${ctx.expires_at ?? ''}\n\nKích hoạt: https://app.${BRAND_DOMAIN}\n\n— ${BRAND_NAME}`
+      : `Scholarship entitlement granted\nEntitlement ID: ${ctx.entitlement_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nExpires: ${ctx.expires_at ?? ''}\n\nActivate: https://app.${BRAND_DOMAIN}\n\n— ${BRAND_NAME}`,
   },
 };
 

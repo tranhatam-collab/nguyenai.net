@@ -129,4 +129,6 @@ export {
   listCohorts,
   setRequestContext,
   clearRequestContext,
+  setEmailService,
+  getEmailService,
 } from './service';
