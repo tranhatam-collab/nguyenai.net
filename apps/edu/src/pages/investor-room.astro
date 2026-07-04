@@ -138,6 +138,13 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
   <script>
     const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
 
+    // XSS protection: escape user-provided content before inserting into HTML
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = String(s ?? '');
+      return d.innerHTML;
+    }
+
     async function loadFeed() {
       try {
         const res = await fetch(`${API_BASE}/investor/feed`, { credentials: 'include' });
@@ -157,16 +164,16 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
           <div class="app-card border rounded-lg p-4">
             <div class="flex justify-between items-start mb-2">
               <div>
-                <h3 class="font-semibold">${app.full_name}</h3>
-                <p class="text-sm text-gray-600">${app.program_code} — ${app.email}</p>
+                <h3 class="font-semibold">${esc(app.full_name)}</h3>
+                <p class="text-sm text-gray-600">${esc(app.program_code)} — ${esc(app.email)}</p>
               </div>
-              <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">${app.status}</span>
+              <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">${esc(app.status)}</span>
             </div>
-            <p class="text-sm mb-3 line-clamp-2">${app.wish_text || 'Chưa có nguyện vọng'}</p>
+            <p class="text-sm mb-3 line-clamp-2">${esc(app.wish_text || 'Chưa có nguyện vọng')}</p>
             <div class="flex gap-2">
-              <button onclick="openReview('${app.application_id}')" class="px-3 py-1 text-sm bg-blue-600 text-white rounded">Review</button>
-              <button onclick="openVote('${app.application_id}')" class="px-3 py-1 text-sm bg-purple-600 text-white rounded">Bầu chọn</button>
-              <button onclick="openSponsor('${app.application_id}')" class="px-3 py-1 text-sm bg-green-600 text-white rounded">Tài trợ</button>
+              <button onclick="openReview('${esc(app.application_id)}')" class="px-3 py-1 text-sm bg-blue-600 text-white rounded">Review</button>
+              <button onclick="openVote('${esc(app.application_id)}')" class="px-3 py-1 text-sm bg-purple-600 text-white rounded">Bầu chọn</button>
+              <button onclick="openSponsor('${esc(app.application_id)}')" class="px-3 py-1 text-sm bg-green-600 text-white rounded">Tài trợ</button>
             </div>
           </div>
         `).join('');

@@ -94,6 +94,13 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 
   <script>
     const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+
+    // XSS protection: escape user-provided content before inserting into HTML
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = String(s ?? '');
+      return d.innerHTML;
+    }
     let applicationId = new URLSearchParams(window.location.search).get('id');
 
     // Tab switching
@@ -163,9 +170,9 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
         }
         list.innerHTML = timeline.map(e => `
           <div class="timeline-entry">
-            <div class="font-medium">${e.to_status}</div>
+            <div class="font-medium">${esc(e.to_status)}</div>
             <div class="text-sm text-gray-600">${new Date(e.created_at).toLocaleString('vi-VN')}</div>
-            ${e.reason ? `<div class="text-sm">${e.reason}</div>` : ''}
+            ${e.reason ? `<div class="text-sm">${esc(e.reason)}</div>` : ''}
           </div>
         `).join('');
       } catch (e) { console.error(e); }
@@ -184,9 +191,9 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
         }
         list.innerHTML = messages.map(m => `
           <div class="border rounded p-3 ${m.read ? '' : 'bg-blue-50'}">
-            <div class="font-medium">${m.subject}</div>
-            <div class="text-sm text-gray-600">Từ: ${m.from_role} — ${new Date(m.created_at).toLocaleString('vi-VN')}</div>
-            <div class="mt-2 text-sm">${m.body}</div>
+            <div class="font-medium">${esc(m.subject)}</div>
+            <div class="text-sm text-gray-600">Từ: ${esc(m.from_role)} — ${new Date(m.created_at).toLocaleString('vi-VN')}</div>
+            <div class="mt-2 text-sm">${esc(m.body)}</div>
           </div>
         `).join('');
       } catch (e) { console.error(e); }
@@ -205,9 +212,9 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
         }
         list.innerHTML = documents.map(d => `
           <div class="border rounded p-3">
-            <div class="font-medium">${d.filename}</div>
-            <div class="text-sm text-gray-600">Loại: ${d.type} — ${new Date(d.uploaded_at).toLocaleDateString('vi-VN')}</div>
-            <div class="text-sm">Trạng thái: <span class="font-medium">${d.status}</span></div>
+            <div class="font-medium">${esc(d.filename)}</div>
+            <div class="text-sm text-gray-600">Loại: ${esc(d.type)} — ${new Date(d.uploaded_at).toLocaleDateString('vi-VN')}</div>
+            <div class="text-sm">Trạng thái: <span class="font-medium">${esc(d.status)}</span></div>
           </div>
         `).join('');
       } catch (e) { console.error(e); }
