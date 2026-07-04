@@ -45,6 +45,7 @@ import {
   checkCommandQuota,
   InMemoryEntitlementStore,
   setEntitlementStore,
+  getEntitlementStore,
 } from '@nai/entitlement';
 
 import {
@@ -104,6 +105,17 @@ import {
   deleteMemory,
   type MemoryType,
 } from '@nai/relic';
+import {
+  InMemoryProofStore,
+  setProofStore,
+  getProofStore,
+  generateCertificateId,
+  verifyCertificateId,
+  type Proof,
+  type Certificate,
+  type ReviewerResult,
+  type ReviewDecision,
+} from '@nai/proof';
 
 // Scholarship routes (Sprint 1 — 21 endpoints per EDU_MASTER_PLAN_V4 §XXXV)
 import { scholarshipRoutes } from './scholarship-routes';
@@ -175,6 +187,7 @@ function initStores(env: AppEnv['Bindings']): void {
   }
   setEntitlementStore(new InMemoryEntitlementStore());
   setApprovalStore(new InMemoryApprovalStore());
+  setProofStore(new InMemoryProofStore());
 
   // Phase 3 — initialize LLM platform (prism)
   // Load model registry from product-catalog models.json (bundled at build time)
@@ -279,6 +292,188 @@ app.get('/v1/entitlements', async (c) => {
   const planId = (session.plan_id ?? 'nguyen-start') as PlanId;
   const ent = await resolveEntitlements(session.user_id, session.tenant_id, planId);
   return c.json(ent);
+});
+
+// ============================================================
+// Service-write entitlements — POST /v1/internal/entitlements/{grant,revoke,recalculate}
+// Per ENTITLEMENT_API_RFC §3.3 — service-authenticated only (X-Service-Key + IP allowlist)
+// All write endpoints require idempotency_key (return 400 if missing)
+// ============================================================
+
+const SERVICE_KEY = (env: any): string | null => env?.SERVICE_KEY ?? null;
+// IP allowlist — empty in dev means allow all; production must set
+const SERVICE_IP_ALLOWLIST = (env: any): string[] | null => {
+  const raw: string = env?.SERVICE_IP_ALLOWLIST ?? '';
+  return raw ? raw.split(',').map((s: string) => s.trim()).filter(Boolean) : null;
+};
+
+async function verifyServiceAuth(c: Context): Promise<{ ok: boolean; error?: string; status?: number }> {
+  const key = c.req.header('X-Service-Key');
+  if (!key) return { ok: false, error: 'X-Service-Key header required', status: 401 };
+  const expected = SERVICE_KEY((c as any).env);
+  if (!expected) return { ok: false, error: 'service auth not configured', status: 500 };
+  if (key !== expected) return { ok: false, error: 'invalid service key', status: 401 };
+
+  const allowlist = SERVICE_IP_ALLOWLIST((c as any).env);
+  if (allowlist && allowlist.length > 0) {
+    const ip = c.req.header('CF-Connecting-IP') ?? c.req.header('X-Forwarded-For') ?? '';
+    if (!allowlist.includes(ip)) return { ok: false, error: 'IP not allowed', status: 403 };
+  }
+  return { ok: true };
+}
+
+// Idempotency cache — uses KV in production; in-memory fallback for dev/tests
+const idempotencyCache = new Map<string, { result: unknown; status: number; expires_at: number }>();
+
+async function checkIdempotency(key: string): Promise<{ result: unknown; status: number } | null> {
+  const cached = idempotencyCache.get(key);
+  if (cached && cached.expires_at > Date.now()) {
+    return { result: cached.result, status: cached.status };
+  }
+  if (cached) idempotencyCache.delete(key);
+  return null;
+}
+
+async function storeIdempotency(key: string, result: unknown, status: number): Promise<void> {
+  // 24h retention
+  idempotencyCache.set(key, { result, status, expires_at: Date.now() + 24 * 60 * 60 * 1000 });
+}
+
+app.post('/v1/internal/entitlements/grant', async (c) => {
+  const auth = await verifyServiceAuth(c);
+  if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+
+  const body = await c.req.json().catch(() => ({}));
+  const { user_id, entitlement_key, value, source, idempotency_key, reason } = body ?? {};
+  if (!user_id || !entitlement_key) {
+    return c.json({ error: 'user_id and entitlement_key required' }, 400);
+  }
+  if (!idempotency_key) {
+    return c.json({ error: 'idempotency_key required (per ENTITLEMENT_API_RFC §5)' }, 400);
+  }
+
+  // Idempotency check
+  const cached = await checkIdempotency(`grant:${idempotency_key}`);
+  if (cached) return c.json(cached.result, cached.status as any);
+
+  const store = getEntitlementStore();
+  const existing = await store.getEntitlements(user_id, '');
+  const alreadyGranted = existing.find(
+    (r) => r.key === entitlement_key && r.value === value && r.revoked_at === null
+  );
+  if (alreadyGranted) {
+    const result = { entitlement_id: alreadyGranted.entitlement_id, granted_at: alreadyGranted.granted_at, already_granted: true };
+    await storeIdempotency(`grant:${idempotency_key}`, result, 200);
+    return c.json(result, 200);
+  }
+
+  const entitlementId = await store.grant({
+    user_id,
+    tenant_id: '',
+    key: entitlement_key,
+    value,
+    source: source ?? 'service',
+    granted_by: 'service',
+    granted_at: new Date().toISOString(),
+    expires_at: null,
+    revoked_at: null,
+  } as any);
+
+  await logAuditEvent({
+    user_id,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'entitlement_granted',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `entitlement:${entitlementId}`,
+    result: 'success',
+    metadata: { entitlement_key, value, source, reason, idempotency_key },
+  });
+
+  const result = { entitlement_id: entitlementId, granted_at: new Date().toISOString() };
+  await storeIdempotency(`grant:${idempotency_key}`, result, 200);
+  return c.json(result, 200);
+});
+
+app.post('/v1/internal/entitlements/revoke', async (c) => {
+  const auth = await verifyServiceAuth(c);
+  if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+
+  const body = await c.req.json().catch(() => ({}));
+  const { user_id, entitlement_key, revoked_by, reason, idempotency_key } = body ?? {};
+  if (!user_id || !entitlement_key) {
+    return c.json({ error: 'user_id and entitlement_key required' }, 400);
+  }
+  if (!idempotency_key) {
+    return c.json({ error: 'idempotency_key required (per ENTITLEMENT_API_RFC §5)' }, 400);
+  }
+
+  const cached = await checkIdempotency(`revoke:${idempotency_key}`);
+  if (cached) return c.json(cached.result, cached.status as any);
+
+  const store = getEntitlementStore();
+  const existing = await store.getEntitlements(user_id, '');
+  const target = existing.find((r) => r.key === entitlement_key && r.revoked_at === null);
+  if (!target) {
+    const result = { error: 'not_found' };
+    await storeIdempotency(`revoke:${idempotency_key}`, result, 404);
+    return c.json(result, 404);
+  }
+
+  await store.revoke(target.entitlement_id, revoked_by ?? 'service');
+
+  await logAuditEvent({
+    user_id,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'entitlement_revoked',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `entitlement:${target.entitlement_id}`,
+    result: 'success',
+    metadata: { entitlement_key, revoked_by, reason, idempotency_key },
+  });
+
+  const result = { revoked_at: new Date().toISOString() };
+  await storeIdempotency(`revoke:${idempotency_key}`, result, 200);
+  return c.json(result, 200);
+});
+
+app.post('/v1/internal/entitlements/recalculate', async (c) => {
+  const auth = await verifyServiceAuth(c);
+  if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+
+  const body = await c.req.json().catch(() => ({}));
+  const { user_id, trigger, idempotency_key } = body ?? {};
+  if (!user_id) return c.json({ error: 'user_id required' }, 400);
+  if (!idempotency_key) {
+    return c.json({ error: 'idempotency_key required (per ENTITLEMENT_API_RFC §5)' }, 400);
+  }
+
+  const cached = await checkIdempotency(`recalc:${idempotency_key}`);
+  if (cached) return c.json(cached.result, cached.status as any);
+
+  // Recalculation: re-resolve entitlements from plan (no-op if no plan change)
+  // For now, this is a placeholder that records the trigger and returns empty changes
+  // Production should re-read plan from org membership and diff against current entitlements
+  const changes: unknown[] = [];
+
+  await logAuditEvent({
+    user_id,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'entitlement_recalculated',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `user:${user_id}`,
+    result: 'success',
+    metadata: { trigger, changes_count: changes.length, idempotency_key },
+  });
+
+  const result = { recalculated_at: new Date().toISOString(), changes };
+  await storeIdempotency(`recalc:${idempotency_key}`, result, 200);
+  return c.json(result, 200);
 });
 
 // ============================================================
@@ -1043,5 +1238,408 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
 // ============================================================
 
 app.route('/v1/scholarship', scholarshipRoutes);
+
+// ============================================================
+// Proof & Certification — 8 endpoints per PROOF_AND_CERTIFICATION_RFC §3
+// ============================================================
+
+// POST /v1/me/proofs — submit proof (session + academy.pass/preview)
+app.post('/v1/me/proofs', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const { program_id, evidence_refs, attempt_id } = await c.req.json().catch(() => ({}));
+  if (!program_id || !Array.isArray(evidence_refs)) {
+    return c.json({ error: 'program_id and evidence_refs[] required' }, 400);
+  }
+
+  const store = getProofStore();
+  const proofId = await store.createProof({
+    proof_id: '',
+    user_id: session.user_id,
+    program_id,
+    attempt_id: attempt_id ?? null,
+    submitted_at: new Date().toISOString(),
+    evidence_refs,
+    rubric_scores: null,
+    ai_review: null,
+    human_review: null,
+    certificate_id: null,
+  });
+
+  await logAuditEvent({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    session_id: session.session_id,
+    event_type: 'proof_submitted' as any,
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `proof:${proofId}`,
+    result: 'success',
+    metadata: { program_id, evidence_refs_count: evidence_refs.length },
+  });
+
+  return c.json({ proof_id: proofId, status: 'submitted' }, 201);
+});
+
+// GET /v1/me/proofs — list user's proofs
+app.get('/v1/me/proofs', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const store = getProofStore();
+  const proofs = await store.getProofsByUser(session.user_id);
+  return c.json({
+    proofs: proofs.map((p) => ({
+      proof_id: p.proof_id,
+      program_id: p.program_id,
+      status: p.status,
+      submitted_at: p.submitted_at,
+    })),
+  });
+});
+
+// GET /v1/me/proofs/:proof_id — get proof detail
+app.get('/v1/me/proofs/:proof_id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const proofId = c.req.param('proof_id');
+  const store = getProofStore();
+  const proof = await store.getProof(proofId);
+  if (!proof) return c.json({ error: 'not found' }, 404);
+  if (proof.user_id !== session.user_id) return c.json({ error: 'forbidden' }, 403);
+
+  return c.json({
+    proof_id: proof.proof_id,
+    status: proof.status,
+    rubric_scores: proof.rubric_scores,
+    ai_review: proof.ai_review,
+    human_review: proof.human_review,
+    certificate_id: proof.certificate_id,
+  });
+});
+
+// GET /v1/me/certificates — list user's certificates
+app.get('/v1/me/certificates', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const store = getProofStore();
+  const certs = await store.getCertificatesByUser(session.user_id);
+  return c.json({
+    certificates: certs.map((cert) => ({
+      certificate_id: cert.certificate_id,
+      program_id: cert.program_id,
+      issued_at: cert.issued_at,
+      status: cert.status,
+    })),
+  });
+});
+
+// GET /v1/review/queue — reviewer: list pending proofs
+app.get('/v1/review/queue', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  // TODO: check reviewer.certified permission — for now any authenticated user
+  // Production: check session.permissions includes 'reviewer.certified'
+
+  const store = getProofStore();
+  const queue = await store.getReviewQueue();
+  return c.json({
+    queue: queue.map((p) => ({
+      proof_id: p.proof_id,
+      user_id: p.user_id,
+      program_id: p.program_id,
+      submitted_at: p.submitted_at,
+      ai_review: p.ai_review,
+    })),
+  });
+});
+
+// POST /v1/review/:proof_id/decision — reviewer: approve/reject/request_changes
+app.post('/v1/review/:proof_id/decision', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const proofId = c.req.param('proof_id');
+  const { decision, scores, notes } = await c.req.json().catch(() => ({}));
+  if (!decision || !['approve', 'reject', 'request_changes'].includes(decision)) {
+    return c.json({ error: 'decision must be approve|reject|request_changes' }, 400);
+  }
+
+  const store = getProofStore();
+  const proof = await store.getProof(proofId);
+  if (!proof) return c.json({ error: 'proof not found' }, 404);
+
+  const review: ReviewerResult = {
+    reviewer_id: session.user_id,
+    reviewer_type: 'human',
+    reviewed_at: new Date().toISOString(),
+    decision: decision as ReviewDecision,
+    scores: scores ?? {},
+    notes: notes ?? '',
+  };
+
+  await store.recordReview(proofId, review);
+
+  let certificateId: string | null = null;
+  if (decision === 'approve') {
+    // Issue certificate
+    const year = new Date().getFullYear();
+    const sequence = await store.getNextSequence(proof.program_id, year);
+    certificateId = await store.issueCertificate({
+      user_id: proof.user_id,
+      program_id: proof.program_id,
+      proof_id: proofId,
+      issued_by: session.user_id,
+      public_visible: true,
+      user_display_name: null,
+      program: proof.program_id,
+      year,
+      sequence,
+    });
+
+    // Link certificate to proof
+    await store.updateProofStatus(proofId, 'approved', { certificate_id: certificateId });
+
+    await logAuditEvent({
+      user_id: session.user_id,
+      tenant_id: session.tenant_id,
+      session_id: session.session_id,
+      event_type: 'certificate_issued' as any,
+      actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+      user_agent: c.req.header('User-Agent') ?? null,
+      target: `certificate:${certificateId}`,
+      result: 'success',
+      metadata: { proof_id: proofId, program_id: proof.program_id, recipient_user_id: proof.user_id },
+    });
+  }
+
+  return c.json({ proof_id: proofId, decision, certificate_id: certificateId });
+});
+
+// GET /v1/certificates/:certificate_id — public verification (no auth, no PII)
+app.get('/v1/certificates/:certificate_id', async (c) => {
+  const certificateId = c.req.param('certificate_id');
+
+  // Verify format
+  if (!verifyCertificateId(certificateId)) {
+    return c.json({ error: 'invalid certificate ID format' }, 400);
+  }
+
+  const store = getProofStore();
+  const cert = await store.getCertificate(certificateId);
+  if (!cert) return c.json({ error: 'not_found' }, 404);
+  if (!cert.public_visible) return c.json({ error: 'not_found' }, 404);
+
+  // Public response — NO PII (per RFC §2.10)
+  return c.json({
+    certificate_id: cert.certificate_id,
+    program_id: cert.program_id,
+    issued_at: cert.issued_at,
+    status: cert.status,
+    user_display_name: cert.user_display_name,
+  }, 200, {
+    'Cache-Control': 'public, max-age=3600', // CDN cache 1 hour per RFC
+  });
+});
+
+// POST /v1/internal/certificates/:certificate_id/revoke — admin/service only
+app.post('/v1/internal/certificates/:certificate_id/revoke', async (c) => {
+  const auth = await verifyServiceAuth(c);
+  if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+
+  const certificateId = c.req.param('certificate_id');
+  const { reason, revoked_by } = await c.req.json().catch(() => ({}));
+  if (!reason || reason.length < 20) {
+    return c.json({ error: 'reason required (min 20 chars) per RFC §2.9' }, 400);
+  }
+
+  const store = getProofStore();
+  const cert = await store.getCertificate(certificateId);
+  if (!cert) return c.json({ error: 'not_found' }, 404);
+  if (cert.status === 'revoked') return c.json({ error: 'already revoked' }, 409);
+
+  await store.revokeCertificate(certificateId, reason, revoked_by ?? 'service');
+
+  await logAuditEvent({
+    user_id: revoked_by ?? 'service',
+    tenant_id: '',
+    session_id: null,
+    event_type: 'certificate_revoked' as any,
+    actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `certificate:${certificateId}`,
+    result: 'success',
+    metadata: { reason, revoked_by },
+  });
+
+  return c.json({ revoked_at: new Date().toISOString() });
+});
+
+// ============================================================
+// Investor private room — 5 endpoints per INVESTOR_ACCESS_POLICY §9-11
+// All require session + invest:private-read permission + audit
+// ============================================================
+
+// GET /v1/investor/me — current investor's access grant + scopes
+app.get('/v1/investor/me', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  if (!session.permissions.includes('invest:private-read')) {
+    return c.json({ error: 'forbidden — no investor access' }, 403);
+  }
+
+  // TODO: load investor_grant from store — placeholder returns session-derived data
+  return c.json({
+    user_id: session.user_id,
+    permissions: session.permissions.filter((p: string) => p.startsWith('invest:')),
+    grant: {
+      grant_id: `grant-${session.user_id}`,
+      room_scope: session.permissions.filter((p: string) => p.startsWith('invest:') && p !== 'invest:private-read'),
+      expires_at: null, // TODO: load from investor grant store
+      suspended: false,
+    },
+  });
+});
+
+// GET /v1/investor/documents — list private documents available to this investor
+app.get('/v1/investor/documents', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  if (!session.permissions.includes('invest:private-read')) {
+    return c.json({ error: 'forbidden — no investor access' }, 403);
+  }
+
+  // TODO: load from document store — placeholder returns static list
+  const documents = [
+    { document_id: 'cap-table-2026-q3', name: 'Cap Table 2026 Q3', scope: 'cap-table', size_bytes: 245678, updated_at: '2026-07-01T00:00:00Z' },
+    { document_id: 'financial-model-2026', name: 'Financial Model 2026', scope: 'invest:financial-read', size_bytes: 1892344, updated_at: '2026-07-02T00:00:00Z' },
+    { document_id: 'contracts-index', name: 'Contracts Index', scope: 'contracts', size_bytes: 45123, updated_at: '2026-06-15T00:00:00Z' },
+    { document_id: 'ip-portfolio', name: 'IP Portfolio', scope: 'ip', size_bytes: 234567, updated_at: '2026-06-20T00:00:00Z' },
+  ];
+
+  // Filter by user's scopes (room_scope strings, not Permission type)
+  const userPerms: string[] = session.permissions as string[];
+  const visibleDocs = documents.filter((d) => {
+    if (d.scope === 'cap-table') return userPerms.includes('cap-table');
+    if (d.scope === 'invest:financial-read') return userPerms.includes('invest:financial-read');
+    if (d.scope === 'contracts') return userPerms.includes('contracts');
+    if (d.scope === 'ip') return userPerms.includes('ip');
+    return false;
+  });
+
+  return c.json({ documents: visibleDocs });
+});
+
+// GET /v1/investor/documents/:document_id/download — download private document
+// Per INVESTOR_ACCESS_POLICY §8: requires invest:download permission + audit
+app.get('/v1/investor/documents/:document_id/download', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  if (!session.permissions.includes('invest:private-read')) {
+    return c.json({ error: 'forbidden — no investor access' }, 403);
+  }
+  if (!session.permissions.includes('invest:download')) {
+    return c.json({ error: 'forbidden — no download permission' }, 403);
+  }
+
+  const documentId = c.req.param('document_id');
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Audit the download (per §8: every document download must be audited)
+  await logAuditEvent({
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    session_id: session.session_id,
+    event_type: 'investor_document_downloaded' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `document:${documentId}`,
+    result: 'success',
+    metadata: { document_id: documentId, ip },
+  });
+
+  // TODO: stream actual document from R2 — placeholder returns signed URL
+  return c.json({
+    document_id: documentId,
+    download_url: `https://r2.nguyenai.net/private/${documentId}?token=placeholder`,
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
 
 export default app;

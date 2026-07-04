@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@astrojs/cloudflare':
+      specifier: ^11.2.0
+      version: 11.2.0
     '@cloudflare/workers-types':
       specifier: ^4.20260629.1
       version: 4.20260629.1
@@ -67,6 +70,9 @@ importers:
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
+      '@nai/proof':
+        specifier: workspace:*
+        version: link:../../packages/@nai/proof
       '@nai/relic':
         specifier: workspace:*
         version: link:../../packages/@nai/relic
@@ -200,6 +206,9 @@ importers:
 
   apps/invest:
     dependencies:
+      '@astrojs/cloudflare':
+        specifier: 'catalog:'
+        version: 11.2.0(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.5(astro@4.16.19(@types/node@22.20.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@5.9.3))(tailwindcss@3.4.19(tsx@4.22.4)(yaml@2.9.0))
@@ -506,6 +515,15 @@ importers:
         version: 4.22.4
       typescript:
         specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/@nai/proof:
+    devDependencies:
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.6.0
         version: 5.9.3
 
   packages/@nai/provenance: {}

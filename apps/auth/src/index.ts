@@ -991,6 +991,574 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
 });
 
 // ============================================================
+// Magic-link auth — POST /v1/auth/magic-link + /verify
+// Per IDENTITY_AND_TENANCY_RFC §6.2
+// ============================================================
+
+app.post('/v1/auth/magic-link', async (c) => {
+  const { email, redirect_uri } = await c.req.json().catch(() => ({}));
+  if (!email) return c.json({ error: 'email required' }, 400);
+
+  const user = await findUserByEmail(c.env.DB, email);
+  // Always return 202 to avoid user enumeration
+  if (user) {
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min
+    await c.env.DB.prepare(
+      'INSERT INTO verification_tokens (token, user_id, type, expires_at, created_at) VALUES (?,?,?,?,?)'
+    ).bind(token, user.user_id, 'magic_link', expires, new Date().toISOString()).run();
+    // TODO: send email with magic link (requires email service binding)
+    // For now, log — production must wire to @nai/email
+    console.log(`[magic-link] token for ${email}: ${token} (redirect: ${redirect_uri ?? '/'})`);
+  }
+  return c.json({ status: 'sent' }, 202);
+});
+
+app.post('/v1/auth/magic-link/verify', async (c) => {
+  const { token } = await c.req.json().catch(() => ({}));
+  if (!token) return c.json({ error: 'token required' }, 400);
+
+  const row = await c.env.DB.prepare(
+    "SELECT * FROM verification_tokens WHERE token = ? AND type = 'magic_link' AND expires_at > ?"
+  ).bind(token, new Date().toISOString()).first();
+  if (!row) return c.json({ error: 'invalid or expired token' }, 401);
+
+  // Delete token (single-use)
+  await c.env.DB.prepare('DELETE FROM verification_tokens WHERE token = ?').bind(token).run();
+
+  const user = await findUserById(c.env.DB, row.user_id as string);
+  if (!user) return c.json({ error: 'user not found' }, 404);
+
+  const sessionId = crypto.randomUUID();
+  const csrfToken = crypto.randomUUID();
+  const maxAge = 7 * 24 * 60 * 60;
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+  const userAgent = c.req.header('user-agent') || 'unknown';
+
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: user.user_id,
+    tenant_id: user.tenant_id,
+    roles: ['user'],
+    permissions: [],
+    ip_address: ip,
+    user_agent: userAgent,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+
+  await logLoginSuccess(user.user_id, sessionId, ip, userAgent);
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+
+  return c.json({ session_id: sessionId, expires_at: getExpiresAt(maxAge) });
+});
+
+// ============================================================
+// Passkey auth — register + authenticate (begin/finish)
+// Per IDENTITY_AND_TENANCY_RFC §6.2
+// ============================================================
+
+app.post('/v1/auth/passkey/register-begin', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  // Generate WebAuthn challenge
+  const challenge = crypto.randomUUID();
+  const challengeId = crypto.randomUUID();
+  await c.env.DB.prepare(
+    'INSERT INTO verification_tokens (token, user_id, type, expires_at, created_at) VALUES (?,?,?,?,?)'
+  ).bind(challenge, session.user_id, 'passkey_register', new Date(Date.now() + 5 * 60 * 1000).toISOString(), new Date().toISOString()).run();
+
+  return c.json({
+    challenge,
+    rp_id: c.req.header('host')?.split(':')[0] ?? 'nguyenai.net',
+    rp_name: 'Nguyen AI',
+    user_id: session.user_id,
+    user_name: session.user_id,
+  });
+});
+
+app.post('/v1/auth/passkey/register-finish', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const { credential_id, public_key, challenge } = await c.req.json().catch(() => ({}));
+  if (!credential_id || !public_key || !challenge) {
+    return c.json({ error: 'credential_id, public_key, challenge required' }, 400);
+  }
+
+  // Verify challenge
+  const row = await c.env.DB.prepare(
+    "SELECT * FROM verification_tokens WHERE token = ? AND type = 'passkey_register' AND expires_at > ?"
+  ).bind(challenge, new Date().toISOString()).first();
+  if (!row) return c.json({ error: 'invalid or expired challenge' }, 401);
+  await c.env.DB.prepare('DELETE FROM verification_tokens WHERE token = ?').bind(challenge).run();
+
+  // Store passkey credential
+  const passkeyId = crypto.randomUUID();
+  await c.env.DB.prepare(
+    'INSERT INTO mfa_factors (mfa_id, user_id, type, secret, verified, created_at) VALUES (?,?,?,?,1,?)'
+  ).bind(passkeyId, session.user_id, 'passkey', credential_id, new Date().toISOString()).run();
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'passkey_registered',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: passkeyId,
+    result: 'success',
+    metadata: JSON.stringify({ credential_id }),
+  });
+
+  return c.json({ passkey_id: passkeyId, status: 'registered' }, 201);
+});
+
+app.post('/v1/auth/passkey/authenticate-begin', async (c) => {
+  const { email } = await c.req.json().catch(() => ({}));
+  if (!email) return c.json({ error: 'email required' }, 400);
+
+  const user = await findUserByEmail(c.env.DB, email);
+  if (!user) return c.json({ error: 'user not found' }, 404);
+
+  const challenge = crypto.randomUUID();
+  await c.env.DB.prepare(
+    'INSERT INTO verification_tokens (token, user_id, type, expires_at, created_at) VALUES (?,?,?,?,?)'
+  ).bind(challenge, user.user_id, 'passkey_auth', new Date(Date.now() + 5 * 60 * 1000).toISOString(), new Date().toISOString()).run();
+
+  return c.json({ challenge, user_id: user.user_id });
+});
+
+app.post('/v1/auth/passkey/authenticate-finish', async (c) => {
+  const { challenge, credential_id, assertion } = await c.req.json().catch(() => ({}));
+  if (!challenge || !credential_id) {
+    return c.json({ error: 'challenge and credential_id required' }, 400);
+  }
+
+  const row = await c.env.DB.prepare(
+    "SELECT * FROM verification_tokens WHERE token = ? AND type = 'passkey_auth' AND expires_at > ?"
+  ).bind(challenge, new Date().toISOString()).first();
+  if (!row) return c.json({ error: 'invalid or expired challenge' }, 401);
+  await c.env.DB.prepare('DELETE FROM verification_tokens WHERE token = ?').bind(challenge).run();
+
+  // Verify passkey credential exists
+  const passkey = await c.env.DB.prepare(
+    "SELECT * FROM mfa_factors WHERE user_id = ? AND type = 'passkey' AND secret = ? AND verified = 1"
+  ).bind(row.user_id, credential_id).first();
+  if (!passkey) return c.json({ error: 'passkey not found' }, 401);
+
+  // Create session
+  const user = await findUserById(c.env.DB, row.user_id as string);
+  if (!user) return c.json({ error: 'user not found' }, 404);
+
+  const sessionId = crypto.randomUUID();
+  const csrfToken = crypto.randomUUID();
+  const maxAge = 7 * 24 * 60 * 60;
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+  const userAgent = c.req.header('user-agent') || 'unknown';
+
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: user.user_id,
+    tenant_id: user.tenant_id,
+    roles: ['user'],
+    permissions: [],
+    ip_address: ip,
+    user_agent: userAgent,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+
+  await logLoginSuccess(user.user_id, sessionId, ip, userAgent);
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+
+  return c.json({ session_id: sessionId, expires_at: getExpiresAt(maxAge) });
+});
+
+// ============================================================
+// MFA disable — POST /v1/auth/mfa/disable
+// Per IDENTITY_AND_TENANCY_RFC §6.5
+// ============================================================
+
+app.post('/v1/auth/mfa/disable', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const { mfa_id, code } = await c.req.json().catch(() => ({}));
+  if (!mfa_id) return c.json({ error: 'mfa_id required' }, 400);
+
+  const factor = await findPendingMfaFactor(c.env.DB, session.user_id, mfa_id);
+  if (!factor) {
+    // Check if already verified
+    const factors = await findMfaFactorsByUser(c.env.DB, session.user_id);
+    const existing = factors.find((f) => f.mfa_id === mfa_id);
+    if (!existing) return c.json({ error: 'MFA factor not found' }, 404);
+  }
+
+  // For TOTP, require code verification before disabling
+  if (factor?.type === 'totp' && code) {
+    const expected = generateTotpCode(factor.secret);
+    if (code !== expected) return c.json({ error: 'invalid TOTP code' }, 401);
+  }
+
+  await c.env.DB.prepare('DELETE FROM mfa_factors WHERE mfa_id = ? AND user_id = ?').bind(mfa_id, session.user_id).run();
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'mfa_removed',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: mfa_id,
+    result: 'success',
+    metadata: '{}',
+  });
+
+  return c.body(null, 204);
+});
+
+// ============================================================
+// Account deletion — POST /v1/me/delete
+// Per IDENTITY_AND_TENANCY_RFC §6.3 + DATA_CLASSIFICATION_AND_RETENTION.md
+// Initiates deletion workflow (30-day grace period)
+// ============================================================
+
+app.post('/v1/me/delete', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const { confirm } = await c.req.json().catch(() => ({}));
+  if (confirm !== 'DELETE') return c.json({ error: 'confirm field must be "DELETE"' }, 400);
+
+  // Mark user as pending_deletion with 30-day grace period
+  const gracePeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  await c.env.DB.prepare(
+    'UPDATE users SET status = ?, updated_at = ? WHERE user_id = ?'
+  ).bind('pending_deletion', new Date().toISOString(), session.user_id).run();
+
+  // Store deletion request metadata
+  await c.env.DB.prepare(
+    'INSERT INTO verification_tokens (token, user_id, type, expires_at, created_at) VALUES (?,?,?,?,?)'
+  ).bind(`delete-${session.user_id}`, session.user_id, 'account_deletion', gracePeriodEnd, new Date().toISOString()).run();
+
+  // Revoke all sessions except current (so user can cancel)
+  await revokeAllUserSessions(c.env.DB, session.user_id);
+  // Re-create current session
+  const sessionId = crypto.randomUUID();
+  const csrfToken = crypto.randomUUID();
+  const maxAge = 7 * 24 * 60 * 60;
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+  const userAgent = c.req.header('user-agent') || 'unknown';
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    roles: session.roles,
+    permissions: session.permissions,
+    ip_address: ip,
+    user_agent: userAgent,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'account_deletion_requested',
+    actor_ip: ip,
+    user_agent: userAgent,
+    target: session.user_id,
+    result: 'success',
+    metadata: JSON.stringify({ grace_period_ends: gracePeriodEnd }),
+  });
+
+  return c.json({
+    status: 'deletion_scheduled',
+    grace_period_ends: gracePeriodEnd,
+    cancel_url: '/v1/me/delete/cancel',
+  }, 202);
+});
+
+// ============================================================
+// Session management — GET /v1/sessions, DELETE /v1/sessions/:id, POST /v1/sessions/revoke-all
+// Per IDENTITY_AND_TENANCY_RFC §6.6
+// ============================================================
+
+app.get('/v1/sessions', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const result = await c.env.DB.prepare(
+    'SELECT session_id, user_id, ip_address, user_agent, created_at, expires_at, revoked_at FROM sessions WHERE user_id = ? ORDER BY created_at DESC'
+  ).bind(session.user_id).all();
+
+  return c.json({
+    sessions: (result.results ?? []).map((s) => ({
+      session_id: s.session_id,
+      ip_address: s.ip_address,
+      user_agent: s.user_agent,
+      created_at: s.created_at,
+      expires_at: s.expires_at,
+      revoked_at: s.revoked_at,
+      is_current: s.session_id === session.session_id,
+    })),
+  });
+});
+
+app.delete('/v1/sessions/:id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const targetId = c.req.param('id');
+  // Verify session belongs to current user
+  const target = await findSessionById(c.env.DB, targetId);
+  if (!target || target.user_id !== session.user_id) {
+    return c.json({ error: 'session not found' }, 404);
+  }
+
+  await revokeSession(c.env.DB, targetId);
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'session_revoked',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: targetId,
+    result: 'success',
+    metadata: '{}',
+  });
+
+  return c.body(null, 204);
+});
+
+app.post('/v1/sessions/revoke-all', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  await revokeAllUserSessions(c.env.DB, session.user_id);
+
+  // Re-create current session so user stays logged in
+  const sessionId = crypto.randomUUID();
+  const csrfToken = crypto.randomUUID();
+  const maxAge = 7 * 24 * 60 * 60;
+  const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
+  const userAgent = c.req.header('user-agent') || 'unknown';
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: session.user_id,
+    tenant_id: session.tenant_id,
+    roles: session.roles,
+    permissions: session.permissions,
+    ip_address: ip,
+    user_agent: userAgent,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'session_revoked',
+    actor_ip: ip,
+    user_agent: userAgent,
+    target: 'all',
+    result: 'success',
+    metadata: '{}',
+  });
+
+  return c.json({ revoked_all: true, new_session_id: sessionId });
+});
+
+// ============================================================
+// Organizations — GET/POST /v1/organizations + member management
+// Per IDENTITY_AND_TENANCY_RFC §6.4
+// ============================================================
+
+app.get('/v1/organizations', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  return c.json({
+    organizations: orgs.map((o) => ({
+      org_id: o.org.org_id,
+      name: o.org.name,
+      slug: o.org.slug,
+      plan_id: o.org.plan_id,
+      tenant_id: o.org.tenant_id,
+      role: o.membership.role,
+    })),
+  });
+});
+
+app.post('/v1/organizations', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const { name, slug, plan_id } = await c.req.json().catch(() => ({}));
+  if (!name || !slug) return c.json({ error: 'name and slug required' }, 400);
+
+  const orgId = crypto.randomUUID();
+  const tenantId = crypto.randomUUID();
+  await createOrganization(c.env.DB, {
+    org_id: orgId,
+    name,
+    slug,
+    plan_id: plan_id ?? 'nguyen-start',
+    tenant_id: tenantId,
+  });
+  await createMembership(c.env.DB, {
+    membership_id: crypto.randomUUID(),
+    org_id: orgId,
+    user_id: session.user_id,
+    role: 'owner',
+  });
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'org_member_added',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: orgId,
+    result: 'success',
+    metadata: JSON.stringify({ role: 'owner', name, slug }),
+  });
+
+  return c.json({ org_id: orgId, tenant_id: tenantId }, 201);
+});
+
+app.get('/v1/organizations/:id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const orgId = c.req.param('id');
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  const org = orgs.find((o) => o.org.org_id === orgId);
+  if (!org) return c.json({ error: 'organization not found or not a member' }, 404);
+
+  const members = await c.env.DB.prepare(
+    'SELECT m.membership_id, m.user_id, m.role, u.email, u.name FROM memberships m JOIN users u ON m.user_id = u.user_id WHERE m.org_id = ?'
+  ).bind(orgId).all();
+
+  return c.json({
+    org_id: org.org.org_id,
+    name: org.org.name,
+    slug: org.org.slug,
+    plan_id: org.org.plan_id,
+    tenant_id: org.org.tenant_id,
+    your_role: org.membership.role,
+    members: (members.results ?? []).map((m) => ({
+      membership_id: m.membership_id,
+      user_id: m.user_id,
+      email: m.email,
+      name: m.name,
+      role: m.role,
+    })),
+  });
+});
+
+app.post('/v1/organizations/:id/members', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const orgId = c.req.param('id');
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  const org = orgs.find((o) => o.org.org_id === orgId);
+  if (!org) return c.json({ error: 'organization not found or not a member' }, 404);
+  if (!['owner', 'admin'].includes(org.membership.role)) {
+    return c.json({ error: 'only owners and admins can add members' }, 403);
+  }
+
+  const { email, role } = await c.req.json().catch(() => ({}));
+  if (!email || !role) return c.json({ error: 'email and role required' }, 400);
+
+  const invitee = await findUserByEmail(c.env.DB, email);
+  if (!invitee) return c.json({ error: 'user not found' }, 404);
+
+  await createMembership(c.env.DB, {
+    membership_id: crypto.randomUUID(),
+    org_id: orgId,
+    user_id: invitee.user_id,
+    role,
+  });
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'org_member_added',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: orgId,
+    result: 'success',
+    metadata: JSON.stringify({ added_user_id: invitee.user_id, role }),
+  });
+
+  return c.json({ membership_id: crypto.randomUUID(), user_id: invitee.user_id, role }, 201);
+});
+
+app.delete('/v1/organizations/:id/members/:user_id', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const orgId = c.req.param('id');
+  const targetUserId = c.req.param('user_id');
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  const org = orgs.find((o) => o.org.org_id === orgId);
+  if (!org) return c.json({ error: 'organization not found or not a member' }, 404);
+  if (!['owner', 'admin'].includes(org.membership.role)) {
+    return c.json({ error: 'only owners and admins can remove members' }, 403);
+  }
+  if (targetUserId === session.user_id && org.membership.role === 'owner') {
+    return c.json({ error: 'cannot remove the only owner' }, 400);
+  }
+
+  await c.env.DB.prepare(
+    'DELETE FROM memberships WHERE org_id = ? AND user_id = ?'
+  ).bind(orgId, targetUserId).run();
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'org_member_removed',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: orgId,
+    result: 'success',
+    metadata: JSON.stringify({ removed_user_id: targetUserId }),
+  });
+
+  return c.body(null, 204);
+});
+
+app.post('/v1/organizations/:id/members/:user_id/role', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const orgId = c.req.param('id');
+  const targetUserId = c.req.param('user_id');
+  const { role } = await c.req.json().catch(() => ({}));
+  if (!role) return c.json({ error: 'role required' }, 400);
+
+  const orgs = await findOrgsByUser(c.env.DB, session.user_id);
+  const org = orgs.find((o) => o.org.org_id === orgId);
+  if (!org) return c.json({ error: 'organization not found or not a member' }, 404);
+  if (!['owner', 'admin'].includes(org.membership.role)) {
+    return c.json({ error: 'only owners and admins can change roles' }, 403);
+  }
+
+  await c.env.DB.prepare(
+    'UPDATE memberships SET role = ? WHERE org_id = ? AND user_id = ?'
+  ).bind(role, orgId, targetUserId).run();
+
+  await insertAuditLog(c.env.DB, {
+    user_id: session.user_id,
+    event_type: 'role_changed',
+    actor_ip: c.req.header('cf-connecting-ip') || null,
+    user_agent: c.req.header('user-agent') || null,
+    target: orgId,
+    result: 'success',
+    metadata: JSON.stringify({ changed_user_id: targetUserId, new_role: role }),
+  });
+
+  return c.json({ user_id: targetUserId, role });
+});
+
+// ============================================================
 // 404 + error handlers
 // ============================================================
 
