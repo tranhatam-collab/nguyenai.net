@@ -127,4 +127,6 @@ export {
   getEntitlementEvents,
   createCohort,
   listCohorts,
+  setRequestContext,
+  clearRequestContext,
 } from './service';

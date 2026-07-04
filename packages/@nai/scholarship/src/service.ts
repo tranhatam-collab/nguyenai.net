@@ -15,6 +15,36 @@
 
 import { getScholarshipStore, type ScholarshipStore } from './store';
 import { logAuditEvent } from '@nai/audit';
+
+// ============================================================
+// Request context — carries IP + User-Agent for audit logging
+// ============================================================
+
+export interface RequestContext {
+  actor_ip: string | null;
+  user_agent: string | null;
+  session_id: string | null;
+}
+
+let currentContext: RequestContext = { actor_ip: null, user_agent: null, session_id: null };
+
+export function setRequestContext(ctx: Partial<RequestContext>): void {
+  currentContext = { ...currentContext, ...ctx };
+}
+
+export function clearRequestContext(): void {
+  currentContext = { actor_ip: null, user_agent: null, session_id: null };
+}
+
+// Internal wrapper that injects current context into audit events
+async function audit(event: Parameters<typeof logAuditEvent>[0]): Promise<string> {
+  return logAuditEvent({
+    ...event,
+    actor_ip: event.actor_ip ?? currentContext.actor_ip,
+    user_agent: event.user_agent ?? currentContext.user_agent,
+    session_id: event.session_id ?? currentContext.session_id,
+  });
+}
 import type {
   ScholarshipApplication,
   IdentityVerification,
@@ -82,7 +112,7 @@ export async function createApplication(
     submitted_at: null,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'scholarship_application_created',
@@ -111,7 +141,7 @@ export async function updateApplication(
 
   await store.updateApplication(applicationId, patch);
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'scholarship_application_updated',
@@ -190,7 +220,7 @@ export async function startVerification(
     attempts: 0,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'identity_verification_started',
@@ -230,7 +260,7 @@ export async function completeVerification(
     await store.updateApplication(v.application_id, patch);
   }
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'identity_verification_completed',
@@ -286,7 +316,7 @@ export async function updateWishVisibility(
   await store.updateWish(wishId, { visibility });
 
   if (visibility === 'investors_only') {
-    await logAuditEvent({
+    await audit({
       user_id: userId,
       session_id: null,
       event_type: 'wish_shared_with_investors',
@@ -307,7 +337,7 @@ export async function requestWishPublication(wishId: string, userId: string): Pr
 
   await store.updateWish(wishId, { publication_requested: true });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'wish_publication_requested',
@@ -323,7 +353,7 @@ export async function approveWishPublication(wishId: string, adminId: string): P
   const store = getScholarshipStore();
   await store.updateWish(wishId, { publication_approved: true, visibility: 'public' });
 
-  await logAuditEvent({
+  await audit({
     user_id: adminId,
     session_id: null,
     event_type: 'wish_publication_approved',
@@ -339,7 +369,7 @@ export async function rejectWishPublication(wishId: string, adminId: string, rea
   const store = getScholarshipStore();
   await store.updateWish(wishId, { publication_rejected: true });
 
-  await logAuditEvent({
+  await audit({
     user_id: adminId,
     session_id: null,
     event_type: 'wish_publication_rejected',
@@ -416,7 +446,7 @@ export async function submitVote(
     reason: reason ?? null,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: voterId,
     session_id: null,
     event_type: 'scholarship_vote_submitted',
@@ -444,7 +474,7 @@ export async function declareConflict(
     description,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: reviewerId,
     session_id: null,
     event_type: 'conflict_of_interest_declared',
@@ -480,7 +510,7 @@ export async function createSponsorship(
     paid_at: null,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: sponsorId,
     session_id: null,
     event_type: 'sponsorship_committed',
@@ -501,7 +531,7 @@ export async function markSponsorshipPaid(sponsorshipId: string, sponsorId: stri
     paid_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: sponsorId,
     session_id: null,
     event_type: 'sponsorship_paid',
@@ -547,7 +577,7 @@ export async function submitForumPost(postId: string, userId: string): Promise<v
     submitted_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'forum_post_submitted',
@@ -589,7 +619,7 @@ export async function moderateForumPost(
   });
 
   const eventType = action === 'approve' ? 'forum_post_approved' : 'forum_post_rejected';
-  await logAuditEvent({
+  await audit({
     user_id: moderatorId,
     session_id: null,
     event_type: eventType,
@@ -645,7 +675,7 @@ export async function createAppeal(
     reviewed_at: null,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'appeal_submitted',
@@ -832,7 +862,7 @@ export async function verifyInvestor(investorId: string, adminId: string): Promi
     verified_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: adminId,
     session_id: null,
     event_type: 'investor_access_granted',
@@ -863,7 +893,7 @@ export async function grantInvestorAccess(
     revoked_at: null,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: grantedBy,
     session_id: null,
     event_type: 'investor_access_granted',
@@ -881,7 +911,7 @@ export async function revokeInvestorAccess(grantId: string, revokedBy: string, r
   const store = getScholarshipStore();
   await store.revokeAccessGrant(grantId, revokedBy);
 
-  await logAuditEvent({
+  await audit({
     user_id: revokedBy,
     session_id: null,
     event_type: 'investor_access_revoked',
@@ -973,7 +1003,7 @@ export async function submitReviewWithScores(
   const totalScore = calculateTotalScore(fullScores);
 
   // Log audit
-  await logAuditEvent({
+  await audit({
     user_id: reviewerId,
     session_id: null,
     event_type: 'scholarship_review_submitted',
@@ -1017,7 +1047,7 @@ export async function awardScholarship(
     reason: `Scholarship awarded for program ${programCode}`,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: councilMemberId,
     session_id: null,
     event_type: 'scholarship_awarded',
@@ -1063,7 +1093,7 @@ export async function declineScholarship(
     reason: `Declined: ${reason}`,
   });
 
-  await logAuditEvent({
+  await audit({
     user_id: userId,
     session_id: null,
     event_type: 'scholarship_declined',
@@ -1145,7 +1175,7 @@ export async function reportContent(
     }
   }
 
-  await logAuditEvent({
+  await audit({
     user_id: reportedBy,
     session_id: null,
     event_type: 'complaint_submitted',

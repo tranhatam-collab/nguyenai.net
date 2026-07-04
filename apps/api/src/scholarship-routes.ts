@@ -59,6 +59,8 @@ import {
   type ModerationAction,
   type AppealType,
   type SponsorshipType,
+  setRequestContext,
+  clearRequestContext,
 } from '@nai/scholarship';
 
 export interface ScholarshipEnv {
@@ -85,6 +87,19 @@ function requireAuth(c: { req: { header: (n: string) => string | undefined }; ge
 }
 
 export const scholarshipRoutes = new Hono<ScholarshipEnv>();
+
+// Middleware: set request context (IP + User-Agent) for audit logging
+scholarshipRoutes.use('*', async (c, next) => {
+  const cf = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || null;
+  const ua = c.req.header('user-agent') || null;
+  setRequestContext({
+    actor_ip: cf,
+    user_agent: ua,
+    session_id: null,
+  });
+  await next();
+  clearRequestContext();
+});
 
 // ============================================================
 // 1-4. Application endpoints
