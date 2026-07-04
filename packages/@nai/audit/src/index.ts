@@ -85,7 +85,10 @@ export type AuditEventType =
   | 'forum_post_approved'
   | 'forum_post_rejected'
   | 'complaint_submitted'
-  | 'appeal_submitted';
+  | 'appeal_submitted'
+  // P1-3/P1-4: Data export + retention (GDPR/PDPD compliance)
+  | 'scholarship_data_exported'
+  | 'scholarship_retention_sweep';
 
 export const AUDIT_REGISTRY_VERSION = '2026-07-03.1';
 export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
@@ -113,6 +116,7 @@ export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'scholarship_enrollment_activated',
   'forum_post_submitted', 'forum_post_approved', 'forum_post_rejected',
   'complaint_submitted', 'appeal_submitted',
+  'scholarship_data_exported', 'scholarship_retention_sweep',
 ] as const;
 
 export type AuditResult = 'success' | 'failure' | 'denied';

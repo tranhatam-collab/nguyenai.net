@@ -13,7 +13,7 @@
  * Per EDU_MASTER_PLAN_V4.md Sections XXIII-XXXV.
  */
 
-import { getScholarshipStore, type ScholarshipStore } from './store';
+import { getScholarshipStore, type ScholarshipStore, type UserDataExport, type RetentionSweepOptions, type RetentionSweepResult } from './store';
 import { logAuditEvent } from '@nai/audit';
 import { EmailService, type EmailTemplateId, type TemplateContext } from '@nai/email';
 
@@ -1715,4 +1715,92 @@ export async function createCohort(
 export async function listCohorts(filter?: { program_code?: string; status?: Cohort['status'] }): Promise<Cohort[]> {
   const store = getScholarshipStore();
   return store.listCohorts(filter);
+}
+
+// ============================================================
+// P1-3: Data export (GDPR/PDPD right to portability)
+// ============================================================
+
+/**
+ * Export all user-owned records as a JSON-serializable bundle.
+ * Implements GDPR Article 20 (right to data portability) and
+ * Vietnam PDPD Article 26 (quyền xuất dữ liệu cá nhân).
+ *
+ * Audit-logged. User must be authenticated — caller passes userId
+ * derived from session, NOT from request body.
+ */
+export async function exportUserData(userId: string): Promise<UserDataExport> {
+  if (!userId) throw new Error('exportUserData requires userId');
+  const store = getScholarshipStore();
+  const bundle = await store.exportUserData(userId);
+  await audit({
+    user_id: userId,
+    session_id: null,
+    event_type: 'scholarship_data_exported',
+    actor_ip: null,
+    user_agent: null,
+    target: userId,
+    result: 'success',
+    metadata: {
+      records_total:
+        bundle.applications.length +
+        bundle.wishes.length +
+        bundle.verifications.length +
+        bundle.reviews.length +
+        bundle.votes.length +
+        bundle.sponsorships.length +
+        bundle.forum_posts.length +
+        bundle.forum_comments.length +
+        bundle.notifications.length +
+        bundle.appeals.length +
+        bundle.messages.length +
+        bundle.documents.length +
+        bundle.timeline.length +
+        bundle.entitlements.length +
+        bundle.entitlement_events.length +
+        bundle.waitlist_entries.length,
+      schema_version: bundle.schema_version,
+    },
+  });
+  return bundle;
+}
+
+// ============================================================
+// P1-4: Retention automation
+// ============================================================
+
+/**
+ * Run retention sweep — hard-delete or anonymize records past their
+ * retention period per DATA_CLASSIFICATION_AND_RETENTION.md §6.
+ *
+ * Default policy:
+ * - rejected/ineligible applications: hard-delete after 1 year
+ * - awarded/enrolled applications: anonymize PII after 1 year (audit trail kept)
+ * - notifications: hard-delete after cutoff
+ * - expired investor access grants: revoke
+ *
+ * Audit-logged. Caller must be admin (enforced at API layer).
+ */
+export async function runRetentionSweep(opts: RetentionSweepOptions): Promise<RetentionSweepResult> {
+  if (!opts.before_date) throw new Error('runRetentionSweep requires before_date');
+  const store = getScholarshipStore();
+  const result = await store.runRetentionSweep(opts);
+  await audit({
+    user_id: null,
+    session_id: null,
+    event_type: 'scholarship_retention_sweep',
+    actor_ip: null,
+    user_agent: null,
+    target: 'retention',
+    result: 'success',
+    metadata: {
+      before_date: result.before_date,
+      dry_run: result.dry_run,
+      total_deleted: result.total_deleted,
+      total_anonymized: result.total_anonymized,
+      deleted: result.deleted,
+      anonymized: result.anonymized,
+    },
+  });
+  return result;
 }

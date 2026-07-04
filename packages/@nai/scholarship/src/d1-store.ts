@@ -46,7 +46,12 @@ import type {
   Cohort,
   EntitlementEvent,
 } from './types';
-import type { ScholarshipStore } from './store';
+import type {
+  ScholarshipStore,
+  UserDataExport,
+  RetentionSweepOptions,
+  RetentionSweepResult,
+} from './store';
 
 const now = (): string => new Date().toISOString();
 const uid = (): string => (globalThis as { crypto?: { randomUUID?: () => string } }).crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -747,6 +752,199 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const result = await this.db.prepare('SELECT * FROM entitlement_events WHERE entitlement_id = ? ORDER BY created_at ASC').bind(entitlementId).all();
     return (result.results ?? []).map(mapEntitlementEvent);
   }
+
+  // ============================================================
+  // P1-3: Data export (GDPR/PDPD right to portability)
+  // ============================================================
+  async exportUserData(userId: string): Promise<UserDataExport> {
+    const applications = (await this.db.prepare('SELECT * FROM scholarship_applications WHERE user_id = ?').bind(userId).all()).results?.map(mapApplication) ?? [];
+    const applicationIds = applications.map((a) => a.application_id);
+    const appIdsPlaceholder = applicationIds.length > 0 ? applicationIds.map(() => '?').join(',') : "''";
+    const wishes = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM scholarship_wishes WHERE user_id = ? OR application_id IN (${appIdsPlaceholder})`).bind(userId, ...applicationIds).all()).results?.map(mapWish) ?? []
+      : [];
+    const verifications = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM identity_verifications WHERE application_id IN (${appIdsPlaceholder})`).bind(...applicationIds).all()).results?.map(mapVerification) ?? []
+      : [];
+    const reviews = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM reviews WHERE application_id IN (${appIdsPlaceholder})`).bind(...applicationIds).all()).results?.map(mapReview) ?? []
+      : [];
+    const votes = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM votes WHERE voter_id = ? OR application_id IN (${appIdsPlaceholder})`).bind(userId, ...applicationIds).all()).results?.map(mapVote) ?? []
+      : [];
+    const sponsorships = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM sponsorships WHERE application_id IN (${appIdsPlaceholder})`).bind(...applicationIds).all()).results?.map(mapSponsorship) ?? []
+      : [];
+    const investorRow = await this.db.prepare('SELECT * FROM investor_profiles WHERE user_id = ?').bind(userId).first();
+    const investorProfile = investorRow ? mapInvestor(investorRow) : null;
+    const accessGrants = investorProfile
+      ? (await this.db.prepare('SELECT * FROM investor_access_grants WHERE investor_id = ?').bind(investorProfile.investor_id).all()).results?.map(mapGrant) ?? []
+      : [];
+    const forumPosts = (await this.db.prepare('SELECT * FROM forum_posts WHERE user_id = ?').bind(userId).all()).results?.map(mapPost) ?? [];
+    const postIds = forumPosts.map((p) => p.post_id);
+    const postIdsPlaceholder = postIds.length > 0 ? postIds.map(() => '?').join(',') : "''";
+    const forumComments = postIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM forum_comments WHERE user_id = ? OR post_id IN (${postIdsPlaceholder})`).bind(userId, ...postIds).all()).results?.map(mapComment) ?? []
+      : [];
+    const notifications = (await this.db.prepare('SELECT * FROM notifications WHERE user_id = ?').bind(userId).all()).results?.map(mapNotification) ?? [];
+    const appeals = (await this.db.prepare('SELECT * FROM appeals WHERE user_id = ?').bind(userId).all()).results?.map(mapAppeal) ?? [];
+    const messages = (await this.db.prepare('SELECT * FROM application_messages WHERE from_user_id = ? OR to_user_id = ?').bind(userId, userId).all()).results?.map(mapMessage) ?? [];
+    const documents = (await this.db.prepare('SELECT * FROM application_documents WHERE user_id = ?').bind(userId).all()).results?.map(mapDocument) ?? [];
+    const timeline = applicationIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM status_timeline_entries WHERE application_id IN (${appIdsPlaceholder})`).bind(...applicationIds).all()).results?.map(mapTimeline) ?? []
+      : [];
+    const entitlements = (await this.db.prepare('SELECT * FROM scholarship_entitlements WHERE user_id = ?').bind(userId).all()).results?.map(mapEntitlement) ?? [];
+    const entitlementIds = entitlements.map((e) => e.entitlement_id);
+    const entIdsPlaceholder = entitlementIds.length > 0 ? entitlementIds.map(() => '?').join(',') : "''";
+    const entitlementEvents = entitlementIds.length > 0
+      ? (await this.db.prepare(`SELECT * FROM entitlement_events WHERE entitlement_id IN (${entIdsPlaceholder})`).bind(...entitlementIds).all()).results?.map(mapEntitlementEvent) ?? []
+      : [];
+    const waitlistEntries = (await this.db.prepare('SELECT * FROM waitlist_entries WHERE user_id = ?').bind(userId).all()).results?.map(mapWaitlist) ?? [];
+
+    return {
+      user_id: userId,
+      exported_at: now(),
+      schema_version: '1.0.0',
+      applications,
+      wishes,
+      verifications,
+      reviews,
+      votes,
+      sponsorships,
+      investor_profile: investorProfile,
+      access_grants: accessGrants,
+      forum_posts: forumPosts,
+      forum_comments: forumComments,
+      notifications,
+      appeals,
+      messages,
+      documents,
+      timeline,
+      entitlements,
+      entitlement_events: entitlementEvents,
+      waitlist_entries: waitlistEntries,
+    };
+  }
+
+  // ============================================================
+  // P1-4: Retention automation
+  // ============================================================
+  async listAgedApplications(beforeDate: string, statuses: ApplicationStatus[]): Promise<ScholarshipApplication[]> {
+    if (statuses.length === 0) return [];
+    const placeholders = statuses.map(() => '?').join(',');
+    const result = await this.db.prepare(
+      `SELECT * FROM scholarship_applications WHERE status IN (${placeholders}) AND updated_at < ? ORDER BY updated_at ASC`
+    ).bind(...statuses, beforeDate).all();
+    return (result.results ?? []).map(mapApplication);
+  }
+
+  async anonymizeApplication(applicationId: string): Promise<void> {
+    await this.db.prepare(
+      `UPDATE scholarship_applications SET
+        full_name = '[ANONYMIZED]',
+        email = '[anonymized]@deleted.local',
+        phone = '[ANONYMIZED]',
+        city = '[ANONYMIZED]',
+        wish_text = '[ANONYMIZED]',
+        circumstances_text = '[ANONYMIZED]',
+        capability_text = '[ANONYMIZED]',
+        portfolio_url = NULL,
+        updated_at = ?
+       WHERE application_id = ?`
+    ).bind(now(), applicationId).run();
+  }
+
+  async deleteApplicationCascade(applicationId: string): Promise<void> {
+    // Delete child records first, then the application itself.
+    await this.db.prepare('DELETE FROM identity_verifications WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM scholarship_wishes WHERE application_id = ?').bind(applicationId).run();
+    // Reviews + their scores
+    const reviewRows = await this.db.prepare('SELECT review_id FROM reviews WHERE application_id = ?').bind(applicationId).all();
+    const reviewIds = (reviewRows.results ?? []).map((r) => r.review_id as string);
+    for (const rid of reviewIds) {
+      await this.db.prepare('DELETE FROM review_scores WHERE review_id = ?').bind(rid).run();
+    }
+    await this.db.prepare('DELETE FROM reviews WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM votes WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM sponsorships WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM application_messages WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM application_documents WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM status_timeline_entries WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM appeals WHERE application_id = ?').bind(applicationId).run();
+    await this.db.prepare('DELETE FROM waitlist_entries WHERE application_id = ?').bind(applicationId).run();
+    // Entitlements + their events
+    const entRows = await this.db.prepare('SELECT entitlement_id FROM scholarship_entitlements WHERE application_id = ?').bind(applicationId).all();
+    const entIds = (entRows.results ?? []).map((r) => r.entitlement_id as string);
+    for (const eid of entIds) {
+      await this.db.prepare('DELETE FROM entitlement_events WHERE entitlement_id = ?').bind(eid).run();
+    }
+    await this.db.prepare('DELETE FROM scholarship_entitlements WHERE application_id = ?').bind(applicationId).run();
+    // Finally the application
+    await this.db.prepare('DELETE FROM scholarship_applications WHERE application_id = ?').bind(applicationId).run();
+  }
+
+  async runRetentionSweep(opts: RetentionSweepOptions): Promise<RetentionSweepResult> {
+    const dryRun = opts.dry_run ?? false;
+    const terminalStatuses: ApplicationStatus[] = opts.terminal_statuses ?? ['rejected', 'ineligible'];
+    const deleted: Record<string, number> = {};
+    const anonymized: Record<string, number> = {};
+
+    // 1. Hard-delete applications in terminal status older than retention cutoff.
+    const aged = await this.listAgedApplications(opts.before_date, terminalStatuses);
+    if (aged.length > 0) {
+      deleted['applications'] = aged.length;
+      if (!dryRun) {
+        for (const app of aged) await this.deleteApplicationCascade(app.application_id);
+      }
+    }
+
+    // 2. Anonymize awarded/enrolled applications older than cutoff (audit trail preserved).
+    const completedAged = await this.listAgedApplications(opts.before_date, ['awarded', 'enrolled']);
+    const toAnonymize = completedAged.filter((a) => !terminalStatuses.includes(a.status));
+    if (toAnonymize.length > 0) {
+      anonymized['applications'] = toAnonymize.length;
+      if (!dryRun) {
+        for (const app of toAnonymize) await this.anonymizeApplication(app.application_id);
+      }
+    }
+
+    // 3. Delete expired notifications older than cutoff.
+    const notifResult = await this.db.prepare('SELECT COUNT(*) as cnt FROM notifications WHERE created_at < ?').bind(opts.before_date).first();
+    const oldNotifications = (notifResult?.cnt as number) ?? 0;
+    if (oldNotifications > 0) {
+      deleted['notifications'] = oldNotifications;
+      if (!dryRun) {
+        await this.db.prepare('DELETE FROM notifications WHERE created_at < ?').bind(opts.before_date).run();
+      }
+    }
+
+    // 4. Revoke expired investor access grants past expiry.
+    const grantResult = await this.db.prepare(
+      'SELECT COUNT(*) as cnt FROM investor_access_grants WHERE revoked_at IS NULL AND expires_at IS NOT NULL AND expires_at < ?'
+    ).bind(opts.before_date).first();
+    const expiredGrants = (grantResult?.cnt as number) ?? 0;
+    if (expiredGrants > 0) {
+      anonymized['access_grants'] = expiredGrants;
+      if (!dryRun) {
+        await this.db.prepare(
+          'UPDATE investor_access_grants SET revoked_at = ? WHERE revoked_at IS NULL AND expires_at IS NOT NULL AND expires_at < ?'
+        ).bind(now(), opts.before_date).run();
+      }
+    }
+
+    const totalDeleted = Object.values(deleted).reduce((a, b) => a + b, 0);
+    const totalAnonymized = Object.values(anonymized).reduce((a, b) => a + b, 0);
+
+    return {
+      ran_at: now(),
+      before_date: opts.before_date,
+      dry_run: dryRun,
+      deleted,
+      anonymized,
+      total_deleted: totalDeleted,
+      total_anonymized: totalAnonymized,
+    };
+  }
 }
 
 // ============================================================
@@ -1067,5 +1265,32 @@ function mapEntitlementEvent(r: Record<string, unknown>): EntitlementEvent {
     reason: (r.reason as string) ?? null,
     metadata: JSON.parse((r.metadata as string) ?? '{}'),
     created_at: r.created_at as string,
+  };
+}
+
+function mapSponsorship(r: Record<string, unknown>): Sponsorship {
+  return {
+    sponsorship_id: r.sponsorship_id as string,
+    sponsor_id: r.sponsor_id as string,
+    application_id: (r.application_id as string) ?? null,
+    type: r.type as Sponsorship['type'],
+    amount_vnd: (r.amount_vnd as number) ?? 0,
+    amount_usd: (r.amount_usd as number) ?? 0,
+    status: r.status as Sponsorship['status'],
+    committed_at: r.committed_at as string,
+    paid_at: (r.paid_at as string) ?? null,
+  };
+}
+
+function mapAppeal(r: Record<string, unknown>): Appeal {
+  return {
+    appeal_id: r.appeal_id as string,
+    application_id: r.application_id as string,
+    user_id: r.user_id as string,
+    type: r.type as Appeal['type'],
+    reason: r.reason as string,
+    status: r.status as Appeal['status'],
+    created_at: r.created_at as string,
+    reviewed_at: (r.reviewed_at as string) ?? null,
   };
 }

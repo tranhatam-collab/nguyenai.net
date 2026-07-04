@@ -132,6 +132,72 @@ export interface ScholarshipStore {
   // Sprint 6: Entitlement events
   createEntitlementEvent(e: Omit<EntitlementEvent, 'event_id' | 'created_at'>): Promise<string>;
   listEntitlementEvents(entitlementId: string): Promise<EntitlementEvent[]>;
+  // P1-3: Data export (GDPR/PDPD right to portability)
+  // Returns all records owned by userId across all tables.
+  exportUserData(userId: string): Promise<UserDataExport>;
+  // P1-4: Retention automation
+  // Hard-deletes (or anonymizes) records past their retention period.
+  // Returns counts of deleted/anonymized records per table.
+  runRetentionSweep(opts: RetentionSweepOptions): Promise<RetentionSweepResult>;
+  // P1-4 helper: list applications in a terminal status older than `beforeDate`.
+  listAgedApplications(beforeDate: string, statuses: ApplicationStatus[]): Promise<ScholarshipApplication[]>;
+  // P1-4 helper: anonymize an application (PII scrubbed, audit trail preserved).
+  anonymizeApplication(applicationId: string): Promise<void>;
+  // P1-4 helper: hard-delete an application and all its child records.
+  deleteApplicationCascade(applicationId: string): Promise<void>;
+}
+
+/**
+ * Bundle of all user-owned records, returned by exportUserData.
+ * Conforms to GDPR/PDPD right to data portability — JSON-serializable.
+ */
+export interface UserDataExport {
+  user_id: string;
+  exported_at: string;
+  schema_version: string;
+  applications: ScholarshipApplication[];
+  wishes: ScholarshipWish[];
+  verifications: IdentityVerification[];
+  reviews: Review[];
+  votes: Vote[];
+  sponsorships: Sponsorship[];
+  investor_profile: InvestorProfile | null;
+  access_grants: InvestorAccessGrant[];
+  forum_posts: ForumPost[];
+  forum_comments: ForumComment[];
+  notifications: Notification[];
+  appeals: Appeal[];
+  messages: ApplicationMessage[];
+  documents: ApplicationDocument[];
+  timeline: StatusTimelineEntry[];
+  entitlements: ScholarshipEntitlement[];
+  entitlement_events: EntitlementEvent[];
+  waitlist_entries: WaitlistEntry[];
+}
+
+/**
+ * Options for retention sweep.
+ * `dry_run` returns counts without modifying anything.
+ * `before_date` ISO timestamp — only records older than this are eligible.
+ */
+export interface RetentionSweepOptions {
+  before_date: string;
+  dry_run?: boolean;
+  // Terminal application statuses eligible for hard deletion after retention.
+  // Per DATA_CLASSIFICATION_AND_RETENTION.md §6: academy_progress = 1 year
+  // post-account-deletion. We apply 1 year from application terminal transition.
+  // Default: ['rejected', 'ineligible']
+  terminal_statuses?: ApplicationStatus[];
+}
+
+export interface RetentionSweepResult {
+  ran_at: string;
+  before_date: string;
+  dry_run: boolean;
+  deleted: Record<string, number>;
+  anonymized: Record<string, number>;
+  total_deleted: number;
+  total_anonymized: number;
 }
 
 // ============================================================
@@ -547,6 +613,183 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     return [...this.entitlementEvents.values()]
       .filter((e) => e.entitlement_id === entitlementId)
       .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+
+  // ============================================================
+  // P1-3: Data export (GDPR/PDPD right to portability)
+  // ============================================================
+  async exportUserData(userId: string): Promise<UserDataExport> {
+    const applications = [...this.applications.values()].filter((a) => a.user_id === userId);
+    const applicationIds = new Set(applications.map((a) => a.application_id));
+    const wishes = [...this.wishes.values()].filter((w) => w.user_id === userId);
+    const verifications = [...this.verifications.values()].filter((v) => applicationIds.has(v.application_id));
+    const reviews = [...this.reviews.values()].filter((r) => applicationIds.has(r.application_id));
+    const reviewIds = new Set(reviews.map((r) => r.review_id));
+    const votes = [...this.votes.values()].filter((v) => v.voter_id === userId || applicationIds.has(v.application_id));
+    const sponsorships = [...this.sponsorships.values()].filter((s) => applicationIds.has(s.application_id ?? ''));
+    const investorProfile = [...this.investors.values()].find((p) => p.user_id === userId) ?? null;
+    const investorId = investorProfile?.investor_id;
+    const accessGrants = investorId ? [...this.grants.values()].filter((g) => g.investor_id === investorId) : [];
+    const forumPosts = [...this.forumPosts.values()].filter((p) => p.user_id === userId);
+    const postIds = new Set(forumPosts.map((p) => p.post_id));
+    const forumComments = [...this.comments.values()].filter((c) => c.user_id === userId || postIds.has(c.post_id));
+    const notifications = [...this.notifications.values()].filter((n) => n.user_id === userId);
+    const appeals = [...this.appeals.values()].filter((a) => a.user_id === userId);
+    const messages = [...this.messages.values()].filter((m) => m.from_user_id === userId || m.to_user_id === userId);
+    const documents = [...this.documents.values()].filter((d) => d.user_id === userId);
+    const timeline = [...this.timeline.values()].filter((t) => applicationIds.has(t.application_id));
+    const entitlements = [...this.entitlements.values()].filter((e) => e.user_id === userId);
+    const entitlementIds = new Set(entitlements.map((e) => e.entitlement_id));
+    const entitlementEvents = [...this.entitlementEvents.values()].filter((e) => entitlementIds.has(e.entitlement_id));
+    const waitlistEntries = [...this.waitlist.values()].filter((w) => w.user_id === userId);
+
+    return {
+      user_id: userId,
+      exported_at: new Date().toISOString(),
+      schema_version: '1.0.0',
+      applications,
+      wishes,
+      verifications,
+      reviews,
+      votes,
+      sponsorships,
+      investor_profile: investorProfile,
+      access_grants: accessGrants,
+      forum_posts: forumPosts,
+      forum_comments: forumComments,
+      notifications,
+      appeals,
+      messages,
+      documents,
+      timeline,
+      entitlements,
+      entitlement_events: entitlementEvents,
+      waitlist_entries: waitlistEntries,
+    };
+  }
+
+  // ============================================================
+  // P1-4: Retention automation
+  // ============================================================
+  async listAgedApplications(beforeDate: string, statuses: ApplicationStatus[]): Promise<ScholarshipApplication[]> {
+    return [...this.applications.values()].filter((a) => {
+      if (!statuses.includes(a.status)) return false;
+      // Use updated_at as proxy for terminal-transition timestamp when
+      // submitted_at is null. Per §6 academy_progress retention = 1 year.
+      const ref = a.updated_at ?? a.created_at;
+      return ref < beforeDate;
+    });
+  }
+
+  async anonymizeApplication(applicationId: string): Promise<void> {
+    const existing = this.applications.get(applicationId);
+    if (!existing) return;
+    this.applications.set(applicationId, {
+      ...existing,
+      full_name: '[ANONYMIZED]',
+      email: '[anonymized]@deleted.local',
+      phone: '[ANONYMIZED]',
+      city: '[ANONYMIZED]',
+      wish_text: '[ANONYMIZED]',
+      circumstances_text: '[ANONYMIZED]',
+      capability_text: '[ANONYMIZED]',
+      portfolio_url: null,
+      updated_at: new Date().toISOString(),
+    });
+  }
+
+  async deleteApplicationCascade(applicationId: string): Promise<void> {
+    // Delete child records first
+    for (const [id, v] of this.verifications) if (v.application_id === applicationId) this.verifications.delete(id);
+    for (const [id, w] of this.wishes) if (w.application_id === applicationId) this.wishes.delete(id);
+    for (const [id, r] of this.reviews) if (r.application_id === applicationId) {
+      for (const [sid, s] of this.scores) if (s.review_id === id) this.scores.delete(sid);
+      this.reviews.delete(id);
+    }
+    for (const [id, v] of this.votes) if (v.application_id === applicationId) this.votes.delete(id);
+    for (const [id, s] of this.sponsorships) if (s.application_id === applicationId) this.sponsorships.delete(id);
+    for (const [id, m] of this.messages) if (m.application_id === applicationId) this.messages.delete(id);
+    for (const [id, d] of this.documents) if (d.application_id === applicationId) this.documents.delete(id);
+    for (const [id, t] of this.timeline) if (t.application_id === applicationId) this.timeline.delete(id);
+    for (const [id, a] of this.appeals) if (a.application_id === applicationId) this.appeals.delete(id);
+    for (const [id, w] of this.waitlist) if (w.application_id === applicationId) this.waitlist.delete(id);
+    const ent = [...this.entitlements.values()].find((e) => e.application_id === applicationId);
+    if (ent) {
+      for (const [id, ev] of this.entitlementEvents) if (ev.entitlement_id === ent.entitlement_id) this.entitlementEvents.delete(id);
+      this.entitlements.delete(ent.entitlement_id);
+    }
+    // Finally delete the application itself
+    this.applications.delete(applicationId);
+  }
+
+  async runRetentionSweep(opts: RetentionSweepOptions): Promise<RetentionSweepResult> {
+    const dryRun = opts.dry_run ?? false;
+    const terminalStatuses: ApplicationStatus[] = opts.terminal_statuses ?? ['rejected', 'ineligible'];
+    const deleted: Record<string, number> = {};
+    const anonymized: Record<string, number> = {};
+
+    // 1. Hard-delete applications in terminal status older than retention cutoff.
+    //    Per §6: academy_progress = 1 year post-account-deletion. We apply the
+    //    same 1-year window from terminal transition (updated_at proxy).
+    const aged = await this.listAgedApplications(opts.before_date, terminalStatuses);
+    if (aged.length > 0) {
+      deleted['applications'] = aged.length;
+      if (!dryRun) {
+        for (const app of aged) await this.deleteApplicationCascade(app.application_id);
+      }
+    }
+
+    // 2. Anonymize (not delete) applications in non-terminal but completed
+    //    statuses older than retention cutoff — preserves audit trail per §6
+    //    (audit_log = 7 years, never erased).
+    const completedAged = [...this.applications.values()].filter((a) => {
+      if (terminalStatuses.includes(a.status)) return false;
+      if (a.status !== 'awarded' && a.status !== 'enrolled') return false;
+      return (a.updated_at ?? a.created_at) < opts.before_date;
+    });
+    if (completedAged.length > 0) {
+      anonymized['applications'] = completedAged.length;
+      if (!dryRun) {
+        for (const app of completedAged) await this.anonymizeApplication(app.application_id);
+      }
+    }
+
+    // 3. Delete expired notifications older than cutoff (notifications are
+    //    transient, no long-term retention requirement).
+    const oldNotifications = [...this.notifications.values()].filter((n) => n.created_at < opts.before_date);
+    if (oldNotifications.length > 0) {
+      deleted['notifications'] = oldNotifications.length;
+      if (!dryRun) {
+        for (const n of oldNotifications) this.notifications.delete(n.notification_id);
+      }
+    }
+
+    // 4. Revoke expired investor access grants past expiry.
+    const expiredGrants = [...this.grants.values()].filter((g) => {
+      if (g.revoked_at) return false;
+      return g.expires_at && g.expires_at < opts.before_date;
+    });
+    if (expiredGrants.length > 0) {
+      anonymized['access_grants'] = expiredGrants.length;
+      if (!dryRun) {
+        for (const g of expiredGrants) {
+          this.grants.set(g.grant_id, { ...g, revoked_at: new Date().toISOString() });
+        }
+      }
+    }
+
+    const totalDeleted = Object.values(deleted).reduce((a, b) => a + b, 0);
+    const totalAnonymized = Object.values(anonymized).reduce((a, b) => a + b, 0);
+
+    return {
+      ran_at: new Date().toISOString(),
+      before_date: opts.before_date,
+      dry_run: dryRun,
+      deleted,
+      anonymized,
+      total_deleted: totalDeleted,
+      total_anonymized: totalAnonymized,
+    };
   }
 }
 

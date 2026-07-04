@@ -89,6 +89,8 @@ import {
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
   SCORING_WEIGHTS,
+  exportUserData,
+  runRetentionSweep,
 } from './index';
 import { InMemoryAuditStore, setAuditStore, queryAuditLog } from '@nai/audit';
 
@@ -799,6 +801,129 @@ async function testCohorts() {
   assert(ENTITLEMENT_LIFECYCLE.transitions.active.includes('suspended'), 'active -> suspended allowed');
 }
 
+// ============================================================
+// P1-3: Data export (GDPR/PDPD right to portability)
+// ============================================================
+async function testDataExport() {
+  console.log('Test: data export (GDPR/PDPD)');
+  setScholarshipStore(new InMemoryScholarshipStore());
+  setAuditStore(new InMemoryAuditStore());
+
+  const userId = 'user-export-test';
+  const appId = await createApplication(userId, {
+    full_name: 'Export Test',
+    email: 'export@test.local',
+    phone: '+84999999999',
+    program_code: 'nguyen-ai-computer',
+    program_id: 'prog-test',
+  });
+  // Fill required fields before submit
+  await updateApplication(appId, userId, {
+    wish_text: 'I want to learn AI',
+    circumstances_text: 'Need support',
+    consents_to_data_processing: true,
+    consents_to_audit: true,
+    commits_to_attendance: true,
+    commits_to_graduation: true,
+  });
+  await submitApplication(appId, userId);
+  await createWish(appId, userId, 'I want to learn AI', 'private');
+  await createNotification(userId, 'Test', 'Test title', 'Test body');
+
+  const bundle = await exportUserData(userId);
+  assert(bundle.user_id === userId, 'export: user_id matches');
+  assert(bundle.schema_version === '1.0.0', 'export: schema_version 1.0.0');
+  assert(bundle.applications.length === 1, 'export: 1 application');
+  assert(bundle.applications[0]!.application_id === appId, 'export: correct application_id');
+  assert(bundle.wishes.length === 1, 'export: 1 wish');
+  assert(bundle.notifications.length === 1, 'export: 1 notification');
+  assert(bundle.investor_profile === null, 'export: no investor profile');
+  assert(bundle.exported_at.length > 0, 'export: has timestamp');
+
+  // Verify audit event was logged
+  const logs = await queryAuditLog({ user_id: userId });
+  const exportEvent = logs.find((e) => e.event_type === 'scholarship_data_exported');
+  assert(!!exportEvent, 'export: audit event scholarship_data_exported logged');
+
+  // Verify empty user returns empty bundle (not error)
+  const emptyBundle = await exportUserData('nonexistent-user');
+  assert(emptyBundle.applications.length === 0, 'export: empty user has 0 applications');
+  assert(emptyBundle.user_id === 'nonexistent-user', 'export: empty user_id preserved');
+
+  console.log('  OK');
+}
+
+// ============================================================
+// P1-4: Retention automation
+// ============================================================
+async function testRetentionSweep() {
+  console.log('Test: retention sweep');
+  const store = new InMemoryScholarshipStore();
+  setScholarshipStore(store);
+  setAuditStore(new InMemoryAuditStore());
+
+  // Create an application in 'rejected' status with old timestamp
+  const oldAppId = await createApplication('user-old', {
+    full_name: 'Old Rejected',
+    email: 'old@test.local',
+    phone: '+84999999998',
+    program_code: 'nguyen-ai-computer',
+    program_id: 'prog-test',
+  });
+  // Force status to rejected + old updated_at via store directly
+  await store.updateApplication(oldAppId, { status: 'rejected' });
+  // Use a future before_date so the just-created record qualifies
+  // (record updated_at = now; before_date = now+1s ensures < comparison passes)
+  const futureDate = new Date(Date.now() + 100000).toISOString();
+
+  // Dry run — should report but not delete
+  const dryRun = await runRetentionSweep({
+    before_date: futureDate,
+    dry_run: true,
+  });
+  assert(dryRun.dry_run === true, 'retention: dry_run flag preserved');
+  assert(dryRun.total_deleted >= 1, 'retention: dry run reports >=1 to delete');
+  const stillExists = await getApplication(oldAppId, 'user-old');
+  assert(stillExists !== null, 'retention: dry run does NOT delete');
+
+  // Real run — should delete
+  const realRun = await runRetentionSweep({
+    before_date: futureDate,
+    dry_run: false,
+  });
+  assert(realRun.dry_run === false, 'retention: real run dry_run=false');
+  assert(realRun.total_deleted >= 1, 'retention: real run deletes >=1');
+  assert((realRun.deleted['applications'] ?? 0) >= 1, 'retention: applications deleted count');
+  const deleted = await getApplication(oldAppId, 'user-old');
+  assert(deleted === null, 'retention: application actually deleted');
+
+  // Verify audit event was logged
+  const logs = await queryAuditLog({});
+  const sweepEvent = logs.find((e) => e.event_type === 'scholarship_retention_sweep');
+  assert(!!sweepEvent, 'retention: audit event scholarship_retention_sweep logged');
+
+  // Test anonymization for awarded applications
+  const awardedAppId = await createApplication('user-awarded', {
+    full_name: 'Awarded User',
+    email: 'awarded@test.local',
+    phone: '+84999999997',
+    program_code: 'nguyen-ai-computer',
+    program_id: 'prog-test',
+  });
+  await store.updateApplication(awardedAppId, { status: 'awarded' });
+  const anonymizeRun = await runRetentionSweep({
+    before_date: futureDate,
+    dry_run: false,
+  });
+  assert((anonymizeRun.anonymized['applications'] ?? 0) >= 1, 'retention: awarded app anonymized');
+  const anonymized = await getApplication(awardedAppId, 'user-awarded');
+  assert(anonymized !== null, 'retention: awarded app NOT deleted (anonymized)');
+  assert(anonymized?.full_name === '[ANONYMIZED]', 'retention: PII scrubbed to [ANONYMIZED]');
+  assert(anonymized?.email === '[anonymized]@deleted.local', 'retention: email scrubbed');
+
+  console.log('  OK');
+}
+
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -823,6 +948,8 @@ async function main() {
   await testWaitlist();
   await testEntitlementLifecycle();
   await testCohorts();
+  await testDataExport();
+  await testRetentionSweep();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

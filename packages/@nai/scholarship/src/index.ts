@@ -131,6 +131,9 @@ export {
   clearRequestContext,
   setEmailService,
   getEmailService,
+  exportUserData,
+  runRetentionSweep,
 } from './service';
 
 export { D1ScholarshipStore } from './d1-store';
+export type { UserDataExport, RetentionSweepOptions, RetentionSweepResult } from './store';

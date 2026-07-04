@@ -65,6 +65,8 @@ import {
   clearRequestContext,
   setEmailService,
   getEmailService,
+  exportUserData,
+  runRetentionSweep,
 } from '@nai/scholarship';
 
 export interface ScholarshipEnv {
@@ -1252,5 +1254,53 @@ scholarshipRoutes.post('/cohorts', async (c) => {
     return c.json({ cohort_id: id }, 201);
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// ============================================================
+// 59. GET /me/export — GDPR/PDPD right to data portability
+// Returns all user-owned scholarship records as a JSON bundle.
+// Per Article 20 (GDPR) + Article 26 (PDPD). Audit-logged.
+// ============================================================
+scholarshipRoutes.get('/me/export', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  try {
+    const bundle = await exportUserData(session.user_id);
+    c.header('Content-Type', 'application/json; charset=utf-8');
+    c.header('Content-Disposition', `attachment; filename="nguyenai-scholarship-export-${session.user_id}.json"`);
+    return c.body(JSON.stringify(bundle, null, 2));
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 500);
+  }
+});
+
+// ============================================================
+// 60. POST /admin/retention-sweep — run retention automation (admin)
+// Hard-deletes or anonymizes records past retention period per
+// DATA_CLASSIFICATION_AND_RETENTION.md §6. Audit-logged.
+// Body: { before_date: ISO string, dry_run?: boolean, terminal_statuses?: ApplicationStatus[] }
+// ============================================================
+scholarshipRoutes.post('/admin/retention-sweep', async (c) => {
+  initScholarshipStore(c.env);
+  const session = requireAuth(c);
+  if (!session) return c.json({ error: 'Unauthorized' }, 401);
+  if (!['admin', 'super_admin'].includes(session.role)) {
+    return c.json({ error: 'Admin access required' }, 403);
+  }
+  const body = await c.req.json().catch(() => ({}));
+  if (!body.before_date) {
+    return c.json({ error: 'before_date (ISO string) required' }, 400);
+  }
+  try {
+    const result = await runRetentionSweep({
+      before_date: body.before_date,
+      dry_run: body.dry_run ?? false,
+      terminal_statuses: body.terminal_statuses,
+    });
+    return c.json(result);
+  } catch (e) {
+    return c.json({ error: (e as Error).message }, 500);
   }
 });
