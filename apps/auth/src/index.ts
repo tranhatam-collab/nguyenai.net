@@ -31,6 +31,7 @@
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { getCookie } from 'hono/cookie';
 import { Secret, TOTP } from 'otpauth';
 
 import {
@@ -834,6 +835,8 @@ app.get('/v1/auth/oauth/google/begin', async (c) => {
     prompt: 'select_account',
   });
   const url = `${GOOGLE_AUTH_URL}?${params.toString()}`;
+  // P0 fix: store state in HttpOnly cookie so callback can verify it (CSRF protection)
+  c.header('Set-Cookie', `oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`);
   return c.json({ authorize_url: url, state });
 });
 
@@ -852,6 +855,14 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
   if (!code || !state) {
     return c.json({ error: 'missing code or state' }, 400);
   }
+
+  // P0 fix: verify state matches the cookie set at /begin (CSRF protection)
+  const cookieState = getCookie(c, 'oauth_state');
+  if (!cookieState || !constantTimeEqualStrings(cookieState, state)) {
+    return c.json({ error: 'invalid state' }, 400);
+  }
+  // Clear the state cookie
+  c.header('Set-Cookie', 'oauth_state=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/');
 
   const redirectUri = c.env.GOOGLE_REDIRECT_URI || `https://${c.env.AUTH_ISSUER}/v1/auth/oauth/google/callback`;
 
