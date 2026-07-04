@@ -132,3 +132,5 @@ export {
   setEmailService,
   getEmailService,
 } from './service';
+
+export { D1ScholarshipStore } from './d1-store';
