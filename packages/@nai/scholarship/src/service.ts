@@ -1228,7 +1228,7 @@ export async function makeCouncilDecision(
       outcome,
       decided_at: decidedAt,
     });
-    return { ...existing, total_approve: approve, total_deny: deny, total_abstain: abstain, outcome, decided_at };
+    return { ...existing, total_approve: approve, total_deny: deny, total_abstain: abstain, outcome, decided_at: decidedAt };
   }
 
   const id = await store.createCouncilDecision({
@@ -1340,7 +1340,8 @@ export async function withdrawFromWaitlist(entryId: string, userId: string): Pro
   // Reorder positions
   const waiting = await store.listWaitlist({ program_code: entry.program_code, status: 'waiting' });
   for (let i = 0; i < waiting.length; i++) {
-    await store.updateWaitlistEntry(waiting[i].entry_id, { position: i + 1 });
+    const entry_id = waiting[i]?.entry_id;
+    if (entry_id) await store.updateWaitlistEntry(entry_id, { position: i + 1 });
   }
 }
 

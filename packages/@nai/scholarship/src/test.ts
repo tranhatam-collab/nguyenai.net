@@ -566,7 +566,7 @@ async function testForumComments() {
   // List published posts
   const published = await listPublishedPosts(roomId);
   assert(published.length === 1, '1 published post');
-  assert(published[0].status === 'published', 'post is published');
+  assert(published[0]?.status === 'published', 'post is published');
 }
 
 async function testReportAndModeration() {
@@ -702,7 +702,7 @@ async function testWaitlist() {
   // List waitlist
   const list = await listWaitlist({ status: 'waiting' });
   assert(list.length === 1, '1 waiting entry');
-  assert(list[0].position === 1, 'position 1');
+  assert(list[0]?.position === 1, 'position 1');
 
   // Offer spot
   await offerWaitlistSpot(entryId, 'admin1');
@@ -753,7 +753,7 @@ async function testEntitlementLifecycle() {
   // Get user entitlements
   const userEnts = await getUserEntitlements('u1');
   assert(userEnts.length === 1, '1 entitlement for user');
-  assert(userEnts[0].status === 'active', 'entitlement active');
+  assert(userEnts[0]?.status === 'active', 'entitlement active');
 
   // Add learning path
   await addLearningPath(entId, 'nao-module-3', 'admin1');
