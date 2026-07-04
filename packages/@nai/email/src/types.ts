@@ -33,7 +33,7 @@ export type EmailTemplateId =
   | 'scholarship_cosponsorship'
   | 'scholarship_review_request'
   | 'scholarship_decision'
-  | 'scholarship_entitlement_granted';
+  | 'scholarship_progress';
 
 export interface EmailAddress {
   email: string;

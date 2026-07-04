@@ -1,0 +1,25 @@
+---
+import AcademyLayout from '../../../layouts/AcademyLayout.astro';
+import TrackCard from '../../../components/TrackCard.astro';
+import { tracks } from '../../../data/tracks';
+---
+
+<AcademyLayout
+  title="All Tracks — Nguyen AI Academy"
+  description="Browse all 10 AI learning tracks at Nguyen AI Academy."
+  activeNav="tracks"
+>
+  <section class="academy-container py-12">
+    <h1 class="text-3xl font-bold mb-2">All Tracks</h1>
+    <p class="text-academy-muted mb-8">10 learning tracks from beginner to advanced.</p>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {tracks.map((track) => <TrackCard track={track} />)}
+    </div>
+
+    <div class="mt-8 border-t border-academy-border pt-6 text-center">
+      <a href="/tracks" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

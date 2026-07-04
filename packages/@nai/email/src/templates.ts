@@ -29,7 +29,7 @@
  * 22. scholarship_cosponsorship — sponsorship committed (Section XXVII.3)
  * 23. scholarship_review_request — review assigned to investor (Section XXVII.2)
  * 24. scholarship_decision — council decision (approved/denied) (Section XXVII.4)
- * 25. scholarship_entitlement_granted — entitlement activated (Section XXVII.5)
+ * 25. scholarship_progress — progress report to investors/co-sponsors (Section XXVII.5)
  */
 
 import type { EmailTemplate, EmailTemplateId, TemplateContext } from './types';
@@ -667,28 +667,31 @@ export const TEMPLATES: Record<EmailTemplateId, EmailTemplate> = {
       : `Scholarship decision\nApplication ID: ${ctx.application_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\nDecision: ${ctx.decision ?? ''}\n\nView: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`,
   },
 
-  scholarship_entitlement_granted: {
-    id: 'scholarship_entitlement_granted',
+  scholarship_progress: {
+    id: 'scholarship_progress',
     category: 'scholarship',
-    subject: (ctx) => ctx.locale === 'vi' ? 'Entitlement học bổng đã cấp — Nguyen AI' : 'Scholarship entitlement granted — Nguyen AI',
+    subject: (ctx) => ctx.locale === 'vi' ? 'Báo cáo tiến độ học bổng — Nguyen AI' : 'Scholarship progress report — Nguyen AI',
     html: (ctx) => baseHtml({
       locale: ctx.locale,
-      title: ctx.locale === 'vi' ? 'Entitlement đã cấp' : 'Entitlement granted',
-      preheader: ctx.locale === 'vi' ? 'Bạn đã được cấp quyền lợi học bổng' : 'Your scholarship entitlement has been granted',
+      title: ctx.locale === 'vi' ? 'Báo cáo tiến độ' : 'Progress report',
+      preheader: ctx.locale === 'vi' ? 'Cập nhật tiến độ học tập của học viên' : 'Scholarship recipient learning progress update',
       bodyHtml: `
-        <h1>${ctx.locale === 'vi' ? 'Entitlement học bổng đã được cấp' : 'Scholarship entitlement granted'}</h1>
-        <p>${ctx.locale === 'vi' ? 'Bạn đã được cấp quyền lợi học bổng. Vui lòng kích hoạt trước hạn.' : 'Your scholarship entitlement has been granted. Please activate before the expiry date.'}</p>
-        ${metaRow(ctx.locale === 'vi' ? 'Entitlement ID' : 'Entitlement ID', String(ctx.entitlement_id ?? ''))}
+        <h1>${ctx.locale === 'vi' ? 'Báo cáo tiến độ học bổng' : 'Scholarship progress report'}</h1>
+        <p>${ctx.locale === 'vi' ? 'Đây là cập nhật định kỳ về tiến độ học tập của học viên được tài trợ.' : 'This is a periodic update on the learning progress of the sponsored scholar.'}</p>
+        ${metaRow(ctx.locale === 'vi' ? 'Học viên' : 'Scholar', String(ctx.scholar_name ?? ''))}
         ${metaRow(ctx.locale === 'vi' ? 'Chương trình' : 'Program', String(ctx.program_name ?? ''))}
         ${metaRow(ctx.locale === 'vi' ? 'Cohort' : 'Cohort', String(ctx.cohort_name ?? ''))}
-        ${metaRow(ctx.locale === 'vi' ? 'Hết hạn' : 'Expires', String(ctx.expires_at ?? ''))}
-        ${infoBox(ctx.locale === 'vi' ? 'Vui lòng không chia sẻ entitlement ID với người khác.' : 'Do not share your entitlement ID with others.')}
-        ${ctaButton(`https://app.${BRAND_DOMAIN}`, ctx.locale === 'vi' ? 'Kích hoạt entitlement' : 'Activate entitlement')}
+        ${metaRow(ctx.locale === 'vi' ? 'Tiến độ' : 'Progress', `${ctx.progress_percent ?? 0}%`)}
+        ${metaRow(ctx.locale === 'vi' ? 'Bài học đã hoàn thành' : 'Lessons completed', `${ctx.lessons_completed ?? 0}/${ctx.lessons_total ?? 0}`)}
+        ${metaRow(ctx.locale === 'vi' ? 'Cột mốc gần nhất' : 'Latest milestone', String(ctx.latest_milestone ?? ''))}
+        ${metaRow(ctx.locale === 'vi' ? 'Kỳ báo cáo' : 'Reporting period', String(ctx.reporting_period ?? ''))}
+        ${infoBox(ctx.locale === 'vi' ? 'Báo cáo này được gửi định kỳ cho nhà đầu tư/đồng tài trợ.' : 'This report is sent periodically to investors/co-sponsors.')}
+        ${ctaButton(`https://edu.${BRAND_DOMAIN}/room`, ctx.locale === 'vi' ? 'Xem chi tiết' : 'View details')}
       `,
     }),
     text: (ctx) => ctx.locale === 'vi'
-      ? `Entitlement học bổng đã cấp\nEntitlement ID: ${ctx.entitlement_id ?? ''}\nChương trình: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nHết hạn: ${ctx.expires_at ?? ''}\n\nKích hoạt: https://app.${BRAND_DOMAIN}\n\n— ${BRAND_NAME}`
-      : `Scholarship entitlement granted\nEntitlement ID: ${ctx.entitlement_id ?? ''}\nProgram: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nExpires: ${ctx.expires_at ?? ''}\n\nActivate: https://app.${BRAND_DOMAIN}\n\n— ${BRAND_NAME}`,
+      ? `Báo cáo tiến độ học bổng\nHọc viên: ${ctx.scholar_name ?? ''}\nChương trình: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nTiến độ: ${ctx.progress_percent ?? 0}%\nBài học: ${ctx.lessons_completed ?? 0}/${ctx.lessons_total ?? 0}\nCột mốc: ${ctx.latest_milestone ?? ''}\nKỳ: ${ctx.reporting_period ?? ''}\n\nXem: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`
+      : `Scholarship progress report\nScholar: ${ctx.scholar_name ?? ''}\nProgram: ${ctx.program_name ?? ''}\nCohort: ${ctx.cohort_name ?? ''}\nProgress: ${ctx.progress_percent ?? 0}%\nLessons: ${ctx.lessons_completed ?? 0}/${ctx.lessons_total ?? 0}\nMilestone: ${ctx.latest_milestone ?? ''}\nPeriod: ${ctx.reporting_period ?? ''}\n\nView: https://edu.${BRAND_DOMAIN}/room\n\n— ${BRAND_NAME}`,
   },
 };
 

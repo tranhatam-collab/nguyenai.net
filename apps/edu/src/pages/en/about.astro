@@ -1,0 +1,42 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="About — Nguyen AI Academy"
+  description="About Nguyen AI Academy — free AI learning for the global Nguyen community."
+  activeNav="about"
+>
+  <section class="academy-container py-12 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-6">About the Academy</h1>
+    <p class="text-academy-muted mb-4">
+      Nguyen AI Academy provides free AI learning tracks for Nguyen AI subscribers.
+      Built for the global Nguyen community, our curriculum covers 10 tracks from
+      beginner onboarding to advanced specialization.
+    </p>
+    <p class="text-academy-muted mb-4">
+      Each track includes hands-on lessons, progress tracking, and verified
+      certification upon completion. Lessons are bilingual (Vietnamese + English).
+    </p>
+    <p class="text-academy-muted mb-8">
+      The Academy is part of the Nguyen AI ecosystem, alongside the AI Computer
+      Console (app.nguyenai.net) and the public site (nguyenai.net).
+    </p>
+
+    <div class="border-t border-academy-border pt-6">
+      <h2 class="text-xl font-semibold mb-3">Quick links</h2>
+      <ul class="space-y-2 text-academy-accent">
+        <li><a href="/en/tracks" class="hover:underline">Browse all tracks</a></li>
+        <li><a href="/en/scholarship" class="hover:underline">Scholarship program</a></li>
+        <li><a href="/en/certification" class="hover:underline">Certification</a></li>
+        <li><a href="/en/apply" class="hover:underline">Apply for scholarship</a></li>
+      </ul>
+    </div>
+
+    <div class="mt-8 border-t border-academy-border pt-6 text-center">
+      <a href="/about" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

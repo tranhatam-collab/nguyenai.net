@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Brand naming lock audit
+        run: ./tools/audit-brand-naming-lock.sh
+
       - name: Typecheck
         run: pnpm typecheck
 

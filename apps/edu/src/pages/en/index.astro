@@ -1,0 +1,76 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import TrackCard from '../../components/TrackCard.astro';
+import { tracks, getOnboardingTrack } from '../../data/tracks';
+
+const onboarding = getOnboardingTrack();
+---
+
+<AcademyLayout
+  title="Nguyen AI Academy — English"
+  description="Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more at edu.nguyenai.net/en/."
+  activeNav="home"
+>
+  <!-- Hero -->
+  <section class="bg-academy-header border-b border-academy-border">
+    <div class="academy-container py-16 md:py-24">
+      <div class="max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-academy-accent/10 text-academy-accent text-sm font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-academy-accent"></span>
+          Free for all subscribers
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-bold text-academy-text leading-tight mb-4">
+          Free AI Learning<br />
+          for <span class="text-academy-accent">Nguyen AI</span> Subscribers
+        </h1>
+
+        <p class="text-lg text-academy-muted mb-2">
+          Learn AI for free — 10 learning tracks, Agent team, and verified certification.
+        </p>
+
+        <p class="text-base text-academy-muted mb-8">
+          Built for the global Nguyen community. Bilingual lessons (VI/EN).
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <a
+            href="/en/tracks"
+            class="inline-flex items-center px-6 py-3 bg-academy-accent text-white font-medium rounded-lg hover:bg-academy-accent/90 transition"
+          >
+            Browse Tracks
+          </a>
+          <a
+            href="/en/about"
+            class="inline-flex items-center px-6 py-3 border border-academy-border text-academy-text font-medium rounded-lg hover:bg-academy-card transition"
+          >
+            About the Academy
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onboarding track -->
+  <section class="academy-container py-12">
+    <h2 class="text-2xl font-bold text-academy-text mb-2">Start Here</h2>
+    <p class="text-academy-muted mb-6">New to AI? Begin with the onboarding track.</p>
+    <TrackCard track={onboarding} />
+  </section>
+
+  <!-- All tracks -->
+  <section class="academy-container py-12 border-t border-academy-border">
+    <h2 class="text-2xl font-bold text-academy-text mb-2">All Tracks</h2>
+    <p class="text-academy-muted mb-6">10 learning tracks from beginner to advanced.</p>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {tracks.map((track) => <TrackCard track={track} />)}
+    </div>
+  </section>
+
+  <!-- Lang switch -->
+  <section class="academy-container py-8 border-t border-academy-border text-center">
+    <a href="/" class="text-academy-accent hover:underline">Tiếng Việt</a>
+    <span class="mx-2 text-academy-muted">·</span>
+    <span class="text-academy-text font-medium">English</span>
+  </section>
+</AcademyLayout>

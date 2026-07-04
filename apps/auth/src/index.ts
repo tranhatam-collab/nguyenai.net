@@ -79,9 +79,59 @@ import {
   findOAuthAccount,
   createOAuthAccount,
   findUserByEmailVerified,
+  insertAuditLog,
+  revokeAllUserSessions,
 } from './db';
 
 import type { Context } from 'hono';
+
+// ============================================================
+// Wrappers — auto-fill missing fields for createSession + insertAuditLog
+// ============================================================
+
+/** Wrapper for createSession — fills audience, issuer, device defaults */
+async function createSessionRecord(db: D1Database, partial: {
+  session_id: string;
+  user_id: string;
+  tenant_id: string;
+  roles: string[];
+  permissions: string[];
+  ip_address: string | null;
+  user_agent: string | null;
+  csrf_token: string;
+  expires_at: string;
+}): Promise<void> {
+  await createSession(db, {
+    ...partial,
+    audience: 'nguyenai.net',
+    issuer: 'auth.nguyenai.net',
+    device: null,
+  });
+}
+
+/** Wrapper for insertAuditLog — auto-generates event_id + session_id */
+async function auditLog(db: D1Database, event: {
+  user_id: string;
+  event_type: string;
+  actor_ip?: string | null;
+  user_agent?: string | null;
+  target?: string;
+  result: string;
+  metadata: string;
+  session_id?: string | null;
+}): Promise<void> {
+  await insertAuditLog(db, {
+    event_id: crypto.randomUUID(),
+    user_id: event.user_id,
+    session_id: event.session_id ?? null,
+    event_type: event.event_type,
+    actor_ip: event.actor_ip ?? null,
+    user_agent: event.user_agent ?? null,
+    target: event.target ?? null,
+    result: event.result,
+    metadata: event.metadata,
+  });
+}
 
 // ============================================================
 // App context
@@ -475,15 +525,12 @@ app.post('/v1/auth/login', async (c) => {
   const csrfToken = generateCsrfToken();
   const targetAudience = audience ?? c.env.DEFAULT_AUDIENCE;
 
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: user.user_id,
     tenant_id: primaryOrg.org.tenant_id,
-    audience: targetAudience,
-    issuer: c.env.AUTH_ISSUER,
     roles,
     permissions,
-    device: JSON.stringify({ ua: getUserAgent(c) }),
     ip_address: getClientIp(c),
     user_agent: getUserAgent(c),
     csrf_token: csrfToken,
@@ -962,15 +1009,12 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
   const ip = getClientIp(c);
   const userAgent = getUserAgent(c);
 
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: userId,
     tenant_id: tenantId,
-    audience: c.env.DEFAULT_AUDIENCE,
-    issuer: c.env.AUTH_ISSUER,
     roles: ['user'],
     permissions: getPermissionsForRoles(['user' as Role]),
-    device: JSON.stringify({ ua: userAgent }),
     ip_address: ip,
     user_agent: userAgent,
     csrf_token: csrfToken,
@@ -1035,10 +1079,10 @@ app.post('/v1/auth/magic-link/verify', async (c) => {
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
   const userAgent = c.req.header('user-agent') || 'unknown';
 
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: user.user_id,
-    tenant_id: user.tenant_id,
+    tenant_id: "default",
     roles: ['user'],
     permissions: [],
     ip_address: ip,
@@ -1100,7 +1144,7 @@ app.post('/v1/auth/passkey/register-finish', async (c) => {
     'INSERT INTO mfa_factors (mfa_id, user_id, type, secret, verified, created_at) VALUES (?,?,?,?,1,?)'
   ).bind(passkeyId, session.user_id, 'passkey', credential_id, new Date().toISOString()).run();
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'passkey_registered',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1156,10 +1200,10 @@ app.post('/v1/auth/passkey/authenticate-finish', async (c) => {
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
   const userAgent = c.req.header('user-agent') || 'unknown';
 
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: user.user_id,
-    tenant_id: user.tenant_id,
+    tenant_id: "default",
     roles: ['user'],
     permissions: [],
     ip_address: ip,
@@ -1196,13 +1240,14 @@ app.post('/v1/auth/mfa/disable', async (c) => {
 
   // For TOTP, require code verification before disabling
   if (factor?.type === 'totp' && code) {
-    const expected = generateTotpCode(factor.secret);
+    const totp = new TOTP({ secret: Secret.fromBase32(factor.secret ?? ''), digits: 6, period: 30 });
+    const expected = totp.generate();
     if (code !== expected) return c.json({ error: 'invalid TOTP code' }, 401);
   }
 
   await c.env.DB.prepare('DELETE FROM mfa_factors WHERE mfa_id = ? AND user_id = ?').bind(mfa_id, session.user_id).run();
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'mfa_removed',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1247,7 +1292,7 @@ app.post('/v1/me/delete', async (c) => {
   const maxAge = 7 * 24 * 60 * 60;
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
   const userAgent = c.req.header('user-agent') || 'unknown';
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: session.user_id,
     tenant_id: session.tenant_id,
@@ -1260,7 +1305,7 @@ app.post('/v1/me/delete', async (c) => {
   });
   c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'account_deletion_requested',
     actor_ip: ip,
@@ -1315,7 +1360,7 @@ app.delete('/v1/sessions/:id', async (c) => {
   }
 
   await revokeSession(c.env.DB, targetId);
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'session_revoked',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1340,7 +1385,7 @@ app.post('/v1/sessions/revoke-all', async (c) => {
   const maxAge = 7 * 24 * 60 * 60;
   const ip = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || 'unknown';
   const userAgent = c.req.header('user-agent') || 'unknown';
-  await createSession(c.env.DB, {
+  await createSessionRecord(c.env.DB, {
     session_id: sessionId,
     user_id: session.user_id,
     tenant_id: session.tenant_id,
@@ -1353,7 +1398,7 @@ app.post('/v1/sessions/revoke-all', async (c) => {
   });
   c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'session_revoked',
     actor_ip: ip,
@@ -1409,9 +1454,10 @@ app.post('/v1/organizations', async (c) => {
     org_id: orgId,
     user_id: session.user_id,
     role: 'owner',
+    permissions: [],
   });
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'org_member_added',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1476,10 +1522,11 @@ app.post('/v1/organizations/:id/members', async (c) => {
     membership_id: crypto.randomUUID(),
     org_id: orgId,
     user_id: invitee.user_id,
-    role,
+    role: String(role),
+    permissions: [],
   });
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'org_member_added',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1512,7 +1559,7 @@ app.delete('/v1/organizations/:id/members/:user_id', async (c) => {
     'DELETE FROM memberships WHERE org_id = ? AND user_id = ?'
   ).bind(orgId, targetUserId).run();
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'org_member_removed',
     actor_ip: c.req.header('cf-connecting-ip') || null,
@@ -1545,7 +1592,7 @@ app.post('/v1/organizations/:id/members/:user_id/role', async (c) => {
     'UPDATE memberships SET role = ? WHERE org_id = ? AND user_id = ?'
   ).bind(role, orgId, targetUserId).run();
 
-  await insertAuditLog(c.env.DB, {
+  await auditLog(c.env.DB, {
     user_id: session.user_id,
     event_type: 'role_changed',
     actor_ip: c.req.header('cf-connecting-ip') || null,

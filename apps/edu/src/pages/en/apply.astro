@@ -1,0 +1,50 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import { SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
+---
+
+<AcademyLayout
+  title="Apply for Scholarship — Nguyen AI Academy"
+  description="Apply for the Nguyen AI Scholarship — full sponsorship for Academy access."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-12 max-w-2xl">
+    <h1 class="text-3xl font-bold mb-4">Apply for Scholarship</h1>
+    <p class="text-academy-muted mb-8">
+      Submit your application for the Nguyen AI Scholarship. You will need
+      a verified email and a short statement of intent.
+    </p>
+
+    <form class="space-y-4" action="/api/scholarship/applications" method="POST">
+      <div>
+        <label class="block text-sm font-medium mb-1">Full Name</label>
+        <input type="text" name="full_name" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        <input type="email" name="email" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Program</label>
+        <select name="program_code" required class="w-full border border-academy-border rounded-lg px-4 py-2">
+          {SCHOLARSHIP_PROGRAMS.map((p) => (
+            <option value={p.code}>{p.code} — {p.name}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Statement of Intent</label>
+        <textarea name="statement" rows="5" required class="w-full border border-academy-border rounded-lg px-4 py-2" placeholder="Why do you want to join this scholarship program?"></textarea>
+      </div>
+      <button type="submit" class="w-full bg-academy-accent text-white font-medium rounded-lg px-6 py-3 hover:bg-academy-accent/90 transition">
+        Submit Application
+      </button>
+    </form>
+
+    <div class="mt-8 border-t border-academy-border pt-6 text-center">
+      <a href="/apply" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

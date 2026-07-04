@@ -4,7 +4,8 @@ export type TierName = "free" | "basic" | "pro" | "enterprise";
 export interface TierConfig {
   name: TierName;
   displayName: string;
-  monthlyPrice: number;
+  // NOTE: Pricing is owned by @nai/product-catalog (per PRICING_CATALOG_OWNERSHIP.md).
+  // Do NOT add pricing fields here. Read prices from getAllPlans() / getPlan().
   maxRequestsPerDay: number;
   maxTokensPerMonth: number;
   maxConcurrentSessions: number;
@@ -27,7 +28,6 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
   free: {
     name: "free",
     displayName: "Free",
-    monthlyPrice: 0,
     maxRequestsPerDay: 0,
     maxTokensPerMonth: 0,
     maxConcurrentSessions: 1,
@@ -48,7 +48,6 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
   basic: {
     name: "basic",
     displayName: "Basic",
-    monthlyPrice: 999,
     maxRequestsPerDay: 1000,
     maxTokensPerMonth: 10000000,
     maxConcurrentSessions: 5,
@@ -69,7 +68,6 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
   pro: {
     name: "pro",
     displayName: "Pro",
-    monthlyPrice: 2999,
     maxRequestsPerDay: 10000,
     maxTokensPerMonth: 100000000,
     maxConcurrentSessions: 20,
@@ -90,7 +88,6 @@ export const TIER_CONFIGS: Record<TierName, TierConfig> = {
   enterprise: {
     name: "enterprise",
     displayName: "Enterprise",
-    monthlyPrice: 0,
     maxRequestsPerDay: 0,
     maxTokensPerMonth: 0,
     maxConcurrentSessions: 100,

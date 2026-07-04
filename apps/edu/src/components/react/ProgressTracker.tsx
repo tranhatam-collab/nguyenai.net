@@ -22,8 +22,6 @@ interface ProgressTrackerProps {
   userId?: string;
 }
 
-const STORAGE_KEY_PREFIX = 'nguyenai-progress-';
-
 export default function ProgressTracker({
   track = '01',
   currentLessonSlug,
@@ -34,58 +32,7 @@ export default function ProgressTracker({
   const [error, setError] = useState<string | null>(null);
   const [updatingSlug, setUpdatingSlug] = useState<string | null>(null);
 
-  const storageKey = `${STORAGE_KEY_PREFIX}${track}`;
-
-  // Load from localStorage as fallback
-  const loadFromStorage = useCallback((): Record<string, boolean> => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  }, [storageKey]);
-
-  // Save to localStorage
-  const saveToStorage = useCallback(
-    (lessons: LessonProgress[]) => {
-      try {
-        const map: Record<string, boolean> = {};
-        lessons.forEach((l) => {
-          map[l.slug] = l.completed;
-        });
-        localStorage.setItem(storageKey, JSON.stringify(map));
-      } catch {
-        // localStorage might not be available
-      }
-    },
-    [storageKey]
-  );
-
-  // Merge API data with localStorage fallback
-  const mergeWithStorage = useCallback(
-    (apiData: ProgressData): ProgressData => {
-      const stored = loadFromStorage();
-      const mergedLessons = apiData.lessons.map((l) => ({
-        slug: l.slug,
-        completed: stored[l.slug] ?? l.completed,
-      }));
-      const completedLessons = mergedLessons.filter((l) => l.completed).length;
-      const progress =
-        mergedLessons.length > 0
-          ? Math.round((completedLessons / mergedLessons.length) * 100)
-          : 0;
-      return {
-        ...apiData,
-        lessons: mergedLessons,
-        completedLessons,
-        progress,
-      };
-    },
-    [loadFromStorage]
-  );
-
-  // Fetch progress on mount
+  // Fetch progress from server API (no localStorage fallback — per RFC §2.4)
   useEffect(() => {
     let cancelled = false;
 
@@ -100,32 +47,15 @@ export default function ProgressTracker({
         }
         const data: ProgressData = await res.json();
         if (!cancelled) {
-          const merged = mergeWithStorage(data);
-          setProgressData(merged);
+          setProgressData(data);
           setError(null);
         }
       } catch (err) {
         if (!cancelled) {
-          // Fallback: build from localStorage only
-          const stored = loadFromStorage();
-          const trackNum = track.padStart(2, '0');
-          const lessonSlugs = Array.from({ length: 10 }, (_, i) =>
-            `track-${trackNum}-lesson-${String(i + 1).padStart(2, '0')}`
-          );
-          const lessons = lessonSlugs.map((slug) => ({
-            slug,
-            completed: stored[slug] ?? false,
-          }));
-          const completedLessons = lessons.filter((l) => l.completed).length;
-          const fallbackData: ProgressData = {
-            track: `track-${track}`,
-            totalLessons: lessons.length,
-            completedLessons,
-            progress: Math.round((completedLessons / lessons.length) * 100),
-            lessons,
-          };
-          setProgressData(fallbackData);
-          setError('Using local progress (API unavailable)');
+          // No localStorage fallback — show error state
+          // Per IDENTITY_AND_TENANCY_RFC §2.4: localStorage for business state is FORBIDDEN
+          setProgressData(null);
+          setError('Failed to load progress. Please try again.');
         }
       } finally {
         if (!cancelled) {
@@ -161,9 +91,8 @@ export default function ProgressTracker({
         progress: Math.round((completedLessons / updatedLessons.length) * 100),
       };
       setProgressData(updatedData);
-      saveToStorage(updatedLessons);
 
-      // Sync to API (best-effort)
+      // Sync to API (no localStorage fallback — per RFC §2.4)
       try {
         await fetch('/api/progress', {
           method: 'POST',
@@ -172,15 +101,18 @@ export default function ProgressTracker({
             userId,
             lessonSlug: slug,
             completed: newCompleted,
+            idempotency_key: `progress-${userId}-${slug}-${Date.now()}`,
           }),
         });
       } catch {
-        // API might not be available in static mode — localStorage is the fallback
+        // Revert optimistic update on failure
+        setProgressData(progressData);
+        setError('Failed to save progress. Please try again.');
       } finally {
         setUpdatingSlug(null);
       }
     },
-    [progressData, userId, saveToStorage]
+    [progressData, userId]
   );
 
   if (loading) {

@@ -1,0 +1,43 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import { SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
+---
+
+<AcademyLayout
+  title="Scholarship Program — Nguyen AI Academy"
+  description="Nguyen AI Scholarship — 9 programs, full sponsorship, verified certification."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-12 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-4">Scholarship Program</h1>
+    <p class="text-academy-muted mb-8">
+      The Nguyen AI Scholarship provides full sponsorship for the Academy,
+      including all tracks, certification fees, and a dedicated Agent team.
+    </p>
+
+    <h2 class="text-2xl font-semibold mb-4">9 Scholarship Programs</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      {SCHOLARSHIP_PROGRAMS.map((p) => (
+        <div class="border border-academy-border rounded-lg p-4">
+          <span class="text-sm text-academy-muted">{p.code}</span>
+          <h3 class="font-semibold text-lg">{p.name}</h3>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-8 flex gap-4">
+      <a href="/en/apply" class="inline-flex items-center px-6 py-3 bg-academy-accent text-white font-medium rounded-lg hover:bg-academy-accent/90 transition">
+        Apply Now
+      </a>
+      <a href="/en/scholarship/policies" class="inline-flex items-center px-6 py-3 border border-academy-border text-academy-text font-medium rounded-lg hover:bg-academy-card transition">
+        Policies & Terms
+      </a>
+    </div>
+
+    <div class="mt-8 border-t border-academy-border pt-6 text-center">
+      <a href="/scholarship" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

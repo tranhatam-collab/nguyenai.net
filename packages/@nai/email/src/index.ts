@@ -41,5 +41,5 @@ export const AUDIT_EVENT_TO_TEMPLATE: Record<string, import('./types').EmailTemp
   scholarship_review_assigned: 'scholarship_review_request',
   scholarship_awarded: 'scholarship_decision',
   scholarship_declined: 'scholarship_decision',
-  scholarship_entitlement_granted: 'scholarship_entitlement_granted',
+  scholarship_progress_reported: 'scholarship_progress',
 };

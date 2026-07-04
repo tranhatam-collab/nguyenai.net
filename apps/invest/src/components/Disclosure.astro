@@ -1,17 +1,31 @@
 ---
 /**
- * Disclosure.astro — Reusable disclosure line component.
- * Required on every investor page per AGENTS.md rules.
+ * Disclosure.astro — Reusable investor disclosure component.
+ *
+ * Per INVESTOR_ACCESS_POLICY.md §6 (BINDING):
+ * - Must display approved disclosure in both VI and EN
+ * - Must include version label
+ * - The previous short form ("Financial projections are hypotheses...")
+ *   is NOT the approved wording and has been replaced.
+ *
+ * Approved disclosure version: 2026-07-02-v1
  */
 interface Props {
   class?: string;
+  /** Disclosure version — defaults to current approved version */
+  version?: string;
 }
-const { class: className = '' } = Astro.props;
+const { class: className = '', version = '2026-07-02-v1' } = Astro.props;
 ---
 
-<p class={`disclosure-line ${className}`}>
-  Financial projections are hypotheses, not commitments. Legal entity and IP ownership pending.
-  <span lang="en" class="block mt-1 opacity-70">
-    Dự phóng tài chính là giả thuyết, không phải cam kết. Thực thể pháp lý và quyền sở hữu IP đang hoàn thiện.
-  </span>
-</p>
+<div class={`disclosure-line ${className}`} data-disclosure-version={version}>
+  <p lang="vi">
+    Thông tin trên website không cấu thành lời chào bán chứng khoán, cam kết lợi nhuận hoặc tư vấn đầu tư.
+  </p>
+  <p lang="en" class="block mt-1 opacity-90">
+    Information on this website does not constitute an offer to sell securities, a commitment to returns, or investment advice.
+  </p>
+  <p class="text-xs mt-1 opacity-50">
+    Disclosure version: {version}
+  </p>
+</div>

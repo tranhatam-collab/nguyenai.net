@@ -1,16 +1,17 @@
 /**
  * RoutingRules.tsx — Table of routing rules (condition → preferred model).
- * - Rules stored in localStorage `nguyenai:routing-rules`
+ * - Rules stored server-side via /v1/memory (type=preference)
  * - Add rule inline form (condition input + model dropdown)
  * - Delete rule per row
+ *
+ * NOTE: Previously used localStorage (FORBIDDEN per IDENTITY_AND_TENANCY_RFC §2.4).
+ * Now uses server-side API via /v1/memory.
  */
 import { useCallback, useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { MODELS, PROVIDER_LABELS } from '../../lib/models';
-import { getItem, setItem } from '../../lib/storage';
+import { fetchRoutingRules, saveRoutingRule, deleteRoutingRule, type RoutingRule as ApiRoutingRule } from '../../lib/api';
 import type { RoutingRule } from '../../types/command';
-
-const RULES_KEY = 'nguyenai:routing-rules';
 
 const DEFAULT_RULES: RoutingRule[] = [
   { id: 'rule-1', condition: 'Code generation', modelId: 'claude-3-5-sonnet' },
@@ -25,19 +26,25 @@ export default function RoutingRules() {
   const [condition, setCondition] = useState('');
   const [modelId, setModelId] = useState<string>('auto-route');
 
+  // Load from server API (replaces localStorage)
   useEffect(() => {
-    const stored = getItem<RoutingRule[]>(RULES_KEY, []);
-    if (stored.length === 0) {
-      setItem(RULES_KEY, DEFAULT_RULES);
-      setRules(DEFAULT_RULES);
-    } else {
-      setRules(stored);
-    }
+    fetchRoutingRules()
+      .then((apiRules) => {
+        if (apiRules.length === 0) {
+          // Seed defaults to server
+          setRules(DEFAULT_RULES);
+          DEFAULT_RULES.forEach((r) => saveRoutingRule(r as ApiRoutingRule).catch(() => {}));
+        } else {
+          setRules(apiRules as unknown as RoutingRule[]);
+        }
+      })
+      .catch(() => setRules(DEFAULT_RULES));
   }, []);
 
   const persist = useCallback((next: RoutingRule[]) => {
     setRules(next);
-    setItem(RULES_KEY, next);
+    // Sync to server (fire-and-forget)
+    next.forEach((r) => saveRoutingRule(r as unknown as ApiRoutingRule).catch(() => {}));
   }, []);
 
   const handleAdd = useCallback(
@@ -60,9 +67,11 @@ export default function RoutingRules() {
 
   const handleDelete = useCallback(
     (id: string) => {
-      persist(rules.filter((r) => r.id !== id));
+      const next = rules.filter((r) => r.id !== id);
+      setRules(next);
+      deleteRoutingRule(id).catch(() => {});
     },
-    [rules, persist],
+    [rules],
   );
 
   const modelName = (id: string) =>

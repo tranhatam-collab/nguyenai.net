@@ -6,3 +6,5 @@ export * from "./review.js";
 export * from "./skill.js";
 export * from "./tos.js";
 export * from "./tier.js";
+export * from "./entitlements.js";
+export * from "./commercial-objects.js";

@@ -1,0 +1,54 @@
+---
+import AcademyLayout from '../../../../layouts/AcademyLayout.astro';
+
+// Per EDU_MASTER_PLAN_V4 §XXXVI — 12 policy documents with V4 route slugs
+const policies = [
+  { id: 'program-terms', title: 'Scholarship Program Terms', title_vi: 'Điều khoản chương trình học bổng', v4_route: '/scholarships/program-terms' },
+  { id: 'privacy', title: 'Applicant Privacy Policy', title_vi: 'Quyền riêng tư ứng viên', v4_route: '/scholarships/privacy' },
+  { id: 'wish-sharing', title: 'Public Wish Sharing Policy', title_vi: 'Chính sách chia sẻ nguyện vọng', v4_route: '/scholarships/wish-sharing' },
+  { id: 'investor-review', title: 'Investor Scholarship Review Policy', title_vi: 'Chính sách đánh giá của nhà đầu tư', v4_route: '/investors/scholarship-review-policy' },
+  { id: 'decision-policy', title: 'Scholarship Decision Policy', title_vi: 'Chính sách quyết định', v4_route: '/scholarships/decision-policy' },
+  { id: 'forum-guidelines', title: 'Learning Forum Community Guidelines', title_vi: 'Hướng dẫn cộng đồng diễn đàn', v4_route: '/community/forum-guidelines' },
+  { id: 'moderation-policy', title: 'Content Moderation Policy', title_vi: 'Chính sách kiểm duyệt nội dung', v4_route: '/community/moderation-policy' },
+  { id: 'retention', title: 'Data Retention and Deletion Policy', title_vi: 'Chính sách giữ dữ liệu và xóa', v4_route: '/privacy/retention' },
+  { id: 'sponsorship-terms', title: 'Scholarship Sponsorship Terms', title_vi: 'Điều khoản tài trợ', v4_route: '/investors/sponsorship-terms' },
+  { id: 'appeals', title: 'Appeals and Complaints Policy', title_vi: 'Quy trình khiếu nại và kháng cáo', v4_route: '/scholarships/appeals' },
+  { id: 'code-of-conduct', title: 'Code of Conduct', title_vi: 'Quy tắc ứng xử', v4_route: '/governance/code-of-conduct' },
+  { id: 'conflict-of-interest', title: 'Conflict of Interest Policy', title_vi: 'Chính sách xung đột lợi ích', v4_route: '/governance/conflict-of-interest' },
+];
+---
+
+<AcademyLayout
+  title="Scholarship Policies — Nguyen AI Academy"
+  description="12 scholarship policy documents per V4: terms, privacy, council, sponsorship, appeals."
+  activeNav="scholarship"
+>
+  <section class="academy-container py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-2">Scholarship Policies</h1>
+    <p class="text-gray-600 mb-2">12 policy documents (v1.0.0, effective 2026-07-04).</p>
+    <p class="text-sm text-gray-500 mb-8">Per EDU_MASTER_PLAN_V4 §XXXVI — 12 policy documents.</p>
+
+    <div class="grid gap-4">
+      {policies.map((p, i) => (
+        <a
+          href={`/en/scholarship/policies/${p.id}`}
+          class="border rounded-lg p-4 hover:shadow transition flex items-center justify-between"
+        >
+          <div>
+            <span class="text-sm text-gray-400">#{String(i + 1).padStart(2, '0')}</span>
+            <h2 class="font-semibold text-lg">{p.title}</h2>
+            <p class="text-sm text-gray-500">{p.title_vi}</p>
+            <p class="text-xs text-gray-400 mt-1">V4 route: <code>{p.v4_route}</code></p>
+          </div>
+          <span class="text-blue-600">→</span>
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-8 border-t pt-6 text-center">
+      <a href="/scholarship/policies" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

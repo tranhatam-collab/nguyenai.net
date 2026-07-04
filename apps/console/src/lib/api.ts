@@ -198,3 +198,97 @@ export const api = {
 };
 
 export { API_BASE };
+
+// ============================================================
+// Command history — replaces localStorage key 'nguyenai:command-history'
+// Uses /v1/memory with type='command' (server-side persistence)
+// Per IDENTITY_AND_TENANCY_RFC §2.4: localStorage for business state is FORBIDDEN
+// ============================================================
+
+export interface CommandRecord {
+  id: string;
+  text: string;
+  model: string;
+  status: 'running' | 'completed' | 'failed' | 'pending';
+  timestamp: number;
+  result?: string;
+  commandId?: string;
+  agentId?: string;
+  evidenceLabels?: string[];
+}
+
+export async function fetchCommandHistory(limit = 50): Promise<CommandRecord[]> {
+  try {
+    const data = await apiFetch<{ memories: MemoryEntry[] }>(`/v1/memory?type=command&limit=${limit}`);
+    return (data.memories ?? []).map((m) => m.value as CommandRecord);
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCommandRecord(cmd: CommandRecord): Promise<void> {
+  try {
+    await apiFetch('/v1/memory', 'POST', {
+      memory_type: 'command',
+      key: `command:${cmd.id}`,
+      value: cmd,
+      idempotency_key: `cmd-${cmd.id}`,
+    });
+  } catch {
+    // Silently fail — UI still shows command
+  }
+}
+
+export async function clearCommandHistory(): Promise<void> {
+  try {
+    const records = await fetchCommandHistory(100);
+    await Promise.all(
+      records.map((r) => apiFetch(`/v1/memory/command:${r.id}`, 'DELETE'))
+    );
+  } catch {
+    // Silently fail
+  }
+}
+
+// ============================================================
+// Routing rules — replaces localStorage key 'nguyenai:routing-rules'
+// Uses /v1/memory with type='preference' (server-side persistence)
+// ============================================================
+
+export interface RoutingRule {
+  id: string;
+  condition: string;
+  modelId: string;
+}
+
+export async function fetchRoutingRules(): Promise<RoutingRule[]> {
+  try {
+    const data = await apiFetch<{ memories: MemoryEntry[] }>(`/v1/memory?type=preference&limit=100`);
+    return (data.memories ?? [])
+      .filter((m) => m.key.startsWith('routing-rule:'))
+      .map((m) => m.value as RoutingRule);
+  } catch {
+    return [];
+  }
+}
+
+export async function saveRoutingRule(rule: RoutingRule): Promise<void> {
+  try {
+    await apiFetch('/v1/memory', 'POST', {
+      memory_type: 'preference',
+      key: `routing-rule:${rule.id}`,
+      value: rule,
+      idempotency_key: `rule-${rule.id}`,
+    });
+  } catch {
+    // Silently fail
+  }
+}
+
+export async function deleteRoutingRule(ruleId: string): Promise<void> {
+  try {
+    await apiFetch(`/v1/memory/routing-rule:${ruleId}`, 'DELETE');
+  } catch {
+    // Silently fail
+  }
+}

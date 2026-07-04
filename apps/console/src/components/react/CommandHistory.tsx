@@ -1,19 +1,19 @@
 /**
  * CommandHistory.tsx — List of past commands with filters and re-run.
- * - Data from localStorage key `nguyenai:command-history`
+ * - Data from server API (POST /v1/memory with type=command)
  * - Filter by status (all/completed/failed/running)
  * - Click to re-run (dispatches `command:submit`)
+ *
+ * NOTE: Previously used localStorage (FORBIDDEN per IDENTITY_AND_TENANCY_RFC §2.4).
+ * Now uses server-side API via /v1/memory.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { getItem, setItem } from '../../lib/storage';
+import { fetchCommandHistory, clearCommandHistory, type CommandRecord } from '../../lib/api';
 import { getModelById, PROVIDER_LABELS } from '../../lib/models';
-import type { Command } from '../../types/command';
-
-const HISTORY_KEY = 'nguyenai:command-history';
 
 type StatusFilter = 'all' | 'completed' | 'failed' | 'running';
 
-const STATUS_STYLES: Record<Command['status'], { dot: string; label: string }> = {
+const STATUS_STYLES: Record<CommandRecord['status'], { dot: string; label: string }> = {
   running: { dot: 'bg-status-idle animate-pulse', label: 'Running · Đang chạy' },
   completed: { dot: 'bg-status-active', label: 'Completed · Hoàn thành' },
   failed: { dot: 'bg-status-offline', label: 'Failed · Lỗi' },
@@ -28,31 +28,30 @@ const FILTERS: { id: StatusFilter; label: string }[] = [
 ];
 
 export default function CommandHistory() {
-  const [history, setHistory] = useState<Command[]>([]);
+  const [history, setHistory] = useState<CommandRecord[]>([]);
   const [filter, setFilter] = useState<StatusFilter>('all');
 
-  // Load + subscribe to history changes (updated by CommandInput)
-  const loadHistory = useCallback(() => {
-    setHistory(getItem<Command[]>(HISTORY_KEY, []));
+  // Load from server API (replaces localStorage)
+  const loadHistory = useCallback(async () => {
+    const records = await fetchCommandHistory(50);
+    setHistory(records);
   }, []);
 
   useEffect(() => {
     loadHistory();
     const onChange = () => loadHistory();
-    window.addEventListener('storage', onChange);
     window.addEventListener('command:history:updated', onChange);
     return () => {
-      window.removeEventListener('storage', onChange);
       window.removeEventListener('command:history:updated', onChange);
     };
   }, [loadHistory]);
 
-  const handleClear = useCallback(() => {
-    setItem(HISTORY_KEY, []);
+  const handleClear = useCallback(async () => {
+    await clearCommandHistory();
     setHistory([]);
   }, []);
 
-  const handleReRun = useCallback((cmd: Command) => {
+  const handleReRun = useCallback((cmd: CommandRecord) => {
     window.dispatchEvent(
       new CustomEvent('command:submit', {
         detail: { command: cmd.text, model: cmd.model },

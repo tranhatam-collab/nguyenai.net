@@ -1,40 +1,44 @@
 ---
 import AcademyLayout from '../../../layouts/AcademyLayout.astro';
 
+// Per EDU_MASTER_PLAN_V4 §XXXVI — 12 policy documents with V4 route slugs
 const policies = [
-  { id: '01', title: 'Chính sách học bổng', file: '01_SCHOLARSHIP_POLICY.md' },
-  { id: '02', title: 'Tiêu chí và quy trình nộp đơn', file: '02_APPLICATION_CRITERIA.md' },
-  { id: '03', title: 'Quy trình kiểm duyệt nội dung', file: '03_MODERATION_POLICY.md' },
-  { id: '04', title: 'Quyền riêng tư và dữ liệu', file: '04_PRIVACY_AND_DATA.md' },
-  { id: '05', title: 'Hội đồng đánh giá (Council)', file: '05_COUNCIL_GOVERNANCE.md' },
-  { id: '06', title: 'Quy trình tài trợ và đầu tư', file: '06_SPONSORSHIP_POLICY.md' },
-  { id: '07', title: 'Quyền lợi học bổng', file: '07_ENTITLEMENT_RIGHTS.md' },
-  { id: '08', title: 'Quy trình khiếu nại và kháng cáo', file: '08_APPEAL_PROCESS.md' },
-  { id: '09', title: 'Chính sách bảo mật và an ninh', file: '09_SECURITY_POLICY.md' },
-  { id: '10', title: 'Chính sách giữ dữ liệu và xóa', file: '10_DATA_RETENTION.md' },
-  { id: '11', title: 'Điều khoản sử dụng', file: '11_TERMS_OF_SERVICE.md' },
-  { id: '12', title: 'Chính sách thay đổi và phiên bản', file: '12_CHANGE_POLICY.md' },
+  { id: 'program-terms', title: 'Điều khoản chương trình học bổng', title_en: 'Scholarship Program Terms', file: '01_SCHOLARSHIP_POLICY.md', v4_route: '/scholarships/program-terms' },
+  { id: 'privacy', title: 'Quyền riêng tư ứng viên', title_en: 'Applicant Privacy Policy', file: '04_PRIVACY_AND_DATA.md', v4_route: '/scholarships/privacy' },
+  { id: 'wish-sharing', title: 'Chính sách chia sẻ nguyện vọng', title_en: 'Public Wish Sharing Policy', file: '02_APPLICATION_CRITERIA.md', v4_route: '/scholarships/wish-sharing' },
+  { id: 'investor-review', title: 'Chính sách đánh giá của nhà đầu tư', title_en: 'Investor Scholarship Review Policy', file: '05_COUNCIL_GOVERNANCE.md', v4_route: '/investors/scholarship-review-policy' },
+  { id: 'decision-policy', title: 'Chính sách quyết định', title_en: 'Scholarship Decision Policy', file: '05_COUNCIL_GOVERNANCE.md', v4_route: '/scholarships/decision-policy' },
+  { id: 'forum-guidelines', title: 'Hướng dẫn cộng đồng diễn đàn', title_en: 'Learning Forum Community Guidelines', file: '03_MODERATION_POLICY.md', v4_route: '/community/forum-guidelines' },
+  { id: 'moderation-policy', title: 'Chính sách kiểm duyệt nội dung', title_en: 'Content Moderation Policy', file: '03_MODERATION_POLICY.md', v4_route: '/community/moderation-policy' },
+  { id: 'retention', title: 'Chính sách giữ dữ liệu và xóa', title_en: 'Data Retention and Deletion Policy', file: '10_DATA_RETENTION.md', v4_route: '/privacy/retention' },
+  { id: 'sponsorship-terms', title: 'Điều khoản tài trợ', title_en: 'Scholarship Sponsorship Terms', file: '06_SPONSORSHIP_POLICY.md', v4_route: '/investors/sponsorship-terms' },
+  { id: 'appeals', title: 'Quy trình khiếu nại và kháng cáo', title_en: 'Appeals and Complaints Policy', file: '08_APPEAL_PROCESS.md', v4_route: '/scholarships/appeals' },
+  { id: 'code-of-conduct', title: 'Quy tắc ứng xử', title_en: 'Code of Conduct', file: '11_TERMS_OF_SERVICE.md', v4_route: '/governance/code-of-conduct' },
+  { id: 'conflict-of-interest', title: 'Chính sách xung đột lợi ích', title_en: 'Conflict of Interest Policy', file: '12_CHANGE_POLICY.md', v4_route: '/governance/conflict-of-interest' },
 ];
 ---
 
 <AcademyLayout
   title="Chính sách học bổng — Nguyễn AI"
-  description="12 tài liệu chính sách học bổng Nguyễn AI: quy trình, tiêu chí, bảo mật, council, tài trợ, quyền lợi."
+  description="12 tài liệu chính sách học bổng Nguyễn AI per V4: điều khoản, quyền riêng tư, council, tài trợ, khiếu nại."
   activeNav="scholarship"
 >
   <section class="academy-container py-8 max-w-4xl">
     <h1 class="text-3xl font-bold mb-2">Chính sách học bổng</h1>
-    <p class="text-gray-600 mb-8">12 tài liệu chính sách (v1.0.0, hiệu lực 2026-07-04).</p>
+    <p class="text-gray-600 mb-2">12 tài liệu chính sách (v1.0.0, hiệu lực 2026-07-04).</p>
+    <p class="text-sm text-gray-500 mb-8">Per EDU_MASTER_PLAN_V4 §XXXVI — 12 policy documents.</p>
 
     <div class="grid gap-4">
-      {policies.map((p) => (
+      {policies.map((p, i) => (
         <a
           href={`/scholarship/policies/${p.id}`}
           class="border rounded-lg p-4 hover:shadow transition flex items-center justify-between"
         >
           <div>
-            <span class="text-sm text-gray-400">#{p.id}</span>
+            <span class="text-sm text-gray-400">#{String(i + 1).padStart(2, '0')}</span>
             <h2 class="font-semibold text-lg">{p.title}</h2>
+            <p class="text-sm text-gray-500">{p.title_en}</p>
+            <p class="text-xs text-gray-400 mt-1">V4 route: <code>{p.v4_route}</code></p>
           </div>
           <span class="text-blue-600">→</span>
         </a>

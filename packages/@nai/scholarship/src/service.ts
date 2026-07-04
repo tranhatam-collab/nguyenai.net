@@ -438,19 +438,50 @@ export async function createReview(
   });
 
   // Send review request email to investor (Section XXVII.2)
+  // Per V4 §XXVII: pre-email checks — investor must be verified, have valid access grant,
+  // not suspended, and opted in to email
   const app = await store.getApplication(applicationId);
   if (app) {
-    // Look up investor profile to get display name (email is not stored on profile)
     const investor = await store.getInvestorProfileByUserId(reviewerId);
     if (investor) {
-      await sendEmail('scholarship_review_request', {
-        locale: 'vi',
-        user_email: '', // Investor email resolved at API layer from session
-        user_name: investor.display_name,
-        application_id: applicationId,
-        program_name: app.program_code,
-        review_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      });
+      // Pre-check 1: Investor must be verified
+      if (!investor.verified) {
+        // Skip email — log for audit
+        console.log(`[createReview] Skipping email to ${reviewerId}: investor not verified`);
+      } else {
+        // Pre-check 2: Investor must have valid (non-expired, non-revoked) access grant
+        const grants = await checkUserInvestorAccess(reviewerId);
+        const hasValidGrant = grants.length > 0 && grants.some((g) => g.revoked_at === null);
+        if (!hasValidGrant) {
+          console.log(`[createReview] Skipping email to ${reviewerId}: no valid access grant`);
+        } else {
+          // Pre-check 3: access_expires_at must be in the future
+          const accessExpired = investor.access_expires_at
+            ? new Date(investor.access_expires_at) <= new Date()
+            : false;
+          if (accessExpired) {
+            console.log(`[createReview] Skipping email to ${reviewerId}: access expired`);
+          } else {
+            // Pre-check 4: email opt-in (stored as preference in memory store)
+            // For now, default to opted-in. Production should check investor preference.
+            // TODO: load opt-in from investor preferences store
+            const optedIn = true; // placeholder — replace with preference lookup
+            if (!optedIn) {
+              console.log(`[createReview] Skipping email to ${reviewerId}: opted out`);
+            } else {
+              // All pre-checks passed — send email
+              await sendEmail('scholarship_review_request', {
+                locale: 'vi',
+                user_email: '', // Investor email resolved at API layer from session
+                user_name: investor.display_name,
+                application_id: applicationId,
+                program_name: app.program_code,
+                review_deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              });
+            }
+          }
+        }
+      }
     }
   }
 
@@ -1540,15 +1571,20 @@ export async function grantEntitlement(
     read_at: null,
   });
 
-  // Send entitlement granted email (Section XXVII.5)
-  await sendEmail('scholarship_entitlement_granted', {
+  // Send progress report email to investor/co-sponsor (Section XXVII.5)
+  // Per V4: progress report sent after award — replaces previous entitlement_granted template
+  await sendEmail('scholarship_progress', {
     locale: 'vi',
     user_email: app.email,
     user_name: app.full_name,
-    entitlement_id: id,
+    scholar_name: app.full_name,
     program_name: app.program_code,
     cohort_name: cohortId,
-    expires_at: expiresAt,
+    progress_percent: 0,
+    lessons_completed: 0,
+    lessons_total: 0,
+    latest_milestone: 'Scholarship awarded — entitlement activated',
+    reporting_period: new Date().toISOString().slice(0, 7), // YYYY-MM
   });
 
   return id;

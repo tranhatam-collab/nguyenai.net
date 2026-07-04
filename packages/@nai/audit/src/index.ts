@@ -160,6 +160,13 @@ export interface AuditStore {
 }
 
 // ============================================================
+// Data classes + retention schedule (15 classes)
+// Per DATA_CLASSIFICATION_AND_RETENTION.md §6 (LOCKED)
+// ============================================================
+
+export * from './data-classes';
+
+// ============================================================
 // In-memory store — for testing and local dev
 // ============================================================
 

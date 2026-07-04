@@ -8,7 +8,7 @@
     "build": "wrangler deploy --dry-run",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'API tested via E2E suite (tests/e2e)'",
+    "test": "tsx src/idempotency.test.ts",
     "lint": "echo 'TODO: eslint for @nai/api'"
   },
   "dependencies": {

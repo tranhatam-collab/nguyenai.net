@@ -30,6 +30,7 @@
 import { Hono } from 'hono';
 import { defaultRateLimit, formSubmitRateLimit, cleanupBuckets } from './rate-limiter';
 import { EmailService } from '@nai/email';
+import { logAuditEvent } from '@nai/audit';
 import {
   InMemoryScholarshipStore,
   setScholarshipStore,
@@ -120,6 +121,40 @@ scholarshipRoutes.use('*', async (c, next) => {
 
 // Default rate limit: 60 req/min per IP
 scholarshipRoutes.use('*', defaultRateLimit);
+
+// Audit middleware — logs every write operation (POST/PATCH/DELETE/PUT)
+// Per ENTITLEMENT_API_RFC §6: every write operation MUST log to audit_log
+// Per INVESTOR_ACCESS_POLICY §8: every private room event must be audited
+scholarshipRoutes.use('*', async (c, next) => {
+  const method = c.req.method.toUpperCase();
+  // Only audit write operations
+  if (!['POST', 'PATCH', 'DELETE', 'PUT'].includes(method)) {
+    await next();
+    return;
+  }
+  await next();
+  // Log after handler completes — captures success/failure
+  const session = (c as any).get('session') as { user_id?: string; tenant_id?: string; session_id?: string } | null;
+  const status = c.res.status;
+  // Build event type from method + path
+  const path = c.req.path.replace('/v1/scholarship/', '').replace(/\//g, '_');
+  const eventType = `scholarship_${method.toLowerCase()}_${path}`.substring(0, 80) as any;
+  try {
+    await logAuditEvent({
+      user_id: session?.user_id ?? 'anonymous',
+      tenant_id: session?.tenant_id ?? '',
+      session_id: session?.session_id ?? null,
+      event_type: eventType,
+      actor_ip: c.req.header('CF-Connecting-IP') ?? c.req.header('cf-connecting-ip') ?? null,
+      user_agent: c.req.header('User-Agent') ?? c.req.header('user-agent') ?? null,
+      target: c.req.path,
+      result: status >= 200 && status < 400 ? 'success' : 'failure',
+      metadata: { method, path: c.req.path, status },
+    });
+  } catch {
+    // Audit failure should not block response
+  }
+});
 
 // ============================================================
 // 1-4. Application endpoints

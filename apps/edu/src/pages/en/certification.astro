@@ -1,0 +1,32 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+---
+
+<AcademyLayout
+  title="Certification — Nguyen AI Academy"
+  description="Verified certification upon track completion — binding proof of AI competency."
+  activeNav="certification"
+>
+  <section class="academy-container py-12 max-w-3xl">
+    <h1 class="text-3xl font-bold mb-4">Certification</h1>
+    <p class="text-academy-muted mb-8">
+      Complete a track and earn a verified certificate, issued via the
+      Nguyen AI Proof service. Certificates are binding, revocable, and
+      permanently recorded.
+    </p>
+
+    <h2 class="text-2xl font-semibold mb-4">How it works</h2>
+    <ol class="space-y-3 list-decimal list-inside text-academy-muted">
+      <li>Complete all lessons in a track.</li>
+      <li>Pass the final assessment (≥80% score).</li>
+      <li>Receive a binding certificate with a unique ID.</li>
+      <li>Certificate is verifiable at <code>edu.nguyenai.net/verify</code>.</li>
+    </ol>
+
+    <div class="mt-8 border-t border-academy-border pt-6 text-center">
+      <a href="/certification" class="text-academy-accent hover:underline">Tiếng Việt</a>
+      <span class="mx-2 text-academy-muted">·</span>
+      <span class="text-academy-text font-medium">English</span>
+    </div>
+  </section>
+</AcademyLayout>

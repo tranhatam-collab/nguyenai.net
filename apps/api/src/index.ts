@@ -39,6 +39,8 @@ import {
   setAuditStore,
 } from '@nai/audit';
 import { D1AuditStore } from './d1-audit-store';
+import { idempotencyMiddleware } from './idempotency';
+import { defaultRateLimit } from './rate-limiter';
 
 import {
   resolveEntitlements,
@@ -211,7 +213,7 @@ function initStores(env: AppEnv['Bindings']): void {
 }
 
 // ============================================================
-// Middleware — resolve session from cookie
+// Middleware — resolve session from cookie + idempotency gate
 // ============================================================
 
 app.use('/v1/*', async (c, next) => {
@@ -221,6 +223,15 @@ app.use('/v1/*', async (c, next) => {
   c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie, c.env) : null);
   await next();
 });
+
+// Idempotency middleware — applies to all write endpoints (POST/PUT/PATCH/DELETE)
+// Per ENTITLEMENT_API_RFC §5: without idempotency_key, write endpoints return 400
+// Exempt: GET, /health, /v1/session, /v1/logout, /v1/auth/*, /v1/payment/webhook/*, /v1/gen1/*
+app.use('/v1/*', idempotencyMiddleware);
+
+// Rate limiting — 60 req/min per IP for all /v1/* endpoints
+// Per AGENTS.md: rate limiting on main API (34+ endpoints)
+app.use('/v1/*', defaultRateLimit);
 
 // ============================================================
 // Health check — no auth
