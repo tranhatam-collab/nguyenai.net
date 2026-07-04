@@ -9,13 +9,13 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 // Import the app (side-effects: initializes in-memory stores)
-import app from './index';
+import app from './index.ts';
 
 describe('@nai/api', () => {
   it('GET /health returns 200 with service info', async () => {
     const res = await app.request('/health');
     assert.equal(res.status, 200);
-    const body = await res.json() as any;
+    const body = await res.json();
     assert.equal(body.status, 'ok');
     assert.equal(body.service, 'nai-api');
     assert.ok(body.timestamp);
@@ -24,7 +24,7 @@ describe('@nai/api', () => {
   it('GET /v1/session without cookie returns 401', async () => {
     const res = await app.request('/v1/session');
     assert.equal(res.status, 401);
-    const body = await res.json() as any;
+    const body = await res.json();
     assert.equal(body.error, 'no valid session');
   });
 
@@ -36,7 +36,7 @@ describe('@nai/api', () => {
   it('GET /v1/plans returns 8 plans from catalog', async () => {
     const res = await app.request('/v1/plans');
     assert.equal(res.status, 200);
-    const body = await res.json() as any;
+    const body = await res.json();
     assert.ok(Array.isArray(body.plans));
     assert.equal(body.plans.length, 8);
   });

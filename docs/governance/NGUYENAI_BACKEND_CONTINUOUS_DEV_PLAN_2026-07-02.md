@@ -339,14 +339,12 @@ Phase 0 (governance + monorepo)
 
 ---
 
-## 8. Quyết định Founder — SIGN-OFF 2026-07-02
+## 8. Quyết định còn treo (cần Founder)
 
-| # | Quyết định | Trả lời Founder | Trạng thái |
-|---|---|---|---|
-| Q1 | DB chính: Neon Postgres hay Cloudflare D1? | **Cả hai** — Neon Postgres (primary, pgvector + transaction) + Cloudflare D1 (edge cache) | LOCKED |
-| Q2 | Sign-off override `ECOSYSTEM_SOURCE_OF_TRUTH` + `FOUNDER_VERDICT`? | **SIGN-OFF** — nguyenai.net có backend riêng độc lập | LOCKED |
-| Q3 | Academy pricing: free cho subscriber hay freemium? | **Freemium** — free cơ bản + Pass trả phí | LOCKED |
-| Q4 | Payment: VNPay + Stripe hay chỉ Stripe? | **VNPay (VND) + Stripe (USD)** | LOCKED |
-| Q5 | Vector: Qdrant Cloud (dev) → dedicated (prod) hay self-host? | **Qdrant Cloud dev → dedicated prod** (default) | LOCKED |
-
-> **Founder sign-off timestamp:** 2026-07-02. Override có hiệu lực ngay. Phase 0 bắt đầu.
+| # | Quyết định | Default nếu không trả lời |
+|---|---|---|
+| Q1 | DB chính: Neon Postgres hay Cloudflare D1? | Neon Postgres (cần pgvector + transaction) |
+| Q2 | Sign-off override `ECOSYSTEM_SOURCE_OF_TRUTH` + `FOUNDER_VERDICT`? | Chưa sign = không build |
+| Q3 | Academy pricing: free cho subscriber hay freemium (Pass trả phí)? | Freemium (QA_AUDIT §B.3 khuyến nghị Option B) |
+| Q4 | Payment: VNPay + Stripe hay chỉ Stripe? | VNPay (VND) + Stripe (USD) |
+| Q5 | Vector: Qdrant Cloud (dev) → dedicated (prod) hay self-host Fly.io? | Qdrant Cloud dev, dedicated prod |

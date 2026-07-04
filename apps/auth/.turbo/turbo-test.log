@@ -1,2 +1,9 @@
-$ echo 'auth-worker tested via E2E suite'
-auth-worker tested via E2E suite
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/auth-worker test
+----------------------
+  ✓ auth module loads
+  ✓ exports default handler or fetch
+
+2 passed, 0 failed

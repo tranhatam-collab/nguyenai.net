@@ -5,7 +5,7 @@
  * Gateway integration (Stripe/VNPay) requires live API keys — tested via tools/test-models.mjs pattern.
  */
 
-import { computeVat, generateInvoice, parseStripeEvent, parseVnPayReturn, type PaymentResult } from './index';
+import { computeVat, generateInvoice, parseStripeEvent, parseVnPayReturn, type PaymentResult } from './index.ts';
 
 let passed = 0;
 let failed = 0;

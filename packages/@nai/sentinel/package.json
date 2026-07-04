@@ -2,20 +2,30 @@
   "name": "@nai/sentinel",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for sentinel (https://github.com/semgrep/semgrep). Original source consumed via native package manager.",
+  "description": "Static analysis security tool for detecting vulnerabilities in source code.",
   "license": "LGPL-2.1",
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/semgrep\""
+    "lint": "echo 'TODO: eslint for @nai/sentinel'"
   },
   "keywords": [
-    "semgrep",
+    "sast",
+    "security",
+    "static-analysis",
     "nai",
-    "nguyenai",
-    "py"
+    "nguyenai"
   ],
-  "upstream": "https://github.com/semgrep/semgrep"
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

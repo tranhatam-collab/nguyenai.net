@@ -1,2 +1,50 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/forge test
+----------------
+  ✓ generatePromptTests returns 5 tests
+  ✓ test id starts with pt
+  ✓ category is prompt-variation
+  ✓ input is string
+  ✓ expected preserved
+  ✓ generatePromptTests wraps variations
+  ✓ edge cases include empty string
+  ✓ edge cases include 0
+  ✓ edge cases include -1
+  ✓ edge cases include null
+  ✓ edge cases include undefined
+  ✓ edge cases include NaN
+  ✓ edge cases include special chars
+  ✓ edge cases include unicode
+  ✓ allowEmpty=false removes empty string
+  ✓ minLength generates min-length string
+  ✓ exceeds maxLength
+  ✓ allowSpecialChars=false removes special chars
+  ✓ allowUnicode=false removes unicode
+  ✓ includes vi language case
+  ✓ includes ja language case
+  ✓ synonym mutation returns string
+  ✓ synonym mutation non-empty
+  ✓ rephrase mutation returns string
+  ✓ rephrase mutation non-empty
+  ✓ add_noise mutation returns string
+  ✓ add_noise does not shrink
+  ✓ truncate shortens prompt
+  ✓ truncate keeps at least 1 char
+  ✓ translate adds language marker
+  ✓ translate keeps original text
+  ✓ mutatePrompt returns 5 mutations
+  ✓ all mutations are strings
+  ✓ suite has 3 prompt tests
+  ✓ suite has edge cases
+  ✓ suite has 5 mutations
+  ✓ default promptTestCount = 5
+  ✓ valid test case has no errors
+  ✓ empty id has errors
+  ✓ null input has errors
+  ✓ error mentions input
+  ✓ null expected has errors
+  ✓ empty category has errors
+
+43 passed, 0 failed

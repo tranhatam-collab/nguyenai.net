@@ -4,7 +4,7 @@
  */
 
 import type { AuditEvent, AuditQuery, AuditStore } from '@nai/audit';
-import { insertAuditLog, queryAuditLogD1 } from './db';
+import { insertAuditLog, queryAuditLogD1 } from './db.ts';
 
 export class D1AuditStore implements AuditStore {
   constructor(private db: D1Database) {}

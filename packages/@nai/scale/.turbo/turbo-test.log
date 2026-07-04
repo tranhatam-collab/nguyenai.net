@@ -1,2 +1,38 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/scale tests:
+  ✓ createTestCase sets id
+  ✓ createTestCase sets input
+  ✓ createTestCase sets expected
+  ✓ createTestCase sets category
+  ✓ createTestCase without category has undefined category
+  ✓ loadTestCases returns 2 cases
+  ✓ loadTestCases preserves ids
+  ✓ runEval sets name
+  ✓ runEval produces 3 results
+  ✓ runEval passed count = 2 (score >= 1.0)
+  ✓ runEval failed count = 1
+  ✓ runEval accuracy = 2/3
+  ✓ runEval generates id
+  ✓ runEval sets durationMs
+  ✓ runEval error result passed=false
+  ✓ runEval error result score=0
+  ✓ runEval error result has error message
+  ✓ runEval empty produces 0 results
+  ✓ runEval empty accuracy = 0
+  ✓ accuracy = 0.5 for 2/4 passed
+  ✓ accuracy empty = 0
+  ✓ precision = 1.0 (no false positives)
+  ✓ precision = 0.5 with 1 TP and 1 FP
+  ✓ recall = 0.5 for 2 TP and 2 FN
+  ✓ recall empty = 0
+  ✓ f1 = 2*P*R/(P+R) for results
+  ✓ f1 = 0 when all fail
+  ✓ exportResults JSON has name
+  ✓ exportResults JSON has 3 results
+  ✓ exportResults JSON has accuracy as number
+  ✓ runEval run preserves testCases
+  ✓ runEval run testCases[0] has correct id
+
+32 passed, 0 failed

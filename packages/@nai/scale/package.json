@@ -2,20 +2,28 @@
   "name": "@nai/scale",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for scale (https://github.com/confident-ai/deepeval). Original source consumed via native package manager.",
+  "description": "LLM evaluation framework — test cases, scoring, metrics.",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/deepeval\""
+    "build": "echo 'no build — TypeScript source consumed directly'"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
   },
   "keywords": [
-    "deepeval",
+    "evaluation",
+    "llm",
+    "testing",
     "nai",
-    "nguyenai",
-    "py"
-  ],
-  "upstream": "https://github.com/confident-ai/deepeval"
+    "nguyenai"
+  ]
 }

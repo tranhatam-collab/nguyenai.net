@@ -1,0 +1,11 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+✓ InMemoryPagefindIndex — index 3 docs
+✓ pagefindBuildCommand
+
+All @nai/search tests passed.
+✓ Search "AI Computer" (en) — 2 results
+✓ Search "Máy Tính" (vi) — 1 results
+✓ Search "xyznonexistent" — 0 results
+✓ Search with section filter — 3 results
+✓ UnifiedSearch — 3 deduplicated results

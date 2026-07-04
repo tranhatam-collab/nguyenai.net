@@ -35,4 +35,11 @@ export const AUDIT_EVENT_TO_TEMPLATE: Record<string, import('./types').EmailTemp
   certificate_revoked: 'certificate_revoked',
   account_deletion_requested: 'account_deletion_requested',
   investor_room_accessed: 'investor_access_granted',
+  // Scholarship (Section XXVII)
+  scholarship_application_submitted: 'scholarship_application_submitted',
+  sponsorship_committed: 'scholarship_cosponsorship',
+  scholarship_review_assigned: 'scholarship_review_request',
+  scholarship_awarded: 'scholarship_decision',
+  scholarship_declined: 'scholarship_decision',
+  scholarship_progress_reported: 'scholarship_progress',
 };

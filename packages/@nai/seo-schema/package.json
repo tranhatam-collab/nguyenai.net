@@ -1,0 +1,26 @@
+{
+  "name": "@nai/seo-schema",
+  "version": "0.1.0",
+  "private": true,
+  "description": "schema.org structured data generators for Nguyen AI — Organization, WebSite, Product, Article, FAQPage, BreadcrumbList, Course, ScholarshipEvent, Person. Brand naming lock compliant.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/test.ts",
+    "lint": "echo 'TODO: eslint for @nai/seo-schema'"
+  },
+  "keywords": ["seo", "schema.org", "json-ld", "structured-data", "nguyenai"],
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

@@ -67,7 +67,7 @@ async function testApproveFlow() {
     requested_by: 'u1',
   });
 
-  await approveRequest(id, 'admin-1', 'looks safe');
+  await approveRequest(id, 'admin-1', 't1', 'looks safe');
   const status = await checkApprovalStatus(id);
   assert(status === 'approved', 'approval is approved');
 
@@ -90,7 +90,7 @@ async function testDenyFlow() {
     requested_by: 'u1',
   });
 
-  await denyRequest(id, 'admin-1', 'not allowed');
+  await denyRequest(id, 'admin-1', 't1', 'not allowed');
   const status = await checkApprovalStatus(id);
   assert(status === 'denied', 'approval is denied');
 
@@ -113,7 +113,7 @@ async function testExecuteFlow() {
     requested_by: 'u1',
   });
 
-  await approveRequest(id, 'admin-1');
+  await approveRequest(id, 'admin-1', 't1');
   await markExecuted(id);
   const status = await checkApprovalStatus(id);
   assert(status === 'executed', 'approval is executed after markExecuted');
@@ -156,9 +156,9 @@ async function testCannotApproveNonPending() {
     requested_by: 'u1',
   });
 
-  await denyRequest(id, 'admin-1');
+  await denyRequest(id, 'admin-1', 't1');
   try {
-    await approveRequest(id, 'admin-2');
+    await approveRequest(id, 'admin-2', 't1');
     assert(false, 'should throw when approving denied request');
   } catch (e) {
     assert((e as Error).message.includes('not pending'), 'throws correct error');
@@ -173,7 +173,7 @@ async function testListPending() {
   await requestApproval({ user_id: 'u1', tenant_id: 't1', action: 'a1', resource: 'r1', requested_by: 'u1' });
   await requestApproval({ user_id: 'u1', tenant_id: 't1', action: 'a2', resource: 'r2', requested_by: 'u1' });
   const id3 = await requestApproval({ user_id: 'u2', tenant_id: 't2', action: 'a3', resource: 'r3', requested_by: 'u2' });
-  await approveRequest(id3, 'admin-1');
+  await approveRequest(id3, 'admin-1', 't2');
 
   const pending = await listPendingApprovals('u1', 't1');
   assert(pending.length === 2, '2 pending for t1');

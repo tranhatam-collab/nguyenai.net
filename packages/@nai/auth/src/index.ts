@@ -104,8 +104,7 @@ const SALT_LENGTH = 16;
 const KEY_LENGTH = 32;
 
 function getCrypto(): Crypto {
-  const c = (globalThis as unknown as { crypto?: Crypto }).crypto;
-  if (c) return c;
+  if (typeof globalThis.crypto !== 'undefined') return globalThis.crypto;
   throw new Error('Web Crypto API not available');
 }
 

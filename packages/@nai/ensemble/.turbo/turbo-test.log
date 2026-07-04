@@ -1,2 +1,50 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/ensemble test
+-------------------
+  ✓ simple crew succeeds
+  ✓ task completed
+  ✓ task result correct
+  ✓ task assigned to a1
+  ✓ role crew succeeds
+  ✓ research task → researcher
+  ✓ write task → writer
+  ✓ sequential crew succeeds
+  ✓ t2 uses t1 output
+  ✓ parallel crew succeeds
+  ✓ t1 result correct
+  ✓ t2 result correct
+  ✓ failing crew returns failed status
+  ✓ task marked failed
+  ✓ error message preserved
+  ✓ cascade crew fails
+  ✓ t1 failed
+  ✓ t2 failed due to dep
+  ✓ t2 error is dependency
+  ✓ no agent crew fails
+  ✓ no agent error message
+  ✓ canHandle crew succeeds
+  ✓ special task → picky agent
+  ✓ normal task → general agent
+  ✓ priority crew succeeds
+  ✓ all 3 tasks executed
+  ✓ crew_started event
+  ✓ task_assigned event
+  ✓ task_completed event
+  ✓ crew_completed event
+  ✓ tenant context passed to agents
+  ✓ crew context has tenantId
+  ✓ unanimous decision = yes
+  ✓ unanimous agreement = 1
+  ✓ majority decision = approve
+  ✓ majority agreement = 2/3
+  ✓ tie returns one decision
+  ✓ tie agreement = 0.5
+  ✓ empty votes → null decision
+  ✓ empty votes → 0 agreement
+  ✓ partial crew returns partial status
+  ✓ t1 completed
+  ✓ t2 failed
+
+43 passed, 0 failed

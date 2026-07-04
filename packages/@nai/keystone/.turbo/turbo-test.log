@@ -1,2 +1,28 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/keystone test
+--------------------
+  ✓ createBackup sets tenant_id
+  ✓ createBackup sets type=full
+  ✓ createBackup computes checksum
+  ✓ createBackup sets size_bytes
+  ✓ createBackup generates backup_id
+  ✓ restoreBackup returns data
+  ✓ restored data matches original
+  ✓ listBackups returns 1 for t_1
+  ✓ verifyBackup returns true for intact backup
+  ✓ t_1 list does not include t_2 backups
+  ✓ t_2 list has its own backup
+  ✓ deleteBackup returns true
+  ✓ backup deleted from list
+  ✓ restore deleted backup returns null
+  ✓ t_3 has 2 backups after auto-retention
+  ✓ enforceRetention returns 0 when already within limit
+  ✓ purgeExpired removes old backups
+  ✓ t_4 empty after purge
+  ✓ t_5 has 5 backups
+  ✓ listBackups sorted newest first
+  ✓ verifyBackup returns false for missing backup
+
+21 passed, 0 failed

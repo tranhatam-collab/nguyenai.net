@@ -376,7 +376,7 @@ function allTenants(store: BackupStore): string[] {
 }
 
 /** Internal accessor used by purgeExpired — exposed on the in-memory store. */
-(InMemoryBackupStore.prototype as unknown as { _tenants: function })._tenants = function (
+(InMemoryBackupStore.prototype as unknown as { _tenants: () => string[] })._tenants = function (
   this: InMemoryBackupStore,
 ): string[] {
   // Access private maps via a typed shim.

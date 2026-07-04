@@ -1,2 +1,43 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/seismograph tests:
+  ✓ startSpan generates 32-char traceId
+  ✓ startSpan generates 16-char spanId
+  ✓ startSpan sets name
+  ✓ startSpan status is active
+  ✓ root span has no parentSpanId
+  ✓ child span inherits traceId
+  ✓ child span has parentSpanId
+  ✓ child span has attributes from start
+  ✓ getCurrentSpan returns span2
+  ✓ setAttribute adds attribute
+  ✓ addEvent adds one event
+  ✓ event has correct name
+  ✓ event has attributes
+  ✓ endSpan sets status to ended
+  ✓ endSpan sets endTime
+  ✓ endSpan sets durationMs >= 10
+  ✓ getCurrentSpan returns span1 after span2 ended
+  ✓ root span ended
+  ✓ getCurrentSpan is null after all spans ended
+  ✓ getTrace returns trace
+  ✓ trace has 2 spans
+  ✓ trace rootSpanId is span1
+  ✓ getTrace returns null for unknown traceId
+  ✓ listTraces returns 1 trace
+  ✓ runInSpan returns function result
+  ✓ runInSpan created a trace
+  ✓ runInSpan created 1 span
+  ✓ runInSpan ended the span
+  ✓ runInSpan span has durationMs
+  ✓ runInSpan span has attributes
+  ✓ runInSpan rethrows error
+  ✓ runInSpan records error message in attributes
+  ✓ nested runInSpan creates 2 spans in 1 trace
+  ✓ all nested spans ended
+  ✓ child span has parentSpanId in nested runInSpan
+  ✓ clearTraces empties traces
+  ✓ clearTraces resets current span
+
+37 passed, 0 failed

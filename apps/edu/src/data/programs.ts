@@ -47,7 +47,7 @@ export const programs: Program[] = [
     duration: '14 tuần',
     weeks: 14,
     icon: '💻',
-    machineProfile: 'Nguyen AI Operator Machine',
+    machineProfile: 'NAI Operator Machine',
     pricing: {
       khoiDong: { vnd: 1990000, usd: 80 },
       thucHanh: { vnd: 5990000, usd: 240 },
@@ -98,7 +98,7 @@ export const programs: Program[] = [
     duration: '14 tuần',
     weeks: 14,
     icon: '🎨',
-    machineProfile: 'Nguyen AI Creator Machine',
+    machineProfile: 'NAI Creator Machine',
     pricing: {
       khoiDong: { vnd: 2490000, usd: 100 },
       thucHanh: { vnd: 6900000, usd: 276 },
@@ -147,7 +147,7 @@ export const programs: Program[] = [
     duration: '16 tuần',
     weeks: 16,
     icon: '⚙️',
-    machineProfile: 'Nguyen AI Code Machine',
+    machineProfile: 'NAI Code Machine',
     pricing: {
       khoiDong: { vnd: 2990000, usd: 120 },
       thucHanh: { vnd: 8900000, usd: 356 },
@@ -198,7 +198,7 @@ export const programs: Program[] = [
     duration: '14 tuần',
     weeks: 14,
     icon: '🏢',
-    machineProfile: 'Nguyen AI Business Machine',
+    machineProfile: 'NAI Business Machine',
     pricing: {
       khoiDong: { vnd: 3900000, usd: 156 },
       thucHanh: { vnd: 12900000, usd: 516 },
@@ -247,7 +247,7 @@ export const programs: Program[] = [
     duration: '16 tuần',
     weeks: 16,
     icon: '🚀',
-    machineProfile: 'Nguyen AI Founder Machine',
+    machineProfile: 'NAI Founder Machine',
     pricing: {
       khoiDong: { vnd: 3900000, usd: 156 },
       thucHanh: { vnd: 14900000, usd: 596 },
@@ -298,7 +298,7 @@ export const programs: Program[] = [
     duration: '14 tuần',
     weeks: 14,
     icon: '🔍',
-    machineProfile: 'Nguyen AI Research Machine',
+    machineProfile: 'NAI Research Machine',
     pricing: {
       khoiDong: { vnd: 2490000, usd: 100 },
       thucHanh: { vnd: 7900000, usd: 316 },
@@ -346,8 +346,8 @@ export const programs: Program[] = [
     lessonCount: 48,
     duration: '14 tuần',
     weeks: 14,
-    icon: '�',
-    machineProfile: 'Nguyen AI Career Machine',
+    icon: '💼',
+    machineProfile: 'NAI Career Machine',
     pricing: {
       khoiDong: { vnd: 1990000, usd: 80 },
       thucHanh: { vnd: 5900000, usd: 236 },
@@ -397,8 +397,8 @@ export const programs: Program[] = [
     lessonCount: 42,
     duration: '14 tuần',
     weeks: 14,
-    icon: '�',
-    machineProfile: 'Nguyen AI Family Memory Machine',
+    icon: '🌳',
+    machineProfile: 'NAI Family Memory Machine',
     pricing: {
       khoiDong: { vnd: 1990000, usd: 80 },
       thucHanh: { vnd: 6900000, usd: 276 },
@@ -447,7 +447,7 @@ export const programs: Program[] = [
     duration: '14 tuần',
     weeks: 14,
     icon: '🏛️',
-    machineProfile: 'Nguyen AI Community Machine',
+    machineProfile: 'NAI Community Machine',
     pricing: {
       khoiDong: { vnd: 2490000, usd: 100 },
       thucHanh: { vnd: 8900000, usd: 356 },
@@ -488,7 +488,7 @@ export const programCategories = [
   { id: 'creativity', label: { vi: 'Sáng tạo', en: 'Creativity' }, icon: '🎨' },
   { id: 'entrepreneurship', label: { vi: 'Khởi nghiệp', en: 'Entrepreneurship' }, icon: '🚀' },
   { id: 'heritage', label: { vi: 'Di sản', en: 'Heritage' }, icon: '🌳' },
-  { id: 'career', label: { vi: 'Nghề nghiệp', en: 'Career' }, icon: '�' },
+  { id: 'career', label: { vi: 'Nghề nghiệp', en: 'Career' }, icon: '💼' },
   { id: 'community', label: { vi: 'Cộng đồng', en: 'Community' }, icon: '🏛️' },
 ] as const;
 

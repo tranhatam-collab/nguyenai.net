@@ -1,3 +1,4 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ tsx src/test.ts
 === @nai/proof Tests ===
 
@@ -28,7 +29,7 @@ $ tsx src/test.ts
   ✅ Checksum is uppercase hex: A6E5
 
 === InMemoryProofStore ===
-  ✅ Proof created with ID: 367e4697-f1bf-44fa-b690-97a9920186de
+  ✅ Proof created with ID: efa1c018-1abd-4b60-b08d-a5f80097d8bc
   ✅ Proof retrieved
   ✅ Default status is submitted: submitted
   ✅ User has 1 proof: 1

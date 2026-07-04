@@ -2,20 +2,33 @@
   "name": "@nai/provenance",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for provenance (https://github.com/slsa-framework/slsa-github-generator). Original source consumed via native package manager.",
+  "description": "Software Bill of Materials (SBOM) generator for the Nguyen AI monorepo. Supports SPDX 2.3 and CycloneDX export formats.",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/slsa\""
+    "lint": "echo 'TODO: eslint for @nai/provenance'"
   },
   "keywords": [
-    "slsa",
+    "sbom",
+    "provenance",
+    "spdx",
+    "cyclonedx",
     "nai",
     "nguyenai",
     "ts"
   ],
-  "upstream": "https://github.com/slsa-framework/slsa-github-generator"
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

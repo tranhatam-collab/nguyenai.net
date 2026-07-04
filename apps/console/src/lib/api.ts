@@ -227,3 +227,55 @@ export async function saveRoutingRule(rule: RoutingRule): Promise<void> {
 export async function deleteRoutingRule(id: string): Promise<void> {
   await apiFetch(`/v1/routing-rules/${id}`, { method: 'DELETE' });
 }
+
+// ============================================================
+// Command history — replaces localStorage key 'nguyenai:command-history'
+// Uses /v1/memory with type='command' (server-side persistence)
+// Per IDENTITY_AND_TENANCY_RFC §2.4: localStorage for business state is FORBIDDEN
+// ============================================================
+
+export interface CommandRecord {
+  id: string;
+  text: string;
+  model: string;
+  status: 'running' | 'completed' | 'failed' | 'pending';
+  timestamp: number;
+  result?: string;
+  commandId?: string;
+  agentId?: string;
+  evidenceLabels?: string[];
+}
+
+export async function fetchCommandHistory(limit = 50): Promise<CommandRecord[]> {
+  try {
+    const data = await apiFetch<{ memories: MemoryEntry[] }>(`/v1/memory?type=command&limit=${limit}`);
+    return (data.memories ?? []).map((m) => m.value as CommandRecord);
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCommandRecord(cmd: CommandRecord): Promise<void> {
+  try {
+    await apiFetch('/v1/memory', 'POST', {
+      memory_type: 'command',
+      key: `command:${cmd.id}`,
+      value: cmd,
+      idempotency_key: `cmd-${cmd.id}`,
+    });
+  } catch {
+    // Silently fail — UI still shows command
+  }
+}
+
+export async function clearCommandHistory(): Promise<void> {
+  try {
+    const records = await fetchCommandHistory(100);
+    await Promise.all(
+      records.map((r) => apiFetch(`/v1/memory/command:${r.id}`, 'DELETE'))
+    );
+  } catch {
+    // Silently fail
+  }
+}
+

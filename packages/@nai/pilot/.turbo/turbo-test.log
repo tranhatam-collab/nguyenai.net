@@ -1,2 +1,49 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/pilot test
+----------------
+  ✓ navigate sets url
+  ✓ navigate sets title
+  ✓ visible elements only (3)
+  ✓ screenshot has data
+  ✓ click succeeds
+  ✓ click has before snapshot
+  ✓ click has after snapshot
+  ✓ click recorded in browser
+  ✓ click non-existent fails
+  ✓ click error has message
+  ✓ type succeeds
+  ✓ text recorded in browser
+  ✓ scroll succeeds
+  ✓ scroll position updated
+  ✓ wait succeeds
+  ✓ wait duration tracked
+  ✓ navigate succeeds
+  ✓ navigated to new page
+  ✓ screenshot action succeeds
+  ✓ screenshot captured
+  ✓ sequence executes 3 actions
+  ✓ all sequence actions succeed
+  ✓ sequence stops on first failure
+  ✓ first action failed
+  ✓ click plan has actions
+  ✓ click plan first action is click
+  ✓ click plan targets btn1
+  ✓ type plan has 2+ actions
+  ✓ type plan includes type action
+  ✓ type plan extracts text from quotes
+  ✓ scroll plan has actions
+  ✓ scroll plan first action is scroll
+  ✓ scroll down is positive
+  ✓ screenshot plan has actions
+  ✓ screenshot plan first action is screenshot
+  ✓ no match returns empty plan
+  ✓ goal achieved
+  ✓ goal has actions
+  ✓ goal duration tracked
+  ✓ unachievable goal not achieved
+  ✓ no actions when plan is empty
+  ✓ hidden elements excluded from snapshot
+
+42 passed, 0 failed

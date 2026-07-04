@@ -54,7 +54,7 @@ nguyenai.net/                          # Monorepo root
 | App | Trước | Sau | Pages |
 |---|---|---|---|
 | console | `nguyenai-console/` (repo riêng) | `apps/console/` | 11 trang |
-| academy | `nguyenai-console/nguyenai-academy/` | `apps/edu/` | 12 trang + 3 API |
+| academy | `nguyenai-console/nguyenai-academy/` | `apps/academy/` | 12 trang + 3 API |
 | invest | `nguyenai-invest/` (repo riêng) | `apps/invest/` | 23 trang |
 | admin | (chưa có) | `apps/admin/` (Phase 2) | 0 |
 
@@ -114,7 +114,7 @@ Chi tiết: `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`
 |---|---|---|
 | Admin console | apps/admin | P1 |
 | Console → API integration (live data) | apps/console + apps/api | P1 |
-| Academy → Auth integration (progress tracking) | apps/edu + apps/auth | P1 |
+| Academy → Auth integration (progress tracking) | apps/academy + apps/auth | P1 |
 | Invest → Private room auth | apps/invest + apps/auth | P1 |
 | Gen1 plan → tier mapping | apps/api | P2 |
 | Multi-agent orchestration | packages/@nai/runtime-sdk | P2 |

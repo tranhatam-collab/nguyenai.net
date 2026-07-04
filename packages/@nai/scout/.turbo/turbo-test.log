@@ -1,2 +1,48 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/scout test
+----------------
+  ✓ extractText gets title
+  ✓ extractAttributes finds 3+ links
+  ✓ finds /about link
+  ✓ extractMeta gets description
+  ✓ extractMeta gets og:title
+  ✓ extractJsonLd finds 1 block
+  ✓ JSON-LD parsed correctly
+  ✓ extractLinks finds 3+ links
+  ✓ relative link resolved
+  ✓ external link preserved
+  ✓ extractImages finds 2+ images
+  ✓ relative image resolved
+  ✓ image alt preserved
+  ✓ stripHtml preserves text
+  ✓ stripHtml removes tags
+  ✓ stripHtml removes script content
+  ✓ parsePage gets title
+  ✓ parsePage gets description
+  ✓ parsePage preserves url
+  ✓ parsePage extracts links
+  ✓ parsePage extracts images
+  ✓ parsePage extracts JSON-LD
+  ✓ parsePage extracts meta
+  ✓ extractByRule tag selector works
+  ✓ extractByRule multiple returns array
+  ✓ extractByRule finds 3 items
+  ✓ extractByRule first item correct
+  ✓ extractByRule id selector works
+  ✓ attribute extraction returns array
+  ✓ attribute extraction gets /about
+  ✓ extractByRules heading
+  ✓ extractByRules items array
+  ✓ extractByRules sidebar
+  ✓ extractByRule returns null for no match
+  ✓ crawl session starts with 1 URL
+  ✓ crawl session maxPages = 5
+  ✓ crawl session starts with 0 visited
+  ✓ stripHtml empty string
+  ✓ stripHtml simple tag
+  ✓ stripHtml decodes entities
+  ✓ extractLinks without baseUrl keeps relative
+
+41 passed, 0 failed

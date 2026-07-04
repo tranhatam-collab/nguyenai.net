@@ -2,6 +2,7 @@ packages:
   - "apps/*"
   - "packages/*"
   - "packages/@nai/*"
+  - "!packages/@nai/n8n"
   - "migrations"
   - "tests/e2e"
   - "workers/*"

@@ -1,28 +1,3 @@
-$ tsx src/idempotency.test.ts
-=== Idempotency Middleware Tests ===
-
-Test 1: GET /health is exempt
-  ✅ GET /health returns 200 (got 200)
-Test 2: GET /v1/session is exempt
-  ✅ GET /v1/session returns 200 (got 200)
-Test 3: POST without idempotency_key returns 400
-  ✅ POST without key returns 400 (got 400)
-  ✅ Error mentions idempotency_key: idempotency_key required for write endpoints (per ENTITLEMENT_API_RFC §5)
-Test 4: POST with idempotency_key returns 200
-  ✅ POST with key returns 200 (got 200)
-  ✅ Response body correct: {"received":true,"echo":{"data":"test","idempotency_key":"test-key-1"}}
-Test 5: Duplicate request returns cached response
-  ✅ First request returns 200
-  ✅ First response has data=first: first
-  ✅ Duplicate request returns 200 (got 200)
-  ✅ Replay header set
-  ✅ Duplicate returns cached (first), not second: first
-Test 6: /v1/auth/* is exempt
-  ✅ POST /v1/auth/test without key returns 200 (got 200)
-Test 7: Idempotency-Key header works
-  ✅ POST with header key returns 200 (got 200)
-Test 8: Different keys → different responses
-  ✅ Different keys → different responses: a, b
-  ✅ Second request not marked as replay
-
-=== Results: 15 passed, 0 failed ===
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ echo 'API tested via E2E suite (tests/e2e)'
+API tested via E2E suite (tests/e2e)

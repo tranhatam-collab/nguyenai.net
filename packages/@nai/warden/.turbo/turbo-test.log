@@ -1,2 +1,32 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/warden test
+-----------------
+  ✓ empty policy list defaults to allow with no matched policy
+  ✓ ip equals rule denies matching IP
+  ✓ non-matching IP falls through to allow
+  ✓ higher priority policy wins over lower priority
+  ✓ path contains rule matches substring
+  ✓ method rule matches case-insensitively
+  ✓ header rule matches header value via contains
+  ✓ header presence-only rule matches when header exists, allows when absent
+  ✓ country in-operator matches listed countries, allows others
+  ✓ multiple rules require all to match (AND semantics)
+  ✓ path matches-operator uses RegExp anchoring
+  ✓ rate limiter allows up to max then blocks
+  ✓ rate limiter reports remaining and future resetAt
+  ✓ rate limiter tracks keys independently
+  ✓ single IP allow list matches exact IP only
+  ✓ CIDR /24 matches range and rejects outside
+  ✓ CIDR /16 matches wide range
+  ✓ CIDR /32 matches single IP only
+  ✓ remove deletes entry from allow list
+  ✓ list returns remaining entries
+  ✓ createPolicy fills id, defaults rules and priority
+  ✓ createPolicy respects provided action, priority, rules
+  ✓ validatePolicy reports multiple errors for invalid policy
+  ✓ validatePolicy returns no errors for valid policy
+  ✓ validatePolicy catches invalid rule type, value, and operator
+
+25 passed, 0 failed

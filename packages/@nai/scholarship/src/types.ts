@@ -606,6 +606,8 @@ export const SCORING_RUBRIC: ScoringRubric = {
 };
 
 export const COUNCIL_CONFIG = {
+  size: 5,
+  approvalThreshold: 3,
   min_reviewers: 3,
   max_reviewers: 7,
   quorum_percentage: 0.6,

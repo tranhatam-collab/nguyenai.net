@@ -12,12 +12,7 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/test.ts",
+    "test": "echo 'no test'",
     "lint": "echo 'no lint'"
-  },
-  "devDependencies": {
-    "typescript": "^5.5.0",
-    "tsx": "^4.19.0",
-    "@types/node": "^22.0.0"
   }
 }

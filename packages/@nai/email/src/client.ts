@@ -119,7 +119,6 @@ function normalizeRecipients(to: string | EmailAddress | (string | EmailAddress)
   return recipients.map((r) => (typeof r === 'string' ? r : r.email));
 }
 
-function formatAddress(addr: string | EmailAddress): string {
-  if (typeof addr === 'string') return addr;
+function formatAddress(addr: EmailAddress): string {
   return addr.name ? `${addr.name} <${addr.email}>` : addr.email;
 }

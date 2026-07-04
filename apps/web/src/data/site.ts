@@ -6,7 +6,7 @@ export const site = {
     en: 'Nguyen AI'
   },
   productCategory: {
-    vi: 'Nguyen AI Computer',
+    vi: 'Máy Tính AI Nguyễn',
     en: 'Nguyen AI Computer'
   },
   tagline: {

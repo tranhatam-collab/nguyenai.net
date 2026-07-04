@@ -166,7 +166,7 @@ async function main() {
   assert(ent.machine.plan === 'founder', 'entitlement plan is founder');
   assert(ent.machine.model_tier === 'pro', 'entitlement model tier is pro');
   assert(ent.machine.command_quota === 1000, 'entitlement command quota is 1000');
-  assert(ent.academy.pass === false, 'academy.pass is false (standalone product)');
+  assert(ent.academy.pass === true, 'academy.pass is true (Founder includes Academy Pass per D-015)');
 
   // Check command quota
   const quotaCheck = await checkCommandQuota(userId, tenantId, planId);
@@ -180,7 +180,7 @@ async function main() {
   // Academy access without pass
   const academyAccess = await checkAcademyAccess(userId, tenantId, planId);
   assert(academyAccess.canLearn === true, 'can learn free intro without pass');
-  assert(academyAccess.canSubmit === false, 'cannot submit without Academy Pass');
+  assert(academyAccess.canSubmit === true, 'can submit with Academy Pass (Founder includes pass per D-015)');
 
   // ============================================================
   // Step 5: Sensitive action — policy evaluation
@@ -208,7 +208,7 @@ async function main() {
 
   // Entitlement check for academy submit
   const academyCheck = checkEntitlementForAction(policyCtx, 'academy:submit');
-  assert(academyCheck.allowed === false, 'academy:submit denied without pass');
+  assert(academyCheck.allowed === true, 'academy:submit allowed with pass (Founder includes Academy Pass per D-015)');
 
   // ============================================================
   // Step 6: Approval — request → approve → execute
@@ -229,7 +229,7 @@ async function main() {
 
   // Admin approves
   const adminId = crypto.randomUUID();
-  await approveRequest(approvalId, adminId, 'verified safe');
+  await approveRequest(approvalId, adminId, tenantId, 'verified safe');
   const approvedStatus = await checkApprovalStatus(approvalId);
   assert(approvedStatus === 'approved', 'approval is approved');
 

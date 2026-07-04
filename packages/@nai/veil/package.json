@@ -2,20 +2,29 @@
   "name": "@nai/veil",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for veil (https://github.com/gitleaks/gitleaks). Original source consumed via native package manager.",
+  "description": "Code signing utilities for the Nguyen AI monorepo (Web Crypto API).",
   "license": "MIT",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/gitleaks\""
+    "lint": "echo \"TODO: eslint for @nai/veil\""
   },
   "keywords": [
-    "gitleaks",
+    "veil",
     "nai",
     "nguyenai",
-    "go"
+    "signing",
+    "crypto"
   ],
-  "upstream": "https://github.com/gitleaks/gitleaks"
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.0.0"
+  }
 }

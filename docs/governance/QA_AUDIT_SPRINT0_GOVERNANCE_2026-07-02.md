@@ -1,6 +1,6 @@
 # QA AUDIT — Sprint 0 Governance Lock (7 tài liệu)
 
-> **Auditor:** Trần Hà Tâm
+> **Auditor:** AI QA Specialist — Chief Inspector (36+ năm kinh nghiệm, khó tính nhất)
 > **Ngày audit:** 2026-07-02
 > **Phương pháp:** Đọc độc lập + cross-reference giữa 7 file + Founder Verdict + AGENTS.md + verify code/data thực tế
 > **Files audit:**

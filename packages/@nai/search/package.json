@@ -1,0 +1,28 @@
+{
+  "name": "@nai/search",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Search package for Nguyen AI — Pagefind (static site search) + Qdrant (semantic search via @nai/compass). Unified search interface combining both.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/test.ts",
+    "lint": "echo 'TODO: eslint for @nai/search'"
+  },
+  "keywords": ["search", "pagefind", "qdrant", "nguyenai", "semantic"],
+  "dependencies": {
+    "@nai/compass": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

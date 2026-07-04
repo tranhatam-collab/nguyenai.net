@@ -3,10 +3,8 @@ import type {
   AgentResponse, AgentTrace, OrchestrationPlan, OrchestrationStep,
   ToolCall, ToolResult, ReviewResult, ReviewGate, ReviewViolation, QualityScore
 } from "@nai/contracts";
-
-export type { AgentTask, AgentId, AgentIdentity, AgentRole, AgentContext, AgentResponse, OrchestrationPlan, OrchestrationStep, QualityScore, ReviewResult, ReviewViolation };
-import type { ProviderResponse } from "@nai/contracts";
-import { callProvider, PROVIDER_REGISTRY, type ProviderRequest } from "@nai/gateway-sdk";
+import type { ProviderRequest, ProviderResponse } from "@nai/contracts";
+import { callProvider, PROVIDER_REGISTRY } from "@nai/gateway-sdk";
 // connector-sdk not yet forked — stubbed locally
 const executeConnector = async (_call: unknown): Promise<unknown> => { throw new Error("connector-sdk not yet forked"); };
 const buildToolSystemPrompt = (): string => "";
@@ -160,7 +158,6 @@ export class AgentRuntime {
     let idx = 0;
     while (idx < plan.sequence.length) {
       const step = plan.sequence[idx];
-      if (!step) break;
 
       if (!step.parallel) {
         // Sequential step
@@ -174,10 +171,8 @@ export class AgentRuntime {
         // Parallel batch: consecutive steps marked parallel run together
         const batch: OrchestrationStep[] = [step];
         let j = idx + 1;
-        while (j < plan.sequence.length) {
-          const nextStep = plan.sequence[j];
-          if (!nextStep || !nextStep.parallel) break;
-          batch.push(nextStep);
+        while (j < plan.sequence.length && plan.sequence[j].parallel) {
+          batch.push(plan.sequence[j]);
           j++;
         }
 
@@ -254,14 +249,15 @@ export class AgentRuntime {
 
     try {
       const providerRequest: ProviderRequest = {
-        provider: agent.provider,
         model: agent.model,
         messages,
         temperature: agent.temperature,
         maxTokens: agent.maxTokens
       };
 
-      const providerResponse = await callProvider(providerRequest);
+      const providerResponse = await callProvider(
+        agent.provider as any, providerRequest, undefined
+      );
 
       stepTrace.output = providerResponse.content;
       stepTrace.duration = Date.now() - stepStart;
@@ -273,8 +269,7 @@ export class AgentRuntime {
       if (reviewResult?.status === "rejected") {
         stepTrace.output += `\n\n[REVIEW BLOCKED: ${reviewResult.violations.map(v => v.message).join(", ")}]`;
         if (reviewResult.violations.some(v => v.severity === "critical")) {
-          const firstViolation = reviewResult.violations[0];
-          return { step, content: "", stepTrace, error: new Error(`Content blocked by review: ${firstViolation?.message ?? 'unknown'}`) };
+          return { step, content: "", stepTrace, error: new Error(`Content blocked by review: ${reviewResult.violations[0].message}`) };
         }
       }
 
@@ -304,7 +299,7 @@ export class AgentRuntime {
 
     if (agentsForTask.length === 1) {
       sequence.push({
-        order: 0, agentId: agentsForTask[0]?.id ?? '',
+        order: 0, agentId: agentsForTask[0].id,
         action: "process-request", input: task.input,
         dependsOn: [], parallel: false
       });
@@ -373,7 +368,7 @@ export class AgentRuntime {
       .slice(0, task.maxAgents - 1);
 
     for (const [role] of sortedRoles) {
-      const agent = Array.from(this.agents.values()).find(a => a.role === role && !selected.find(s => s.id === a.id));
+      const agent = this.agents.values().find(a => a.role === role && !selected.find(s => s.id === a.id));
       if (agent) selected.push(agent);
     }
 

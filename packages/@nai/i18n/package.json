@@ -1,0 +1,26 @@
+{
+  "name": "@nai/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "i18n package for Nguyen AI — VI/EN translation, locale helpers, route helpers. Paraglide-compatible interface; can swap to @inlang/paraglide-js later.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'no build — TypeScript source consumed directly'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/test.ts",
+    "lint": "echo 'TODO: eslint for @nai/i18n'"
+  },
+  "keywords": ["i18n", "paraglide", "nguyenai", "vi", "en"],
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

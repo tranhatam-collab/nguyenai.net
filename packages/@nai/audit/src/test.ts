@@ -15,7 +15,7 @@ import {
   logSessionRevoked,
   setAuditStore,
   type AuditEventType,
-} from './index';
+} from './index.ts';
 
 let passed = 0;
 let failed = 0;

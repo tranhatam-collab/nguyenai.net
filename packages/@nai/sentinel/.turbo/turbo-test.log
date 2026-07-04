@@ -1,2 +1,48 @@
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+Test: SQL injection detection
+Test: SQL injection via template literal
+Test: SQL injection false positive (parameterized)
+Test: XSS via innerHTML
+Test: XSS via dangerouslySetInnerHTML
+Test: XSS false positive (innerHTML with static string)
+Test: hardcoded API key
+Test: AWS access key id
+Test: GitHub token
+Test: hardcoded secret false positive (short value)
+Test: dangerous eval
+Test: new Function constructor
+Test: prototype pollution __proto__
+Test: prototype pollution via constructor
+Test: scanFile with filename language inference
+Test: addRule custom rule
+Test: formatReport empty
+Test: formatReport with results
+Test: clean code no findings
+  ✓ detects string-concat SQL injection
+  ✓ SQL injection severity is high
+  ✓ detects template-literal SQL injection
+  ✓ parameterized query is not flagged
+  ✓ detects innerHTML XSS
+  ✓ detects dangerouslySetInnerHTML
+  ✓ innerHTML with static string literal is not flagged
+  ✓ detects hardcoded api key
+  ✓ detects AWS AKIA key
+  ✓ detects GitHub token
+  ✓ short non-secret value not flagged
+  ✓ detects eval()
+  ✓ eval severity is critical
+  ✓ detects new Function()
+  ✓ detects __proto__ assignment
+  ✓ detects constructor[prototype]
+  ✓ scanFile detects eval on line 1
+  ✓ scanFile sets filename in result
+  ✓ addRule adds to registry
+  ✓ custom rule is applied during scan
+  ✓ empty report says no issues
+  ✓ report includes issue count
+  ✓ report includes severity labels
+  ✓ critical sorted before high
+  ✓ clean code has zero findings
+
+25 passed, 0 failed

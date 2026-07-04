@@ -183,4 +183,3 @@ Academy is a separate paid product governed by the `academy.pass` entitlement (s
 - Correlation between Academy progress and retention
 - Chapter certification coverage
 - Enterprise team certification coverage
-- Enterprise team certification coverage

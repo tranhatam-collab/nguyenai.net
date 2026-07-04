@@ -60,6 +60,7 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/DEV_EXECUTION_CHECKLIST.md` — 103-task execution checklist (BINDING)
 - `docs/governance/DEV_WORK_ITEMS_P0_P1.md` — 62 P0+P1 work items with estimates (BINDING)
 - `docs/governance/RELEASE_EVIDENCE_PACK_2026-07-02.md` — Pre-deploy verification pass (50 routes, SEO, accessibility)
+- `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md` — FOUNDER LOCKED brand naming standard (BINDING, overrides all prior brand docs)
 
 ### Strategy + Investor (canonical)
 
@@ -95,23 +96,43 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 
 ## Brand lock
 
+> **FOUNDER BRAND NAMING LOCK 2026-07-04 (BINDING):** See
+> `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md` for the full
+> lock. CI gate: `tools/audit-brand-naming-lock.sh` — build fails if
+> banned names are found.
+
 Approved names:
 
-- Vietnamese: `Nguyễn AI`
-- English: `Nguyen AI`
+- Vietnamese master brand: `Nguyễn AI`
+- Vietnamese core product: `Máy Tính AI Nguyễn`
+- English master brand: `Nguyen AI`
+- English core product: `Nguyen AI Computer`
+- Product surfaces: `Nguyen AI Edu`, `Nguyen AI Invest`, `Nguyen AI Docs`,
+  `Nguyen AI Academy`, `Nguyen AI Scholarships`, `Nguyen AI Forum`
 - Domain: `nguyenai.net`
 - Code identifier: `nguyenai`
+- Code scope: `@nai/*` (internal only, NOT a public brand)
 
 Do not use as public brand names:
 
 - `Nguyên AI`
 - `AI Nguyen`
+- `AI Nguyễn`
 - `NguyenAI`
 - `Nguyễn.AI`
 - `Nguyen Artificial Intelligence`
 - `NAI Network`
+- `NAI Edu`
+- `NAI Invest`
+- `NAI Computer`
+- `Nguyen Computer AI`
+- `Nguyen Ai Computer`
 
 `Nguyên` may only be used in philosophy/editorial copy, not as the brand name.
+`NAI` may only be used as internal code scope (`@nai/*`), never as a public brand.
+All new product names, models, agents, plans, scholarship programs, courses,
+investment rounds, community rooms, or important routes require Founder
+approval before publish.
 
 ## Strategic positioning
 
@@ -258,6 +279,26 @@ Do not approve production release without:
 
 Monorepo (root):
 
+```bash
+pnpm install          # install tất cả workspace
+pnpm build            # build tất cả apps + packages (turbo)
+pnpm typecheck        # typecheck tất cả
+pnpm test             # test tất cả
+pnpm lint             # lint tất cả
+pnpm --filter ./apps/web dev      # chạy web dev
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
 ```bash
 pnpm install          # install tất cả workspace
 pnpm build            # build tất cả apps + packages (turbo)

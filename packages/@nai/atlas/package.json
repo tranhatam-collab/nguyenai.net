@@ -2,20 +2,28 @@
   "name": "@nai/atlas",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for atlas (https://github.com/grafana/grafana). Original source consumed via native package manager.",
-  "license": "AGPL-3.0",
+  "description": "Dashboard & metrics aggregation for the Nguyen AI monorepo — in-process metric store, time-series aggregation, dashboard config.",
+  "license": "Apache-2.0",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/grafana\""
+    "build": "echo 'no build — TypeScript source consumed directly'"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
   },
   "keywords": [
-    "grafana",
+    "metrics",
+    "dashboard",
+    "observability",
     "nai",
-    "nguyenai",
-    "ts"
-  ],
-  "upstream": "https://github.com/grafana/grafana"
+    "nguyenai"
+  ]
 }

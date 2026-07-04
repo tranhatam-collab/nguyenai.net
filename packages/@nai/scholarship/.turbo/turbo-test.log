@@ -1,3 +1,4 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ tsx src/test.ts
 === @nai/scholarship unit tests ===
 
@@ -17,15 +18,5 @@ Test: Sprint 2 documents
 Test: Sprint 2 timeline + status transition
 Test: Sprint 3 investor room
 Test: Sprint 3 award + decline
-Test: Sprint 4 forum comments
-Test: Sprint 4 report + moderation queue
-Test: Sprint 5 council decision
-Test: Sprint 5 waitlist
-Test: Sprint 6 entitlement lifecycle
-Test: Sprint 6 cohorts
-Test: data export (GDPR/PDPD)
-  OK
-Test: retention sweep
-  OK
 
-124 passed, 0 failed
+65 passed, 0 failed
