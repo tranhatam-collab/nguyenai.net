@@ -112,7 +112,7 @@ const statusClass: Record<string, string> = {
       <div class="table-wrap">
         <table class="comparison-table">
           <thead>
-            <tr><th>{locale === 'vi' ? 'Tiêu chí' : 'Criteria'}</th><th>Chatbot</th><th>Nguyen AI Computer</th></tr>
+            <tr><th>{locale === 'vi' ? 'Tiêu chí' : 'Criteria'}</th><th>Chatbot</th><th>{locale === 'vi' ? 'Máy Tính AI Nguyễn' : 'Nguyen AI Computer'}</th></tr>
           </thead>
           <tbody>
             {page.comparisonVsChatbot.rows.map((row) => (

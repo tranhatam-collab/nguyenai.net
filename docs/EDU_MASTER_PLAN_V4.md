@@ -6,6 +6,18 @@
 **Audience:** Dev team AI sẽ build theo; Founder duyệt; QA audit bởi agent hiện tại
 **Liên hệ Founder:** Nguyễn Lan Anh — +84 989 660 750
 
+> **⚠️ BRAND NAMING LOCK 2026-07-04 (BINDING cho toàn bộ dev team):**
+>
+> Toàn bộ naming trong plan này phải tuân thủ
+> `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md`:
+> - Tiếng Việt: thương hiệu mẹ `Nguyễn AI`, sản phẩm lõi `Máy Tính AI Nguyễn`
+> - Tiếng Anh: master brand `Nguyen AI`, core product `Nguyen AI Computer`
+> - Product surfaces: `Nguyen AI Edu`, `Nguyen AI Invest`, `Nguyen AI Docs`,
+>   `Nguyen AI Academy`, `Nguyen AI Scholarships`, `Nguyen AI Forum`
+> - Code scope `@nai/*` là nội bộ, KHÔNG dùng làm public brand
+> - CI gate: `tools/audit-brand-naming-lock.sh` — build fail nếu còn tên cấm
+> - Mọi tên sản phẩm/chương trình/gói mới cần Founder duyệt trước khi publish
+
 ---
 
 # PHẦN A — KẾ HOẠCH GIÁO DỤC (Sections I–XX)

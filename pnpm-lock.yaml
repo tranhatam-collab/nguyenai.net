@@ -551,6 +551,9 @@ importers:
       '@nai/audit':
         specifier: workspace:*
         version: link:../audit
+      '@nai/email':
+        specifier: workspace:*
+        version: link:../email
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -657,12 +660,15 @@ importers:
       '@nai/relic':
         specifier: workspace:*
         version: link:../../packages/@nai/relic
+      '@nai/scholarship':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scholarship
       '@nai/scroll':
         specifier: workspace:*
         version: link:../../packages/@nai/scroll
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240620.0
+        specifier: 'catalog:'
         version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0

@@ -10,19 +10,27 @@
     "lint": "echo 'TODO'"
   },
   "dependencies": {
-    "@nai/auth": "workspace:*",
-    "@nai/audit": "workspace:*",
-    "@nai/policy-fga": "workspace:*",
-    "@nai/entitlement": "workspace:*",
-    "@nai/policy-engine": "workspace:*",
     "@nai/approval": "workspace:*",
-    "@nai/product-catalog": "workspace:*",
+    "@nai/audit": "workspace:*",
+    "@nai/auth": "workspace:*",
+    "@nai/compass": "workspace:*",
+    "@nai/conductor": "workspace:*",
     "@nai/email": "workspace:*",
-    "@nai/scholarship": "workspace:*"
+    "@nai/entitlement": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/harness": "workspace:*",
+    "@nai/policy-engine": "workspace:*",
+    "@nai/policy-fga": "workspace:*",
+    "@nai/prism": "workspace:*",
+    "@nai/product-catalog": "workspace:*",
+    "@nai/relic": "workspace:*",
+    "@nai/scholarship": "workspace:*",
+    "@nai/scroll": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
+    "@cloudflare/workers-types": "catalog:",
+    "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.5.0"
   }
 }
