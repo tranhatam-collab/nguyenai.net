@@ -28,6 +28,7 @@
  */
 
 import { Hono } from 'hono';
+import { defaultRateLimit, formSubmitRateLimit, cleanupBuckets } from './rate-limiter';
 import {
   InMemoryScholarshipStore,
   setScholarshipStore,
@@ -90,6 +91,7 @@ export const scholarshipRoutes = new Hono<ScholarshipEnv>();
 
 // Middleware: set request context (IP + User-Agent) for audit logging
 scholarshipRoutes.use('*', async (c, next) => {
+  cleanupBuckets();
   const cf = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || null;
   const ua = c.req.header('user-agent') || null;
   setRequestContext({
@@ -101,12 +103,15 @@ scholarshipRoutes.use('*', async (c, next) => {
   clearRequestContext();
 });
 
+// Default rate limit: 60 req/min per IP
+scholarshipRoutes.use('*', defaultRateLimit);
+
 // ============================================================
 // 1-4. Application endpoints
 // ============================================================
 
 // 1. POST /applications
-scholarshipRoutes.post('/applications', async (c) => {
+scholarshipRoutes.post('/applications', formSubmitRateLimit, async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
@@ -166,7 +171,7 @@ scholarshipRoutes.patch('/applications/:id', async (c) => {
 });
 
 // 4. POST /applications/:id/submit
-scholarshipRoutes.post('/applications/:id/submit', async (c) => {
+scholarshipRoutes.post('/applications/:id/submit', formSubmitRateLimit, async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
