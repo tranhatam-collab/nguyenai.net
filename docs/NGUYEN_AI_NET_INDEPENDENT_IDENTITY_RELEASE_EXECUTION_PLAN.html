@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nguyễn AI - Hồ sơ thực thi hệ nhận diện độc lập</title>
+  <style>
+    :root{
+      --brown:#7A2212;
+      --red:#A6260C;
+      --orange:#E55B09;
+      --gold:#FFB810;
+      --cream:#FFF7EA;
+      --paper:#FFFDF8;
+      --ink:#2A1711;
+      --muted:#6B554D;
+      --line:#E8D5C4;
+      --ok:#1F6D5A;
+      --warn:#B86D00;
+      --bad:#9F1D1D;
+      --blue:#254A7A;
+      --shadow:0 24px 70px rgba(122,34,18,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:linear-gradient(180deg,#fff 0%,var(--cream) 100%);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.62;
+    }
+    .page{
+      max-width:1180px;
+      margin:0 auto;
+      padding:36px 24px 80px;
+    }
+    header{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:34px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    header:before{
+      content:"";
+      position:absolute;
+      inset:0 auto auto 0;
+      width:100%;
+      height:8px;
+      background:linear-gradient(90deg,var(--brown),var(--red),var(--orange),var(--gold));
+    }
+    .eyebrow{
+      color:var(--red);
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size:13px;
+    }
+    h1{
+      margin:.25rem 0 .5rem;
+      color:var(--brown);
+      line-height:1.1;
+      font-size:clamp(32px,5vw,58px);
+      letter-spacing:-.04em;
+    }
+    .subtitle{
+      font-size:20px;
+      color:var(--muted);
+      max-width:920px;
+    }
+    .meta{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+      margin-top:24px;
+    }
+    .meta div{
+      background:var(--cream);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+      min-height:80px;
+    }
+    .meta strong{display:block;color:var(--brown);font-size:13px}
+    .meta span{display:block;color:var(--ink);font-weight:700;margin-top:4px}
+    nav{
+      position:sticky;
+      top:0;
+      background:rgba(255,253,248,.94);
+      backdrop-filter:blur(12px);
+      z-index:10;
+      border-bottom:1px solid var(--line);
+      margin:24px -24px 28px;
+      padding:12px 24px;
+      overflow:auto;
+      white-space:nowrap;
+    }
+    nav a{
+      display:inline-block;
+      color:var(--brown);
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 12px;
+      border-radius:999px;
+    }
+    nav a:hover{background:var(--cream)}
+    section{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:30px;
+      margin:24px 0;
+      box-shadow:0 12px 40px rgba(122,34,18,.06);
+    }
+    h2{
+      color:var(--brown);
+      font-size:30px;
+      line-height:1.18;
+      margin:0 0 16px;
+      letter-spacing:-.02em;
+    }
+    h3{
+      color:var(--red);
+      font-size:21px;
+      margin:28px 0 10px;
+    }
+    h4{
+      color:var(--ink);
+      font-size:17px;
+      margin:20px 0 8px;
+    }
+    p{margin:0 0 12px}
+    ul,ol{padding-left:24px}
+    li{margin:6px 0}
+    .callout{
+      border-left:5px solid var(--orange);
+      background:var(--cream);
+      padding:16px 18px;
+      border-radius:14px;
+      margin:16px 0;
+      font-weight:700;
+    }
+    .danger{border-left-color:var(--bad);background:#FFF1F1}
+    .ok{border-left-color:var(--ok);background:#EFFAF4}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:linear-gradient(180deg,#fff,#fffaf2);
+    }
+    .badge{
+      display:inline-block;
+      border-radius:999px;
+      padding:3px 10px;
+      font-size:12px;
+      font-weight:700;
+      color:#fff;
+      background:var(--brown);
+      margin-right:6px;
+      margin-bottom:6px;
+    }
+    .r0{background:#2C67A1}
+    .r1{background:#B88A00}
+    .r2{background:#C46017}
+    .r3{background:#20704C}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:16px;
+      margin:14px 0 22px;
+      background:#fff;
+    }
+    th,td{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+      text-align:left;
+    }
+    th{
+      background:var(--cream);
+      color:var(--brown);
+      font-weight:800;
+    }
+    tr:last-child td{border-bottom:none}
+    code,pre{
+      font-family:"JetBrains Mono","SFMono-Regular",Consolas,monospace;
+      background:#2a1711;
+      color:#fff7ea;
+      border-radius:12px;
+    }
+    code{padding:2px 6px}
+    pre{
+      padding:16px;
+      overflow:auto;
+      line-height:1.5;
+      font-size:13px;
+    }
+    .langbox{
+      border:2px solid var(--red);
+      background:#fff;
+    }
+    .langbox h2{margin-bottom:4px}
+    .small{font-size:13px;color:var(--muted)}
+    .checklist li{list-style:none;position:relative;padding-left:24px}
+    .checklist li:before{
+      content:"";
+      width:10px;height:10px;border-radius:50%;
+      background:var(--orange);
+      position:absolute;left:0;top:.65em;
+    }
+    .footer{
+      text-align:center;
+      color:var(--muted);
+      margin-top:40px;
+      font-size:13px;
+    }
+    @media(max-width:900px){
+      .meta,.grid,.grid3{grid-template-columns:1fr}
+      section,header{padding:22px}
+      nav{position:relative}
+    }
+    @media print{
+      nav{display:none}
+      body{background:#fff}
+      section,header{box-shadow:none;break-inside:avoid}
+      a{color:inherit;text-decoration:none}
+      .page{max-width:none;padding:0}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+<header>
+  <div class="eyebrow">Tài liệu thực thi cho đội phát triển</div>
+  <h1>Nguyễn AI<br>Hệ nhận diện độc lập bằng bằng chứng</h1>
+  <p class="subtitle">Bản này khóa lại hướng nâng cấp cho toàn bộ nguyenai.net sau khi kiểm tra kho mã, tài liệu quản trị và bằng chứng phát hành. Ngôn ngữ gốc là tiếng Việt. Bản tiếng Anh được đặt riêng ở phần cuối để dùng cho đội quốc tế.</p>
+  <div class="meta">
+    <div><strong>Thương hiệu mẹ</strong><span>Nguyễn AI</span></div>
+    <div><strong>Sản phẩm lõi</strong><span>Máy Tính AI Nguyễn</span></div>
+    <div><strong>Tên miền chính</strong><span>nguyenai.net</span></div>
+    <div><strong>Trạng thái yêu cầu</strong><span>Khóa nhận diện độc lập</span></div>
+  </div>
+</header>
+
+<nav>
+  <a href="#audit">Kiểm tra</a>
+  <a href="#decision">Quyết định</a>
+  <a href="#identity">Nhận diện</a>
+  <a href="#language">Ngôn ngữ</a>
+  <a href="#structure">Cấu trúc</a>
+  <a href="#files">Danh sách tệp</a>
+  <a href="#tasks">Lệnh thực thi</a>
+  <a href="#qa">Cổng duyệt</a>
+  <a href="#english">English</a>
+</nav>
+
+<section id="audit">
+  <h2>1. Kết quả kiểm tra hiện trạng</h2>
+  <p>Kho mã chính đang dùng là kho công khai tranhatam-collab/nguyenai.net, nhánh chính là main. Kho đã có quyền quản trị, quyền ghi và trạng thái chưa lưu trữ.</p>
+  <p>Bằng chứng phát hành gần nhất trong kho cho thấy trang công khai đã từng vượt kiểm tra tạo bản dựng, có năm mươi trang, có bộ tuyến tiếng Việt và tiếng Anh, có bản đồ trang, có liên kết thay thế ngôn ngữ, có kiểm tra khả năng tiếp cận và có kiểm tra trang đầu tư.</p>
+  <p>Kiểm tra qua công cụ truy cập trực tiếp trong phiên này không tải được trang sống do lỗi phân giải tên miền từ môi trường chạy. Vì vậy, bản này dựa trên bằng chứng trong kho mã, các ghi chú phát hành, tài liệu khóa tên thương hiệu, kế hoạch hệ thống độc lập và các tệp quản trị đã có trong kho. Đội phát triển phải chạy lại kiểm tra trang sống trước khi ghi hoàn tất.</p>
+
+  <div class="callout danger">
+    Kết luận kiểm tra: trang công khai đã có nền tốt, nhưng tài liệu vẫn còn dấu vết của mô hình tham chiếu cũ. Từ bản này, nguyenai.net phải được vận hành như một hệ nhận diện và hệ sản phẩm độc lập, không phụ thuộc hai nền cũ khi chạy thật.
+  </div>
+
+  <h3>Việc đã xác nhận trong kho</h3>
+  <table>
+    <thead><tr><th>Hạng mục</th><th>Trạng thái đọc được</th><th>Yêu cầu tiếp theo</th></tr></thead>
+    <tbody>
+      <tr><td>Kho mã</td><td>Kho chính đã xác định, công khai, nhánh chính là main.</td><td>Duy trì một nguồn sự thật cho toàn bộ đội.</td></tr>
+      <tr><td>Thương hiệu</td><td>Chuẩn tên đã khóa: Nguyễn AI, Máy Tính AI Nguyễn, Nguyen AI, Nguyen AI Computer.</td><td>Chạy quét tên sai trên mọi tệp.</td></tr>
+      <tr><td>Trang công khai</td><td>Bằng chứng phát hành ghi nhận năm mươi tuyến song ngữ.</td><td>Kiểm tra lại trên tên miền thật.</td></tr>
+      <tr><td>Kiến trúc</td><td>Tài liệu đã ghi quyết định nguyenai.net có hệ sau độc lập.</td><td>Loại bỏ mọi câu công khai làm người dùng nghĩ hệ phụ thuộc nền cũ.</td></tr>
+      <tr><td>Đầu tư</td><td>Đã có trang và quy trình xác minh nhà đầu tư trong tài liệu phát hành.</td><td>Đổi ngôn ngữ theo nhận diện độc lập và nhãn trạng thái.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="decision">
+  <h2>2. Quyết định khóa mới của nhà sáng lập</h2>
+  <div class="callout ok">
+    Nguyễn AI là một hệ nhận diện và hệ sản phẩm độc lập cho dòng sáng tạo công nghệ của người mang họ Nguyễn. Hai nền cũ chỉ còn là nguồn tham chiếu kỹ thuật nội bộ, không được dùng làm điểm tựa truyền thông, không được xuất hiện trong lời hứa công khai, không được làm người dùng nghĩ sản phẩm phụ thuộc chúng khi vận hành.
+  </div>
+
+  <h3>Câu chủ</h3>
+  <p class="callout">Máy làm, người ký, mọi việc có biên nhận.</p>
+
+  <h3>Câu định vị tiếng Việt</h3>
+  <p>Nguyễn AI xây dựng Máy Tính AI Nguyễn, một nền tảng máy tính trí tuệ nhân tạo độc lập cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp, giáo dục, học bổng, đầu tư và cộng đồng người mang họ Nguyễn tại Việt Nam và trên thế giới.</p>
+
+  <h3>Điều bị cấm trong bản công khai</h3>
+  <ul class="checklist">
+    <li>Không nói sản phẩm chạy trên nền cũ như một điều kiện bắt buộc.</li>
+    <li>Không dùng tên nền cũ trong tiêu đề, mô tả, lời kêu gọi, giá, học bổng, đầu tư, mô tả mạng xã hội hoặc bản đồ trang.</li>
+    <li>Không mô tả cơ chế lõi bên trong nếu chỉ cần nói kết quả và bằng chứng.</li>
+    <li>Không bán năng lực chưa đạt nhãn tin cậy sản xuất.</li>
+    <li>Không dùng tên sai hoặc viết sai dấu trong nội dung tiếng Việt.</li>
+    <li>Không trộn tiếng Việt và tiếng Anh trong cùng một đoạn nội dung người dùng.</li>
+  </ul>
+</section>
+
+<section id="identity">
+  <h2>3. Kiến trúc nhận diện bằng bằng chứng</h2>
+  <p>Nhận diện mới không dựa vào lời hứa quá mức. Mỗi năng lực, mỗi sản phẩm, mỗi gói, mỗi bài học, mỗi công cụ và mỗi trang gọi vốn phải có nhãn trạng thái rõ ràng.</p>
+
+  <h3>Công thức nhận diện</h3>
+  <div class="callout">Nhận diện bằng lời hứa được đóng khung, cấp độ tin cậy và biên nhận kiểm chứng được.</div>
+
+  <h3>Bốn nhãn trạng thái</h3>
+  <table>
+    <thead><tr><th>Nhãn</th><th>Tên tiếng Việt</th><th>Ý nghĩa</th><th>Được nói</th><th>Không được nói</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge r0">R0</span></td><td>Bản chứng minh</td><td>Đã có bằng chứng thử nghiệm ban đầu.</td><td>Có bản thử.</td><td>Sẵn sàng dùng thật.</td></tr>
+      <tr><td><span class="badge r1">R1</span></td><td>Vận hành nội bộ</td><td>Đội ngũ đang dùng có giám sát.</td><td>Đang dùng nội bộ.</td><td>Mở bán đại trà.</td></tr>
+      <tr><td><span class="badge r2">R2</span></td><td>Thử nghiệm có kiểm soát</td><td>Mở theo lời mời, có giới hạn rõ.</td><td>Mời dùng có điều kiện.</td><td>Cam kết sản xuất.</td></tr>
+      <tr><td><span class="badge r3">R3</span></td><td>Tin cậy sản xuất</td><td>Mở bán, có số đo, có phê duyệt và có biên nhận.</td><td>Mở bán theo cam kết đã đo.</td><td>Nói vượt số đo.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Năm tên lõi được phép công bố</h3>
+  <p>Các tên sau chỉ mô tả kết quả bên ngoài. Không được mô tả cách cài đặt, sơ đồ ruột hoặc mã nguồn nội bộ.</p>
+  <table>
+    <thead><tr><th>Tên công bố</th><th>Tên tiếng Việt</th><th>Câu nhận diện được phép dùng</th></tr></thead>
+    <tbody>
+      <tr><td>Proof Receipt Chain</td><td>Chuỗi Biên Nhận</td><td>Mọi việc máy làm đều có biên nhận bạn tự kiểm chứng được.</td></tr>
+      <tr><td>Authority Matrix</td><td>Ma Trận Thẩm Quyền</td><td>Không gì quan trọng xảy ra khi chưa có chữ ký của bạn.</td></tr>
+      <tr><td>Command Pack Registry</td><td>Kho Lệnh Nghiệm Thu</td><td>Máy chỉ nhận việc nó đã chứng minh làm được, có số liệu từng loại việc.</td></tr>
+      <tr><td>Threshold Flywheel</td><td>Vòng Hiệu Chỉnh</td><td>Máy của bạn giỏi lên mỗi quý bằng chính dữ liệu công việc của bạn.</td></tr>
+      <tr><td>ProofCore</td><td>Lõi Bằng Chứng</td><td>Lõi vận hành được niêm phong. Bạn không cần thấy bên trong, vì mọi đầu ra đều có bằng chứng.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Câu hiến chương công khai</h3>
+  <p class="callout">Chúng tôi dán nhãn trạng thái thật cho từng năng lực. Thứ chưa đạt tin cậy sản xuất sẽ không bao giờ được bán như tin cậy sản xuất.</p>
+</section>
+
+<section id="language">
+  <h2>4. Chuẩn ngôn ngữ song ngữ</h2>
+  <p>Tiếng Việt là ngôn ngữ gốc. Tiếng Anh là bản quốc tế. Hai bản không được trộn từ trong cùng một đoạn nội dung người dùng.</p>
+
+  <h3>Chuẩn tiếng Việt</h3>
+  <table>
+    <thead><tr><th>Loại</th><th>Tên chuẩn</th><th>Quy tắc</th></tr></thead>
+    <tbody>
+      <tr><td>Thương hiệu mẹ</td><td>Nguyễn AI</td><td>Luôn có dấu.</td></tr>
+      <tr><td>Sản phẩm lõi</td><td>Máy Tính AI Nguyễn</td><td>Luôn có dấu.</td></tr>
+      <tr><td>Giáo dục</td><td>Nguyễn AI Edu</td><td>Dùng thống nhất nếu tên miền hoặc khu vực sản phẩm cần giữ chữ Edu.</td></tr>
+      <tr><td>Đầu tư</td><td>Nguyễn AI Invest</td><td>Dùng thống nhất nếu tên miền hoặc khu vực sản phẩm cần giữ chữ Invest.</td></tr>
+      <tr><td>Tài liệu</td><td>Nguyễn AI Docs</td><td>Dùng thống nhất nếu tên miền hoặc khu vực sản phẩm cần giữ chữ Docs.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Quy tắc tiếng Việt không trộn chữ</h3>
+  <ul>
+    <li>Trong phần tiếng Việt, dùng câu tiếng Việt hoàn chỉnh.</li>
+    <li>Không chèn thuật ngữ tiếng Anh nếu đã có từ tiếng Việt tương đương.</li>
+    <li>Tên riêng đã khóa được giữ nguyên theo bảng chuẩn.</li>
+    <li>Đường dẫn, tên tệp và đoạn mã được đặt trong khối kỹ thuật riêng, không nằm trong câu tiếp thị.</li>
+  </ul>
+
+  <h3>Chuẩn tiếng Anh</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Approved name</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Master brand</td><td>Nguyen AI</td><td>Use plain ASCII.</td></tr>
+      <tr><td>Core product</td><td>Nguyen AI Computer</td><td>Use this exact order.</td></tr>
+      <tr><td>Education</td><td>Nguyen AI Edu</td><td>Use only in English copy.</td></tr>
+      <tr><td>Investment</td><td>Nguyen AI Invest</td><td>Use only in English copy.</td></tr>
+      <tr><td>Documentation</td><td>Nguyen AI Docs</td><td>Use only in English copy.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tên cấm</h3>
+  <p>Các tên sau phải bị chặn trong mọi giao diện, mô tả, thư điện tử, tài liệu, siêu dữ liệu và bản đồ trang.</p>
+  <pre>Nguyen Computer AI
+Nguyen Ai Computer
+NguyenAI
+Nguyễn.AI
+Nguyên AI
+AI Nguyen
+AI Nguyễn
+Nguyen Artificial Intelligence
+NAI Edu
+NAI Invest
+NAI Computer</pre>
+</section>
+
+<section id="structure">
+  <h2>5. Cấu trúc sản phẩm độc lập</h2>
+  <p>Tất cả khu vực dưới đây thuộc cùng một hệ sản phẩm Nguyễn AI. Chúng dùng cùng nhận diện, cùng tài khoản, cùng chính sách dữ liệu, cùng biên nhận, cùng nhãn trạng thái.</p>
+
+  <div class="grid3">
+    <div class="card"><h3>Trang chính</h3><p>Giới thiệu Máy Tính AI Nguyễn, sản phẩm, giá, nhãn trạng thái, chứng cứ, cộng đồng và đường dẫn đăng ký.</p></div>
+    <div class="card"><h3>Bảng điều khiển</h3><p>Nơi người dùng điều khiển máy, tác nhân, lệnh, bộ nhớ, tài liệu, phê duyệt và biên nhận.</p></div>
+    <div class="card"><h3>Giáo dục</h3><p>Giáo trình, bài học, bài kiểm tra, thực hành, học lại, học bổng và chứng nhận.</p></div>
+    <div class="card"><h3>Đầu tư</h3><p>Hồ sơ đầu tư, phòng riêng, xác minh nhà đầu tư, tài trợ học bổng và báo cáo tác động.</p></div>
+    <div class="card"><h3>Tài liệu</h3><p>Điều khoản, chính sách, chuẩn ngôn ngữ, chuẩn học bổng, chuẩn biên nhận và quy tắc cộng đồng.</p></div>
+    <div class="card"><h3>Quản trị</h3><p>Quản lý học viên, nhà tài trợ, nhà đầu tư, kiểm duyệt, khiếu nại, nhật ký và quyền truy cập.</p></div>
+  </div>
+
+  <h3>Các vùng công khai và riêng tư</h3>
+  <table>
+    <thead><tr><th>Vùng</th><th>Tên miền</th><th>Công khai</th><th>Nhãn cần có</th></tr></thead>
+    <tbody>
+      <tr><td>Trang chính</td><td>nguyenai.net</td><td>Có</td><td>Nhãn năng lực, nhãn demo, nhãn gói.</td></tr>
+      <tr><td>Bảng điều khiển</td><td>app.nguyenai.net</td><td>Không</td><td>Nhãn tác vụ, nhãn phê duyệt, nhãn biên nhận.</td></tr>
+      <tr><td>Giáo dục</td><td>edu.nguyenai.net</td><td>Một phần</td><td>Nhãn bài học, nhãn qua bài, nhãn tốt nghiệp.</td></tr>
+      <tr><td>Đầu tư</td><td>invest.nguyenai.net</td><td>Một phần</td><td>Nhãn xác minh, nhãn truy cập, nhãn tài trợ.</td></tr>
+      <tr><td>Tài liệu</td><td>docs.nguyenai.net</td><td>Có</td><td>Phiên bản, hiệu lực, chủ sở hữu, phạm vi.</td></tr>
+      <tr><td>Quản trị</td><td>admin.nguyenai.net</td><td>Không</td><td>Nhãn quyền, nhật ký và phê duyệt.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="files">
+  <h2>6. Danh sách tệp đội phát triển phải tạo hoặc cập nhật</h2>
+
+  <h3>Tệp quản trị</h3>
+  <pre>docs/governance/INDEPENDENT_IDENTITY_SYSTEM_CHARTER_2026-07-04.html
+docs/governance/INDEPENDENT_IDENTITY_SYSTEM_CHARTER_2026-07-04.md
+docs/governance/PUBLIC_CLAIMS_CHARTER_2026-07-04.md
+docs/governance/TRUE_AI_COMPUTER_STANDARD_V1_1.md
+docs/governance/AIOS_CORE_SECRET_REGISTER.md
+docs/governance/R_GRADE_STATUS_POLICY.md
+docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md
+docs/governance/BRAND_LANGUAGE_SEPARATION_POLICY.md
+docs/governance/BRAND_CLAIMS_APPROVAL_WORKFLOW.md
+docs/governance/RELEASE_EVIDENCE_REQUIREMENTS.md</pre>
+
+  <h3>Tệp dữ liệu</h3>
+  <pre>packages/brand/brand-names.json
+packages/brand/banned-names.json
+packages/brand/r-grade-labels.json
+packages/brand/public-claims.json
+packages/brand/language-rules.json
+packages/product-catalog/plans.json
+packages/product-catalog/entitlements.json
+packages/product-catalog/prices.json
+packages/product-catalog/limits.json
+packages/product-catalog/catalog.schema.json
+packages/status/claim-status.json
+packages/status/demo-status.json</pre>
+
+  <h3>Tệp giao diện</h3>
+  <pre>apps/web/src/components/RGradeBadge.astro
+apps/web/src/components/ProofReceiptCard.astro
+apps/web/src/components/PublicClaimBlock.astro
+apps/web/src/components/LanguageBoundaryNotice.astro
+apps/web/src/components/FounderApprovedName.astro
+apps/web/src/components/VerificationReceipt.astro
+apps/web/src/components/ProductStatusMatrix.astro
+apps/web/src/components/CapabilityCard.astro
+apps/web/src/components/InvestorTrustPanel.astro
+apps/web/src/components/EduScholarshipPanel.astro</pre>
+
+  <h3>Trang cần có</h3>
+  <pre>apps/web/src/pages/index.astro
+apps/web/src/pages/ai-computer/index.astro
+apps/web/src/pages/proof/index.astro
+apps/web/src/pages/status/index.astro
+apps/web/src/pages/claims/index.astro
+apps/web/src/pages/receipts/index.astro
+apps/web/src/pages/plans/index.astro
+apps/web/src/pages/demo/index.astro
+apps/web/src/pages/edu/index.astro
+apps/web/src/pages/invest/index.astro
+apps/web/src/pages/docs/index.astro
+apps/web/src/pages/en/index.astro
+apps/web/src/pages/en/ai-computer/index.astro
+apps/web/src/pages/en/proof/index.astro
+apps/web/src/pages/en/status/index.astro
+apps/web/src/pages/en/claims/index.astro
+apps/web/src/pages/en/receipts/index.astro
+apps/web/src/pages/en/plans/index.astro
+apps/web/src/pages/en/demo/index.astro
+apps/web/src/pages/en/edu/index.astro
+apps/web/src/pages/en/invest/index.astro
+apps/web/src/pages/en/docs/index.astro</pre>
+
+  <h3>Tệp kiểm tra tự động</h3>
+  <pre>tools/audit-brand-naming-lock.sh
+tools/audit-language-boundary.sh
+tools/audit-r-grade-claims.sh
+tools/audit-public-claims-charter.sh
+tools/audit-proof-receipts.sh
+tools/audit-private-terms-leak.sh
+tools/audit-seo-bilingual.sh
+tools/audit-live-routes.sh
+tools/audit-release-evidence.sh
+tests/brand-naming.test.ts
+tests/language-boundary.test.ts
+tests/r-grade-claims.test.ts
+tests/receipts.test.ts
+tests/seo-hreflang.test.ts</pre>
+</section>
+
+<section id="tasks">
+  <h2>7. Lệnh thực thi cho đội phát triển</h2>
+  <p>Đội phát triển không được bắt đầu bằng sửa giao diện. Phải bắt đầu bằng khóa quản trị, sau đó mới sửa nội dung, dữ liệu, tuyến, kiểm tra và phát hành.</p>
+
+  <h3>Giai đoạn một: khóa quyết định độc lập</h3>
+  <ol>
+    <li>Cập nhật tệp quản trị để ghi rõ nguyenai.net là hệ độc lập khi chạy thật.</li>
+    <li>Loại bỏ câu khiến người dùng hiểu sản phẩm phụ thuộc nền cũ.</li>
+    <li>Giữ nền cũ chỉ trong vùng tài liệu lịch sử hoặc tham chiếu kỹ thuật riêng tư.</li>
+    <li>Thêm câu chủ: Máy làm, người ký, mọi việc có biên nhận.</li>
+    <li>Thêm bốn nhãn trạng thái và quy tắc dùng nhãn trên mọi năng lực.</li>
+  </ol>
+
+  <h3>Giai đoạn hai: khóa ngôn ngữ và tên</h3>
+  <ol>
+    <li>Quét toàn kho để sửa tên sai.</li>
+    <li>Tách văn bản tiếng Việt và tiếng Anh.</li>
+    <li>Tạo tệp dữ liệu tên chuẩn.</li>
+    <li>Tạo tệp dữ liệu tên cấm.</li>
+    <li>Thêm kiểm tra tự động để bản dựng thất bại nếu còn tên cấm.</li>
+  </ol>
+
+  <h3>Giai đoạn ba: nâng cấp trang công khai</h3>
+  <ol>
+    <li>Trang chủ phải có khối nhận diện bằng bằng chứng.</li>
+    <li>Trang sản phẩm phải có nhãn trạng thái từng năng lực.</li>
+    <li>Trang giá phải ghi rõ gói nào đang ở mức chứng minh, nội bộ, thử nghiệm hay sản xuất.</li>
+    <li>Trang đầu tư phải có ma trận rủi ro, giả định và bằng chứng.</li>
+    <li>Trang giáo dục phải có quy tắc qua bài, học lại, bằng chứng và tốt nghiệp bằng sản phẩm.</li>
+    <li>Trang tài liệu phải công khai điều khoản học bổng, quyền riêng tư, kiểm duyệt, tài trợ, khiếu nại và xung đột lợi ích.</li>
+  </ol>
+
+  <h3>Giai đoạn bốn: tạo cổng biên nhận</h3>
+  <ol>
+    <li>Mỗi tuyên bố quan trọng có mã biên nhận.</li>
+    <li>Mỗi bản phát hành có tệp bằng chứng.</li>
+    <li>Mỗi demo có nhãn trạng thái.</li>
+    <li>Mỗi học viên tốt nghiệp có chứng nhận có thể xác minh.</li>
+    <li>Mỗi khoản tài trợ học bổng có báo cáo tác động.</li>
+  </ol>
+
+  <h3>Giai đoạn năm: phát hành</h3>
+  <pre>pnpm install
+pnpm audit:contamination
+pnpm audit:brand
+pnpm audit:language
+pnpm audit:claims
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+pnpm preview:web
+bash tools/audit-live-routes.sh
+bash tools/audit-release-evidence.sh</pre>
+</section>
+
+<section id="qa">
+  <h2>8. Cổng duyệt trước khi công bố</h2>
+
+  <h3>Cổng không được vượt</h3>
+  <table>
+    <thead><tr><th>Cổng</th><th>Điều kiện</th><th>Không đạt thì xử lý</th></tr></thead>
+    <tbody>
+      <tr><td>Tên thương hiệu</td><td>Không còn tên cấm.</td><td>Dừng bản dựng.</td></tr>
+      <tr><td>Ngôn ngữ</td><td>Không trộn ngôn ngữ trong nội dung người dùng.</td><td>Sửa bản dịch.</td></tr>
+      <tr><td>Nhãn trạng thái</td><td>Mọi năng lực có nhãn.</td><td>Không công bố năng lực đó.</td></tr>
+      <tr><td>Biên nhận</td><td>Tuyên bố quan trọng có biên nhận.</td><td>Chuyển về bản nháp.</td></tr>
+      <tr><td>Độc lập</td><td>Không có lời hứa phụ thuộc nền cũ trên trang công khai.</td><td>Sửa trước khi phát hành.</td></tr>
+      <tr><td>Đầu tư</td><td>Không có cam kết lợi nhuận, không có định giá không gắn giả định.</td><td>Khóa trang đầu tư.</td></tr>
+      <tr><td>Học bổng</td><td>Không công khai dữ liệu nhạy cảm, có điều khoản đầy đủ.</td><td>Khóa nhận hồ sơ.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Chuẩn báo cáo hoàn thành</h3>
+  <p>Đội phát triển chỉ được báo hoàn thành khi cung cấp đủ các bằng chứng sau:</p>
+  <ul>
+    <li>Mã phiên bản và nhánh.</li>
+    <li>Danh sách tệp đã thay đổi.</li>
+    <li>Kết quả quét tên sai.</li>
+    <li>Kết quả quét trộn ngôn ngữ.</li>
+    <li>Kết quả kiểm tra nhãn trạng thái.</li>
+    <li>Kết quả kiểm tra tuyến sống.</li>
+    <li>Kết quả kiểm tra bản đồ trang.</li>
+    <li>Kết quả kiểm tra liên kết thay thế ngôn ngữ.</li>
+    <li>Ảnh chụp trang chủ tiếng Việt và tiếng Anh.</li>
+    <li>Ảnh chụp trang đầu tư, giáo dục, giá, trạng thái và tài liệu.</li>
+  </ul>
+</section>
+
+<section id="english" class="langbox" lang="en">
+  <h2>English Execution Brief</h2>
+  <p>This section is intentionally written in English only. It is the international working brief for developers, reviewers and external technical partners.</p>
+
+  <h3>Founder decision</h3>
+  <p>Nguyen AI is an independent product identity and operating system for the Nguyen AI ecosystem. Public users must not be told that the product depends on older reference systems at runtime. Older systems may remain internal references only.</p>
+
+  <h3>Master naming</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Approved name</th></tr></thead>
+    <tbody>
+      <tr><td>Master brand</td><td>Nguyen AI</td></tr>
+      <tr><td>Core product</td><td>Nguyen AI Computer</td></tr>
+      <tr><td>Education surface</td><td>Nguyen AI Edu</td></tr>
+      <tr><td>Investment surface</td><td>Nguyen AI Invest</td></tr>
+      <tr><td>Documentation surface</td><td>Nguyen AI Docs</td></tr>
+      <tr><td>Scholarship surface</td><td>Nguyen AI Scholarships</td></tr>
+      <tr><td>Community surface</td><td>Nguyen AI Forum</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Core public promise</h3>
+  <p class="callout">The machine acts. The human signs. Every action has a receipt.</p>
+
+  <h3>Status labels</h3>
+  <table>
+    <thead><tr><th>Label</th><th>Name</th><th>Allowed public meaning</th></tr></thead>
+    <tbody>
+      <tr><td>R0</td><td>Proof build</td><td>Prototype proven. Not for real work.</td></tr>
+      <tr><td>R1</td><td>Internal operation</td><td>Used by the team with human supervision.</td></tr>
+      <tr><td>R2</td><td>Controlled beta</td><td>Invite only. Limits are disclosed before use.</td></tr>
+      <tr><td>R3</td><td>Production trust</td><td>Commercial release with measured commitments.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Required implementation files</h3>
+  <pre>docs/governance/INDEPENDENT_IDENTITY_SYSTEM_CHARTER_2026-07-04.html
+docs/governance/PUBLIC_CLAIMS_CHARTER_2026-07-04.md
+docs/governance/R_GRADE_STATUS_POLICY.md
+packages/brand/brand-names.json
+packages/brand/banned-names.json
+packages/brand/r-grade-labels.json
+packages/brand/public-claims.json
+tools/audit-brand-naming-lock.sh
+tools/audit-language-boundary.sh
+tools/audit-r-grade-claims.sh
+tools/audit-public-claims-charter.sh</pre>
+
+  <h3>Release rule</h3>
+  <p>No feature, claim, demo, scholarship workflow, investor workflow or product plan may be published without an explicit status label and a matching source of evidence.</p>
+</section>
+
+<div class="footer">
+  <p>Nguyễn AI - Hồ sơ thực thi hệ nhận diện độc lập. Bản dành cho đội phát triển.</p>
+</div>
+
+</div>
+</body>
+</html>

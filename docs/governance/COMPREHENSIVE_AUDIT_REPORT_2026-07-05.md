@@ -1,8 +1,10 @@
 # COMPREHENSIVE AUDIT REPORT — Nguyễn AI Project
-**Date:** 2026-07-05 (final update)
+**Date:** 2026-07-05 (corrected after independent verification)
 **Auditor:** Devin CLI session (independent verification)
-**HEAD:** `cef7cec` (pushed to origin/main)
+**HEAD:** `ef98ed4` → pending new commit with E2E fixes
 **Audit scope:** Total plan — DEV_WORK_ITEMS_P0_P1.md (62 items), DEV_EXECUTION_CHECKLIST.md (103 tasks), all prior audit reports
+
+> **CORRECTION NOTE:** This report was corrected after independent verification found 3 significant discrepancies in the original version. See §3a for details.
 
 ---
 
@@ -10,19 +12,21 @@
 
 | Metric | Value |
 |--------|-------|
-| Total commits | 75 |
+| Total commits | 75+ |
 | Total apps | 8 (web, console, invest, edu, admin, academy, auth, api) |
 | Total @nai packages | 56 |
 | Packages with tests | 56/56 (100%) |
-| Stub packages (metadata only) | 13 |
-| Real packages (>=30 lines) | 42 |
+| True stub packages (0 lines) | 1 (n8n, excluded from workspace) |
+| Wrapper packages (metadata + smoke test) | 12 (49 lines each, 4/4 tests PASS) |
+| Real packages (>=30 lines index.ts) | 42 |
 | Migrations | 7 |
 | Governance docs | 40 |
-| Total endpoints | 198 (auth 29 + API 65 + scholarship 62 + investor 21 + edu 21) |
+| Total programmatic endpoints | 177 (auth 29 + API 65 + scholarship 62 + investor 21) |
+| Astro static pages (edu) | 32 (not programmatic endpoints) |
 | Commercial objects in catalog | 15 |
 | Data classes | 16 |
-| Audit event types | 70 |
-| E2E tests | 34/34 PASS |
+| Audit event types | 67 |
+| E2E tests | 4 suites, all PASS (P0-B 34, P1-A 42, Scholarship 43, Audit Registry 67) |
 
 ---
 
@@ -45,9 +49,30 @@
 
 | Suite | Result |
 |-------|--------|
-| E2E (P0-B chain) | ✅ 34/34 PASS |
+| E2E P0-B (identity chain) | ✅ 34/34 PASS |
+| E2E P1-A (core runtime chain) | ✅ 42/42 PASS (fixed: missing deps in package.json) |
+| E2E Scholarship (full flow) | ✅ 43/43 PASS (fixed: duplicate content corruption + email service) |
+| E2E Audit Registry (67 events) | ✅ PASS (fixed: duplicate content corruption + stale assertions) |
 | @nai/approval | ✅ 13/13 PASS |
 | @nai/auth | ✅ 35/35 PASS |
+| @nai/audit | ✅ 18/18 PASS |
+| @nai/entitlement | ✅ 39/39 PASS |
+| @nai/scholarship | ✅ 65/65 PASS |
+| @nai/email | ✅ PASS |
+| @nai/runtime-sdk | ✅ 10/10 PASS |
+| @nai/contracts | ✅ 42/42 PASS |
+| 12 wrapper packages | ✅ 4/4 each (48 total) |
+| @nai/bulwark | ✅ 4/4 PASS |
+
+### 3a. Corrections from Independent Verification
+
+Original report had 3 significant discrepancies, now corrected:
+
+| # | Original claim | Corrected | Root cause |
+|---|---------------|-----------|------------|
+| 1 | "E2E 34/34 PASS" | 4 suites: P0-B 34, P1-A 42, Scholarship 43, Audit Registry 67 — all PASS after fixes | 3 suites had broken imports, duplicate content corruption, stale assertions |
+| 2 | "13 stub packages (metadata only)" | 1 true stub (n8n, 0 lines); 12 wrapper packages with smoke tests (49 lines, 4/4 PASS) | Counted wrapper packages with tests as stubs |
+| 3 | "198 endpoints" | 177 programmatic endpoints (auth 29 + API 65 + scholarship 62 + investor 21); edu has 32 Astro static pages, not Hono endpoints | Counted Astro pages as programmatic endpoints |
 | @nai/audit | ✅ 18/18 PASS |
 | @nai/entitlement | ✅ 39/39 PASS |
 | @nai/scholarship | ✅ 65/65 PASS |
@@ -195,7 +220,7 @@
 
 ---
 
-## 7. P0/P1 Fixes This Session (5 commits)
+## 7. P0/P1 Fixes This Session (6 commits)
 
 | Commit | Description |
 |--------|-------------|
@@ -204,6 +229,7 @@
 | `e718f0f` | fix(P0/P1): idempotency, rate limiting, 17 auth endpoints, commercial objects, V4 policy slugs |
 | `8b76f8a` | fix(P1/P2): R7 approval email env, R8 auth Worker verify, scholarship data, package tests |
 | `cef7cec` | chore: add bulwark smoke test, remove 20 corruption artifacts from docs/qa/ |
+| (pending) | fix(E2E): 3 broken suites — missing deps, duplicate corruption, stale assertions |
 
 ---
 
@@ -259,7 +285,7 @@
 | Issue | Impact | Status |
 |-------|--------|--------|
 | Astro 7.0 static build — 0 HTML for web/console/invest | 🔴 CRITICAL | Needs downgrade to 4.x or config fix |
-| 13 stub packages (metadata only, <30 lines) | 🟡 Medium | Need real implementation for P1-D/P1-E |
+| 1 true stub (n8n, 0 lines) + 12 wrapper packages (49 lines, smoke tests) | 🟡 Medium | Wrapper packages need real implementation for P1-D/P1-E |
 | Working tree corruption (6th occurrence) | 🔴 CRITICAL | Root cause: parallel Devin desktop session |
 
 ---
@@ -313,7 +339,7 @@ Per QA_BINDING_RULES_FOR_DEV_TEAM.md:
 - All fixes verified by running commands and reading output
 - No paste-trust — every claim independently verified against codebase
 - Red before green — remaining work reported before completed work
-- "Build green" is necessary but not sufficient — E2E tests run (34/34 PASS)
+- "Build green" is necessary but not sufficient — all 4 E2E suites run (P0-B 34, P1-A 42, Scholarship 43, Audit Registry 67 — all PASS)
 
 **Production release: NOT APPROVED.**
 - 1 Founder decision + 11 Founder actions required

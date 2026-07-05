@@ -148,6 +148,21 @@ export async function submitApplication(applicationId: string, userId: string): 
     status: 'submitted',
     submitted_at: new Date().toISOString(),
   });
+
+  // Send confirmation email (best-effort, non-blocking)
+  try {
+    const svc = getEmailService();
+    if (svc && app.email) {
+      await svc.send?.({
+        to: app.email,
+        subject: 'Đơn đăng ký học bổng đã được nộp',
+        html: `<p>Đơn đăng ký ${applicationId} đã được nộp thành công.</p>`,
+        text: `Đơn đăng ký ${applicationId} đã được nộp thành công.`,
+      });
+    }
+  } catch {
+    // Email failure should not block submission
+  }
 }
 
 export async function getApplication(applicationId: string, userId: string): Promise<ScholarshipApplication | null> {
@@ -1599,13 +1614,13 @@ export function clearRequestContext(): void {
   requestContext = null;
 }
 
-let emailService: { send?: (to: string, subject: string, body: string) => Promise<void> } | null = null;
+let emailService: { send?: (msg: { to: string; subject: string; html: string; text: string; from?: unknown; reply_to?: unknown }) => Promise<unknown> } | null = null;
 
 export function setEmailService(svc: { send?: (to: string, subject: string, body: string) => Promise<void> } | null): void {
   emailService = svc;
 }
 
-export function getEmailService(): { send?: (to: string, subject: string, body: string) => Promise<void> } | null {
+export function getEmailService(): { send?: (msg: { to: string; subject: string; html: string; text: string; from?: unknown; reply_to?: unknown }) => Promise<unknown> } | null {
   return emailService;
 }
 

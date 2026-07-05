@@ -891,18 +891,45 @@ importers:
       '@nai/auth':
         specifier: workspace:*
         version: link:../../packages/@nai/auth
+      '@nai/compass':
+        specifier: workspace:*
+        version: link:../../packages/@nai/compass
+      '@nai/conductor':
+        specifier: workspace:*
+        version: link:../../packages/@nai/conductor
+      '@nai/email':
+        specifier: workspace:*
+        version: link:../../packages/@nai/email
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
+      '@nai/evidence':
+        specifier: workspace:*
+        version: link:../../packages/@nai/evidence
+      '@nai/harness':
+        specifier: workspace:*
+        version: link:../../packages/@nai/harness
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
       '@nai/policy-fga':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-fga
+      '@nai/prism':
+        specifier: workspace:*
+        version: link:../../packages/@nai/prism
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
+      '@nai/relic':
+        specifier: workspace:*
+        version: link:../../packages/@nai/relic
+      '@nai/scholarship':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scholarship
+      '@nai/scroll':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scroll
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

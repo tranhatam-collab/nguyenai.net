@@ -118,6 +118,7 @@ export type AuditResult = 'success' | 'failure' | 'denied';
 export interface AuditEvent {
   event_id?: string;
   timestamp?: string;
+  registry_version?: string;
   user_id: string | null;
   session_id: string | null;
   event_type: AuditEventType;
@@ -158,7 +159,7 @@ export class InMemoryAuditStore implements AuditStore {
   async log(event: AuditEvent): Promise<string> {
     const event_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    const stored: AuditEvent = { ...event, event_id, timestamp };
+    const stored: AuditEvent = { ...event, event_id, timestamp, registry_version: AUDIT_REGISTRY_VERSION };
     this.events.push(stored);
     return event_id;
   }

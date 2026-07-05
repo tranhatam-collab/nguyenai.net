@@ -16,7 +16,16 @@
     "@nai/entitlement": "workspace:*",
     "@nai/policy-engine": "workspace:*",
     "@nai/approval": "workspace:*",
-    "@nai/product-catalog": "workspace:*"
+    "@nai/product-catalog": "workspace:*",
+    "@nai/prism": "workspace:*",
+    "@nai/conductor": "workspace:*",
+    "@nai/harness": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/relic": "workspace:*",
+    "@nai/compass": "workspace:*",
+    "@nai/scroll": "workspace:*",
+    "@nai/scholarship": "workspace:*",
+    "@nai/email": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
