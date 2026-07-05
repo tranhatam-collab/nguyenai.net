@@ -48,13 +48,19 @@ export class CrewRuntime {
   private crews = new Map<string, Crew>();
   private executions = new Map<string, CrewExecution>();
 
+  registerCrew(crew: Crew): void {
+    this.crews.set(crew.id, crew);
+  }
+
+  getCrew(id: string): Crew | undefined {
+    return this.crews.get(id);
+  }
+
   createCrew(name: string, description: string, agents: Agent[]): Crew {
     const crew: Crew = { id: crypto.randomUUID(), name, description, agents, tasks: [], sharedContext: {} };
     this.crews.set(crew.id, crew);
     return crew;
   }
-
-  getCrew(id: string): Crew | undefined { return this.crews.get(id); }
 
   addTask(crewId: string, description: string, dependencies?: string[]): Task {
     const crew = this.crews.get(crewId);
@@ -146,4 +152,65 @@ export function createBusinessPackCrew(runtime: CrewRuntime): Crew {
     { id: 'agent-sales', name: 'Sales Agent', role: 'sales', description: 'Sales and revenue growth.', capabilities: ['sales', 'acquisition', 'revenue'] },
   ];
   return runtime.createCrew('Business Pack', 'Crew for business operations.', agents);
+}
+
+/**
+ * Create a crew (standalone function, not using runtime).
+ */
+export function createCrew(config: { name: string; description: string }): Crew {
+  return {
+    id: `crew-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    name: config.name,
+    description: config.description,
+    agents: [],
+    tasks: [],
+    sharedContext: {},
+  };
+}
+
+/**
+ * Assign an agent to a crew.
+ */
+export function assignAgent(crew: Crew, agent: Omit<Agent, 'id'>): Crew {
+  const newAgent: Agent = {
+    ...agent,
+    id: `agent-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+  };
+  return {
+    ...crew,
+    agents: [...crew.agents, newAgent],
+  };
+}
+
+/**
+ * Execute a crew (standalone function, not using runtime).
+ */
+export async function executeCrew(crew: Crew, input: { task: string; context: Record<string, unknown> }): Promise<CrewExecution> {
+  const execution: CrewExecution = {
+    crewId: crew.id,
+    status: 'running',
+    startedAt: new Date().toISOString(),
+    results: new Map(),
+  };
+
+  try {
+    // Mock execution - in real system, this would orchestrate agents
+    for (const agent of crew.agents) {
+      execution.results.set(agent.id, {
+        agentId: agent.id,
+        agentName: agent.name,
+        task: input.task,
+        result: `Agent ${agent.name} completed task: ${input.task}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    execution.status = 'completed';
+    execution.completedAt = new Date().toISOString();
+  } catch (err) {
+    execution.status = 'failed';
+    execution.completedAt = new Date().toISOString();
+  }
+
+  return execution;
 }
