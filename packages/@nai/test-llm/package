@@ -1,0 +1,22 @@
+{
+  "name": "@nai/test-llm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LLM unit test framework — 9 NAI Agents (deepeval rebrand)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/test-llm\""
+  },
+  "keywords": ["test-llm", "deepeval", "nai", "nguyenai"],
+  "upstream": "https://github.com/confident-ai/deepeval",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

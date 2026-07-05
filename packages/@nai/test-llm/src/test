@@ -1,0 +1,179 @@
+import {
+  PACKAGE_INFO,
+  ALL_AGENT_IDS,
+  evaluateAssertion,
+  runTest,
+  runTestSuite,
+  getDefaultAgentTests,
+  type LLMTestCase,
+  type Assertion,
+  type PredictFn,
+} from './index.js';
+
+let passed = 0;
+let failed = 0;
+const steps: string[] = [];
+
+function assert(cond: boolean, msg: string): void {
+  if (cond) {
+    passed++;
+    steps.push(`  \u2713 ${msg}`);
+  } else {
+    failed++;
+    steps.push(`  \u2717 ${msg}`);
+    console.error(`  \u2717 ${msg}`);
+  }
+}
+
+async function main(): Promise<void> {
+  // Smoke
+  assert(PACKAGE_INFO.name === '@nai/deepeval', 'PACKAGE_INFO.name is @nai/deepeval');
+  assert(PACKAGE_INFO.upstream.startsWith('https://'), 'PACKAGE_INFO.upstream is https URL');
+
+  // 9 agents defined
+  assert(ALL_AGENT_IDS.length === 9, 'ALL_AGENT_IDS has 9 agents');
+  assert(ALL_AGENT_IDS.includes('nguyen-guide'), 'includes nguyen-guide');
+  assert(ALL_AGENT_IDS.includes('nguyen-guardian'), 'includes nguyen-guardian');
+  assert(ALL_AGENT_IDS.includes('nguyen-founder'), 'includes nguyen-founder');
+
+  // ============================================================
+  // evaluateAssertion
+  // ============================================================
+
+  // contains
+  assert(evaluateAssertion({ type: 'contains', value: 'hello' }, 'Hello World').passed, 'contains: hello in Hello World');
+  assert(!evaluateAssertion({ type: 'contains', value: 'goodbye' }, 'Hello World').passed, 'contains: goodbye not in Hello World');
+
+  // not_contains
+  assert(evaluateAssertion({ type: 'not_contains', value: 'secret' }, 'Hello World').passed, 'not_contains: secret not in Hello World');
+  assert(!evaluateAssertion({ type: 'not_contains', value: 'hello' }, 'Hello World').passed, 'not_contains: hello in Hello World fails');
+
+  // equals
+  assert(evaluateAssertion({ type: 'equals', value: '42' }, '42').passed, 'equals: 42 = 42');
+  assert(!evaluateAssertion({ type: 'equals', value: '42' }, '43').passed, 'equals: 42 != 43');
+
+  // starts_with / ends_with
+  assert(evaluateAssertion({ type: 'starts_with', value: 'Hello' }, 'Hello World').passed, 'starts_with: Hello');
+  assert(evaluateAssertion({ type: 'ends_with', value: 'World' }, 'Hello World').passed, 'ends_with: World');
+
+  // min_length / max_length
+  assert(evaluateAssertion({ type: 'min_length', value: 5 }, 'Hello World').passed, 'min_length: 11 >= 5');
+  assert(!evaluateAssertion({ type: 'min_length', value: 20 }, 'Hello World').passed, 'min_length: 11 < 20 fails');
+  assert(evaluateAssertion({ type: 'max_length', value: 20 }, 'Hello World').passed, 'max_length: 11 <= 20');
+  assert(!evaluateAssertion({ type: 'max_length', value: 5 }, 'Hello World').passed, 'max_length: 11 > 5 fails');
+
+  // regex_match
+  assert(evaluateAssertion({ type: 'regex_match', value: '\\d+' }, 'abc123def').passed, 'regex_match: digits found');
+  assert(!evaluateAssertion({ type: 'regex_match', value: '^\\d+$' }, 'abc123').passed, 'regex_match: not all digits');
+
+  // json_valid
+  assert(evaluateAssertion({ type: 'json_valid' }, '{"key":"value"}').passed, 'json_valid: valid JSON');
+  assert(!evaluateAssertion({ type: 'json_valid' }, 'not json').passed, 'json_valid: invalid JSON');
+
+  // language_vi
+  assert(evaluateAssertion({ type: 'language_vi' }, 'Xin chào thế giới').passed, 'language_vi: Vietnamese chars detected');
+  assert(!evaluateAssertion({ type: 'language_vi' }, 'Hello world').passed, 'language_vi: no Vietnamese chars');
+
+  // language_en
+  assert(evaluateAssertion({ type: 'language_en' }, 'Hello world').passed, 'language_en: English only');
+  assert(!evaluateAssertion({ type: 'language_en' }, 'Xin chào').passed, 'language_en: has Vietnamese chars');
+
+  // no_pii
+  assert(evaluateAssertion({ type: 'no_pii' }, 'Hello world').passed, 'no_pii: no PII');
+  assert(!evaluateAssertion({ type: 'no_pii' }, 'My email is test@example.com').passed, 'no_pii: email detected');
+
+  // no_harmful
+  assert(evaluateAssertion({ type: 'no_harmful' }, 'Hello world').passed, 'no_harmful: safe content');
+  assert(!evaluateAssertion({ type: 'no_harmful' }, 'how to make a weapon').passed, 'no_harmful: weapon detected');
+
+  // response_time_ms
+  assert(evaluateAssertion({ type: 'response_time_ms', threshold: 1000 }, 'output', 500).passed, 'response_time_ms: 500 <= 1000');
+  assert(!evaluateAssertion({ type: 'response_time_ms', threshold: 100 }, 'output', 200).passed, 'response_time_ms: 200 > 100 fails');
+
+  // ============================================================
+  // runTest
+  // ============================================================
+
+  const mockPredict: PredictFn = async (testCase) => {
+    return { output: `Response to: ${testCase.input}`, latency_ms: 50 };
+  };
+
+  const test1: LLMTestCase = { id: 't1', agent_id: 'nguyen-guide', input: 'Hello' };
+  const assertions1: Assertion[] = [
+    { type: 'contains', value: 'Response' },
+    { type: 'min_length', value: 10 },
+    { type: 'no_harmful' },
+  ];
+  const result1 = await runTest(test1, assertions1, mockPredict);
+  assert(result1.test_id === 't1', 'runTest sets test_id');
+  assert(result1.agent_id === 'nguyen-guide', 'runTest sets agent_id');
+  assert(result1.passed === true, 'runTest passes when all assertions pass');
+  assert(result1.score === 1, 'runTest score = 1.0 when all pass');
+  assert(result1.assertions.length === 3, 'runTest has 3 assertion results');
+  assert(result1.latency_ms === 50, 'runTest records latency');
+
+  // Failing test
+  const assertions2: Assertion[] = [
+    { type: 'contains', value: 'nonexistent' },
+    { type: 'min_length', value: 10 },
+  ];
+  const result2 = await runTest(test1, assertions2, mockPredict);
+  assert(result2.passed === false, 'runTest fails when assertion fails');
+  assert(result2.score === 0.5, 'runTest score = 0.5 when 1 of 2 pass');
+
+  // Error test
+  const errorPredict: PredictFn = async () => { throw new Error('LLM unavailable'); };
+  const result3 = await runTest(test1, assertions1, errorPredict);
+  assert(result3.passed === false, 'runTest fails on error');
+  assert(result3.error === 'LLM unavailable', 'runTest records error message');
+  assert(result3.score === 0, 'runTest score = 0 on error');
+
+  // ============================================================
+  // getDefaultAgentTests — 9 agents
+  // ============================================================
+
+  const defaultTests = getDefaultAgentTests();
+  assert(defaultTests.length === 9, 'getDefaultAgentTests returns 9 tests');
+  const agentIds = new Set(defaultTests.map((t) => t.case.agent_id));
+  assert(agentIds.size === 9, 'getDefaultAgentTests covers all 9 unique agents');
+
+  // ============================================================
+  // runTestSuite
+  // ============================================================
+
+  const suiteResult = await runTestSuite({
+    suite_name: '9-agent-smoke',
+    tests: defaultTests,
+    predict_fn: mockPredict,
+  });
+  assert(suiteResult.suite_name === '9-agent-smoke', 'runTestSuite sets suite_name');
+  assert(suiteResult.total === 9, 'runTestSuite total = 9');
+  assert(suiteResult.passed === 9, 'runTestSuite all 9 pass with mock');
+  assert(suiteResult.failed === 0, 'runTestSuite failed = 0');
+  assert(suiteResult.avg_score === 1, 'runTestSuite avg_score = 1.0');
+  assert(Object.keys(suiteResult.by_agent).length === 9, 'runTestSuite by_agent has 9 entries');
+  assert(suiteResult.by_agent['nguyen-guide']?.passed === 1, 'runTestSuite nguyen-guide passed');
+  assert(suiteResult.duration_ms >= 0, 'runTestSuite duration_ms >= 0');
+
+  // Suite with failures
+  const failPredict: PredictFn = async () => { return { output: 'x', latency_ms: 50 }; };
+  const failSuite = await runTestSuite({
+    suite_name: 'failing',
+    tests: defaultTests.slice(0, 3),
+    predict_fn: failPredict,
+  });
+  assert(failSuite.total === 3, 'failing suite total = 3');
+  assert(failSuite.failed > 0, 'failing suite has failures (min_length fails)');
+  assert(failSuite.avg_score < 1, 'failing suite avg_score < 1');
+
+  // Print results
+  console.log('\n@nai/test-llm tests:');
+  for (const s of steps) console.log(s);
+  console.log(`\n${passed} passed, ${failed} failed`);
+  if (failed > 0) process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('FATAL:', err);
+  process.exit(1);
+});

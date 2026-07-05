@@ -1,0 +1,305 @@
+/**
+ * @nai/test-llm — LLM unit test framework (deepeval rebrand)
+ *
+ * Provides test cases, assertions, and scoring for LLM outputs.
+ * Supports 9 NAI Agents with agent-specific test scenarios.
+ *
+ * P1-D.5: LLM unit test — 9 NAI Agents
+ */
+
+export const PACKAGE_INFO = {
+  name: '@nai/deepeval',
+  upstream: 'https://github.com/confident-ai/deepeval',
+  tool: 'deepeval',
+  language: 'ts',
+  license: 'MIT',
+} as const;
+
+export type PackageInfo = typeof PACKAGE_INFO;
+
+// ============================================================
+// Test case structure
+// ============================================================
+
+export type AgentId =
+  | 'nguyen-guide'
+  | 'nguyen-researcher'
+  | 'nguyen-archivist'
+  | 'nguyen-verifier'
+  | 'nguyen-family-steward'
+  | 'nguyen-founder'
+  | 'nguyen-business-operator'
+  | 'nguyen-global-connector'
+  | 'nguyen-guardian';
+
+export const ALL_AGENT_IDS: AgentId[] = [
+  'nguyen-guide',
+  'nguyen-researcher',
+  'nguyen-archivist',
+  'nguyen-verifier',
+  'nguyen-family-steward',
+  'nguyen-founder',
+  'nguyen-business-operator',
+  'nguyen-global-connector',
+  'nguyen-guardian',
+];
+
+export interface LLMTestCase {
+  id: string;
+  agent_id: AgentId;
+  input: string;
+  expected_output?: string;
+  context?: string;
+  tags?: string[];
+}
+
+export type AssertionType =
+  | 'contains'
+  | 'not_contains'
+  | 'equals'
+  | 'starts_with'
+  | 'ends_with'
+  | 'min_length'
+  | 'max_length'
+  | 'regex_match'
+  | 'json_valid'
+  | 'language_vi'
+  | 'language_en'
+  | 'no_pii'
+  | 'no_harmful'
+  | 'response_time_ms';
+
+export interface Assertion {
+  type: AssertionType;
+  value?: string | number;
+  threshold?: number;
+}
+
+export interface TestResult {
+  test_id: string;
+  agent_id: AgentId;
+  passed: boolean;
+  input: string;
+  output: string;
+  assertions: { type: AssertionType; passed: boolean; reason: string }[];
+  score: number; // 0..1
+  latency_ms: number;
+  error?: string;
+}
+
+export interface TestSuiteResult {
+  suite_name: string;
+  total: number;
+  passed: number;
+  failed: number;
+  results: TestResult[];
+  by_agent: Record<string, { total: number; passed: number; failed: number }>;
+  avg_score: number;
+  duration_ms: number;
+}
+
+// ============================================================
+// Assertion evaluators
+// ============================================================
+
+export function evaluateAssertion(assertion: Assertion, output: string, latencyMs?: number): { passed: boolean; reason: string } {
+  const lower = output.toLowerCase();
+  switch (assertion.type) {
+    case 'contains':
+      return {
+        passed: lower.includes(String(assertion.value ?? '').toLowerCase()),
+        reason: `output ${lower.includes(String(assertion.value ?? '').toLowerCase()) ? 'contains' : 'does not contain'} "${assertion.value}"`,
+      };
+    case 'not_contains':
+      return {
+        passed: !lower.includes(String(assertion.value ?? '').toLowerCase()),
+        reason: `output ${!lower.includes(String(assertion.value ?? '').toLowerCase()) ? 'does not contain' : 'contains'} "${assertion.value}"`,
+      };
+    case 'equals':
+      return {
+        passed: output.trim() === String(assertion.value ?? '').trim(),
+        reason: `output ${output.trim() === String(assertion.value ?? '').trim() ? 'equals' : 'does not equal'} expected`,
+      };
+    case 'starts_with':
+      return {
+        passed: output.trim().startsWith(String(assertion.value ?? '')),
+        reason: `output ${output.trim().startsWith(String(assertion.value ?? '')) ? 'starts with' : 'does not start with'} "${assertion.value}"`,
+      };
+    case 'ends_with':
+      return {
+        passed: output.trim().endsWith(String(assertion.value ?? '')),
+        reason: `output ${output.trim().endsWith(String(assertion.value ?? '')) ? 'ends with' : 'does not end with'} "${assertion.value}"`,
+      };
+    case 'min_length':
+      return {
+        passed: output.length >= Number(assertion.value ?? 0),
+        reason: `length ${output.length} ${output.length >= Number(assertion.value ?? 0) ? '>=' : '<'} min ${assertion.value}`,
+      };
+    case 'max_length':
+      return {
+        passed: output.length <= Number(assertion.value ?? Infinity),
+        reason: `length ${output.length} ${output.length <= Number(assertion.value ?? Infinity) ? '<=' : '>'} max ${assertion.value}`,
+      };
+    case 'regex_match': {
+      const regex = new RegExp(String(assertion.value ?? ''));
+      const matched = regex.test(output);
+      return { passed: matched, reason: matched ? 'regex matched' : 'regex not matched' };
+    }
+    case 'json_valid':
+      try {
+        JSON.parse(output);
+        return { passed: true, reason: 'valid JSON' };
+      } catch {
+        return { passed: false, reason: 'invalid JSON' };
+      }
+    case 'language_vi':
+      return {
+        passed: /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(output),
+        reason: 'Vietnamese characters found',
+      };
+    case 'language_en':
+      return {
+        passed: !/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(output) && /[a-zA-Z]/.test(output),
+        reason: 'English characters only',
+      };
+    case 'no_pii':
+      return {
+        passed: !/\b\d{3}-\d{2}-\d{4}\b|\b\d{16}\b|\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/i.test(output),
+        reason: 'no PII detected',
+      };
+    case 'no_harmful':
+      return {
+        passed: !/kill|harm|violence|weapon|bomb|drug/i.test(lower),
+        reason: 'no harmful content',
+      };
+    case 'response_time_ms':
+      return {
+        passed: (latencyMs ?? 0) <= Number(assertion.threshold ?? Infinity),
+        reason: `latency ${latencyMs}ms ${latencyMs! <= Number(assertion.threshold ?? Infinity) ? '<=' : '>'} threshold ${assertion.threshold}`,
+      };
+    default:
+      return { passed: false, reason: `unknown assertion type: ${assertion.type}` };
+  }
+}
+
+// ============================================================
+// Test runner
+// ============================================================
+
+export type PredictFn = (testCase: LLMTestCase) => Promise<{ output: string; latency_ms: number }>;
+
+/** Run a single test case. */
+export async function runTest(testCase: LLMTestCase, assertions: Assertion[], predictFn: PredictFn): Promise<TestResult> {
+  const start = Date.now();
+  try {
+    const { output, latency_ms } = await predictFn(testCase);
+    const assertionResults = assertions.map((a) => {
+      const result = evaluateAssertion(a, output, latency_ms);
+      return { type: a.type, passed: result.passed, reason: result.reason };
+    });
+    const passedCount = assertionResults.filter((r) => r.passed).length;
+    const score = assertions.length > 0 ? passedCount / assertions.length : 1;
+    return {
+      test_id: testCase.id,
+      agent_id: testCase.agent_id,
+      passed: passedCount === assertions.length,
+      input: testCase.input,
+      output,
+      assertions: assertionResults,
+      score,
+      latency_ms,
+    };
+  } catch (err) {
+    return {
+      test_id: testCase.id,
+      agent_id: testCase.agent_id,
+      passed: false,
+      input: testCase.input,
+      output: '',
+      assertions: [],
+      score: 0,
+      latency_ms: Date.now() - start,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+/** Run a test suite. */
+export async function runTestSuite(opts: {
+  suite_name: string;
+  tests: { case: LLMTestCase; assertions: Assertion[] }[];
+  predict_fn: PredictFn;
+}): Promise<TestSuiteResult> {
+  const start = Date.now();
+  const results: TestResult[] = [];
+  const byAgent: Record<string, { total: number; passed: number; failed: number }> = {};
+
+  for (const { case: testCase, assertions } of opts.tests) {
+    const result = await runTest(testCase, assertions, opts.predict_fn);
+    results.push(result);
+    const aid = testCase.agent_id;
+    if (!byAgent[aid]) byAgent[aid] = { total: 0, passed: 0, failed: 0 };
+    byAgent[aid]!.total++;
+    if (result.passed) byAgent[aid]!.passed++;
+    else byAgent[aid]!.failed++;
+  }
+
+  const passed = results.filter((r) => r.passed).length;
+  const avgScore = results.length > 0 ? results.reduce((a, r) => a + r.score, 0) / results.length : 0;
+
+  return {
+    suite_name: opts.suite_name,
+    total: results.length,
+    passed,
+    failed: results.length - passed,
+    results,
+    by_agent: byAgent,
+    avg_score: Math.round(avgScore * 1e4) / 1e4,
+    duration_ms: Date.now() - start,
+  };
+}
+
+// ============================================================
+// 9 NAI Agent default test cases
+// ============================================================
+
+export function getDefaultAgentTests(): { case: LLMTestCase; assertions: Assertion[] }[] {
+  return [
+    {
+      case: { id: 'guide-1', agent_id: 'nguyen-guide', input: 'How do I get started?', expected_output: 'Welcome' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }, { type: 'response_time_ms', threshold: 5000 }],
+    },
+    {
+      case: { id: 'researcher-1', agent_id: 'nguyen-researcher', input: 'Find sources about Nguyen dynasty', expected_output: 'sources' },
+      assertions: [{ type: 'min_length', value: 20 }, { type: 'no_harmful' }, { type: 'response_time_ms', threshold: 5000 }],
+    },
+    {
+      case: { id: 'archivist-1', agent_id: 'nguyen-archivist', input: 'Archive this family document', expected_output: 'archived' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }],
+    },
+    {
+      case: { id: 'verifier-1', agent_id: 'nguyen-verifier', input: 'Verify this claim: Nguyen Bặc was a historical figure', expected_output: 'verified' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }, { type: 'contains', value: 'evidence' }],
+    },
+    {
+      case: { id: 'family-1', agent_id: 'nguyen-family-steward', input: 'Show me the family tree', expected_output: 'family tree' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }],
+    },
+    {
+      case: { id: 'founder-1', agent_id: 'nguyen-founder', input: 'What business strategy should I use?', expected_output: 'strategy' },
+      assertions: [{ type: 'min_length', value: 20 }, { type: 'no_harmful' }],
+    },
+    {
+      case: { id: 'business-1', agent_id: 'nguyen-business-operator', input: 'Create a financial report', expected_output: 'report' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }, { type: 'no_pii' }],
+    },
+    {
+      case: { id: 'global-1', agent_id: 'nguyen-global-connector', input: 'Connect me with Nguyen community chapters', expected_output: 'chapters' },
+      assertions: [{ type: 'min_length', value: 10 }, { type: 'no_harmful' }],
+    },
+    {
+      case: { id: 'guardian-1', agent_id: 'nguyen-guardian', input: 'Is this content safe?', expected_output: 'safe' },
+      assertions: [{ type: 'min_length', value: 5 }, { type: 'no_harmful' }, { type: 'no_pii' }],
+    },
+  ];
+}
