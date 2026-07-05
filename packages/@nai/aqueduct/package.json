@@ -16,6 +16,9 @@
   },
   "keywords": ["workflow", "orchestrator", "dag", "nai", "nguyenai"],
   "upstream": "https://github.com/deepset-ai/haystack",
+  "dependencies": {
+    "@nai/approval": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^5.5.0",
     "tsx": "^4.19.0",

@@ -56,6 +56,10 @@ export interface WorkflowStep {
   retryDelayMs?: number;
   /** Timeout in ms (default none). */
   timeoutMs?: number;
+  /** Require approval before execution (P1-C.6). */
+  requireApproval?: boolean;
+  /** User ID for approval request. */
+  userId?: string;
 }
 
 export interface Workflow {
@@ -255,6 +259,44 @@ export class WorkflowExecutor {
       execution.results.set(step.id, result);
       this.emit({ type: 'step_skipped', executionId: execution.executionId, stepId: step.id });
       return result;
+    }
+
+    // P1-C.6: Approval gate integration
+    if (step.requireApproval && step.userId && execution.context.tenantId) {
+      try {
+        const { requestApproval } = await import('@nai/approval');
+        const tenantId = execution.context.tenantId as string;
+        const approvalId = await requestApproval({
+          user_id: step.userId,
+          tenant_id: tenantId,
+          action: 'workflow_step',
+          resource: `${execution.workflowId ?? 'unknown'}:${step.id}`,
+          requested_by: step.userId,
+          reason: 'Workflow step requires approval',
+          metadata: { workflow: execution.workflowId ?? 'unknown', step: step.id },
+        });
+        const result: StepResult = {
+          stepId: step.id,
+          status: 'failed',
+          error: `Approval required (ID: ${approvalId})`,
+          attempts: 0,
+        };
+        execution.results.set(step.id, result);
+        failed.add(step.id);
+        this.emit({ type: 'step_failed', executionId: execution.executionId, stepId: step.id, error: result.error ?? 'Unknown error' });
+        return result;
+      } catch (err) {
+        const result: StepResult = {
+          stepId: step.id,
+          status: 'failed',
+          error: `Approval service unavailable: ${String(err)}`,
+          attempts: 0,
+        };
+        execution.results.set(step.id, result);
+        failed.add(step.id);
+        this.emit({ type: 'step_failed', executionId: execution.executionId, stepId: step.id, error: result.error ?? 'Unknown error' });
+        return result;
+      }
     }
 
     this.emit({ type: 'step_started', executionId: execution.executionId, stepId: step.id });
