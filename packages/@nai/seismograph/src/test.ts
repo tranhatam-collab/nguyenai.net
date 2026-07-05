@@ -8,6 +8,12 @@ import {
   getCurrentSpan,
   runInSpan,
   clearTraces,
+  recordLLMCall,
+  observeLLMCall,
+  queryLLMCalls,
+  getLLMMetrics,
+  clearLLMCalls,
+  setVndPerUsd,
   type Span,
 } from './index.js';
 
@@ -28,6 +34,7 @@ function assert(cond: boolean, msg: string): void {
 
 async function main(): Promise<void> {
   clearTraces();
+  clearLLMCalls();
 
   // 1. startSpan creates a span with traceId and spanId
   const span1 = startSpan('root-operation');
@@ -133,6 +140,145 @@ async function main(): Promise<void> {
   clearTraces();
   assert(listTraces().length === 0, 'clearTraces empties traces');
   assert(getCurrentSpan() === null, 'clearTraces resets current span');
+
+  // ============================================================
+  // P1-D.1: LLM Observability — cost, latency, token tracking
+  // ============================================================
+  clearLLMCalls();
+  clearTraces();
+
+  // 16. recordLLMCall creates a record with cost + tokens
+  const rec1 = recordLLMCall({
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+    model_tier: 'standard',
+    tenant_id: 't1',
+    user_id: 'u1',
+    agent_id: 'nguyen-guide',
+    prompt_tokens: 100,
+    completion_tokens: 50,
+    latency_ms: 250,
+  });
+  assert(rec1.call_id.length === 16, 'recordLLMCall generates call_id');
+  assert(rec1.total_tokens === 150, 'recordLLMCall computes total_tokens');
+  assert(rec1.cost_usd > 0, 'recordLLMCall computes cost_usd > 0 for standard tier');
+  assert(rec1.cost_vnd > 0, 'recordLLMCall computes cost_vnd > 0');
+  assert(rec1.status === 'success', 'recordLLMCall default status is success');
+
+  // 17. free tier has zero cost
+  const rec2 = recordLLMCall({
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+    model_tier: 'free',
+    tenant_id: 't1',
+    user_id: 'u1',
+    prompt_tokens: 1000,
+    completion_tokens: 500,
+    latency_ms: 100,
+  });
+  assert(rec2.cost_usd === 0, 'free tier cost_usd is 0');
+
+  // 18. higher tier has higher cost
+  const recPro = recordLLMCall({
+    provider: 'anthropic',
+    model: 'claude-sonnet',
+    model_tier: 'pro',
+    tenant_id: 't1',
+    user_id: 'u1',
+    prompt_tokens: 100,
+    completion_tokens: 50,
+    latency_ms: 300,
+  });
+  assert(recPro.cost_usd > rec1.cost_usd, 'pro tier cost > standard tier cost');
+
+  // 19. observeLLMCall wraps and records
+  const { result: obsResult, record: obsRec } = await observeLLMCall(
+    {
+      provider: 'openai',
+      model: 'gpt-4o',
+      model_tier: 'business',
+      tenant_id: 't2',
+      user_id: 'u2',
+      agent_id: 'nguyen-researcher',
+      prompt_tokens: 200,
+    },
+    async () => {
+      await new Promise((r) => setTimeout(r, 10));
+      return { result: 'synthesis done', completion_tokens: 80 };
+    },
+  );
+  assert(obsResult === 'synthesis done', 'observeLLMCall returns function result');
+  assert(obsRec.completion_tokens === 80, 'observeLLMCall records completion_tokens');
+  assert(obsRec.latency_ms >= 10, 'observeLLMCall records latency_ms');
+  assert(obsRec.status === 'success', 'observeLLMCall status is success');
+
+  // 20. observeLLMCall records errors
+  clearLLMCalls();
+  let llmThrew = false;
+  try {
+    await observeLLMCall(
+      {
+        provider: 'openai',
+        model: 'gpt-4o',
+        model_tier: 'standard',
+        tenant_id: 't3',
+        user_id: 'u3',
+        prompt_tokens: 50,
+      },
+      async () => {
+        throw new Error('rate limited');
+      },
+    );
+  } catch {
+    llmThrew = true;
+  }
+  assert(llmThrew, 'observeLLMCall rethrows error');
+  const errRecs = queryLLMCalls({ tenant_id: 't3' });
+  assert(errRecs.length === 1, 'observeLLMCall recorded error call');
+  assert(errRecs[0]?.status === 'error', 'error call status is error');
+  assert(errRecs[0]?.error === 'rate limited', 'error call records error message');
+
+  // 21. queryLLMCalls filters by tenant
+  clearLLMCalls();
+  recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 'ta', user_id: 'u', prompt_tokens: 10, completion_tokens: 5, latency_ms: 50 });
+  recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 'tb', user_id: 'u', prompt_tokens: 10, completion_tokens: 5, latency_ms: 50 });
+  assert(queryLLMCalls({ tenant_id: 'ta' }).length === 1, 'queryLLMCalls filters by tenant');
+  assert(queryLLMCalls({}).length === 2, 'queryLLMCalls returns all without filter');
+
+  // 22. queryLLMCalls filters by agent
+  clearLLMCalls();
+  recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 't', user_id: 'u', agent_id: 'nguyen-guide', prompt_tokens: 10, completion_tokens: 5, latency_ms: 50 });
+  recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 't', user_id: 'u', agent_id: 'nguyen-researcher', prompt_tokens: 10, completion_tokens: 5, latency_ms: 50 });
+  assert(queryLLMCalls({ agent_id: 'nguyen-guide' }).length === 1, 'queryLLMCalls filters by agent');
+
+  // 23. getLLMMetrics aggregates correctly
+  clearLLMCalls();
+  recordLLMCall({ provider: 'openai', model: 'gpt-4o', model_tier: 'standard', tenant_id: 'tm', user_id: 'u', agent_id: 'nguyen-guide', prompt_tokens: 100, completion_tokens: 50, latency_ms: 200 });
+  recordLLMCall({ provider: 'openai', model: 'gpt-4o', model_tier: 'standard', tenant_id: 'tm', user_id: 'u', agent_id: 'nguyen-researcher', prompt_tokens: 200, completion_tokens: 100, latency_ms: 400 });
+  recordLLMCall({ provider: 'anthropic', model: 'claude', model_tier: 'pro', tenant_id: 'tm', user_id: 'u', agent_id: 'nguyen-guide', prompt_tokens: 50, completion_tokens: 25, latency_ms: 600, status: 'error' });
+  const metrics = getLLMMetrics('tm');
+  assert(metrics.total_calls === 3, 'getLLMMetrics total_calls');
+  assert(metrics.total_tokens === 525, 'getLLMMetrics total_tokens');
+  assert(metrics.total_prompt_tokens === 350, 'getLLMMetrics total_prompt_tokens');
+  assert(metrics.total_completion_tokens === 175, 'getLLMMetrics total_completion_tokens');
+  assert(metrics.avg_latency_ms === 400, 'getLLMMetrics avg_latency_ms');
+  assert(metrics.error_count === 1, 'getLLMMetrics error_count');
+  assert(Object.keys(metrics.by_model).length === 2, 'getLLMMetrics by_model has 2 models');
+  assert(metrics.by_agent['nguyen-guide']?.calls === 2, 'getLLMMetrics by_agent nguyen-guide calls');
+  assert(metrics.by_agent['nguyen-researcher']?.calls === 1, 'getLLMMetrics by_agent nguyen-researcher calls');
+
+  // 24. setVndPerUsd changes VND conversion
+  clearLLMCalls();
+  setVndPerUsd(25000);
+  const recVnd1 = recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 't', user_id: 'u', prompt_tokens: 1000, completion_tokens: 500, latency_ms: 50 });
+  setVndPerUsd(24000);
+  const recVnd2 = recordLLMCall({ provider: 'p', model: 'm', model_tier: 'standard', tenant_id: 't', user_id: 'u', prompt_tokens: 1000, completion_tokens: 500, latency_ms: 50 });
+  assert(recVnd1.cost_vnd > recVnd2.cost_vnd, 'higher VND rate → higher cost_vnd');
+  setVndPerUsd(25000); // reset
+
+  // 25. clearLLMCalls empties the log
+  clearLLMCalls();
+  assert(queryLLMCalls({}).length === 0, 'clearLLMCalls empties log');
 
   // Print results
   console.log('\n@nai/seismograph tests:');
