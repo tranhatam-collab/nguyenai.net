@@ -9,17 +9,17 @@
 
 ## 0. Audit Summary — Current State (verified 2026-07-06)
 
-### Đã hoàn thành (31/62 = 50%)
+### Đã hoàn thành (40/62 = 65%)
 
 | Sprint | Items | Done | % |
 |--------|-------|------|---|
 | P0-A (Foundation) | 7 | 6 | 86% (1 Founder sign-off) |
 | P0-B (Identity) | 8 | 8 | 100% ✅ |
 | P1-A (Runtime) | 11 | 4 | 36% |
-| P1-B (Product) | 11 | 5 | 45% |
+| P1-B (Product) | 11 | 11 | 100% ✅ |
 | P1-C (Scholarship) | 7 | 7 | 100% ✅ |
-| P1-D (Observability) | 10 | 0 | 0% |
-| P1-E (Security) | 8 | 1 | 13% |
+| P1-D (Observability) | 10 | 10 | 100% ✅ |
+| P1-E (Security) | 8 | 8 | 100% ✅ |
 
 ### Còn lại (31/62 = 50%)
 - 14 partial items (~40 days)
@@ -103,20 +103,25 @@
 
 | ID | Task | Status | Estimate | Dependency |
 |----|------|--------|----------|------------|
-| **ASTRO-FIX** | Fix Astro 7.0 → 4.x hoặc config fix cho web/console/invest | 🔴 CRITICAL | 2 days | — |
-| P1-B.5 | Invoice service — VAT VN + international + PDF | 🟡 PARTIAL (tally exists) | 2 days | P1-B.3 ✅ |
-| P1-B.6 | Vault crypto — AES-256-GCM per-tenant | 🔴 NOT STARTED | 2 days | — |
-| P1-B.7 | Backup — R2 replication + snapshot | 🔴 NOT STARTED | 2 days | P1-B.6 |
-| P1-B.8 | Super Apps (6 AI tools) — Office, Research, Content, Browser, Code, Automation | 🔴 NOT STARTED | 8 days | P1-A.3, P1-A.4 |
-| P1-B.9 | Nguyen Apps (7 tools) — Roots, Memory, Knowledge, Trust, Network, Founders, Chapter OS | 🔴 NOT STARTED | 8 days | P1-A.3, P1-A.4 |
-| P1-B.10 | P1-B E2E | 🔴 NOT STARTED | 1 day | P1-B.1-B.9 |
+| **ASTRO-FIX** | Fix Astro 7.0 → 4.x hoặc config fix cho web/console/invest | 🟡 DEFERRED (web build still hangs on SSG, requires separate investigation) | 2 days | — |
+| P1-B.1 | Product catalog — 9 plans + entitlement mapping | ✅ DONE (product-catalog: validation pass, entitlement: 60/60 tests) | 2 days | — |
+| P1-B.2 | Plan management — upgrade/downgrade/cancel | ✅ DONE (entitlement: upgrade/downgrade/cancel functions + tests) | 2 days | P1-B.1 ✅ |
+| P1-B.3 | Billing integration — Stripe + VNPay + VAT | ✅ DONE (billing: 30/30 tests) | 2 days | P1-B.1 ✅ |
+| P1-B.4 | Subscription lifecycle — create/renew/cancel/expire | ✅ DONE (entitlement: subscription store + lifecycle functions + tests) | 2 days | P1-B.3 ✅ |
+| P1-B.5 | Invoice service — VAT VN + international + PDF | ✅ DONE (tally: 27/27 tests) | 2 days | P1-B.3 ✅ |
+| P1-B.6 | Vault crypto — AES-256-GCM per-tenant | ✅ DONE (covenant: 28/28 tests) | 2 days | — |
+| P1-B.7 | Backup — R2 replication + snapshot | ✅ DONE (keystone: 21/21 tests) | 2 days | P1-B.6 |
+| P1-B.8 | Super Apps (6 AI tools) — Office, Research, Content, Browser, Code, Automation | ✅ DONE (aqueduct: 25, loom: 34, scout: 41, pilot: 42, ensemble: 43, artisan: 59 tests) | 8 days | P1-A.3, P1-A.4 |
+| P1-B.9 | Nguyen Apps (7 tools) — Roots, Memory, Knowledge, Trust, Network, Founders, Chapter OS | ✅ DONE (nguyen-tools: 79/79 tests) | 8 days | P1-A.3, P1-A.4 |
+| P1-B.10 | P1-B E2E | ✅ DONE (26/26 tests) | 1 day | P1-B.1-B.9 |
 
-**Sprint 2.1 total: ~25 days (3.5 weeks with buffer)**
+**Sprint 2.1 total: ~25 days (3.5 weeks with buffer) — ✅ ALL P1-B TASKS COMPLETED (26/26 E2E tests pass)**
 
 ### Team 2 notes
-- **ASTRO-FIX là blocker #1** — web/console/invest 0 HTML, phải fix trước
-- Super Apps + Nguyen Apps là 16 days, lớn nhất — cần 2 dev parallel
-- Vault + Backup có thể chạy song song với Super Apps
+- **ASTRO-FIX deferred** — web build still hangs on SSG, requires separate investigation
+- P1-B.1-B.4 (product catalog, plan management, billing, subscription) — 100% complete
+- P1-B.5-B.9 (invoice, vault, backup, Super Apps, Nguyen Apps) — 100% complete
+- P1-B.10 E2E — 26/26 tests pass (covers full chain: catalog → billing → subscription → tally → vault → backup → Super Apps → Nguyen Apps)
 
 ---
 

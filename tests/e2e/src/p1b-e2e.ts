@@ -1,7 +1,8 @@
 /**
  * P1-B E2E Test — Product & Billing End-to-End
  *
- * Tests the full chain: tally (LLM cost) → covenant (vault) → keystone (backup)
+ * Tests the full chain: product catalog → plan management → billing → subscription lifecycle
+ * → tally (LLM cost) → covenant (vault) → keystone (backup)
  * → Super Apps → Nguyen Apps.
  *
  * Uses the same assert pattern as P0-B E2E for consistency.
@@ -13,6 +14,19 @@ import { runWorkflow } from '@nai/aqueduct';
 import { createAgent } from '@nai/ensemble';
 import { generateContent } from '@nai/artisan';
 import { NguyenRoots, NguyenMemory, NguyenKnowledge } from '@nai/nguyen-tools';
+import { getPlan, getAllPlans, getPlanEntitlements } from '@nai/product-catalog';
+import { computeVat, generateInvoice } from '@nai/billing';
+import {
+  InMemoryEntitlementStore,
+  InMemorySubscriptionStore,
+  setEntitlementStore,
+  setSubscriptionStore,
+  upgradePlan,
+  downgradePlan,
+  cancelPlan,
+  createSubscription,
+  scheduleCancellation,
+} from '@nai/entitlement';
 
 let passed = 0;
 let failed = 0;
@@ -24,6 +38,64 @@ function assert(cond: boolean, msg: string): void {
 }
 
 async function main(): Promise<void> {
+  // P1-B.1: Product catalog
+  const plans = getAllPlans();
+  assert(plans.length === 9, 'catalog has 9 plans');
+  const startPlan = getPlan('nguyen-start');
+  assert(startPlan !== undefined, 'Start plan exists');
+  assert(startPlan.price_vnd === 0, 'Start plan is free');
+  const entitlements = getPlanEntitlements('nguyen-start');
+  assert(entitlements['machine.plan'] === 'free', 'Start plan entitlement is free');
+
+  // P1-B.2: Plan management
+  const entStore = new InMemoryEntitlementStore();
+  setEntitlementStore(entStore);
+  const upgradeResult = await upgradePlan('u1', 't1', 'nguyen-start', 'nguyen-personal');
+  assert(upgradeResult.success === true, 'plan upgrade succeeds');
+  assert(upgradeResult.new_plan_id === 'nguyen-personal', 'upgraded to personal');
+  const downgradeResult = await downgradePlan('u1', 't1', 'nguyen-personal', 'nguyen-start');
+  assert(downgradeResult.success === true, 'plan downgrade succeeds');
+  const cancelResult = await cancelPlan('u1', 't1', 'nguyen-personal');
+  assert(cancelResult.success === true, 'plan cancel succeeds');
+  assert(cancelResult.new_plan_id === 'start', 'canceled to start');
+
+  // P1-B.3: Billing integration
+  const vat = computeVat(299000, 'VND', true);
+  assert(vat.vat_amount === 29900, 'VAT 10% computed correctly');
+  assert(vat.issuing_entity === 'KASAN_JSC', 'Kasan JSC issues for VN customers');
+  const invoice = generateInvoice(
+    {
+      payment_id: 'pay-123',
+      user_id: 'u1',
+      tenant_id: 't1',
+      price_id: 'personal',
+      amount: 299000,
+      currency: 'VND',
+      status: 'paid',
+      paid_at: new Date().toISOString(),
+      raw: {},
+    },
+    true
+  );
+  assert(invoice.invoice_id.startsWith('INV-'), 'invoice ID format correct');
+  assert(invoice.vat_amount === 29900, 'invoice VAT correct');
+
+  // P1-B.4: Subscription lifecycle
+  const subStore = new InMemorySubscriptionStore();
+  setSubscriptionStore(subStore);
+  const subId = await createSubscription(
+    'u1',
+    't1',
+    'nguyen-personal',
+    'stripe',
+    'sub_123',
+    new Date('2026-07-01'),
+    new Date('2026-08-01')
+  );
+  assert(subId !== undefined, 'subscription created');
+  const scheduled = await scheduleCancellation('u1', 't1');
+  assert(scheduled === true, 'cancellation scheduled');
+
   // P1-B.5: LLM cost tracking
   logCall({
     model: 'gpt-4',

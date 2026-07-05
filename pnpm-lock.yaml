@@ -288,6 +288,10 @@ importers:
         version: 5.9.3
 
   packages/@nai/aqueduct:
+    dependencies:
+      '@nai/approval':
+        specifier: workspace:*
+        version: link:../approval
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -1039,6 +1043,9 @@ importers:
       '@nai/auth':
         specifier: workspace:*
         version: link:../../packages/@nai/auth
+      '@nai/billing':
+        specifier: workspace:*
+        version: link:../../packages/@nai/billing
       '@nai/compass':
         specifier: workspace:*
         version: link:../../packages/@nai/compass
