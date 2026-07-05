@@ -1,0 +1,22 @@
+{
+  "name": "@nai/telemetry",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Telemetry pipeline — metrics, traces, logs export (opentelemetry rebrand)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/telemetry\""
+  },
+  "keywords": ["telemetry", "opentelemetry", "nai", "nguyenai"],
+  "upstream": "https://github.com/open-telemetry/opentelemetry-js",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}
