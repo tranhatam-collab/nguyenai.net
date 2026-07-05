@@ -53,7 +53,7 @@ All P1-E security CI/CD gates have been implemented and tested. The Nguyen AI mo
 ## P1-E.2 — Image/FS Scan (trivy)
 
 ### Implementation
-- **Package:** `@nai/bulwark` (enhanced from 20 lines → 193 lines)
+- **Package:** `@nai/bulwark` (enhanced from 20 lines → 120 lines)
 - **CI workflow:** `.github/workflows/security.yml` → `trivy-fs` job
 - **Config:** Trivy default + HIGH/CRITICAL severity
 - **Local tool:** `tools/security-scan.sh trivy`
@@ -95,7 +95,7 @@ All P1-E security CI/CD gates have been implemented and tested. The Nguyen AI mo
 ## P1-E.4 — Secret Scan (gitleaks)
 
 ### Implementation
-- **Package:** `@nai/seal` (enhanced with gitleaks integration)
+- **Package:** `@nai/seal` (enhanced with gitleaks integration, 348 lines)
 - **CI workflow:** `.github/workflows/security.yml` → `gitleaks` job
 - **Config:** `.gitleaks.toml` with custom Nguyen AI rules
 - **Local tool:** `tools/security-scan.sh gitleaks`
@@ -124,7 +124,7 @@ All P1-E security CI/CD gates have been implemented and tested. The Nguyen AI mo
 ## P1-E.5 — Artifact Signing (cosign)
 
 ### Implementation
-- **Package:** `@nai/veil` (enhanced with cosign integration)
+- **Package:** `@nai/veil` (enhanced with cosign integration, 245 lines)
 - **CI workflow:** `.github/workflows/security.yml` → `cosign` job
 - **Method:** Keyless signing with GitHub Actions OIDC
 - **Local tool:** `tools/security-scan.sh cosign`
@@ -145,7 +145,7 @@ All P1-E security CI/CD gates have been implemented and tested. The Nguyen AI mo
 ## P1-E.6 — Provenance (SLSA)
 
 ### Implementation
-- **Package:** `@nai/provenance` (enhanced with SLSA v0.2)
+- **Package:** `@nai/provenance` (enhanced with SLSA v0.2, 400 lines)
 - **CI workflow:** `.github/workflows/security.yml` → `slsa` job
 - **Standard:** SLSA Provenance v0.2
 - **Local tool:** `tools/security-scan.sh slsa`
