@@ -1,0 +1,65 @@
+# Gitleaks configuration — Nguyen AI monorepo
+# P1-E.4: Secret scan CI gate
+
+title = "nguyenai gitleaks config"
+
+[allowlist]
+description = "Allowed paths and patterns"
+paths = [
+  '''node_modules/.*''',
+  '''.turbo/.*''',
+  '''dist/.*''',
+  '''.astro/.*''',
+  '''pnpm-lock.yaml''',
+  '''package-lock.json''',
+  '''yarn.lock''',
+  '''migrations/.*\.sql''',
+  '''docs/.*''',
+]
+
+regexes = [
+  '''placeholder''',
+  '''example\.com''',
+  '''test.*key''',
+  '''dev.*secret''',
+  '''EVIDENCE_SIGNING_KEY.*dev''',
+]
+
+[[rules]]
+id = "nai-jwt-secret"
+description = "NAI JWT secret"
+regex = '''JWT_SECRET\s*=\s*['"]([A-Za-z0-9+/=]{32,})['"]'''
+tags = ["jwt", "secret"]
+
+[[rules]]
+id = "nai-resend-key"
+description = "Resend API key"
+regex = '''re_[a-zA-Z0-9]{8,}'''
+tags = ["api-key", "resend"]
+
+[[rules]]
+id = "nai-stripe-key"
+description = "Stripe secret key"
+regex = '''sk_(live|test)_[a-zA-Z0-9]{24,}'''
+tags = ["api-key", "stripe"]
+
+[[rules]]
+id = "nai-vnpay-secret"
+description = "VNPay hash secret"
+regex = '''VNPAY_HASH_SECRET\s*=\s*['"]([A-Za-z0-9]{16,})['"]'''
+tags = ["api-key", "vnpay"]
+
+[[rules]]
+id = "nai-google-secret"
+description = "Google OAuth client secret"
+regex = '''GOCSPX-[a-zA-Z0-9_-]{24,}'''
+tags = ["oauth", "google"]
+
+[[rules]]
+id = "nai-cloudflare-token"
+description = "Cloudflare API token"
+regex = '''cloudflare_api_token\s*=\s*['"]([A-Za-z0-9_-]{40,})['"]'''
+tags = ["api-key", "cloudflare"]
+
+[extend]
+useDefault = true

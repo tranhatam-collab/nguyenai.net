@@ -2,20 +2,22 @@
   "name": "@nai/bulwark",
   "version": "0.1.0",
   "private": true,
-  "description": "Wrapper package for bulwark (https://github.com/aquasecurity/trivy). Original source consumed via native package manager.",
+  "description": "Trivy integration — image/filesystem vulnerability scanner for the Nguyen AI monorepo.",
   "license": "Apache-2.0",
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "build": "echo \"wrapper package — no build\"",
     "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"TODO: eslint for @nai/trivy\""
+    "lint": "echo \"TODO\""
   },
-  "keywords": [
-    "trivy",
-    "nai",
-    "nguyenai",
-    "go"
-  ],
-  "upstream": "https://github.com/aquasecurity/trivy"
+  "keywords": ["trivy", "nai", "nguyenai", "security"],
+  "upstream": "https://github.com/aquasecurity/trivy",
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }

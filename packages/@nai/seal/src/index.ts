@@ -310,3 +310,39 @@ export const PACKAGE_INFO = {
 } as const;
 
 export type PackageInfo = typeof PACKAGE_INFO;
+
+// ============================================================
+// P1-E.4: Gitleaks integration for CI secret scanning
+// ============================================================
+
+import { execSync as _execSync } from 'node:child_process';
+
+export function isGitleaksInstalled(): boolean {
+  try { _execSync('gitleaks version', { stdio: 'pipe' }); return true; } catch { return false; }
+}
+
+export function runGitleaksScan(opts: {
+  configPath?: string;
+  basePath?: string;
+  verbose?: boolean;
+} = {}): { passed: boolean; findings: number; output: string } {
+  const { configPath = '.gitleaks.toml', basePath = '.', verbose = true } = opts;
+  if (!isGitleaksInstalled()) throw new Error('gitleaks not installed — brew install gitleaks');
+  const verboseFlag = verbose ? '--verbose' : '';
+  const configFlag = configPath ? `--config ${configPath}` : '';
+  try {
+    const stdout = _execSync(`gitleaks detect ${configFlag} ${verboseFlag} --no-banner`, { encoding: 'utf-8', cwd: basePath, stdio: ['pipe', 'pipe', 'pipe'] });
+    return { passed: true, findings: 0, output: stdout };
+  } catch (err) {
+    const output = (err as { stdout?: string; stderr?: string }).stdout ?? '';
+    const stderr = (err as { stdout?: string; stderr?: string }).stderr ?? '';
+    const combined = `${output}\n${stderr}`;
+    const findings = (combined.match(/leak found/gi) || []).length;
+    return { passed: false, findings: findings || 1, output: combined };
+  }
+}
+
+export function passesSecretScanGate(opts?: { configPath?: string; basePath?: string }): boolean {
+  return runGitleaksScan(opts).passed;
+}
+

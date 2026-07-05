@@ -1,0 +1,71 @@
+# Semgrep configuration — Nguyen AI monorepo
+# P1-E.1: SAST CI gate
+
+rules:
+  - id: no-eval
+    patterns:
+      - pattern: eval(...)
+    message: "eval() is dangerous — use JSON.parse or Function constructor"
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  - id: no-innerhtml
+    patterns:
+      - pattern: $EL.innerHTML = $VAL
+    message: "innerHTML can lead to XSS — use textContent or sanitize"
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  - id: no-dangerouslysetinnerhtml
+    patterns:
+      - pattern: dangerouslySetInnerHTML={{ __html: $VAL }}
+    message: "dangerouslySetInnerHTML is XSS-prone — sanitize input"
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  - id: no-hardcoded-secrets
+    patterns:
+      - pattern-either:
+          - pattern: $SECRET = "sk_live_..."
+          - pattern: $SECRET = "sk_test_..."
+          - pattern: $SECRET = "AIza..."
+          - pattern: $SECRET = "ghp_..."
+          - pattern: $SECRET = "gho_..."
+    message: "Hardcoded API key/secret detected"
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  - id: no-cors-wildcard
+    patterns:
+      - pattern: cors({ origin: "*" })
+    message: "CORS wildcard origin — restrict to *.nguyenai.net"
+    languages: [typescript, javascript]
+    severity: ERROR
+
+  - id: no-console-error-prod
+    patterns:
+      - pattern: console.error(...)
+      - pattern-not-inside: |
+          if ($ENV === 'development') {
+            ...
+            console.error(...)
+            ...
+          }
+    message: "console.error in production code — use structured logger"
+    languages: [typescript, javascript]
+    paths:
+      include:
+        - "apps/*/src/**/*.ts"
+        - "packages/@nai/*/src/**/*.ts"
+      exclude:
+        - "**/*.test.ts"
+        - "**/*.spec.ts"
+    severity: WARNING
+
+  - id: no-unsanitized-set-html
+    patterns:
+      - pattern: set:html={$VAL}
+      - pattern-not: set:html={sanitize($VAL)}
+    message: "Astro set:html without sanitization — XSS risk"
+    languages: [javascript]
+    severity: ERROR

@@ -1,0 +1,281 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ============================================================
+  # P1-E.1 — SAST (semgrep) — fail on SAST finding
+  # ============================================================
+  sast:
+    name: P1-E.1 SAST (semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install semgrep
+        run: pip install semgrep
+
+      - name: Run semgrep SAST scan
+        run: |
+          semgrep ci --config .semgrep.yml --json --output semgrep-results.json || EXIT=$?
+          if [ "${EXIT:-0}" != "0" ]; then
+            echo "::error::Semgrep found SAST findings — merge blocked"
+            python3 -c "import json; d=json.load(open('semgrep-results.json')); print(f'Findings: {len(d.get(\"results\",[]))}')"
+            exit 1
+          fi
+          echo "No SAST findings"
+
+      - name: Upload semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30
+
+  # ============================================================
+  # P1-E.2 — Image/FS scan (trivy) — scan report
+  # ============================================================
+  trivy-fs:
+    name: P1-E.2 Trivy FS scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: fs
+          scan-target: .
+          format: json
+          output: trivy-fs-results.json
+          exit-code: 0
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+
+      - name: Generate trivy summary
+        run: |
+          python3 -c "
+          import json
+          with open('trivy-fs-results.json') as f:
+              d = json.load(f)
+          vulns = d.get('Results', [])
+          total = sum(len(r.get('Vulnerabilities', [])) for r in vulns)
+          print(f'Total vulnerabilities (HIGH/CRITICAL): {total}')
+          "
+
+      - name: Upload trivy results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-results
+          path: trivy-fs-results.json
+          retention-days: 30
+
+  # ============================================================
+  # P1-E.3 — Vuln scan (grype) — fail on critical vuln
+  # ============================================================
+  grype:
+    name: P1-E.3 Grype vuln scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies (for lockfile scan)
+        run: pnpm install --frozen-lockfile
+
+      - name: Run grype vulnerability scan
+        uses: anchore/scan-action@v4
+        with:
+          path: .
+          fail-match: "severity=Critical"
+          output-format: json
+          output-file: grype-results.json
+
+      - name: Upload grype results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grype-results
+          path: grype-results.json
+          retention-days: 30
+
+  # ============================================================
+  # P1-E.4 — Secret scan (gitleaks) — fail on secret leak
+  # ============================================================
+  gitleaks:
+    name: P1-E.4 Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: true
+        with:
+          config-path: .gitleaks.toml
+
+  # ============================================================
+  # P1-E.5 — Artifact signing (cosign) — sign build artifacts
+  # ============================================================
+  cosign:
+    name: P1-E.5 Artifact signing (cosign)
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all apps
+        run: pnpm build
+
+      - name: Create build artifact
+        run: |
+          mkdir -p artifacts
+          tar czf artifacts/nai-build.tar.gz \
+            apps/web/dist \
+            apps/console/dist \
+            apps/invest/dist \
+            apps/edu/dist \
+            2>/dev/null || true
+          sha256sum artifacts/nai-build.tar.gz > artifacts/nai-build.tar.gz.sha256
+          cat artifacts/nai-build.tar.gz.sha256
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign artifact with cosign (keyless)
+        run: |
+          cosign sign-blob --yes \
+            --output-signature artifacts/nai-build.tar.gz.sig \
+            --output-certificate artifacts/nai-build.tar.gz.crt \
+            artifacts/nai-build.tar.gz
+          echo "Artifact signed with cosign keyless signing"
+
+      - name: Verify signature
+        run: |
+          cosign verify-blob \
+            --certificate artifacts/nai-build.tar.gz.crt \
+            --signature artifacts/nai-build.tar.gz.sig \
+            artifacts/nai-build.tar.gz
+          echo "Signature verified"
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-build
+          path: artifacts/
+          retention-days: 7
+
+  # ============================================================
+  # P1-E.6 — Provenance (SLSA) — build provenance attestation
+  # ============================================================
+  slsa:
+    name: P1-E.6 SLSA provenance
+    runs-on: ubuntu-latest
+    needs: cosign
+    permissions:
+      id-token: write
+      packages: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download signed build
+        uses: actions/download-artifact@v4
+        with:
+          name: signed-build
+          path: artifacts/
+
+      - name: Generate SLSA provenance attestation
+        run: |
+          SHA=$(cat artifacts/nai-build.tar.gz.sha256 | cut -d' ' -f1)
+          cat > slsa-provenance.json << PROV
+          {
+            "_type": "https://in-toto.io/Statement/v0.1",
+            "subject": [
+              {
+                "name": "nai-build.tar.gz",
+                "digest": { "sha256": "${SHA}" }
+              }
+            ],
+            "predicateType": "https://slsa.dev/provenance/v0.2",
+            "predicate": {
+              "builder": { "id": "github-actions" },
+              "buildType": "https://github.com/tranhatam-collab/nguyenai.net/.github/workflows/security.yml",
+              "invocation": {
+                "configSource": {
+                  "uri": "https://github.com/tranhatam-collab/nguyenai.net",
+                  "digest": { "sha1": "${{ github.sha }}" },
+                  "entryPoint": ".github/workflows/security.yml:slsa"
+                }
+              },
+              "metadata": {
+                "buildStartedOn": "${{ github.event.head_commit.timestamp }}",
+                "completeness": { "parameters": true, "environment": true, "materials": true },
+                "reproducible": false
+              },
+              "materials": [
+                {
+                  "uri": "https://github.com/tranhatam-collab/nguyenai.net",
+                  "digest": { "sha1": "${{ github.sha }}" }
+                }
+              ]
+            }
+          }
+          PROV
+          echo "SLSA provenance generated"
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Attest provenance with cosign
+        run: |
+          cosign attest-blob --yes \
+            --predicate slsa-provenance.json \
+            --type slsaprovenance \
+            artifacts/nai-build.tar.gz
+          echo "Provenance attested"
+
+      - name: Upload provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: slsa-provenance
+          path: |
+            slsa-provenance.json
+          retention-days: 30

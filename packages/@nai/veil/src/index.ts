@@ -197,3 +197,49 @@ export async function verifyManifestEntry(
 ): Promise<boolean> {
   return verify(`${entry.path}:${entry.hash}`, entry.signature, publicKey);
 }
+
+// ============================================================
+// P1-E.5: Cosign integration for CI artifact signing
+// ============================================================
+
+import { execSync as _cosignExec } from 'node:child_process';
+
+export function isCosignInstalled(): boolean {
+  try { _cosignExec('cosign version', { stdio: 'pipe' }); return true; } catch { return false; }
+}
+
+export function signArtifactWithCosign(opts: {
+  artifactPath: string;
+  outputSignature?: string;
+  outputCertificate?: string;
+}): { signed: boolean; signaturePath?: string; certificatePath?: string } {
+  const { artifactPath, outputSignature = `${artifactPath}.sig`, outputCertificate = `${artifactPath}.crt` } = opts;
+  if (!isCosignInstalled()) throw new Error('cosign not installed — brew install cosign');
+  try {
+    _cosignExec(`cosign sign-blob --yes --output-signature ${outputSignature} --output-certificate ${outputCertificate} ${artifactPath}`, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+    return { signed: true, signaturePath: outputSignature, certificatePath: outputCertificate };
+  } catch (err) {
+    throw new Error(`cosign signing failed: ${err}`);
+  }
+}
+
+export function verifyArtifactWithCosign(opts: {
+  artifactPath: string;
+  signaturePath: string;
+  certificatePath: string;
+}): boolean {
+  const { artifactPath, signaturePath, certificatePath } = opts;
+  if (!isCosignInstalled()) throw new Error('cosign not installed');
+  try {
+    _cosignExec(`cosign verify-blob --certificate ${certificatePath} --signature ${signaturePath} ${artifactPath}`, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+    return true;
+  } catch { return false; }
+}
+
+export function passesSigningGate(opts: { artifactPath: string }): { signed: boolean; verified: boolean; signaturePath?: string } {
+  const result = signArtifactWithCosign({ artifactPath: opts.artifactPath });
+  if (!result.signed) return { signed: false, verified: false };
+  const verified = verifyArtifactWithCosign({ artifactPath: opts.artifactPath, signaturePath: result.signaturePath!, certificatePath: result.certificatePath! });
+  return { signed: true, verified, signaturePath: result.signaturePath };
+}
+

@@ -319,3 +319,82 @@ function shallowEqual(a: SbomComponent, b: SbomComponent): boolean {
     (a.checksum ?? '') === (b.checksum ?? '')
   );
 }
+
+// ============================================================
+// P1-E.6: SLSA Provenance Attestation (v0.2)
+// ============================================================
+
+export interface SlsaBuilder { id: string }
+export interface SlsaConfigSource { uri: string; digest: Record<string, string>; entryPoint: string }
+export interface SlsaInvocation { configSource: SlsaConfigSource; parameters?: Record<string, unknown>; environment?: Record<string, unknown> }
+export interface SlsaMetadata {
+  buildStartedOn: string;
+  buildFinishedOn: string;
+  completeness: { parameters: boolean; environment: boolean; materials: boolean };
+  reproducible: boolean;
+}
+export interface SlsaPredicate {
+  builder: SlsaBuilder;
+  buildType: string;
+  invocation: SlsaInvocation;
+  buildConfig?: Record<string, unknown>;
+  metadata: SlsaMetadata;
+  materials: Array<{ uri: string; digest: Record<string, string> }>;
+}
+export interface SlsaProvenance {
+  _type: string;
+  subject: Array<{ name: string; digest: Record<string, string> }>;
+  predicateType: string;
+  predicate: SlsaPredicate;
+}
+export interface SlsaProvenanceOptions {
+  artifactName: string;
+  artifactDigest: Record<string, string>;
+  sourceUri: string;
+  sourceDigest: Record<string, string>;
+  entryPoint: string;
+  buildType: string;
+  materials?: Array<{ uri: string; digest: Record<string, string> }>;
+  buildStartedOn?: string;
+  buildFinishedOn?: string;
+}
+
+export function generateSlsaProvenance(opts: SlsaProvenanceOptions): SlsaProvenance {
+  return {
+    _type: 'https://in-toto.io/Statement/v0.1',
+    subject: [{ name: opts.artifactName, digest: opts.artifactDigest }],
+    predicateType: 'https://slsa.dev/provenance/v0.2',
+    predicate: {
+      builder: { id: 'github-actions' },
+      buildType: opts.buildType,
+      invocation: { configSource: { uri: opts.sourceUri, digest: opts.sourceDigest, entryPoint: opts.entryPoint } },
+      metadata: {
+        buildStartedOn: opts.buildStartedOn ?? new Date().toISOString(),
+        buildFinishedOn: opts.buildFinishedOn ?? new Date().toISOString(),
+        completeness: { parameters: true, environment: true, materials: true },
+        reproducible: false,
+      },
+      materials: opts.materials ?? [{ uri: opts.sourceUri, digest: opts.sourceDigest }],
+    },
+  };
+}
+
+export function validateSlsaProvenance(prov: SlsaProvenance): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  if (prov._type !== 'https://in-toto.io/Statement/v0.1') errors.push(`Invalid _type: ${prov._type}`);
+  if (prov.predicateType !== 'https://slsa.dev/provenance/v0.2') errors.push(`Invalid predicateType: ${prov.predicateType}`);
+  if (!prov.subject || prov.subject.length === 0) errors.push('No subject');
+  else for (const s of prov.subject) { if (!s.name) errors.push('Subject missing name'); if (!s.digest || !Object.keys(s.digest).length) errors.push(`Subject "${s.name}" missing digest`); }
+  if (!prov.predicate?.builder?.id) errors.push('Missing builder.id');
+  if (!prov.predicate?.buildType) errors.push('Missing buildType');
+  if (!prov.predicate?.invocation?.configSource?.uri) errors.push('Missing configSource.uri');
+  if (!prov.predicate?.invocation?.configSource?.entryPoint) errors.push('Missing configSource.entryPoint');
+  if (!prov.predicate?.metadata) errors.push('Missing metadata');
+  if (!prov.predicate?.materials || !prov.predicate.materials.length) errors.push('No materials');
+  return { valid: errors.length === 0, errors };
+}
+
+export function serializeSlsaProvenance(prov: SlsaProvenance): string {
+  return JSON.stringify(prov, null, 2);
+}
+
