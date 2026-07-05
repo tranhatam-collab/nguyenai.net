@@ -377,7 +377,17 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
-  packages/@nai/bulwark: {}
+  packages/@nai/bulwark:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/catalog-mcp: {}
 
@@ -410,6 +420,30 @@ importers:
   packages/@nai/conveyor: {}
 
   packages/@nai/covenant:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/@nai/crew:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/@nai/dashboard:
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -522,6 +556,18 @@ importers:
       '@nai/contracts':
         specifier: workspace:*
         version: link:../contracts
+
+  packages/@nai/grype:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/harness:
     dependencies:
@@ -639,6 +685,18 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/@nai/pipeline:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/@nai/policy-engine:
     dependencies:
       '@nai/audit':
@@ -723,6 +781,18 @@ importers:
       '@nai/gateway-sdk':
         specifier: workspace:*
         version: link:../gateway-sdk
+
+  packages/@nai/sast:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/scale:
     devDependencies:
@@ -850,7 +920,31 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/@nai/skyvern:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
   packages/@nai/tally:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+
+  packages/@nai/telemetry:
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -933,6 +1027,12 @@ importers:
       '@nai/approval':
         specifier: workspace:*
         version: link:../../packages/@nai/approval
+      '@nai/aqueduct':
+        specifier: workspace:*
+        version: link:../../packages/@nai/aqueduct
+      '@nai/artisan':
+        specifier: workspace:*
+        version: link:../../packages/@nai/artisan
       '@nai/audit':
         specifier: workspace:*
         version: link:../../packages/@nai/audit
@@ -945,18 +1045,39 @@ importers:
       '@nai/conductor':
         specifier: workspace:*
         version: link:../../packages/@nai/conductor
+      '@nai/dashboard':
+        specifier: workspace:*
+        version: link:../../packages/@nai/dashboard
+      '@nai/drift':
+        specifier: workspace:*
+        version: link:../../packages/@nai/drift
+      '@nai/echo':
+        specifier: workspace:*
+        version: link:../../packages/@nai/echo
       '@nai/email':
         specifier: workspace:*
         version: link:../../packages/@nai/email
+      '@nai/ensemble':
+        specifier: workspace:*
+        version: link:../../packages/@nai/ensemble
       '@nai/entitlement':
         specifier: workspace:*
         version: link:../../packages/@nai/entitlement
+      '@nai/eval':
+        specifier: workspace:*
+        version: link:../../packages/@nai/eval
       '@nai/evidence':
         specifier: workspace:*
         version: link:../../packages/@nai/evidence
       '@nai/harness':
         specifier: workspace:*
         version: link:../../packages/@nai/harness
+      '@nai/keystone':
+        specifier: workspace:*
+        version: link:../../packages/@nai/keystone
+      '@nai/nguyen-tools':
+        specifier: workspace:*
+        version: link:../../packages/@nai/nguyen-tools
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
@@ -969,6 +1090,9 @@ importers:
       '@nai/product-catalog':
         specifier: workspace:*
         version: link:../../packages/product-catalog
+      '@nai/proof':
+        specifier: workspace:*
+        version: link:../../packages/@nai/proof
       '@nai/relic':
         specifier: workspace:*
         version: link:../../packages/@nai/relic
@@ -978,6 +1102,24 @@ importers:
       '@nai/scroll':
         specifier: workspace:*
         version: link:../../packages/@nai/scroll
+      '@nai/seismograph':
+        specifier: workspace:*
+        version: link:../../packages/@nai/seismograph
+      '@nai/tally':
+        specifier: workspace:*
+        version: link:../../packages/@nai/tally
+      '@nai/telemetry':
+        specifier: workspace:*
+        version: link:../../packages/@nai/telemetry
+      '@nai/test-llm':
+        specifier: workspace:*
+        version: link:../../packages/@nai/test-llm
+      '@nai/test-prompt':
+        specifier: workspace:*
+        version: link:../../packages/@nai/test-prompt
+      '@nai/trace':
+        specifier: workspace:*
+        version: link:../../packages/@nai/trace
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

@@ -7,6 +7,7 @@
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
     "test": "tsx src/p0b-e2e.ts",
+    "test:p1b": "tsx src/p1b-e2e.ts",
     "lint": "echo 'TODO'"
   },
   "dependencies": {
@@ -34,7 +35,14 @@
     "@nai/test-prompt": "workspace:*",
     "@nai/telemetry": "workspace:*",
     "@nai/echo": "workspace:*",
-    "@nai/dashboard": "workspace:*"
+    "@nai/dashboard": "workspace:*",
+    "@nai/tally": "workspace:*",
+    "@nai/proof": "workspace:*",
+    "@nai/keystone": "workspace:*",
+    "@nai/aqueduct": "workspace:*",
+    "@nai/ensemble": "workspace:*",
+    "@nai/artisan": "workspace:*",
+    "@nai/nguyen-tools": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
