@@ -129,7 +129,10 @@ export interface RequestApprovalParams {
   expires_at?: string | null;
 }
 
-export async function requestApproval(params: RequestApprovalParams): Promise<string> {
+export async function requestApproval(
+  params: RequestApprovalParams,
+  emailEnv?: { RESEND_API_KEY?: string; ENVIRONMENT?: string },
+): Promise<string> {
   const approvalId = await defaultStore.create({
     user_id: params.user_id,
     tenant_id: params.tenant_id,
@@ -155,7 +158,8 @@ export async function requestApproval(params: RequestApprovalParams): Promise<st
   // Notify approvers via email (best-effort, non-blocking)
   try {
     const { createEmailService } = await import('@nai/email');
-    const emailService = createEmailService({ ENVIRONMENT: 'development' });
+    // R7 fix: use caller-provided env, not hardcoded 'development'
+    const emailService = createEmailService(emailEnv ?? {});
     await emailService.sendTemplate('approval_requested', {
       locale: 'vi',
       user_email: 'approver@nguyenai.net',

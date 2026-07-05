@@ -294,7 +294,7 @@ app.post('/v1/approvals', async (c) => {
     requested_by: session.user_id,
     reason: body.reason,
     metadata: body.metadata,
-  });
+  }, { RESEND_API_KEY: c.env.RESEND_API_KEY, ENVIRONMENT: c.env.ENVIRONMENT });
   return c.json({ approval_id: id, status: 'pending' }, 201);
 });
 
@@ -472,6 +472,49 @@ function parseCookie(cookieHeader: string, name: string): string | null {
 
 // R2 fix: resolve session from D1 (shared with auth Worker)
 async function resolveSessionFromCookie(sessionId: string, env: AppEnv['Bindings']): Promise<Session | null> {
+  // R8 fix: verify session with auth Worker (auth.nguyenai.net) as primary source of truth
+  // Falls back to local D1 lookup if auth Worker is unreachable
+  const authIssuer = env.AUTH_ISSUER ?? 'auth.nguyenai.net';
+  try {
+    const resp = await fetch(`https://${authIssuer}/v1/auth/session`, {
+      headers: {
+        'Cookie': `${SESSION_COOKIE_NAME}=${sessionId}`,
+        'X-Internal-Call': 'api-worker',
+      },
+      signal: AbortSignal.timeout(3000),
+    });
+    if (resp.ok) {
+      const data = await resp.json() as {
+        session_id: string; user_id: string; tenant_id: string; plan_id?: string;
+        roles?: string[]; permissions?: string[]; csrf_token?: string;
+        expires_at?: string; issued_at?: string;
+      };
+      if (data && data.session_id) {
+        return {
+          session_id: data.session_id,
+          user_id: data.user_id,
+          tenant_id: data.tenant_id,
+          plan_id: data.plan_id ?? 'nguyen-start',
+          audience: env.DEFAULT_AUDIENCE ?? 'app.nguyenai.net',
+          issuer: authIssuer,
+          roles: data.roles ?? [],
+          permissions: data.permissions ?? [],
+          device: null,
+          ip_address: null,
+          user_agent: null,
+          csrf_token: data.csrf_token ?? '',
+          issued_at: data.issued_at ?? new Date().toISOString(),
+          expires_at: data.expires_at ?? new Date(Date.now() + 3600000).toISOString(),
+          rotated_at: null,
+          revoked_at: null,
+        };
+      }
+    }
+  } catch {
+    // Auth Worker unreachable — fall back to local D1 lookup
+  }
+
+  // Fallback: local D1 session lookup
   if (!env.DB) return null;
   const row = await env.DB.prepare(
     `SELECT s.*, o.plan_id

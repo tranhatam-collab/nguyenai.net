@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "echo \"wrapper package — no build\"",
-    "test": "echo \"wrapper package — tests in integration\"",
+    "test": "tsx src/test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"TODO: eslint for @nai/mcp-sdk\""
   },

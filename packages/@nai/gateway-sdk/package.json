@@ -15,7 +15,7 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "echo 'no test'",
+    "test": "tsx src/test.ts",
     "lint": "echo 'no lint'"
   }
 }
