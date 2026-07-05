@@ -1,0 +1,22 @@
+{
+  "name": "@nai/dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dashboard — system + business KPI (grafana rebrand)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO: eslint for @nai/dashboard\""
+  },
+  "keywords": ["dashboard", "grafana", "nai", "nguyenai"],
+  "upstream": "https://github.com/grafana/grafana",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

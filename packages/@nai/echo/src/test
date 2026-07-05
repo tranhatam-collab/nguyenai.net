@@ -132,7 +132,6 @@ async function main(): Promise<void> {
   clearLogs();
   const start = Date.now();
   for (let i = 0; i < 10; i++) pushLog({ level: 'info', message: `log ${i}` });
-  await new Promise((r) => setTimeout(r, 10));
   const end = Date.now();
   const rate = getLogRate({ start_time: start, end_time: end });
   assert(rate > 0, 'getLogRate > 0 for 10 logs in a window');
