@@ -17,5 +17,9 @@
     "nguyenai",
     "go"
   ],
-  "upstream": "https://github.com/grafana/loki"
+  "upstream": "https://github.com/grafana/loki",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }

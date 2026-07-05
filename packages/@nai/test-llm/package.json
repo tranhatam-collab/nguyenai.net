@@ -11,12 +11,21 @@
     "typecheck": "tsc --noEmit",
     "lint": "echo \"TODO: eslint for @nai/test-llm\""
   },
-  "keywords": ["test-llm", "deepeval", "nai", "nguyenai"],
+  "keywords": [
+    "test-llm",
+    "deepeval",
+    "nai",
+    "nguyenai"
+  ],
   "upstream": "https://github.com/confident-ai/deepeval",
   "dependencies": {},
   "devDependencies": {
     "typescript": "^5.5.0",
     "tsx": "^4.19.0",
     "@types/node": "^22.0.0"
+  },
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

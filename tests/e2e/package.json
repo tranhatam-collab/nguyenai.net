@@ -25,7 +25,16 @@
     "@nai/compass": "workspace:*",
     "@nai/scroll": "workspace:*",
     "@nai/scholarship": "workspace:*",
-    "@nai/email": "workspace:*"
+    "@nai/email": "workspace:*",
+    "@nai/seismograph": "workspace:*",
+    "@nai/trace": "workspace:*",
+    "@nai/eval": "workspace:*",
+    "@nai/drift": "workspace:*",
+    "@nai/test-llm": "workspace:*",
+    "@nai/test-prompt": "workspace:*",
+    "@nai/telemetry": "workspace:*",
+    "@nai/echo": "workspace:*",
+    "@nai/dashboard": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
