@@ -107,22 +107,7 @@ async function testModel(model) {
   const startTime = Date.now();
   try {
     let response;
-    if (provider === 'cloudflare-workers-ai') {
-      // Cloudflare Workers AI API
-      const url = `${baseUrl}/${providerModel}`;
-      response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: TEST_PROMPT }],
-          max_tokens: 100,
-        }),
-        signal: AbortSignal.timeout(30000),
-      });
-    } else if (provider === 'google') {
+    if (provider === 'google') {
       // Google Gemini API
       const url = `${baseUrl}/models/${providerModel}:generateContent?key=${apiKey}`;
       response = await fetch(url, {
@@ -180,9 +165,7 @@ async function testModel(model) {
 
     const data = await response.json();
     let output = '';
-    if (provider === 'cloudflare-workers-ai') {
-      output = data.result?.response ?? data.result?.choices?.[0]?.message?.content ?? '';
-    } else if (provider === 'google') {
+    if (provider === 'google') {
       output = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } else if (provider === 'anthropic') {
       output = data.content?.[0]?.text ?? '';

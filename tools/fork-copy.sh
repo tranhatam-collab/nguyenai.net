@@ -60,15 +60,3 @@ echo "$FORKS" | while IFS=: read -r src pkg; do
 done
 
 echo "=== Copy done ==="
-    --exclude='.*' \
-    --exclude='* *' \
-    "$SRC/$src/" "$DST/$pkg/" 2>/dev/null
-  echo "[$COUNT/$TOTAL] $src → $pkg ✓"
-done
-
-echo "=== Copy done ==="
-    "$SRC/$src/" "$DST/$pkg/" 2>/dev/null
-  echo "[$COUNT/$TOTAL] $src → $pkg ✓"
-done
-
-echo "=== Copy done ==="
