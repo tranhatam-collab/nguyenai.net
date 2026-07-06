@@ -138,7 +138,7 @@ function checkLanguageSwitcher() {
       
       // Check for language switcher link (should point to /)
       if (!content.includes('/en/') && !content.includes('lang-switch')) {
-        console.log(`${COLORS.red}✗ Missing language switcher in: en/${page}${COLORS_RESET}`);
+        console.log(`${COLORS.red}✗ Missing language switcher in: en/${page}${COLORS.reset}`);
         errorsFound++;
       }
     }

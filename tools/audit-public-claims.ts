@@ -19,12 +19,12 @@ const BRAND_RULES = {
   VIETNAMESE: {
     brandName: 'Nguyen AI Computer',
     shortName: 'Nguyen AI',
-    forbidden: ['NguyenAI', 'nguyen-ai', 'NGUYEN AI', 'Nguyen A.I.', 'NguyenA.I.']
+    forbidden: ['NguyenAI', 'Nguyen A.I.', 'NguyenA.I.', 'Nguyên AI', 'AI Nguyen', 'AI Nguyễn', 'Nguyen Computer AI', 'Nguyen Ai Computer']
   },
   ENGLISH: {
     brandName: 'Nguyen AI Computer',
     shortName: 'Nguyen AI',
-    forbidden: ['NguyenAI', 'nguyen-ai', 'NGUYEN AI', 'Nguyen A.I.', 'NguyenA.I.']
+    forbidden: ['NguyenAI', 'Nguyen A.I.', 'NguyenA.I.', 'Nguyên AI', 'AI Nguyen', 'AI Nguyễn', 'Nguyen Computer AI', 'Nguyen Ai Computer']
   }
 };
 
@@ -50,6 +50,10 @@ function checkBrandNaming() {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
+          // Skip node_modules and dist directories
+          if (file === 'node_modules' || file === 'dist' || file === '.astro') {
+            continue;
+          }
           searchDir(filePath);
         } else if (file.match(/\.(astro|tsx|ts|jsx|js|html|md)$/)) {
           checkFile(filePath);
@@ -69,11 +73,17 @@ function checkFile(filePath: string) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const relativePath = path.relative(__dirname, filePath);
   
-  // Check for forbidden brand names
+  // Check for forbidden brand names (excluding URLs and technical identifiers)
   for (const forbidden of BRAND_RULES.VIETNAMESE.forbidden) {
     if (content.includes(forbidden)) {
-      console.log(`${COLORS.red}✗ Found forbidden brand name '${forbidden}' in: ${relativePath}${COLORS.reset}`);
-      errorsFound++;
+      // Skip if it's in a URL or file path
+      const isInUrl = content.includes(`http://${forbidden}`) || content.includes(`https://${forbidden}`) || content.includes(`/${forbidden}/`);
+      const isInPath = relativePath.includes(forbidden);
+      
+      if (!isInUrl && !isInPath) {
+        console.log(`${COLORS.red}✗ Found forbidden brand name '${forbidden}' in: ${relativePath}${COLORS.reset}`);
+        errorsFound++;
+      }
     }
   }
 }

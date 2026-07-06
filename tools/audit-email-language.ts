@@ -24,7 +24,7 @@ function checkEmailLanguage() {
     return;
   }
   
-  const emailFiles = fs.readdirSync(emailDir).filter(f => f.endsWith('.ts') || f.endsWith('.html'));
+  const emailFiles = fs.readdirSync(emailDir).filter(f => f.endsWith('.ts') || f.endsWith('.html') || f.endsWith('.astro'));
   
   for (const file of emailFiles) {
     const filePath = path.join(emailDir, file);

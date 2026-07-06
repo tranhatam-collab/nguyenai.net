@@ -40,6 +40,10 @@ function checkFormLanguage() {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
+          // Skip node_modules and dist directories
+          if (file === 'node_modules' || file === 'dist' || file === '.astro') {
+            continue;
+          }
           searchDir(filePath);
         } else if (file.match(/\.(astro|tsx|ts|jsx|js)$/)) {
           formFiles.push(filePath);
