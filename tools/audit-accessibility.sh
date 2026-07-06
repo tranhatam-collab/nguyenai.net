@@ -86,7 +86,7 @@ echo "=== Checking skip-to-content link (WCAG 2.4.1) ==="
 for app in web invest edu console; do
   layout_dir="$APPS_DIR/$app/src/layouts"
   if [ -d "$layout_dir" ]; then
-    if ! grep -rq 'skip-to-content\|skip-to-main\|skip-link' "$layout_dir" 2>/dev/null; then
+    if ! grep -rq 'skip-to-content\|skip-to-main\|skip-link\|Bỏ qua đến nội dung\|Skip to content' "$layout_dir" 2>/dev/null; then
       echo "VIOLATION: apps/$app/src/layouts/ — [WCAG-2.4.1] missing skip-to-content link"
       VIOLATIONS=$((VIOLATIONS + 1))
     else

@@ -45,6 +45,22 @@ EXCLUDE_PATTERNS=(
   ".git"
 )
 
+# Allowlist patterns (intentional references per AGENTS.md)
+# These are NOT violations because they serve specific purposes:
+# - Investor disclosure in apps/invest pages (architecture lineage)
+# - Adapter/gateway code in packages/@nai/* (compatibility contracts with Gen1/Gen2)
+# - Page content data (src/data/pages.ts) — architecture description in Vietnamese
+ALLOWLIST_PATTERNS=(
+  "apps/invest/src/pages/ai-computer.astro"     # architecture diagram
+  "apps/invest/src/pages/private/product-demo.astro"  # investor disclosure
+  "apps/invest/src/pages/private/technical-audit.astro"  # investor disclosure
+  "apps/invest/src/pages/risks.astro"              # risk mitigation reference
+  "src/data/pages.ts"                            # architecture description content
+  "packages/@nai/gateway-sdk/"                      # Gen1 adapter
+  "packages/@nai/prism/"                             # Gen1 adapter
+  "packages/@nai/investor-verify/"                  # verify.iai.one adapter
+)
+
 # Build exclude grep flags
 EXCLUDE_GREP=""
 for p in "${EXCLUDE_PATTERNS[@]}"; do
@@ -74,6 +90,14 @@ for tok in "${FORBIDDEN[@]}"; do
             *"$ex"*) skip=1; break ;;
           esac
         done
+        # skip allowlist (intentional references)
+        if [ "$skip" -eq 0 ]; then
+          for al in "${ALLOWLIST_PATTERNS[@]}"; do
+            case "$f" in
+              *"$al"*) skip=1; break ;;
+            esac
+          done
+        fi
         if [ "$skip" -eq 0 ]; then
           echo "FAIL: '$tok' found in $f"
           VIOLATIONS=$((VIOLATIONS + 1))

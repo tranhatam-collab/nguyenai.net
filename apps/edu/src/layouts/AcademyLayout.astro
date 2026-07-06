@@ -42,6 +42,8 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     <title>{fullTitle}</title>
   </head>
   <body>
+    <!-- Skip to content link (WCAG 2.4.1) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-academy-accent focus:text-white focus:rounded">Bỏ qua đến nội dung</a>
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-academy-header border-b border-academy-border">
       <div class="academy-container">
@@ -118,13 +120,21 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
             </a>
           </div>
 
-          <!-- Right side: progress + login -->
+          <!-- Right side: progress + login + language switcher -->
           <div class="flex items-center gap-3">
             <!-- Progress indicator (placeholder) -->
             <div class="hidden sm:flex items-center gap-2 text-xs text-academy-muted">
               <span class="w-2 h-2 rounded-full bg-academy-accent"></span>
               <span>0 / 10 tracks</span>
             </div>
+
+            <!-- Language switcher -->
+            {(() => {
+              const path = Astro.url.pathname;
+              const isEn = path.startsWith('/en');
+              const switchHref = isEn ? path.replace('/en', '') || '/' : '/en' + path;
+              return <a href={switchHref} class="px-3 py-1.5 rounded-md text-sm font-medium text-academy-text hover:text-academy-accent hover:bg-academy-accent/5 no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
+            })()}
 
             <a href="/login" class="academy-btn academy-btn-primary text-sm">
               Đăng nhập
@@ -160,7 +170,7 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
     </header>
 
     <!-- Main content -->
-    <main class="min-h-[calc(100vh-8rem)]">
+    <main id="main-content" class="min-h-[calc(100vh-8rem)]">
       <slot />
     </main>
 
