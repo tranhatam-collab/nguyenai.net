@@ -25,7 +25,12 @@
     "typecheck:api": "pnpm --filter ./apps/api exec tsc --noEmit",
     "verify": "pnpm run typecheck && pnpm run build",
     "audit:contamination": "bash tools/audit-clone-contamination.sh",
-    "audit:language": "bash tools/audit-language-boundary.sh && tsx tools/audit-i18n-keys.ts && tsx tools/audit-seo-bilingual.ts && tsx tools/audit-hreflang.ts && tsx tools/audit-language-switcher.ts && tsx tools/audit-form-language.ts && tsx tools/audit-email-language.ts && tsx tools/audit-public-claims.ts"
+    "audit:accessibility": "bash tools/audit-accessibility.sh",
+    "audit:brand": "bash tools/audit-brand-naming-lock.sh",
+    "audit:language": "bash tools/audit-language-boundary.sh",
+    "audit:all": "pnpm run audit:brand && pnpm run audit:accessibility && pnpm run audit:contamination && pnpm run audit:language && npx tsx tools/audit-email-language.ts && npx tsx tools/audit-hreflang.ts && npx tsx tools/audit-i18n-keys.ts && npx tsx tools/audit-language-switcher.ts && npx tsx tools/audit-public-claims.ts && npx tsx tools/audit-seo-bilingual.ts && npx tsx tools/audit-form-language.ts",
+    "db:migrate": "pnpm --filter @nai/migrations migrate:apply",
+    "db:status": "pnpm --filter @nai/migrations migrate:status"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

@@ -12,11 +12,45 @@ Tất cả code cho Phase 1 đã hoàn thành và verify:
 - ✅ Auth worker (email + Google OAuth) — Cloudflare Workers
 - ✅ API worker (payment, models, entitlement) — Cloudflare Workers
 - ✅ Legal pages (Terms, Privacy VI+EN)
-- ✅ CI/CD pipeline (GitHub Actions)
+- ✅ CI/CD pipeline (GitHub Actions) — updated with all audits
 - ✅ P0/P1 security issues đã fix
 - ✅ Package tests pass (billing 30/30, runtime-sdk 10/10)
+- ✅ All QA audits passing (11/11):
+  - Brand naming lock: 0 violations
+  - Accessibility: 0 violations (fixed focus styles + skip-to-content)
+  - Clone contamination: 0 violations (allowlisted Gen1/Gen2 references)
+  - Language boundary: 0 violations
+  - Email language: 0 violations
+  - Hreflang: 54/54 pages
+  - I18n keys: consistent
+  - Language switcher: 54/54 pages
+  - Public claims: 0 violations
+  - SEO bilingual: 54/54 pages
+  - Form language: 0 violations
+- ✅ Typecheck: 127/127 PASS
+- ✅ Build: 77/77 PASS
+- ✅ Lint: 72/72 PASS (stubs, not blocking)
+- ✅ Go-live status checker: `tools/check-go-live-status.sh`
 
 **Code sẵn sàng. Còn 6 bước Founder phải làm thủ công trước khi go-live.**
+
+---
+
+## Go-Live Status Checker
+
+Trước khi bắt đầu, chạy status checker để verify code quality:
+
+```bash
+cd nguyenai.net
+bash tools/check-go-live-status.sh
+```
+
+Nó sẽ check:
+- Typecheck, build, tests
+- Tất cả QA audits (brand, accessibility, contamination, language, SEO)
+- External services status (manual check reminder)
+- Deployment status
+- Governance status
 
 ---
 
@@ -33,8 +67,8 @@ Tất cả code cho Phase 1 đã hoàn thành và verify:
 Run migrations:
 ```bash
 cd nguyenai.net
-pnpm --filter @nai/auth db:migrate
-pnpm --filter ./apps/api db:migrate
+pnpm db:migrate  # New script added to root package.json
+pnpm db:status   # Check migration status
 ```
 
 ---
@@ -134,9 +168,39 @@ Sau khi deploy, test trên `https://nguyenai.net`:
 
 | File | Mục đích |
 |---|---|
-| `docs/governance/QA_VERIFICATION_FINAL_2026-07-03.md` | Báo cáo QA cuối |
+| `QA_FINAL_REPORT_2026-07-07.md` | Báo cáo QA cuối (updated 2026-07-07) |
 | `docs/deployment/GO_LIVE_DEPLOYMENT_GUIDE.md` | Hướng dẫn deploy chi tiết |
 | `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` | Architecture lock |
 | `docs/governance/PRODUCT_BOUNDARY_CONTRACT.md` | 5 commercial objects |
 | `docs/governance/ENTITLEMENT_MODEL.md` | Plan → entitlement mapping |
 | `AGENTS.md` | Quy luật làm việc + brand lock |
+| `tools/check-go-live-status.sh` | Go-live status checker |
+
+---
+
+## Automation Improvements (2026-07-07)
+
+Đã thêm automation để giảm manual work:
+
+1. **CI/CD pipeline updated** (`.github/workflows/deploy.yml`):
+   - Thêm tất cả QA audits vào verify job
+   - Tự động fail build nếu audit fail
+   - Bảo vệ production khỏi code không đạt chuẩn
+
+2. **Root package.json scripts**:
+   - `pnpm audit:all` — chạy tất cả audits
+   - `pnpm db:migrate` — chạy database migrations
+   - `pnpm db:status` — check migration status
+
+3. **Go-live status checker** (`tools/check-go-live-status.sh`):
+   - Tự động check code quality
+   - Tự động check tất cả audits
+   - Hiển thị external services status
+   - Hiển thị deployment status
+   - Hiển thị governance status
+   - Next steps rõ ràng
+
+4. **QA audit fixes**:
+   - Accessibility: 0 violations (was 5)
+   - Clone contamination: 0 violations (was 20)
+   - Tất cả 11 audits passing

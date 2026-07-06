@@ -27,6 +27,36 @@ jobs:
       - name: Brand naming lock audit
         run: ./tools/audit-brand-naming-lock.sh
 
+      - name: Accessibility audit
+        run: ./tools/audit-accessibility.sh
+
+      - name: Clone contamination audit
+        run: ./tools/audit-clone-contamination.sh
+
+      - name: Language boundary audit
+        run: ./tools/audit-language-boundary.sh
+
+      - name: Email language audit
+        run: npx tsx tools/audit-email-language.ts
+
+      - name: Hreflang audit
+        run: npx tsx tools/audit-hreflang.ts
+
+      - name: I18n keys audit
+        run: npx tsx tools/audit-i18n-keys.ts
+
+      - name: Language switcher audit
+        run: npx tsx tools/audit-language-switcher.ts
+
+      - name: Public claims audit
+        run: npx tsx tools/audit-public-claims.ts
+
+      - name: SEO bilingual audit
+        run: npx tsx tools/audit-seo-bilingual.ts
+
+      - name: Form language audit
+        run: npx tsx tools/audit-form-language.ts
+
       - name: Typecheck
         run: pnpm typecheck
 
