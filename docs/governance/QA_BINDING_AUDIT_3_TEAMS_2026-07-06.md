@@ -251,21 +251,21 @@
 
 ---
 
-## Final Test Count
+## Final Test Count (After Fixes)
 
 | Category | Tests | Pass | Fail |
 |----------|-------|------|------|
 | P1-A Runtime | 303 | 303 | 0 |
-| P1-D Observability | 373 | 372 | 1 |
+| P1-D Observability | 373 | 373 | 0 |
 | P1-B Product | 485 | 485 | 0 |
 | P1-E Security | ~200 | ~200 | 0 |
 | P1-C Automation | 274 | 274 | 0 |
-| E2E Suites | 562 | 561 | 1 |
-| **Total** | **2,197** | **2,195** | **2** |
+| E2E Suites | 562 | 562 | 0 |
+| **Total** | **2,197** | **2,197** | **0** |
 
-**Pass Rate:** 99.91%
+**Pass Rate:** 100%
 **Blocking Failures:** 0
-**Minor Failures:** 2 (both dashboard time range)
+**Minor Failures:** 0
 
 ---
 
@@ -275,9 +275,10 @@
 
 **Summary:**
 - ✅ 47/47 P1 items complete
-- ✅ 2,195/2,197 tests pass (99.91%)
-- ✅ All E2E suites pass (1 minor fail in P1-D)
+- ✅ 2,197/2,197 tests pass (100%)
+- ✅ All E2E suites pass (0 failures)
 - ✅ Critical bug (@nai/entitlement) fixed
+- ✅ Dashboard time range test fixed
 - ✅ E2E dependency issues fixed
 - ⏳ P0-A.6 (AGENTS.md sign-off) pending Founder action
 - 🟡 ASTRO-FIX deferred (web build SSG hang)
@@ -289,6 +290,5 @@
 ## Actions Required Before Go-Live
 
 1. **Founder:** Sign-off AGENTS.md (P0-A.6)
-2. **Team 1:** Fix @nai/dashboard time range test (minor)
-3. **Separate investigation:** ASTRO-FIX (web build SSG hang)
-4. **Founder actions:** GitHub secrets, wrangler secrets, domains, OAuth, Stripe, VNPay, corp formation, IP agreement (per go-live checklist)
+2. **Separate investigation:** ASTRO-FIX (web build SSG hang)
+3. **Founder actions:** GitHub secrets, wrangler secrets, domains, OAuth, Stripe, VNPay, corp formation, IP agreement (per go-live checklist)
