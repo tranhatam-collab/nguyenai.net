@@ -148,10 +148,22 @@ Key changes (full list in git diff):
 
 ## 7. Outstanding Items Before Production
 
-1. **Lint stubs:** Replace `echo "TODO"` lint scripts with real ESLint rules.
-2. **Upstream API gateway:** `token usage = 0` (upstream doesn't return `usage`); demo limit 3 requests/session.
-3. **Sprint 0 governance lock:** Still OPEN per AGENTS.md.
-4. **Founder go-live checklist:** 7 manual steps remaining per `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`.
+1. **Lint stubs:** Replace `echo "TODO"` lint scripts with real ESLint rules (non-blocking, lint currently passes).
+2. **Upstream API gateway:** `token usage = 0` (upstream doesn't return `usage`); demo limit 3 requests/session (non-blocking, upstream limitation).
+3. **Sprint 0 governance lock:** Still OPEN per AGENTS.md (requires Founder lock).
+4. **Founder go-live checklist:** 6 manual steps remaining per `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`:
+   - Provision Neon PostgreSQL
+   - Set Cloudflare secrets
+   - Setup Google OAuth
+   - Setup Stripe
+   - Deploy (automated via CI/CD or manual)
+   - Verify end-to-end on production
+
+**Note:** Automation added to reduce manual work:
+- `tools/check-go-live-status.sh` — auto-check code quality + audits
+- `pnpm audit:all` — run all 11 audits
+- `pnpm db:migrate` — run database migrations
+- CI/CD pipeline updated with all audits in verify job
 
 ---
 
