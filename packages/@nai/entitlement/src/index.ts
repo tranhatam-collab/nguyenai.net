@@ -12,6 +12,7 @@
 import {
   getPlanEntitlements,
   getEntitlement,
+  getPlan,
   type PlanId,
   type EntitlementKey,
   type EntitlementValue,
@@ -302,4 +303,266 @@ export async function checkModelTierAccess(
     return { allowed: true, userTier, reason: null };
   }
   return { allowed: false, userTier, reason: `model tier ${requiredTier} requires ${requiredTier}+ (current: ${userTier})` };
+}
+
+// ============================================================
+// Plan management — upgrade, downgrade, cancel
+// ============================================================
+
+export interface PlanChangeResult {
+  success: boolean;
+  new_plan_id: string | null;
+  effective_at: string;
+  prorated_refund_amount: number | null;
+  reason: string | null;
+}
+
+/**
+ * Upgrade user to a higher-tier plan.
+ * Effective immediately. No proration for MVP.
+ */
+export async function upgradePlan(
+  userId: string,
+  tenantId: string,
+  currentPlanId: PlanId,
+  newPlanId: PlanId
+): Promise<PlanChangeResult> {
+  const currentPlan = getPlan(currentPlanId);
+  const newPlan = getPlan(newPlanId);
+  const currentPrice = currentPlan?.price_usd ?? 0;
+  const newPrice = newPlan?.price_usd ?? 0;
+
+  if (newPrice <= currentPrice) {
+    return {
+      success: false,
+      new_plan_id: null,
+      effective_at: '',
+      prorated_refund_amount: null,
+      reason: 'New plan must be higher tier (higher price) for upgrade',
+    };
+  }
+
+  await defaultStore.grant({
+    user_id: userId,
+    tenant_id: tenantId,
+    key: 'machine.plan',
+    value: newPlanId,
+    source: 'plan_upgrade',
+    granted_by: 'system',
+    expires_at: null,
+    revoked_at: null,
+  });
+
+  return {
+    success: true,
+    new_plan_id: newPlanId,
+    effective_at: new Date().toISOString(),
+    prorated_refund_amount: null,
+    reason: null,
+  };
+}
+
+/**
+ * Downgrade user to a lower-tier plan.
+ * Effective at end of current billing period (MVP: immediate for simplicity).
+ */
+export async function downgradePlan(
+  userId: string,
+  tenantId: string,
+  currentPlanId: PlanId,
+  newPlanId: PlanId
+): Promise<PlanChangeResult> {
+  const currentPlan = getPlan(currentPlanId);
+  const newPlan = getPlan(newPlanId);
+  const currentPrice = currentPlan?.price_usd ?? 0;
+  const newPrice = newPlan?.price_usd ?? 0;
+
+  if (newPrice >= currentPrice) {
+    return {
+      success: false,
+      new_plan_id: null,
+      effective_at: '',
+      prorated_refund_amount: null,
+      reason: 'New plan must be lower tier (lower price) for downgrade',
+    };
+  }
+
+  await defaultStore.grant({
+    user_id: userId,
+    tenant_id: tenantId,
+    key: 'machine.plan',
+    value: newPlanId,
+    source: 'plan_downgrade',
+    granted_by: 'system',
+    expires_at: null,
+    revoked_at: null,
+  });
+
+  return {
+    success: true,
+    new_plan_id: newPlanId,
+    effective_at: new Date().toISOString(),
+    prorated_refund_amount: null,
+    reason: null,
+  };
+}
+
+/**
+ * Cancel user's plan (revert to free Start plan).
+ * Effective at end of current billing period (MVP: immediate).
+ */
+export async function cancelPlan(
+  userId: string,
+  tenantId: string,
+  currentPlanId: PlanId
+): Promise<PlanChangeResult> {
+  await defaultStore.grant({
+    user_id: userId,
+    tenant_id: tenantId,
+    key: 'machine.plan',
+    value: 'start',
+    source: 'plan_cancellation',
+    granted_by: 'system',
+    expires_at: null,
+    revoked_at: null,
+  });
+
+  return {
+    success: true,
+    new_plan_id: 'start',
+    effective_at: new Date().toISOString(),
+    prorated_refund_amount: null,
+    reason: null,
+  };
+}
+
+// ============================================================
+// Subscription lifecycle — billing cycle, renewal, expiry
+// ============================================================
+
+export interface SubscriptionState {
+  subscription_id: string;
+  user_id: string;
+  tenant_id: string;
+  plan_id: PlanId;
+  gateway: 'stripe' | 'vnpay';
+  gateway_subscription_id: string;
+  status: 'active' | 'past_due' | 'canceled' | 'expired' | 'trialing';
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubscriptionStore {
+  getSubscription(userId: string, tenantId: string): Promise<SubscriptionState | null>;
+  createSubscription(sub: Omit<SubscriptionState, 'subscription_id' | 'created_at' | 'updated_at'>): Promise<string>;
+  updateSubscription(subscriptionId: string, updates: Partial<SubscriptionState>): Promise<void>;
+  deleteSubscription(subscriptionId: string): Promise<void>;
+}
+
+export class InMemorySubscriptionStore implements SubscriptionStore {
+  private subs = new Map<string, SubscriptionState>();
+
+  async getSubscription(userId: string, tenantId: string): Promise<SubscriptionState | null> {
+    return [...this.subs.values()].find(
+      (s) => s.user_id === userId && s.tenant_id === tenantId && s.status === 'active'
+    ) ?? null;
+  }
+
+  async createSubscription(sub: Omit<SubscriptionState, 'subscription_id' | 'created_at' | 'updated_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const full: SubscriptionState = {
+      ...sub,
+      subscription_id: id,
+      created_at: now,
+      updated_at: now,
+    };
+    this.subs.set(id, full);
+    return id;
+  }
+
+  async updateSubscription(subscriptionId: string, updates: Partial<SubscriptionState>): Promise<void> {
+    const existing = this.subs.get(subscriptionId);
+    if (existing) {
+      this.subs.set(subscriptionId, { ...existing, ...updates, updated_at: new Date().toISOString() });
+    }
+  }
+
+  async deleteSubscription(subscriptionId: string): Promise<void> {
+    this.subs.delete(subscriptionId);
+  }
+}
+
+let defaultSubscriptionStore: SubscriptionStore = new InMemorySubscriptionStore();
+
+export function setSubscriptionStore(store: SubscriptionStore) {
+  defaultSubscriptionStore = store;
+}
+
+export function getSubscriptionStore(): SubscriptionStore {
+  return defaultSubscriptionStore;
+}
+
+/**
+ * Create a new subscription after successful payment.
+ */
+export async function createSubscription(
+  userId: string,
+  tenantId: string,
+  planId: PlanId,
+  gateway: 'stripe' | 'vnpay',
+  gatewaySubscriptionId: string,
+  periodStart: Date,
+  periodEnd: Date
+): Promise<string> {
+  return await defaultSubscriptionStore.createSubscription({
+    user_id: userId,
+    tenant_id: tenantId,
+    plan_id: planId,
+    gateway,
+    gateway_subscription_id: gatewaySubscriptionId,
+    status: 'active',
+    current_period_start: periodStart.toISOString(),
+    current_period_end: periodEnd.toISOString(),
+    cancel_at_period_end: false,
+  });
+}
+
+/**
+ * Mark subscription for cancellation at period end.
+ */
+export async function scheduleCancellation(userId: string, tenantId: string): Promise<boolean> {
+  const sub = await defaultSubscriptionStore.getSubscription(userId, tenantId);
+  if (!sub) return false;
+
+  await defaultSubscriptionStore.updateSubscription(sub.subscription_id, {
+    cancel_at_period_end: true,
+  });
+  return true;
+}
+
+/**
+ * Process subscription expiry (called by billing webhook).
+ */
+export async function processSubscriptionExpiry(subscriptionId: string): Promise<void> {
+  const sub = await defaultSubscriptionStore.getSubscription('', '');
+  if (!sub) return;
+
+  await defaultStore.grant({
+    user_id: sub.user_id,
+    tenant_id: sub.tenant_id,
+    key: 'machine.plan',
+    value: 'start',
+    source: 'subscription_expiry',
+    granted_by: 'system',
+    expires_at: null,
+    revoked_at: null,
+  });
+
+  await defaultSubscriptionStore.updateSubscription(subscriptionId, {
+    status: 'expired',
+  });
 }

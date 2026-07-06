@@ -1046,12 +1046,21 @@ importers:
       '@nai/billing':
         specifier: workspace:*
         version: link:../../packages/@nai/billing
+      '@nai/bulwark':
+        specifier: workspace:*
+        version: link:../../packages/@nai/bulwark
       '@nai/compass':
         specifier: workspace:*
         version: link:../../packages/@nai/compass
       '@nai/conductor':
         specifier: workspace:*
         version: link:../../packages/@nai/conductor
+      '@nai/contracts':
+        specifier: workspace:*
+        version: link:../../packages/@nai/contracts
+      '@nai/crew':
+        specifier: workspace:*
+        version: link:../../packages/@nai/crew
       '@nai/dashboard':
         specifier: workspace:*
         version: link:../../packages/@nai/dashboard
@@ -1076,15 +1085,24 @@ importers:
       '@nai/evidence':
         specifier: workspace:*
         version: link:../../packages/@nai/evidence
+      '@nai/grype':
+        specifier: workspace:*
+        version: link:../../packages/@nai/grype
       '@nai/harness':
         specifier: workspace:*
         version: link:../../packages/@nai/harness
       '@nai/keystone':
         specifier: workspace:*
         version: link:../../packages/@nai/keystone
+      '@nai/loom':
+        specifier: workspace:*
+        version: link:../../packages/@nai/loom
       '@nai/nguyen-tools':
         specifier: workspace:*
         version: link:../../packages/@nai/nguyen-tools
+      '@nai/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/@nai/pipeline
       '@nai/policy-engine':
         specifier: workspace:*
         version: link:../../packages/@nai/policy-engine
@@ -1100,18 +1118,39 @@ importers:
       '@nai/proof':
         specifier: workspace:*
         version: link:../../packages/@nai/proof
+      '@nai/provenance':
+        specifier: workspace:*
+        version: link:../../packages/@nai/provenance
       '@nai/relic':
         specifier: workspace:*
         version: link:../../packages/@nai/relic
+      '@nai/runtime-sdk':
+        specifier: workspace:*
+        version: link:../../packages/@nai/runtime-sdk
+      '@nai/sast':
+        specifier: workspace:*
+        version: link:../../packages/@nai/sast
       '@nai/scholarship':
         specifier: workspace:*
         version: link:../../packages/@nai/scholarship
+      '@nai/scout':
+        specifier: workspace:*
+        version: link:../../packages/@nai/scout
       '@nai/scroll':
         specifier: workspace:*
         version: link:../../packages/@nai/scroll
+      '@nai/seal':
+        specifier: workspace:*
+        version: link:../../packages/@nai/seal
       '@nai/seismograph':
         specifier: workspace:*
         version: link:../../packages/@nai/seismograph
+      '@nai/sentinel':
+        specifier: workspace:*
+        version: link:../../packages/@nai/sentinel
+      '@nai/skyvern':
+        specifier: workspace:*
+        version: link:../../packages/@nai/skyvern
       '@nai/tally':
         specifier: workspace:*
         version: link:../../packages/@nai/tally
@@ -1127,6 +1166,12 @@ importers:
       '@nai/trace':
         specifier: workspace:*
         version: link:../../packages/@nai/trace
+      '@nai/veil':
+        specifier: workspace:*
+        version: link:../../packages/@nai/veil
+      '@nai/warden':
+        specifier: workspace:*
+        version: link:../../packages/@nai/warden
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
