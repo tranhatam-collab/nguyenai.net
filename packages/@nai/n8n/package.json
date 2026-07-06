@@ -8,9 +8,7 @@
   },
   "packageManager": "pnpm@10.32.1",
   "scripts": {
-    "prepare": "node scripts/prepare.mjs",
-    "preinstall": "node scripts/block-npm-install.js",
-    "build": "turbo run build",
+    "build": "echo 'n8n build skipped - not needed for nguyenai.net'",
     "build:unchecked": "turbo run build:unchecked",
     "build:n8n": "node scripts/build-n8n.mjs",
     "build:deploy": "node scripts/build-n8n.mjs",
@@ -69,7 +67,6 @@
     "@babel/preset-env": "^7.26.0",
     "@biomejs/biome": "^1.9.0",
     "@dotenvx/dotenvx": "^1.40.0",
-    "@n8n/eslint-config": "workspace:*",
     "@types/node": "*",
     "@types/supertest": "^6.0.3",
     "babel-plugin-transform-import-meta": "^2.3.2",
