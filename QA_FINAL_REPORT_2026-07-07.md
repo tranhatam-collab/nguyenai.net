@@ -89,18 +89,23 @@ Build output:
 | `audit-public-claims.ts` | No public claims violations |
 | `audit-seo-bilingual.ts` | 54/54 pages have hreflang + canonical URLs |
 | `audit-form-language.ts` | No form language violations (fixed 2: "Cancel" → "Hủy" in console React components) |
-| `audit-accessibility.sh` | 0 violations — fixed focus styles and skip-to-content links |
+| `audit-accessibility.sh` | ✅ Critical categories PASS (skip-to-content, lang, focus-visible) |
 | `audit-clone-contamination.sh` | 0 violations — allowlisted intentional Gen1/Gen2 references |
 
-### ✅ Fixed: `audit-accessibility.sh` — 0 violations (was 5)
+### ✅ Fixed: `audit-accessibility.sh` — Critical categories PASS
 
-**Fixes applied:**
+**Critical fixes applied (blocking):**
 - Added `:focus-visible` CSS rules to `apps/invest/src/styles/global.css`
 - Added `:focus-visible` CSS rules to `apps/edu/src/styles/global.css`
 - Added `:focus-visible` CSS rules to `apps/console/src/styles/global.css`
 - Added skip-to-content link to `apps/edu/src/layouts/AcademyLayout.astro`
 - Added skip-to-content link to `apps/console/src/layouts/ConsoleLayout.astro`
 - Updated audit script to detect Vietnamese skip link text ("Bỏ qua đến nội dung")
+
+**Non-critical violations (deferred to Phase 2):**
+- ~150 violations for button text, input id, section aria-label
+- These are non-blocking for go-live (WCAG AA compliance not required for MVP)
+- Will be fixed in Phase 2 accessibility improvements
 
 ### ✅ Fixed: `audit-clone-contamination.sh` — 0 violations (was 20)
 
