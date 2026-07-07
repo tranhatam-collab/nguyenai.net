@@ -68,11 +68,11 @@ export default function MemoryPanel() {
   return (
     <div>
       {/* Filter + write button */}
-      <div class="mb-4 flex flex-wrap items-center gap-3">
-        <label class="text-xs text-slate-400" htmlFor="memory-filter">Filter:</label>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <label className="text-xs text-slate-400" htmlFor="memory-filter">Filter:</label>
         <select
           id="memory-filter"
-          class="rounded-lg border border-slate-700 bg-bg-card px-3 py-1.5 text-sm text-slate-200"
+          className="rounded-lg border border-slate-700 bg-bg-card px-3 py-1.5 text-sm text-slate-200"
           value={filter}
           onChange={handleFilter}
         >
@@ -80,7 +80,7 @@ export default function MemoryPanel() {
           {MEMORY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
         <button
-          class="console-btn console-btn-primary text-xs"
+          className="console-btn console-btn-primary text-xs"
           onClick={() => setShowForm((v) => !v)}
         >
           {showForm ? 'Cancel · Hủy' : '+ Write memory · Ghi bộ nhớ'}
@@ -89,12 +89,12 @@ export default function MemoryPanel() {
 
       {/* Write form */}
       {showForm && (
-        <div class="console-card mb-4">
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="console-card mb-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-              <label class="console-label">Type</label>
+              <label className="console-label">Type</label>
               <select
-                class="console-input"
+                className="console-input"
                 value={newMemory.memory_type}
                 onChange={(e) => setNewMemory((m) => ({ ...m, memory_type: e.target.value }))}
               >
@@ -102,25 +102,25 @@ export default function MemoryPanel() {
               </select>
             </div>
             <div>
-              <label class="console-label">Key</label>
+              <label className="console-label">Key</label>
               <input
-                class="console-input"
+                className="console-input"
                 value={newMemory.key}
                 onChange={(e) => setNewMemory((m) => ({ ...m, key: e.target.value }))}
                 placeholder="e.g. preferred_language"
               />
             </div>
             <div>
-              <label class="console-label">Value</label>
+              <label className="console-label">Value</label>
               <input
-                class="console-input"
+                className="console-input"
                 value={newMemory.value}
                 onChange={(e) => setNewMemory((m) => ({ ...m, value: e.target.value }))}
                 placeholder="e.g. vi"
               />
             </div>
           </div>
-          <button class="console-btn console-btn-primary mt-3 text-xs" onClick={handleWrite}>
+          <button className="console-btn console-btn-primary mt-3 text-xs" onClick={handleWrite}>
             Save · Lưu
           </button>
         </div>
@@ -128,42 +128,42 @@ export default function MemoryPanel() {
 
       {/* Error */}
       {error && (
-        <div class="mb-4 rounded-lg border border-red-800 bg-red-950/40 p-3 text-sm text-red-300">
-          <p class="font-medium">Error · Lỗi:</p>
-          <p class="mt-1 font-mono text-xs">{error}</p>
+        <div className="mb-4 rounded-lg border border-red-800 bg-red-950/40 p-3 text-sm text-red-300">
+          <p className="font-medium">Error · Lỗi:</p>
+          <p className="mt-1 font-mono text-xs">{error}</p>
         </div>
       )}
 
       {/* Loading */}
-      {loading && <p class="text-sm text-slate-400">Loading memories... · Đang tải...</p>}
+      {loading && <p className="text-sm text-slate-400">Loading memories... · Đang tải...</p>}
 
       {/* Memory list */}
       {!loading && memories.length === 0 && (
-        <div class="console-card">
-          <p class="text-sm text-slate-400">No memories found. · Chưa có bộ nhớ nào.</p>
+        <div className="console-card">
+          <p className="text-sm text-slate-400">No memories found. · Chưa có bộ nhớ nào.</p>
         </div>
       )}
 
       {!loading && memories.length > 0 && (
-        <div class="space-y-3">
+        <div className="space-y-3">
           {memories.map((m) => (
-            <div key={m.memory_id} class="console-card">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="rounded bg-accent/20 px-2 py-0.5 text-xs text-accent">{m.memory_type}</span>
-                    <span class="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{m.visibility}</span>
-                    <span class="font-mono text-sm text-slate-200">{m.key}</span>
+            <div key={m.memory_id} className="console-card">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded bg-accent/20 px-2 py-0.5 text-xs text-accent">{m.memory_type}</span>
+                    <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{m.visibility}</span>
+                    <span className="font-mono text-sm text-slate-200">{m.key}</span>
                   </div>
-                  <p class="mt-2 text-sm text-slate-300">
+                  <p className="mt-2 text-sm text-slate-300">
                     {typeof m.value === 'string' ? m.value : JSON.stringify(m.value)}
                   </p>
-                  <p class="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     {new Date(m.updated_at).toLocaleString()} · {m.tags.join(', ') || 'no tags'}
                   </p>
                 </div>
                 <button
-                  class="text-xs text-red-400 hover:text-red-300"
+                  className="text-xs text-red-400 hover:text-red-300"
                   onClick={() => handleDelete(m.key)}
                 >
                   Delete

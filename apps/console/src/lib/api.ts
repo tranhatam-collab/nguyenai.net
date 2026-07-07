@@ -217,15 +217,11 @@ export async function fetchRoutingRules(): Promise<RoutingRule[]> {
 }
 
 export async function saveRoutingRule(rule: RoutingRule): Promise<void> {
-  await apiFetch('/v1/routing-rules', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(rule),
-  });
+  await apiFetch('/v1/routing-rules', 'POST', rule);
 }
 
 export async function deleteRoutingRule(id: string): Promise<void> {
-  await apiFetch(`/v1/routing-rules/${id}`, { method: 'DELETE' });
+  await apiFetch(`/v1/routing-rules/${id}`, 'DELETE');
 }
 
 // ============================================================

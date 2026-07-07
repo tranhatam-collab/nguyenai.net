@@ -5,6 +5,14 @@
  * sign/verify data and files, and build signed manifests.
  */
 
+// Web Crypto API — use a minimal interface to avoid @types/node vs DOM Crypto conflicts
+interface WebCrypto {
+  randomUUID(): string;
+  getRandomValues<T extends ArrayBufferView>(array: T): T;
+  subtle: SubtleCrypto;
+}
+const _crypto = (globalThis as unknown as { crypto?: WebCrypto }).crypto;
+
 export type SigningAlgorithm = 'ECDSA' | 'RSA-PSS';
 
 export interface SigningKey {
@@ -60,11 +68,11 @@ function strToBuf(s: string): ArrayBuffer {
 }
 
 function randomId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
+  if (_crypto && _crypto.randomUUID) {
+    return _crypto.randomUUID();
   }
   const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
+  _crypto?.getRandomValues(bytes);
   const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
@@ -85,29 +93,29 @@ function keyGenParams(algorithm: SigningAlgorithm): EcKeyGenParams | RsaHashedKe
   };
 }
 
-function signParams(algorithm: SigningAlgorithm): EcSignParams | RsaPssParams {
+function signParams(algorithm: SigningAlgorithm): EcdsaParams | RsaPssParams {
   if (algorithm === 'ECDSA') {
     return { name: 'ECDSA', hash: 'SHA-256' };
   }
   return { name: 'RSA-PSS', saltLength: 32 };
 }
 
-function importParams(algorithm: string): KeyAlgorithm {
+function importParams(algorithm: string): EcKeyImportParams | RsaHashedImportParams {
   if (algorithm === 'RSA-PSS') {
     return { name: 'RSA-PSS', hash: 'SHA-256' };
   }
-  return { name: 'ECDSA', namedCurve: 'P-256', hash: 'SHA-256' };
+  return { name: 'ECDSA', namedCurve: 'P-256' };
 }
 
 // --- key generation ---
 
 export async function generateSigningKey(algorithm: SigningAlgorithm = 'ECDSA'): Promise<SigningKey> {
   const params = keyGenParams(algorithm);
-  const keyPair = await crypto.subtle.generateKey(
-    params as KeyAlgorithm,
+  const keyPair = await _crypto!.subtle.generateKey(
+    params,
     true,
-    algorithm === 'ECDSA' ? ['sign', 'verify'] : ['sign', 'verify'],
-  );
+    ['sign', 'verify'],
+  ) as CryptoKeyPair;
   return {
     id: randomId(),
     publicKey: keyPair.publicKey,
@@ -121,7 +129,7 @@ export async function generateSigningKey(algorithm: SigningAlgorithm = 'ECDSA'):
 
 export async function sign(data: string, key: SigningKey): Promise<string> {
   const buf = strToBuf(data);
-  const sig = await crypto.subtle.sign(signParams(key.algorithm), key.privateKey, buf);
+  const sig = await _crypto!.subtle.sign(signParams(key.algorithm), key.privateKey, buf);
   return bufToB64(sig);
 }
 
@@ -131,7 +139,7 @@ export async function verify(data: string, signature: string, publicKey: CryptoK
     const sigBuf = b64ToBuf(signature);
     // Derive algorithm from the key's algorithm name.
     const algoName = publicKey.algorithm.name as SigningAlgorithm;
-    return await crypto.subtle.verify(signParams(algoName), publicKey, sigBuf, buf);
+    return await _crypto!.subtle.verify(signParams(algoName), publicKey, sigBuf, buf);
   } catch {
     return false;
   }
@@ -157,20 +165,20 @@ export async function verifyFile(signedFile: SignedFile, publicKey: CryptoKey): 
 // --- key export / import ---
 
 export async function exportPublicKey(key: SigningKey): Promise<string> {
-  const spki = await crypto.subtle.exportKey('spki', key.publicKey);
+  const spki = await _crypto!.subtle.exportKey('spki', key.publicKey);
   return bufToB64(spki);
 }
 
 export async function importPublicKey(b64: string, algorithm: string = 'ECDSA'): Promise<CryptoKey> {
   const spki = b64ToBuf(b64);
-  return crypto.subtle.importKey('spki', spki, importParams(algorithm), true, ['verify']);
+  return _crypto!.subtle.importKey('spki', spki, importParams(algorithm), true, ['verify']);
 }
 
 // --- manifest ---
 
 async function sha256B64(content: string): Promise<string> {
   const buf = strToBuf(content);
-  const digest = await crypto.subtle.digest('SHA-256', buf);
+  const digest = await _crypto!.subtle.digest('SHA-256', buf);
   return bufToB64(digest);
 }
 

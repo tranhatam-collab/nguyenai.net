@@ -1,0 +1,13 @@
+# Lefthook configuration
+# https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  jobs:
+    # Block commit if @nai/web Astro build fails
+    # Prevents deploying broken build (lesson learned 2026-07-07:
+    # PageShell.astro duplicate code → build fail → generate-routes.js
+    # fallback deployed placeholder HTML with "Route: /status" debug text)
+    - name: web-build
+      glob: "apps/web/**/*.{astro,ts,tsx,js,css}"
+      run: pnpm --filter @nai/web build

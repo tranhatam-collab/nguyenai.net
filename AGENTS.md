@@ -248,20 +248,28 @@ Current state:
 
 ## Cloudflare deployment accounts (BINDING)
 
+> **FOUNDER LOCKED 2026-07-07:** Account production chính cho toàn bộ
+> `nguyenai.net` ecosystem là **Anhhatam@gmail.com**
+> (`62d57eaa548617aeecac766e5a1cb98e`).
+> Dashboard: https://dash.cloudflare.com/62d57eaa548617aeecac766e5a1cb98e/nguyenai.net
+>
 > **Lưu ý quan trọng:** Các project Cloudflare Pages/Workers nằm ở **nhiều account**.
 > Khi deploy, PHẢI dùng đúng account ID. Deploy sai account = custom domain 404.
 
 | Project | Account | Account ID | Custom domain |
 |---|---|---|---|
+| `nai-web` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `nguyenai.net` |
 | `nguyenai-edu` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `edu.nguyenai.net` |
-| `nguyenai-web` (nai-web) | (verify trước deploy) | | `nguyenai.net` |
-| `nguyenai-console` | (verify trước deploy) | | `app.nguyenai.net` |
-| `nguyenai-invest` | (verify trước deploy) | | `invest.nguyenai.net` |
-| `nguyenai-api-gateway` | (verify trước deploy) | | `api.nguyenai.net` |
+| `nguyenai-console` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `app.nguyenai.net` |
+| `nguyenai-invest` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `invest.nguyenai.net` |
+| `nguyenai-api-gateway` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `api.nguyenai.net` |
+
+> Tất cả project `nguyenai.net` ecosystem đều nằm trong account Anhhatam.
+> Không deploy vào account Tranhatam (`f3f9e76...`) hay Tranhatam66 (`93112c...`).
 
 **Deploy command pattern:**
 ```bash
-CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
+CLOUDFLARE_ACCOUNT_ID=62d57eaa548617aeecac766e5a1cb98e wrangler pages deploy <dist-dir> \
   --project-name=<project> --branch=main
 ```
 
@@ -269,6 +277,7 @@ CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
 `f3f9e76222dcb488d5e303e29e8ba192` (Tranhatam) thay vì
 `62d57eaa548617aeecac766e5a1cb98e` (Anhhatam) → custom domain
 `edu.nguyenai.net` trả 404. Phải luôn check account ID trước khi deploy.
+**Founder đã xác nhận 2026-07-07:** Account Anhhatam là account production chính.
 
 ## Required audit before production
 
@@ -479,20 +488,28 @@ Build currently runs `astro build` for the static public website.
 
 ## Cloudflare deployment accounts (BINDING)
 
+> **FOUNDER LOCKED 2026-07-07:** Account production chính cho toàn bộ
+> `nguyenai.net` ecosystem là **Anhhatam@gmail.com**
+> (`62d57eaa548617aeecac766e5a1cb98e`).
+> Dashboard: https://dash.cloudflare.com/62d57eaa548617aeecac766e5a1cb98e/nguyenai.net
+>
 > **Lưu ý quan trọng:** Các project Cloudflare Pages/Workers nằm ở **nhiều account**.
 > Khi deploy, PHẢI dùng đúng account ID. Deploy sai account = custom domain 404.
 
 | Project | Account | Account ID | Custom domain |
 |---|---|---|---|
+| `nai-web` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `nguyenai.net` |
 | `nguyenai-edu` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `edu.nguyenai.net` |
-| `nguyenai-web` (nai-web) | (verify trước deploy) | | `nguyenai.net` |
-| `nguyenai-console` | (verify trước deploy) | | `app.nguyenai.net` |
-| `nguyenai-invest` | (verify trước deploy) | | `invest.nguyenai.net` |
-| `nguyenai-api-gateway` | (verify trước deploy) | | `api.nguyenai.net` |
+| `nguyenai-console` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `app.nguyenai.net` |
+| `nguyenai-invest` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `invest.nguyenai.net` |
+| `nguyenai-api-gateway` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `api.nguyenai.net` |
+
+> Tất cả project `nguyenai.net` ecosystem đều nằm trong account Anhhatam.
+> Không deploy vào account Tranhatam (`f3f9e76...`) hay Tranhatam66 (`93112c...`).
 
 **Deploy command pattern:**
 ```bash
-CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
+CLOUDFLARE_ACCOUNT_ID=62d57eaa548617aeecac766e5a1cb98e wrangler pages deploy <dist-dir> \
   --project-name=<project> --branch=main
 ```
 
@@ -500,6 +517,7 @@ CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
 `f3f9e76222dcb488d5e303e29e8ba192` (Tranhatam) thay vì
 `62d57eaa548617aeecac766e5a1cb98e` (Anhhatam) → custom domain
 `edu.nguyenai.net` trả 404. Phải luôn check account ID trước khi deploy.
+**Founder đã xác nhận 2026-07-07:** Account Anhhatam là account production chính.
 
 ## Required audit before production
 
