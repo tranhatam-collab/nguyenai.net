@@ -86,7 +86,13 @@ approvalRoutes.post('/v1/admin-approvals/:id/approve', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await approveRequest(id, c.get('session')?.user_id ?? 'system');
+  const { reason } = await c.req.json();
+
+  if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+    return c.json({ error: 'Reason is required for approval' }, 400);
+  }
+
+  await approveRequest(id, c.get('session')?.user_id ?? 'system', reason.trim());
 
   return c.json({ success: true });
 });
@@ -100,7 +106,13 @@ approvalRoutes.post('/v1/admin-approvals/:id/deny', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await denyRequest(id, c.get('session')?.user_id ?? 'system');
+  const { reason } = await c.req.json();
+
+  if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+    return c.json({ error: 'Reason is required for denial' }, 400);
+  }
+
+  await denyRequest(id, c.get('session')?.user_id ?? 'system', reason.trim());
 
   return c.json({ success: true });
 });

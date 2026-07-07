@@ -46,12 +46,13 @@ async function testApproveRequest() {
   setApprovalStore(store);
 
   const id = await requestApproval('deployment', 'production', 'Deploy to prod', 'Test', 'admin-1');
-  await approveRequest(id, 'admin-2');
+  await approveRequest(id, 'admin-2', 'Approved after review');
 
   const request = await store.getRequest(id);
   assert(request?.status === 'approved', 'status is approved');
   assert(request?.approver === 'admin-2', 'approver is admin-2');
   assert(request?.approved_at !== null, 'approved_at set');
+  assert(request?.reason === 'Approved after review', 'reason is logged');
 }
 
 async function testDenyRequest() {
@@ -60,11 +61,12 @@ async function testDenyRequest() {
   setApprovalStore(store);
 
   const id = await requestApproval('secret_rotation', 'preview', 'Rotate secret', 'Test', 'admin-1');
-  await denyRequest(id, 'admin-2');
+  await denyRequest(id, 'admin-2', 'Security risk identified');
 
   const request = await store.getRequest(id);
   assert(request?.status === 'denied', 'status is denied');
   assert(request?.denied_at !== null, 'denied_at set');
+  assert(request?.reason === 'Security risk identified', 'reason is logged');
 }
 
 async function testCheckApprovalStatus() {
@@ -76,7 +78,7 @@ async function testCheckApprovalStatus() {
   const status = await checkApprovalStatus(id);
   assert(status === 'pending', 'status is pending');
 
-  await approveRequest(id, 'admin-2');
+  await approveRequest(id, 'admin-2', 'Approved for testing');
   const status2 = await checkApprovalStatus(id);
   assert(status2 === 'approved', 'status is approved after approval');
 }
@@ -113,6 +115,30 @@ async function testCheckProtectedData() {
   assert(check4.isProtected === false, 'other is not protected');
 }
 
+async function testRequireReason() {
+  console.log('Test: require reason for approval/deny');
+  const store = new InMemoryApprovalStore();
+  setApprovalStore(store);
+
+  const id = await requestApproval('deployment', 'production', 'Test', 'Test', 'admin-1');
+
+  let errorCaught = false;
+  try {
+    await approveRequest(id, 'admin-2', '');
+  } catch (e) {
+    errorCaught = true;
+  }
+  assert(errorCaught === true, 'empty reason throws error');
+
+  errorCaught = false;
+  try {
+    await denyRequest(id, 'admin-2', '   ');
+  } catch (e) {
+    errorCaught = true;
+  }
+  assert(errorCaught === true, 'whitespace-only reason throws error');
+}
+
 async function main() {
   console.log('=== @nai/admin-approval unit tests ===\n');
   await testRequestApproval();
@@ -121,6 +147,7 @@ async function main() {
   await testCheckApprovalStatus();
   await testListPendingApprovals();
   await testCheckProtectedData();
+  await testRequireReason();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

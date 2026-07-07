@@ -31,6 +31,7 @@ export interface ApprovalRequest {
   approved_at: string | null;
   denied_at: string | null;
   expires_at: string | null;
+  reason: string | null;
   metadata: Record<string, unknown>;
 }
 
@@ -136,8 +137,13 @@ export async function requestApproval(
 
 export async function approveRequest(
   requestId: string,
-  approver: string
+  approver: string,
+  reason: string
 ): Promise<void> {
+  if (!reason || reason.trim().length === 0) {
+    throw new Error('Approval reason is required');
+  }
+
   const request = await defaultStore.getRequest(requestId);
   if (!request) {
     throw new Error('Approval request not found');
@@ -153,13 +159,14 @@ export async function approveRequest(
     status: 'approved',
     approver,
     approved_at: new Date().toISOString(),
+    reason,
   });
 
   await logGovernanceAuditEvent({
     category: 'approval',
     action: 'approval_granted',
     target: requestId,
-    details: { category: request.category, stage: request.stage },
+    details: { category: request.category, stage: request.stage, reason },
     user_id: approver,
     tenant_id: 'system',
   });
@@ -167,8 +174,13 @@ export async function approveRequest(
 
 export async function denyRequest(
   requestId: string,
-  approver: string
+  approver: string,
+  reason: string
 ): Promise<void> {
+  if (!reason || reason.trim().length === 0) {
+    throw new Error('Denial reason is required');
+  }
+
   const request = await defaultStore.getRequest(requestId);
   if (!request) {
     throw new Error('Approval request not found');
@@ -181,13 +193,14 @@ export async function denyRequest(
     status: 'denied',
     approver,
     denied_at: new Date().toISOString(),
+    reason,
   });
 
   await logGovernanceAuditEvent({
     category: 'approval',
     action: 'approval_denied',
     target: requestId,
-    details: { category: request.category, stage: request.stage },
+    details: { category: request.category, stage: request.stage, reason },
     user_id: approver,
     tenant_id: 'system',
   });

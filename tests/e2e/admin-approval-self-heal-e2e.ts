@@ -93,7 +93,7 @@ async function testRequestAndApproveSelfHealPreview() {
   assert(approvalId !== undefined, 'preview approval requested');
 
   // Approve
-  await approveRequest(approvalId, 'admin-1');
+  await approveRequest(approvalId, 'admin-1', 'Preview verified successfully');
   const status = await checkApprovalStatus(approvalId);
   assert(status === 'approved', 'approval approved');
 
@@ -176,11 +176,11 @@ async function testCompleteSelfHealWorkflow() {
   await proposePatch(attemptId, 'Patch', JSON.stringify({ code: 'fix' }));
   await runTests(attemptId, JSON.stringify({ passed: 5, failed: 0 }));
   const previewApprovalId = await requestPreviewApproval(attemptId, 'test-user');
-  await approveRequest(previewApprovalId, 'admin-1');
+  await approveRequest(previewApprovalId, 'admin-1', 'Preview verified');
   await deployPreview(attemptId, 'deploy-1');
   await verifyPreview(attemptId, JSON.stringify({ success: true }));
   const prodApprovalId = await requestProductionApproval(attemptId, 'test-user');
-  await approveRequest(prodApprovalId, 'admin-1');
+  await approveRequest(prodApprovalId, 'admin-1', 'Production verified');
   await deployProduction(attemptId, 'deploy-2');
   await completeSelfHeal(attemptId, JSON.stringify({ success: true }));
 
