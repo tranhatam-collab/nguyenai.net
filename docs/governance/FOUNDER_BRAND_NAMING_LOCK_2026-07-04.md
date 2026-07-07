@@ -44,9 +44,22 @@
 | `admin.nguyenai.net` | Administration |
 | `docs.nguyenai.net` | Nguyen AI Docs |
 | `invest.nguyenai.net` | Nguyen AI Invest |
-| `academy.nguyenai.net` | Nguyen AI Academy |
+| `edu.nguyenai.net` | Nguyen AI Edu — cổng tuyển sinh, học bổng, chương trình, truyền thông giáo dục |
+| `academy.nguyenai.net` | Nguyen AI Academy — cổng học tập sau đăng nhập, bài học, bài thi, chứng nhận, hồ sơ học tập |
 | `status.nguyenai.net` | Service status |
 | `api.nguyenai.net` | API gateway |
+| `auth.nguyenai.net` | Auth service |
+
+### 3.8.1. edu.nguyenai.net và academy.nguyenai.net — phân vai (LOCKED 2026-07-07)
+
+Founder quyết định: **giữ cả hai**, phân vai rõ ràng.
+
+| Tên miền | Vai trò |
+|---|---|
+| `edu.nguyenai.net` | Trang tuyển sinh, học bổng, chương trình, truyền thông giáo dục (public-facing) |
+| `academy.nguyenai.net` | Cổng học tập sau đăng nhập, bài học, bài thi, chứng nhận, hồ sơ học tập (gated) |
+
+`edu.nguyenai.net` là cổng công khai giới thiệu chương trình học, học bổng và tuyển sinh. `academy.nguyenai.net` là nơi người học đã đăng nhập vào học, làm bài thi và nhận chứng nhận. Hai tên miền không thay thế nhau.
 
 ---
 
@@ -61,8 +74,8 @@
 | `NguyenAI` | Dính liền. Chuẩn: Nguyen AI (có khoảng trắng) |
 | `Nguyễn.AI` | Dấu chấm giữa. Không dùng |
 | `Nguyên AI` | Sai chính tả họ. Phải là Nguyễn (có g) |
-| `AI Nguyen` | Đảo thứ tự. Brand đứng trước |
-| `AI Nguyễn` | Đảo thứ tự. Brand đứng trước |
+| `AI Nguyen` | Cấm làm public brand hoặc product surface. Ngoại lệ Founder 2026-07-07: chỉ được dùng làm assistant/model identity string trong policy trả lời "who are you", không được dùng làm thương hiệu public. |
+| `AI Nguyễn` | Cấm làm public brand hoặc product surface. Ngoại lệ Founder 2026-07-07: chỉ được dùng làm assistant/model identity string trong policy trả lời "bạn là ai", không được dùng làm thương hiệu public. |
 | `Nguyen Artificial Intelligence` | Quá dài, không phải brand name |
 | `NAI` làm thương hiệu public | Chỉ dùng làm code scope nội bộ (@nai/*), không hiển thị public |
 | `NAI Edu` | Dùng code scope làm public brand. Chuẩn: Nguyen AI Edu |
@@ -157,9 +170,20 @@ Plans đã locked trong AGENTS.md:
 
 ### 4.4. hreflang
 
-- Vietnamese: `vi` — dùng tên có dấu
+- Vietnamese: `vi` (hoặc `vi-VN`) — dùng tên có dấu
 - English: `en` — dùng tên không dấu
-- x-default: English
+- x-default: **tiếng Việt (Vietnamese root)** — LOCKED 2026-07-07 per Founder decision.
+  Tiếng Việt là ngôn ngữ gốc, người dùng Việt Nam là cộng đồng khởi nguồn.
+  Bản tiếng Anh là bản quốc tế hóa, không phải bản mặc định thay thế tiếng Việt.
+  Mọi app (`nguyenai.net`, `edu.nguyenai.net`, `invest.nguyenai.net`, v.v.)
+  phải đặt `x-default` trỏ về bản tiếng Việt.
+
+### 4.5. Audit HTML build (LOCKED 2026-07-07)
+
+Mọi app phải được audit trên **HTML build thật** trong `dist/`, không chỉ kiểm
+source. Audit source mà không kiểm build sẽ pass ảo vì lỗi rendering, hreflang
+sai, lang attribute sai, Open Graph thiếu chỉ xuất hiện sau khi Astro render.
+CI phải chạy audit trên `dist/**/*.html`.
 
 ### 4.5. Sitemap
 

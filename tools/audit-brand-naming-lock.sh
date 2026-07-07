@@ -96,6 +96,23 @@ while IFS= read -r -d '' file; do
   fi
 done < <(find . "${EXCLUDE_DIRS[@]}" -type f \( $EXT_EXPR \) -print0 2>/dev/null)
 
+AI_NGUYEN_ASSISTANT_IDENTITY_ALLOWLIST=(
+  './docs/governance/MODEL_GATEWAY_IDENTITY_POLICY.md'
+  './docs/governance/NGUYEN_AI_MODEL_AND_AGENT_TRAINING_CHARTER.md'
+  './docs/governance/AI_AGENT_ETHICS_AND_SAFETY_POLICY.md'
+  './docs/governance/INDEPENDENT_RUNTIME_FALLBACK_EXECUTION_PLAN_2026-07-07.md'
+)
+
+is_ai_nguyen_identity_allowlisted() {
+  local file="$1"
+  for allowed in "${AI_NGUYEN_ASSISTANT_IDENTITY_ALLOWLIST[@]}"; do
+    if [ "$file" = "$allowed" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Scan
 VIOLATIONS=0
 for file in ${FILES[@]+"${FILES[@]}"}; do
@@ -108,6 +125,9 @@ for file in ${FILES[@]+"${FILES[@]}"}; do
 
     if [ -n "$matches" ]; then
       while IFS= read -r line; do
+        if { [ "$pattern" = "AI Nguyễn" ] || [ "$pattern" = "AI Nguyen" ]; } && is_ai_nguyen_identity_allowlisted "$file"; then
+          continue
+        fi
         echo -e "${RED}VIOLATION${NC}: ${file}:${line%%:*}"
         echo -e "  Pattern: ${YELLOW}${pattern}${NC}"
         echo -e "  Issue:   ${desc}"
