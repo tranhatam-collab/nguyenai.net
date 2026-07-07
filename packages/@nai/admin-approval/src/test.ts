@@ -2,6 +2,8 @@
  * @nai/admin-approval — unit tests.
  */
 
+import type { Role } from '@nai/auth';
+
 import {
   InMemoryApprovalStore,
   setApprovalStore,
@@ -11,6 +13,9 @@ import {
   checkApprovalStatus,
   listPendingApprovals,
   checkProtectedData,
+  validateApprover,
+  setApproverRoles,
+  getApproverRoles,
 } from './index.ts';
 
 let passed = 0;
@@ -46,7 +51,7 @@ async function testApproveRequest() {
   setApprovalStore(store);
 
   const id = await requestApproval('deployment', 'production', 'Deploy to prod', 'Test', 'admin-1');
-  await approveRequest(id, 'admin-2', 'Approved after review');
+  await approveRequest(id, 'admin-2', 'Approved after review', ['ADMIN']);
 
   const request = await store.getRequest(id);
   assert(request?.status === 'approved', 'status is approved');
@@ -61,7 +66,7 @@ async function testDenyRequest() {
   setApprovalStore(store);
 
   const id = await requestApproval('secret_rotation', 'preview', 'Rotate secret', 'Test', 'admin-1');
-  await denyRequest(id, 'admin-2', 'Security risk identified');
+  await denyRequest(id, 'admin-2', 'Security risk identified', ['ADMIN']);
 
   const request = await store.getRequest(id);
   assert(request?.status === 'denied', 'status is denied');
@@ -139,6 +144,51 @@ async function testRequireReason() {
   assert(errorCaught === true, 'whitespace-only reason throws error');
 }
 
+async function testApproverRoleValidation() {
+  console.log('Test: approver role validation');
+  
+  // Default approver roles
+  const defaultRoles = getApproverRoles();
+  assert(defaultRoles.includes('ADMIN'), 'ADMIN is default approver role');
+  assert(defaultRoles.includes('SUPER_ADMIN'), 'SUPER_ADMIN is default approver role');
+
+  // Valid approver
+  const valid = validateApprover(['ADMIN', 'USER']);
+  assert(valid.isValid === true, 'ADMIN role is valid approver');
+
+  // Invalid approver
+  const invalid = validateApprover(['USER', 'MEMBER']);
+  assert(invalid.isValid === false, 'USER role is not valid approver');
+  assert(invalid.reason !== undefined, 'invalid approver has reason');
+
+  // No roles
+  const noRoles = validateApprover([]);
+  assert(noRoles.isValid === false, 'no roles is invalid');
+
+  // Custom approver roles
+  setApproverRoles(['OPERATOR', 'ADMIN']);
+  const customValid = validateApprover(['OPERATOR']);
+  assert(customValid.isValid === true, 'custom OPERATOR role is valid');
+
+  // Reset to default
+  setApproverRoles(['ADMIN', 'SUPER_ADMIN']);
+}
+
+async function testApproveWithInvalidRole() {
+  console.log('Test: approve with invalid role');
+  const store = new InMemoryApprovalStore();
+  setApprovalStore(store);
+  const id = await requestApproval('deployment', 'production', 'Test', 'Test', 'admin-1');
+
+  let roleErrorCaught = false;
+  try {
+    await approveRequest(id, 'user-1', 'Test', ['USER']);
+  } catch (e) {
+    roleErrorCaught = true;
+  }
+  assert(roleErrorCaught === true, 'invalid approver role throws error');
+}
+
 async function main() {
   console.log('=== @nai/admin-approval unit tests ===\n');
   await testRequestApproval();
@@ -148,6 +198,8 @@ async function main() {
   await testListPendingApprovals();
   await testCheckProtectedData();
   await testRequireReason();
+  await testApproverRoleValidation();
+  await testApproveWithInvalidRole();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

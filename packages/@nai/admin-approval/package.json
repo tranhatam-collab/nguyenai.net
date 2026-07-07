@@ -12,7 +12,8 @@
     "lint": "echo 'TODO'"
   },
   "dependencies": {
-    "@nai/audit": "workspace:*"
+    "@nai/audit": "workspace:*",
+    "@nai/auth": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

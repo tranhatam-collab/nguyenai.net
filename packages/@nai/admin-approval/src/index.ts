@@ -9,6 +9,7 @@
  */
 
 import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
+import type { Role } from '@nai/auth';
 
 // ============================================================
 // Types
@@ -138,10 +139,19 @@ export async function requestApproval(
 export async function approveRequest(
   requestId: string,
   approver: string,
-  reason: string
+  reason: string,
+  approverRoles?: Role[]
 ): Promise<void> {
   if (!reason || reason.trim().length === 0) {
     throw new Error('Approval reason is required');
+  }
+
+  // Validate approver has required role
+  if (approverRoles) {
+    const validation = validateApprover(approverRoles);
+    if (!validation.isValid) {
+      throw new Error(`Approver validation failed: ${validation.reason}`);
+    }
   }
 
   const request = await defaultStore.getRequest(requestId);
@@ -166,7 +176,7 @@ export async function approveRequest(
     category: 'approval',
     action: 'approval_granted',
     target: requestId,
-    details: { category: request.category, stage: request.stage, reason },
+    details: { category: request.category, stage: request.stage, reason, approver_roles: approverRoles },
     user_id: approver,
     tenant_id: 'system',
   });
@@ -175,10 +185,19 @@ export async function approveRequest(
 export async function denyRequest(
   requestId: string,
   approver: string,
-  reason: string
+  reason: string,
+  approverRoles?: Role[]
 ): Promise<void> {
   if (!reason || reason.trim().length === 0) {
     throw new Error('Denial reason is required');
+  }
+
+  // Validate approver has required role
+  if (approverRoles) {
+    const validation = validateApprover(approverRoles);
+    if (!validation.isValid) {
+      throw new Error(`Approver validation failed: ${validation.reason}`);
+    }
   }
 
   const request = await defaultStore.getRequest(requestId);
@@ -200,7 +219,7 @@ export async function denyRequest(
     category: 'approval',
     action: 'approval_denied',
     target: requestId,
-    details: { category: request.category, stage: request.stage, reason },
+    details: { category: request.category, stage: request.stage, reason, approver_roles: approverRoles },
     user_id: approver,
     tenant_id: 'system',
   });
@@ -241,4 +260,36 @@ export function checkProtectedData(metadata: Record<string, unknown>): Protected
   }
 
   return { isProtected: false };
+}
+
+// ============================================================
+// Approver role validation
+// ============================================================
+
+export interface ApproverValidation {
+  isValid: boolean;
+  reason?: string;
+}
+
+let approverRoles: Role[] = ['ADMIN', 'SUPER_ADMIN'];
+
+export function setApproverRoles(roles: Role[]): void {
+  approverRoles = roles;
+}
+
+export function getApproverRoles(): Role[] {
+  return approverRoles;
+}
+
+export function validateApprover(userRoles: Role[]): ApproverValidation {
+  if (!userRoles || userRoles.length === 0) {
+    return { isValid: false, reason: 'User has no roles' };
+  }
+
+  const hasApproverRole = userRoles.some(role => approverRoles.includes(role));
+  if (!hasApproverRole) {
+    return { isValid: false, reason: `User does not have approver role. Required: ${approverRoles.join(', ')}, Has: ${userRoles.join(', ')}` };
+  }
+
+  return { isValid: true };
 }

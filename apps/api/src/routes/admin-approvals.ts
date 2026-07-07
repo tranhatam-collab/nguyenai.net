@@ -18,6 +18,7 @@ import {
   checkApprovalStatus,
   listPendingApprovals,
   getApprovalStore,
+  validateApprover,
   type ApprovalCategory,
   type ApprovalStage,
 } from '@nai/admin-approval';
@@ -92,7 +93,10 @@ approvalRoutes.post('/v1/admin-approvals/:id/approve', async (c) => {
     return c.json({ error: 'Reason is required for approval' }, 400);
   }
 
-  await approveRequest(id, c.get('session')?.user_id ?? 'system', reason.trim());
+  const session = c.get('session');
+  const userRoles = session?.role ? [session.role] : [];
+
+  await approveRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 
   return c.json({ success: true });
 });
@@ -112,7 +116,10 @@ approvalRoutes.post('/v1/admin-approvals/:id/deny', async (c) => {
     return c.json({ error: 'Reason is required for denial' }, 400);
   }
 
-  await denyRequest(id, c.get('session')?.user_id ?? 'system', reason.trim());
+  const session = c.get('session');
+  const userRoles = session?.role ? [session.role] : [];
+
+  await denyRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 
   return c.json({ success: true });
 });
