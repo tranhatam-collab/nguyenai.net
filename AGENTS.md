@@ -246,6 +246,30 @@ Current state:
 - Auth: `@nai/auth` (better-auth rebrand) chạy trong Workers.
 - Hosting web: Cloudflare Pages.
 
+## Cloudflare deployment accounts (BINDING)
+
+> **Lưu ý quan trọng:** Các project Cloudflare Pages/Workers nằm ở **nhiều account**.
+> Khi deploy, PHẢI dùng đúng account ID. Deploy sai account = custom domain 404.
+
+| Project | Account | Account ID | Custom domain |
+|---|---|---|---|
+| `nguyenai-edu` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `edu.nguyenai.net` |
+| `nguyenai-web` (nai-web) | (verify trước deploy) | | `nguyenai.net` |
+| `nguyenai-console` | (verify trước deploy) | | `app.nguyenai.net` |
+| `nguyenai-invest` | (verify trước deploy) | | `invest.nguyenai.net` |
+| `nguyenai-api-gateway` | (verify trước deploy) | | `api.nguyenai.net` |
+
+**Deploy command pattern:**
+```bash
+CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
+  --project-name=<project> --branch=main
+```
+
+**Lesson learned 2026-07-07:** Deploy `nguyenai-edu` vào account
+`f3f9e76222dcb488d5e303e29e8ba192` (Tranhatam) thay vì
+`62d57eaa548617aeecac766e5a1cb98e` (Anhhatam) → custom domain
+`edu.nguyenai.net` trả 404. Phải luôn check account ID trước khi deploy.
+
 ## Required audit before production
 
 Do not approve production release without:
@@ -299,6 +323,217 @@ pnpm --filter ./apps/web preview
 ```
 
 Build currently runs `astro build` for the static public website (`apps/web/`).
+
+Do not approve production release without:
+
+- repository identity;
+- source inventory;
+- clone contamination audit for maytinhai / Máy Tính AI / computer.iai.one / AI Computer terms (note: "AI Computer" is now an approved product category per Master Positioning, but "Máy Tính AI" and "computer.iai.one" must not appear as Nguyen AI brand surfaces);
+- security audit;
+- privacy/data audit;
+- bilingual SEO audit;
+- accessibility audit;
+- commerce audit if payments exist;
+- release evidence pack.
+
+## Investor site rules (invest.nguyenai.net)
+
+- Source of truth: `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`.
+- Public investor pages are indexable with canonical and hreflang.
+- Private investor room routes must be noindex, nofollow, noarchive and excluded from sitemap.
+- Never expose cap table, bank account or term sheet in public HTML.
+- Investor qualification required before private room access.
+- Audit log every private room access.
+- Access must be expiring and revocable.
+- Disclosure line required on every public investor page.
+- Do not publish invest.nguyenai.net before legal entity, IP ownership and disclaimer review are complete.
+- Financial model is hypothesis only, not a forecast or commitment.
+
+## Dev commands
+
+> **Phase 0 (2026-07-02):** Monorepo setup. `src/` chuyển vào `apps/web/`. Root dùng pnpm workspace + turbo.
+
+Monorepo (root):
+
+```bash
+pnpm install          # install tất cả workspace
+pnpm build            # build tất cả apps + packages (turbo)
+pnpm typecheck        # typecheck tất cả
+pnpm test             # test tất cả
+pnpm lint             # lint tất cả
+pnpm --filter ./apps/web dev      # chạy web dev
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
+pnpm test             # test tất cả
+pnpm lint             # lint tất cả
+pnpm --filter ./apps/web dev      # chạy web dev
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
+pnpm --filter ./apps/web dev      # chạy web dev
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
+pnpm --filter ./apps/api dev      # chạy API dev (wrangler)
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
+```
+
+Public website (`apps/web/`, Astro static):
+
+```bash
+pnpm --filter ./apps/web install
+pnpm --filter ./apps/web dev
+pnpm --filter ./apps/web build
+pnpm --filter ./apps/web preview
+```
+
+Build currently runs `astro build` for the static public website (`apps/web/`).
+- Access must be expiring and revocable.
+- Disclosure line required on every public investor page.
+- Do not publish invest.nguyenai.net before legal entity, IP ownership and disclaimer review are complete.
+- Financial model is hypothesis only, not a forecast or commitment.
+
+## Dev commands
+
+Public website (Astro static):
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+```
+
+Build currently runs `astro build` for the static public website.
+- Public website: `apps/web/` (Astro static, 54 bilingual routes) — ✅ build pass.
+- App console: `apps/console/` (Astro + React, 11 trang) — ✅ build pass.
+- Edu: `apps/edu/` (Astro + MDX, 25 trang) — ✅ build pass.
+- Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
+- Admin: `apps/admin/` (Phase 2 placeholder).
+- AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
+- Gen1 gateway adapter: deployed trong `apps/api` — proxy 8 endpoints tới `aiagent.iai-one-api-prod.tranhatam.workers.dev`. See `docs/architecture/GEN1_GATEWAY_ADAPTER.md`.
+- Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
+- Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
+- Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).
+- Brand and product plan: locked via Master Positioning Gen1–Gen2.
+- Production release: not approved.
+- Sprint 0 governance: **OPEN** — not yet locked. See Sprint 0 Exit Gate requirements.
+- Repo structure: single monorepo `nguyenai.net` với 7 apps + 9 packages. See `docs/REPO_STRUCTURE_AND_MASTER_PLAN.md`.
+
+## Recommended stack
+
+> **LOCKED 2026-07-02** per `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`:
+
+- Public web: Astro static (`apps/web/`).
+- Console (`app.nguyenai.net`): Astro + React islands (`apps/console/`).
+- API: Cloudflare Workers + Hono (`apps/api/`).
+- DB: **Neon PostgreSQL** (primary, cần pgvector + transaction) + Cloudflare D1 (edge).
+- Storage: Cloudflare R2 (vault, audit archive).
+- Cache/KV: Cloudflare KV.
+- Vector: Qdrant Cloud (dev) → dedicated (prod).
+- Email: Resend.
+- Auth: `@nai/auth` (better-auth rebrand) chạy trong Workers.
+- Hosting web: Cloudflare Pages.
+
+## Cloudflare deployment accounts (BINDING)
+
+> **Lưu ý quan trọng:** Các project Cloudflare Pages/Workers nằm ở **nhiều account**.
+> Khi deploy, PHẢI dùng đúng account ID. Deploy sai account = custom domain 404.
+
+| Project | Account | Account ID | Custom domain |
+|---|---|---|---|
+| `nguyenai-edu` | Anhhatam@gmail.com | `62d57eaa548617aeecac766e5a1cb98e` | `edu.nguyenai.net` |
+| `nguyenai-web` (nai-web) | (verify trước deploy) | | `nguyenai.net` |
+| `nguyenai-console` | (verify trước deploy) | | `app.nguyenai.net` |
+| `nguyenai-invest` | (verify trước deploy) | | `invest.nguyenai.net` |
+| `nguyenai-api-gateway` | (verify trước deploy) | | `api.nguyenai.net` |
+
+**Deploy command pattern:**
+```bash
+CLOUDFLARE_ACCOUNT_ID=<account-id> wrangler pages deploy <dist-dir> \
+  --project-name=<project> --branch=main
+```
+
+**Lesson learned 2026-07-07:** Deploy `nguyenai-edu` vào account
+`f3f9e76222dcb488d5e303e29e8ba192` (Tranhatam) thay vì
+`62d57eaa548617aeecac766e5a1cb98e` (Anhhatam) → custom domain
+`edu.nguyenai.net` trả 404. Phải luôn check account ID trước khi deploy.
+
+## Required audit before production
+
+Do not approve production release without:
+
+- repository identity;
+- source inventory;
+- clone contamination audit for maytinhai / Máy Tính AI / computer.iai.one / AI Computer terms (note: "AI Computer" is now an approved product category per Master Positioning, but "Máy Tính AI" and "computer.iai.one" must not appear as Nguyen AI brand surfaces);
+- security audit;
+- privacy/data audit;
+- bilingual SEO audit;
+- accessibility audit;
+- commerce audit if payments exist;
+- release evidence pack.
+
+## Investor site rules (invest.nguyenai.net)
+
+- Source of truth: `docs/investor/NGUYEN_AI_INVESTOR_MEMORANDUM_V1.md`.
+- Public investor pages are indexable with canonical and hreflang.
+- Private investor room routes must be noindex, nofollow, noarchive and excluded from sitemap.
+- Never expose cap table, bank account or term sheet in public HTML.
+- Investor qualification required before private room access.
+- Audit log every private room access.
+- Access must be expiring and revocable.
+- Disclosure line required on every public investor page.
+- Do not publish invest.nguyenai.net before legal entity, IP ownership and disclaimer review are complete.
+- Financial model is hypothesis only, not a forecast or commitment.
+
+## Dev commands
+
+> **Phase 0 (2026-07-02):** Monorepo setup. `src/` chuyển vào `apps/web/`. Root dùng pnpm workspace + turbo.
+
+Monorepo (root):
+
 ```bash
 pnpm install          # install tất cả workspace
 pnpm build            # build tất cả apps + packages (turbo)

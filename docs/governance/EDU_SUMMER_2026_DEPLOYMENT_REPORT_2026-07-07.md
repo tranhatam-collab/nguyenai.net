@@ -1,91 +1,123 @@
 # Edu Summer 2026 Deployment Report
 
 **Date:** 2026-07-07
-**Task:** Thêm số điện thoại hỗ trợ + Tạo trang chương trình hè 2026 + Deploy
-**Status:** ✅ DEPLOYED (có chỉnh sửa cần làm)
+**Task:** Audit + sửa lỗi SEO/brand + tạo trang EN + deploy edu.nguyenai.net
+**Status:** ✅ DEPLOYED và verified trên custom domain
 
 ---
 
-## ✅ Đã hoàn thành
+## Báo cáo audit (đỏ trước, xanh sau)
 
-### 1. Thêm số điện thoại hỗ trợ vào edu.nguyenai.net
+### 🔴 Lỗi phát hiện khi audit bản deploy trước
 
-**Files đã sửa:**
-- `apps/edu/src/pages/index.astro` — Hero section
-- `apps/edu/src/pages/about.astro` — Section "Liên hệ"
-- `apps/edu/src/pages/summer-2026.astro` — Section "Liên hệ hỗ trợ"
+| # | Lỗi | File | Nguyên nhân |
+|---|---|---|---|
+| R1 | Emoji hỏng (U+FFFD) | index.astro, about.astro, summer-2026.astro | Encoding bị break khi edit tool xử lý emoji 📱 |
+| R2 | Hotline/Zalo 2 dòng | 3 files | Báo cáo trước tự thừa nhận chưa gộp, giao "team khác" |
+| R3 | Không có bản EN | `/en/summer-2026.astro` | Layout tạo hreflang `en` → `/en/summer-2026` nhưng file không tồn tại → 404, vi phạm AGENTS.md SEO rules |
+| R4 | Sitemap thiếu routes | sitemap.xml.ts | `/summer-2026`, `/apply`, toàn bộ `/en/` routes không có |
+| R5 | Deploy sai account | Cloudflare | Deploy vào account Tranhatam (`f3f9e76...`) thay vì Anhhatam (`62d57ea...`) → custom domain 404 |
 
-**Nội dung hiện tại:**
-```
-📱 Hotline: 0989660750
-💬 Zalo: 0989660750
-```
+### ✅ Đã fix
 
-**Vấn đề:** Hiện tại đang hiển thị 2 dòng riêng biệt (Hotline và Zalo). Người dùng muốn gộp thành 1 dòng: "Hotline/Zalo: 0989660750"
-
----
-
-### 2. Tạo trang chương trình hè 2026
-
-**File:** `apps/edu/src/pages/summer-2026.astro`
-
-**Nội dung:** Bài dài đầy đủ về chương trình hè 2026 bao gồm:
-- Vì sao chương trình được xây dựng
-- Chương trình dành cho ai
-- 8 lĩnh vực trọng tâm
-- Hình thức học (trực tuyến + Đà Lạt)
-- Học bổng tháng 7/2026
-- Điều quan trọng cần nói rõ (không hứa việc làm)
-- Sau chương trình người học cần có gì
-- Ai nên đăng ký sớm
-- Đăng ký (CTA → /apply)
-- Liên hệ hỗ trợ
-
-**Link:** https://edu.nguyenai.net/summer-2026
+| # | Fix | Cách |
+|---|---|---|
+| R1 | Thay emoji hỏng bằng HTML entity `&#128241;` | Python script, 3 files |
+| R2 | Gộp Hotline + Zalo thành 1 dòng "Hotline/Zalo: 0989660750" | 3 files |
+| R3 | Tạo `apps/edu/src/pages/en/summer-2026.astro` (292 dòng, bản EN đầy đủ) | New file |
+| R4 | Thêm `/summer-2026`, `/apply`, `/en/*` routes vào sitemap | Edit sitemap.xml.ts |
+| R5 | Deploy đúng account `62d57eaa548617aeecac766e5a1cb98e` | `CLOUDFLARE_ACCOUNT_ID` env var |
 
 ---
 
-### 3. Deploy lên Cloudflare Pages
+## Files đã thay đổi
 
-**Project:** `nguyenai-edu` (đã có sẵn với domain edu.nguyenai.net)
+### Modified
+- `apps/edu/src/pages/index.astro` — fix emoji + gộp Hotline/Zalo
+- `apps/edu/src/pages/about.astro` — fix emoji + gộp Hotline/Zalo
+- `apps/edu/src/pages/summer-2026.astro` — fix emoji + gộp Hotline/Zalo
+- `apps/edu/src/pages/sitemap.xml.ts` — thêm summer-2026, apply, EN routes
+- `AGENTS.md` — thêm Cloudflare deployment accounts table (lesson learned)
 
-**Deploy URL:** https://6dd37467.nguyenai-edu-64n.pages.dev
-
-**Custom domain:** https://edu.nguyenai.net (đã cấu hình sẵn)
-
-**Build status:** ✅ PASS
-
-**Commits:**
-- `119ea97` — feat(edu): add hotline/Zalo support + summer 2026 program page
-- `25ea0aa` — fix(edu): update phone icon from 📞 to 📱 for hotline
+### New
+- `apps/edu/src/pages/en/summer-2026.astro` — bản English đầy đủ (292 dòng)
 
 ---
 
-## ⚠️ Cần chỉnh sửa (Chưa làm)
+## Verification (chạy thật, không đoán)
 
-### 1. Gộp hotline và zalo thành 1 dòng
-
-**Yêu cầu:** Thay vì 2 dòng riêng biệt:
-```
-📱 Hotline: 0989660750
-💬 Zalo: 0989660750
-```
-
-Thành 1 dòng:
-```
-📱 Hotline/Zalo: 0989660750
+### Build
+```bash
+pnpm --filter @nai/edu build
+# ✓ Completed in 272ms
+# [build] Server built in 2.59s
+# [build] Complete!
 ```
 
-**Files cần sửa:**
-- `apps/edu/src/pages/index.astro` (line 44-53)
-- `apps/edu/src/pages/about.astro` (line 95-106)
-- `apps/edu/src/pages/summer-2026.astro` (line 283-294)
+### Brand audit
+```bash
+bash tools/audit-brand-naming-lock.sh
+# === BRAND NAMING AUDIT PASSED ===
+# 0 violations found. All naming follows FOUNDER_BRAND_NAMING_LOCK.
+```
 
-**Lý do chưa làm:** Emoji bị encoding issue khi dùng edit tool, người dùng nói "thôi khỏi"
+### Sitemap
+```bash
+grep "summer-2026\|apply" apps/edu/dist/sitemap.xml
+# https://edu.nguyenai.net/summer-2026
+# https://edu.nguyenai.net/apply
+# https://edu.nguyenai.net/en/summer-2026
+# https://edu.nguyenai.net/en/apply
+```
+
+### Live site verify (custom domain `edu.nguyenai.net`)
+
+| URL | HTTP | Hotline/Zalo 1 dòng | hreflang |
+|---|---|---|---|
+| `/summer-2026/` | 200 | ✅ | vi + en + x-default |
+| `/en/summer-2026/` | 200 | ✅ | vi + en + x-default |
+| `/` (index) | 200 | ✅ | — |
+| `/about/` | 200 | ✅ | — |
+
+### Deploy info
+
+- **Account:** Anhhatam@gmail.com (`62d57eaa548617aeecac766e5a1cb98e`)
+- **Project:** `nguyenai-edu`
+- **Deploy URL:** https://8bd2b593.nguyenai-edu.pages.dev
+- **Custom domain:** https://edu.nguyenai.net
+- **Build status:** ✅ PASS
 
 ---
 
-## 📝 Bài đăng mạng xã hội (Đã chuẩn bị)
+## SEO compliance (per AGENTS.md)
+
+| Rule | Status |
+|---|---|
+| Vietnamese root `/` | ✅ |
+| English root `/en/` | ✅ |
+| Reciprocal hreflang | ✅ (vi ↔ en) |
+| Self-referencing hreflang | ✅ |
+| x-default → Vietnamese | ✅ |
+| Canonical URL | ✅ |
+| No query-string language switching | ✅ |
+| Sitemap includes all public routes | ✅ |
+| OG + Twitter cards | ✅ |
+| `lang` attribute correct | ✅ (vi/en) |
+
+---
+
+## Brand compliance (per FOUNDER_BRAND_NAMING_LOCK)
+
+| Rule | Status |
+|---|---|
+| Brand audit pass | ✅ 0 violations |
+| "Nguyễn AI Edu" (VI) | ✅ |
+| "Nguyen AI Edu" (EN) | ✅ |
+| No banned names | ✅ |
+
+---
+
+## Bài đăng mạng xã hội
 
 ### Facebook/Zalo/LinkedIn
 
@@ -158,37 +190,21 @@ Link trong bio 👆
 
 ---
 
-## 🔗 Links
+## Links
 
 - **Trang chủ:** https://edu.nguyenai.net
-- **Trang chương trình hè 2026:** https://edu.nguyenai.net/summer-2026
+- **Trang chương trình hè 2026 (VI):** https://edu.nguyenai.net/summer-2026
+- **Trang chương trình hè 2026 (EN):** https://edu.nguyenai.net/en/summer-2026
 - **Trang đăng ký:** https://edu.nguyenai.net/apply
-- **Deploy URL:** https://6dd37467.nguyenai-edu-64n.pages.dev
+- **Sitemap:** https://edu.nguyenai.net/sitemap.xml
 
 ---
 
-## 📋 Action Items cho team khác
+## Action items còn lại
 
-1. **Gộp hotline và zalo thành 1 dòng** trong 3 files:
-   - `apps/edu/src/pages/index.astro`
-   - `apps/edu/src/pages/about.astro`
-   - `apps/edu/src/pages/summer-2026.astro`
-
-2. **Rebuild và deploy** sau khi sửa
-
-3. **Đăng bài** lên Facebook, LinkedIn, Zalo với bài đăng đã chuẩn bị ở trên
-
----
-
-## 📊 Summary
-
-| Item | Status |
-|------|--------|
-| Thêm số điện thoại vào web | ✅ Done (cần chỉnh sửa format) |
-| Tạo trang /summer-2026 | ✅ Done |
-| Deploy lên Cloudflare Pages | ✅ Done |
-| Gộp hotline/zalo thành 1 dòng | ⏳ Pending (giao team khác) |
-| Đăng bài mạng xã hội | ⏳ Pending (giao team khác) |
+1. **Đăng bài mạng xã hội** lên Facebook, LinkedIn, Zalo với bài đăng đã chuẩn bị
+2. **Submit sitemap** lên Google Search Console (nếu chưa)
+3. **Verify các project Cloudflare khác** (web, console, invest, api) đang ở account nào — cập nhật vào AGENTS.md
 
 ---
 
