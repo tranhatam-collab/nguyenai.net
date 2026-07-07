@@ -135,5 +135,5 @@ export {
   runRetentionSweep,
 } from './service';
 
-export { D1ScholarshipStore } from './d1-store';
+export { D1ScholarshipStore, _assertAllowedColumn } from './d1-store';
 export type { UserDataExport, RetentionSweepOptions, RetentionSweepResult } from './store';

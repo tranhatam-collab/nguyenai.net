@@ -69,7 +69,7 @@ export const routes = [
 export type RouteKey = typeof routes[number]['key'];
 
 export function routeFor(key: RouteKey, locale: Locale) {
-  const route = Array.from(routes).find((item) => item.key === key);
+  const route = routes.find((item) => item.key === key);
   if (!route) return locale === 'vi' ? '/' : '/en/';
   return route[locale];
 }

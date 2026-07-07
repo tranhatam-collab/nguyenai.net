@@ -80,7 +80,7 @@ export class InMemoryFgaStore implements FgaStore {
     const results: string[] = [];
     for (const key of this.tuples) {
       if (key.startsWith(prefix)) {
-        results.push(key.split('|')[2]);
+        results.push(key.split('|')[2] ?? '');
       }
     }
     return results;

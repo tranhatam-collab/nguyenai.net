@@ -10,7 +10,7 @@
  * Production: swap with OPA or Stytz.
  */
 
-import type { Entitlements } from '@nai/entitlement';
+import type { ResolvedEntitlements } from '@nai/entitlement';
 
 // ============================================================
 // Types
@@ -51,7 +51,7 @@ export interface PolicyContext {
   tenant_id: string;
   roles: string[];
   permissions: string[];
-  entitlements: Entitlements;
+  entitlements: ResolvedEntitlements;
   approval_gate: ApprovalGateLevel;
   ip_address?: string;
   audience?: string;

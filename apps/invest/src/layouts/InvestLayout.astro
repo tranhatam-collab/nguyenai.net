@@ -32,6 +32,13 @@ const navLinks = [
 ];
 
 const fullTitle = titleVi ? `${title} — ${titleVi}` : title;
+const SITE = 'https://invest.nguyenai.net';
+// INVEST-P0-1: robust VI/EN path computation (no /en/en/* double prefix).
+const pathname = Astro.url.pathname;
+const viPath = isEn ? pathname.replace(/^\/en\/?/, '/') : pathname;
+const enPath = isEn ? pathname : `/en${pathname === '/' ? '/' : pathname}`;
+const canonicalPath = isEn ? pathname : viPath;
+const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
 ---
 
 <!doctype html>
@@ -47,11 +54,24 @@ const fullTitle = titleVi ? `${title} — ${titleVi}` : title;
   ) : (
     <meta name="robots" content="index, follow" />
   )}
-  <link rel="canonical" href={`https://invest.nguyenai.net${Astro.url.pathname}`} />
-  <link rel="alternate" hreflang="vi" href={`https://invest.nguyenai.net${isEn ? Astro.url.pathname.replace('/en', '') : Astro.url.pathname}`} />
-  <link rel="alternate" hreflang="en" href={`https://invest.nguyenai.net${isEn ? Astro.url.pathname : '/en' + Astro.url.pathname}`} />
-  <link rel="alternate" hreflang="x-default" href={`https://invest.nguyenai.net${isEn ? Astro.url.pathname.replace('/en', '') : Astro.url.pathname}`} />
+  <link rel="canonical" href={`${SITE}${canonicalPath}`} />
+  <link rel="alternate" hreflang="vi" href={`${SITE}${viPath}`} />
+  <link rel="alternate" hreflang="en" href={`${SITE}${enPath}`} />
+  <link rel="alternate" hreflang="x-default" href={`${SITE}${viPath}`} />
   <meta name="generator" content={Astro.generator} />
+  <!-- INVEST-P0-1: Open Graph + Twitter Card (previously missing entirely) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nguyen AI Invest" />
+  <meta property="og:title" content={fullTitle} />
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:url" content={`${SITE}${canonicalPath}`} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:locale" content={isEn ? 'en_US' : 'vi_VN'} />
+  <meta property="og:locale:alternate" content={isEn ? 'vi_VN' : 'en_US'} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  {description && <meta name="twitter:description" content={description} />}
+  <meta name="twitter:image" content={ogImage} />
 </head>
 <body class="min-h-screen flex flex-col">
   <!-- Skip to content link (WCAG 2.4.1) -->
@@ -78,8 +98,14 @@ const fullTitle = titleVi ? `${title} — ${titleVi}` : title;
           ))}
         </div>
 
-        <!-- CTA -->
+        <!-- CTA + Language switcher -->
         <div class="flex items-center gap-3">
+          <!-- Language switcher -->
+          {(() => {
+            const path = Astro.url.pathname;
+            const switchHref = isEn ? path.replace('/en', '') || '/' : '/en' + path;
+            return <a href={switchHref} class="px-3 py-1.5 text-sm font-medium text-ink-muted hover:text-gold transition-colors rounded-md no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
+          })()}
           <a
             href="/request-access"
             class="px-4 py-2 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors"
@@ -117,7 +143,7 @@ const fullTitle = titleVi ? `${title} — ${titleVi}` : title;
   </header>
 
   <!-- Main content -->
-  <main id="main-content" class="flex-1">
+  <main class="flex-1">
     <slot />
   </main>
 
@@ -151,7 +177,7 @@ const fullTitle = titleVi ? `${title} — ${titleVi}` : title;
         <div>
           <h4 class="text-xs font-semibold text-gold uppercase tracking-wide mb-3">Legal / Pháp lý</h4>
           <ul class="space-y-2">
-            <li><a href="/risks" class="text-sm text-ink-muted hover:text-gold transition-colors">Risk register / Rủi ro</a></li>
+            <li><a href="/risks" class="text-sm text-ink-muted hover:text-gold transition-colors">Sổ rủi ro</a></li>
             <li><a href="/governance" class="text-sm text-ink-muted hover:text-gold transition-colors">Governance / Quản trị</a></li>
             <li><a href="/private/" class="text-sm text-ink-muted hover:text-gold transition-colors">Data room (qualified investors)</a></li>
           </ul>

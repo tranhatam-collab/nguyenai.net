@@ -431,48 +431,32 @@ export async function markEmailVerified(
 }
 
 // ============================================================
-// OAuth accounts
+// OAuth account queries — P1-1 (replaces stubs in index.ts)
+// oauth_accounts table per migration 001_identity_access §7.
 // ============================================================
-
-export interface D1OAuthAccount {
-  oauth_id: string;
-  user_id: string;
-  provider: string;
-  provider_user_id: string;
-  created_at: string;
-}
 
 export async function findOAuthAccount(
   db: D1Database,
   provider: string,
   providerUserId: string,
-): Promise<D1OAuthAccount | null> {
+): Promise<{ oauth_id: string; user_id: string } | null> {
   const result = await db.prepare(
-    'SELECT * FROM oauth_accounts WHERE provider = ?1 AND provider_user_id = ?2'
-  ).bind(provider, providerUserId).first<D1OAuthAccount>();
+    'SELECT oauth_id, user_id FROM oauth_accounts WHERE provider = ?1 AND provider_user_id = ?2'
+  ).bind(provider, providerUserId).first<{ oauth_id: string; user_id: string }>();
   return result ?? null;
-}
-
-export async function findOAuthAccountsByUser(
-  db: D1Database,
-  userId: string,
-): Promise<D1OAuthAccount[]> {
-  const result = await db.prepare(
-    'SELECT * FROM oauth_accounts WHERE user_id = ?1 ORDER BY created_at DESC'
-  ).bind(userId).all<D1OAuthAccount>();
-  return result.results ?? [];
 }
 
 export async function createOAuthAccount(
   db: D1Database,
-  oauthId: string,
-  userId: string,
   provider: string,
   providerUserId: string,
-): Promise<void> {
+  userId: string,
+): Promise<string> {
+  const oauthId = crypto.randomUUID();
   await db.prepare(
     'INSERT INTO oauth_accounts (oauth_id, user_id, provider, provider_user_id) VALUES (?1, ?2, ?3, ?4)'
   ).bind(oauthId, userId, provider, providerUserId).run();
+  return oauthId;
 }
 
 export async function findUserByEmailVerified(

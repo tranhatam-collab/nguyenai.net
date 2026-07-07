@@ -56,6 +56,9 @@ import type {
 const now = (): string => new Date().toISOString();
 const uid = (): string => (globalThis as { crypto?: { randomUUID?: () => string } }).crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36);
 
+// Exported for testing
+export { assertAllowedColumn as _assertAllowedColumn };
+
 export class D1ScholarshipStore implements ScholarshipStore {
   constructor(private db: D1Database) {}
 
@@ -100,7 +103,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'application_id' || k === 'created_at' || k === 'updated_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('scholarship_applications', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     fields.push('updated_at = ?');
@@ -143,7 +146,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'verification_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('identity_verifications', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -175,7 +178,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'wish_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('scholarship_wishes', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     fields.push('updated_at = ?');
@@ -274,7 +277,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'sponsorship_id' || k === 'committed_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('sponsorships', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -310,7 +313,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'investor_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('investor_profiles', toSnake(k))} = ?`);
       values.push(k === 'roles' ? JSON.stringify(v) : serializeVal(v));
     }
     values.push(id);
@@ -371,7 +374,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'post_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('forum_posts', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     fields.push('updated_at = ?');
@@ -476,7 +479,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'document_id' || k === 'uploaded_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('application_documents', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -525,7 +528,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'comment_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('forum_comments', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     fields.push('updated_at = ?');
@@ -561,7 +564,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'report_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('forum_reports', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -605,7 +608,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'decision_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('council_decisions', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -641,7 +644,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'entry_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('waitlist_entries', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -687,7 +690,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'entitlement_id' || k === 'granted_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('scholarship_entitlements', toSnake(k))} = ?`);
       values.push(k === 'learning_paths' ? JSON.stringify(v) : serializeVal(v));
     }
     values.push(id);
@@ -728,7 +731,7 @@ export class D1ScholarshipStore implements ScholarshipStore {
     const values: unknown[] = [];
     for (const [k, v] of Object.entries(patch)) {
       if (k === 'cohort_id' || k === 'created_at') continue;
-      fields.push(`${toSnake(k)} = ?`);
+      fields.push(`${assertAllowedColumn('cohorts', toSnake(k))} = ?`);
       values.push(serializeVal(v));
     }
     values.push(id);
@@ -953,6 +956,86 @@ export class D1ScholarshipStore implements ScholarshipStore {
 
 function toSnake(s: string): string {
   return s.replace(/[A-Z]/g, (m) => `_${m.toLowerCase()}`);
+}
+
+// SEC-P0-1: Column whitelist to prevent SQL injection via interpolated column
+// names in UPDATE statements. Every column name interpolated into SQL must be
+// validated against this per-table whitelist. An attacker controlling patch
+// keys can no longer inject arbitrary column names or SQL fragments.
+const ALLOWED_COLUMNS: Record<string, ReadonlySet<string>> = {
+  scholarship_applications: new Set([
+    'application_id', 'user_id', 'program_code', 'status', 'full_name', 'email', 'phone',
+    'birth_year', 'country', 'city', 'identity_verified', 'email_verified', 'phone_verified',
+    'has_nguyen_surname', 'surname_type', 'wants_community', 'consents_story_sharing',
+    'program_id', 'wish_text', 'wish_visibility', 'circumstances_text', 'financial_need_level',
+    'capability_text', 'portfolio_url', 'commits_to_attendance', 'commits_to_graduation',
+    'commits_to_community', 'consents_to_data_processing', 'consents_to_audit',
+    'submitted_at', 'created_at', 'updated_at',
+  ]),
+  identity_verifications: new Set([
+    'verification_id', 'application_id', 'type', 'status', 'token', 'verified_at',
+    'expires_at', 'attempts', 'created_at',
+  ]),
+  scholarship_wishes: new Set([
+    'wish_id', 'application_id', 'user_id', 'text', 'visibility', 'publication_requested',
+    'publication_approved', 'publication_rejected', 'created_at', 'updated_at',
+  ]),
+  sponsorships: new Set([
+    'sponsorship_id', 'sponsor_id', 'application_id', 'type', 'amount_vnd', 'amount_usd',
+    'status', 'committed_at', 'paid_at',
+  ]),
+  investor_profiles: new Set([
+    'investor_id', 'user_id', 'display_name', 'bio', 'roles', 'verified', 'verified_at',
+    'access_expires_at', 'created_at',
+  ]),
+  forum_posts: new Set([
+    'post_id', 'room_id', 'user_id', 'title', 'content', 'status', 'submitted_at',
+    'published_at', 'created_at', 'updated_at',
+  ]),
+  application_documents: new Set([
+    'document_id', 'application_id', 'user_id', 'type', 'filename', 'storage_key',
+    'mime_type', 'size_bytes', 'status', 'uploaded_at', 'reviewed_at',
+  ]),
+  forum_comments: new Set([
+    'comment_id', 'post_id', 'user_id', 'parent_comment_id', 'body', 'status',
+    'created_at', 'updated_at',
+  ]),
+  forum_reports: new Set([
+    'report_id', 'target_type', 'target_id', 'reported_by', 'reason', 'category',
+    'status', 'created_at', 'reviewed_at',
+  ]),
+  council_decisions: new Set([
+    'decision_id', 'application_id', 'total_approve', 'total_deny', 'total_abstain',
+    'outcome', 'threshold', 'decided_at', 'created_at',
+  ]),
+  waitlist_entries: new Set([
+    'entry_id', 'application_id', 'user_id', 'program_code', 'position', 'status',
+    'created_at', 'offered_at',
+  ]),
+  scholarship_entitlements: new Set([
+    'entitlement_id', 'application_id', 'user_id', 'program_code', 'cohort_id', 'status',
+    'granted_at', 'expires_at', 'suspended_at', 'revoked_at', 'completed_at',
+    'ai_computer_instance_id', 'learning_paths', 'suspend_reason', 'revoke_reason',
+  ]),
+  cohorts: new Set([
+    'cohort_id', 'name', 'program_code', 'start_date', 'end_date', 'capacity',
+    'enrolled_count', 'status', 'created_at',
+  ]),
+};
+
+// Defense in depth: column names must only contain lowercase ascii letters,
+// digits and underscores, and must be present in the per-table whitelist.
+const COLUMN_NAME_RE = /^[a-z][a-z0-9_]*$/;
+
+function assertAllowedColumn(table: string, column: string): string {
+  if (!COLUMN_NAME_RE.test(column)) {
+    throw new Error(`Invalid column name for ${table}: ${column}`);
+  }
+  const allowed = ALLOWED_COLUMNS[table];
+  if (!allowed || !allowed.has(column)) {
+    throw new Error(`Disallowed column for ${table}: ${column}`);
+  }
+  return column;
 }
 
 function serializeVal(v: unknown): unknown {
@@ -1199,13 +1282,20 @@ function mapCouncilDecision(r: Record<string, unknown>): CouncilDecision {
   return {
     decision_id: r.decision_id as string,
     application_id: r.application_id as string,
+    decision: (r.outcome as CouncilDecision['decision']) ?? 'decline',
+    decided_by: (r.decided_by as string) ?? 'system',
+    decided_at: (r.decided_at as string) ?? new Date().toISOString(),
+    rationale: (r.rationale as string) ?? '',
+    conditions: JSON.parse((r.conditions as string) ?? '[]'),
+    cohort_id: (r.cohort_id as string) ?? null,
+    amount_awarded: (r.amount_awarded as number) ?? null,
     total_approve: (r.total_approve as number) ?? 0,
     total_deny: (r.total_deny as number) ?? 0,
     total_abstain: (r.total_abstain as number) ?? 0,
-    outcome: r.outcome as CouncilDecision['outcome'],
+    outcome: r.outcome as string,
     threshold: (r.threshold as number) ?? 0,
-    decided_at: (r.decided_at as string) ?? null,
     created_at: r.created_at as string,
+    metadata: JSON.parse((r.metadata as string) ?? '{}'),
   };
 }
 
@@ -1213,32 +1303,44 @@ function mapWaitlist(r: Record<string, unknown>): WaitlistEntry {
   return {
     entry_id: r.entry_id as string,
     application_id: r.application_id as string,
-    user_id: r.user_id as string,
-    program_code: r.program_code as string,
+    applicant_id: (r.applicant_id as string) ?? (r.user_id as string) ?? '',
+    user_id: r.user_id as string | undefined,
+    cohort_id: (r.cohort_id as string) ?? null,
+    program_code: r.program_code as string | undefined,
     position: (r.position as number) ?? 0,
-    status: r.status as WaitlistEntry['status'],
-    created_at: r.created_at as string,
+    added_at: (r.added_at as string) ?? (r.created_at as string) ?? new Date().toISOString(),
+    expires_at: (r.expires_at as string) ?? null,
+    notes: (r.notes as string) ?? null,
+    status: r.status as string | undefined,
     offered_at: (r.offered_at as string) ?? null,
+    created_at: r.created_at as string | undefined,
   };
 }
 
 function mapEntitlement(r: Record<string, unknown>): ScholarshipEntitlement {
   return {
     entitlement_id: r.entitlement_id as string,
+    recipient_id: (r.recipient_id as string) ?? (r.user_id as string) ?? '',
+    user_id: r.user_id as string | undefined,
     application_id: r.application_id as string,
-    user_id: r.user_id as string,
-    program_code: r.program_code as string,
     cohort_id: r.cohort_id as string,
-    status: r.status as ScholarshipEntitlement['status'],
+    program_code: r.program_code as string | undefined,
+    entitlement_type: (r.entitlement_type as ScholarshipEntitlement['entitlement_type']) ?? 'full_scholarship',
+    value_amount: (r.value_amount as number) ?? null,
+    currency: (r.currency as string) ?? 'VND',
     granted_at: r.granted_at as string,
+    starts_at: (r.starts_at as string) ?? (r.granted_at as string) ?? new Date().toISOString(),
     expires_at: (r.expires_at as string) ?? null,
-    suspended_at: (r.suspended_at as string) ?? null,
+    status: r.status as ScholarshipEntitlement['status'],
     revoked_at: (r.revoked_at as string) ?? null,
+    revoked_reason: (r.revoked_reason as string) ?? (r.revoke_reason as string) ?? null,
+    revoke_reason: (r.revoke_reason as string) ?? null,
+    suspended_at: (r.suspended_at as string) ?? null,
+    suspend_reason: (r.suspend_reason as string) ?? null,
     completed_at: (r.completed_at as string) ?? null,
     ai_computer_instance_id: (r.ai_computer_instance_id as string) ?? null,
     learning_paths: JSON.parse((r.learning_paths as string) ?? '[]'),
-    suspend_reason: (r.suspend_reason as string) ?? null,
-    revoke_reason: (r.revoke_reason as string) ?? null,
+    metadata: JSON.parse((r.metadata as string) ?? '{}'),
   };
 }
 
@@ -1246,13 +1348,16 @@ function mapCohort(r: Record<string, unknown>): Cohort {
   return {
     cohort_id: r.cohort_id as string,
     name: r.name as string,
-    program_code: r.program_code as string,
+    program_id: (r.program_id as string) ?? (r.program_code as string) ?? '',
+    program_code: r.program_code as string | undefined,
     start_date: r.start_date as string,
     end_date: r.end_date as string,
     capacity: (r.capacity as number) ?? 0,
+    filled: (r.filled as number) ?? (r.enrolled_count as number) ?? 0,
     enrolled_count: (r.enrolled_count as number) ?? 0,
     status: r.status as Cohort['status'],
-    created_at: r.created_at as string,
+    created_at: r.created_at as string | undefined,
+    metadata: JSON.parse((r.metadata as string) ?? '{}'),
   };
 }
 
@@ -1261,10 +1366,14 @@ function mapEntitlementEvent(r: Record<string, unknown>): EntitlementEvent {
     event_id: r.event_id as string,
     entitlement_id: r.entitlement_id as string,
     event_type: r.event_type as EntitlementEvent['event_type'],
-    changed_by: r.changed_by as string,
+    triggered_by: (r.triggered_by as string) ?? (r.changed_by as string) ?? 'system',
+    changed_by: r.changed_by as string | undefined,
     reason: (r.reason as string) ?? null,
+    occurred_at: (r.occurred_at as string) ?? (r.created_at as string) ?? new Date().toISOString(),
+    created_at: r.created_at as string | undefined,
+    previous_status: (r.previous_status as string) ?? null,
+    new_status: (r.new_status as string) ?? '',
     metadata: JSON.parse((r.metadata as string) ?? '{}'),
-    created_at: r.created_at as string,
   };
 }
 

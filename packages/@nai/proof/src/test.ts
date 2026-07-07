@@ -160,11 +160,11 @@ async function main(): Promise<void> {
 
   console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
   if (failed > 0) {
-    process.exit(1);
+    (globalThis as any).process?.exit?.(1);
   }
 }
 
 main().catch((err) => {
   console.error('Test runner error:', err);
-  process.exit(1);
+  (globalThis as any).process?.exit?.(1);
 });

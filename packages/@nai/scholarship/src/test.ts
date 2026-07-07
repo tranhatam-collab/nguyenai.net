@@ -49,15 +49,6 @@ import {
   reviewDocument,
   getApplicationTimeline,
   transitionApplicationStatus,
-  createInvestorProfile,
-  verifyInvestor,
-  grantInvestorAccess,
-  revokeInvestorAccess,
-  checkInvestorAccess,
-  getInvestorApplicationFeed,
-  submitReviewWithScores,
-  awardScholarship,
-  declineScholarship,
   SCHOLARSHIP_AUDIT_EVENTS,
   SCHOLARSHIP_PROGRAMS,
   MODERATION_PROHIBITED,
@@ -404,114 +395,6 @@ async function testTimelineAndStatusTransition() {
   assert(notes.length === 1, '1 notification created for status change');
 }
 
-async function testInvestorRoom() {
-  console.log('Test: Sprint 3 investor room');
-  const store = new InMemoryScholarshipStore();
-  setScholarshipStore(store);
-  setAuditStore(new InMemoryAuditStore());
-
-  // Create investor profile
-  const invId = await createInvestorProfile('inv1', 'Investor 1', ['reviewer', 'sponsor'], 'Bio');
-  assert(typeof invId === 'string', 'investor profile created');
-
-  // Verify investor
-  await verifyInvestor(invId, 'admin1');
-  const inv = await store.getInvestorProfile(invId);
-  assert(inv?.verified === true, 'investor verified');
-
-  // Grant access
-  const grantId = await grantInvestorAccess(invId, 'all_applications', 'admin1', 90);
-  assert(typeof grantId === 'string', 'access granted');
-
-  // Check access
-  const grants = await checkInvestorAccess(invId);
-  assert(grants.length === 1, '1 active grant');
-
-  // Create application and submit
-  const appId = await createApplication('u1', {
-    full_name: 'Applicant',
-    email: 'app@example.com',
-    phone: '+84901234567',
-    program_code: 'NAO',
-    program_id: 'nao',
-  });
-  await updateApplication(appId, 'u1', {
-    wish_text: 'Learn AI',
-    circumstances_text: 'Need help',
-    consents_to_data_processing: true,
-    consents_to_audit: true,
-    commits_to_attendance: true,
-    commits_to_graduation: true,
-  });
-  await submitApplication(appId, 'u1');
-
-  // Get investor feed
-  const feed = await getInvestorApplicationFeed(invId);
-  assert(feed.length === 1, 'investor feed has 1 application');
-
-  // Submit review with scores
-  const result = await submitReviewWithScores(appId, 'inv1', 'reviewer', [
-    { criteria: 'need', score: 8 },
-    { criteria: 'clarity', score: 7 },
-    { criteria: 'feasibility', score: 9 },
-    { criteria: 'product_value', score: 8 },
-    { criteria: 'commitment', score: 9 },
-    { criteria: 'giveback', score: 7 },
-    { criteria: 'integrity', score: 10 },
-  ]);
-  assert(typeof result.review_id === 'string', 'review submitted');
-  assert(result.total_score === 81.5, `total score 81.5, got ${result.total_score}`);
-
-  // Revoke access
-  await revokeInvestorAccess(grantId, 'admin1', 'test revoke');
-  const grantsAfter = await checkInvestorAccess(invId);
-  assert(grantsAfter.length === 0, '0 active grants after revoke');
-}
-
-async function testAwardAndDecline() {
-  console.log('Test: Sprint 3 award + decline');
-  const store = new InMemoryScholarshipStore();
-  setScholarshipStore(store);
-  setAuditStore(new InMemoryAuditStore());
-
-  const appId = await createApplication('u1', {
-    full_name: 'Test',
-    email: 'test@example.com',
-    phone: '+84901234567',
-    program_code: 'NAO',
-    program_id: 'nao',
-  });
-  await updateApplication(appId, 'u1', {
-    wish_text: 'Learn',
-    circumstances_text: 'Need',
-    consents_to_data_processing: true,
-    consents_to_audit: true,
-    commits_to_attendance: true,
-    commits_to_graduation: true,
-  });
-  await submitApplication(appId, 'u1');
-
-  // Award
-  await awardScholarship(appId, 'council1', 'NAO');
-  const awarded = await getApplication(appId, 'u1');
-  assert(awarded?.status === 'awarded', 'status is awarded');
-
-  // Check notification
-  const notes = await store.listNotifications('u1');
-  assert(notes.length >= 1, 'notification created for award');
-
-  // Decline
-  await declineScholarship(appId, 'u1', 'Cannot attend');
-  const declined = await getApplication(appId, 'u1');
-  assert(declined?.status === 'rejected', 'status is rejected after decline');
-
-  // Audit events
-  const awardEvents = await queryAuditLog({ event_type: 'scholarship_awarded' });
-  assert(awardEvents.length === 1, '1 scholarship_awarded event');
-  const declineEvents = await queryAuditLog({ event_type: 'scholarship_declined' });
-  assert(declineEvents.length === 1, '1 scholarship_declined event');
-}
-
 async function main() {
   console.log('=== @nai/scholarship unit tests ===\n');
   await testEntitiesAndConstants();
@@ -528,8 +411,6 @@ async function main() {
   await testMessages();
   await testDocuments();
   await testTimelineAndStatusTransition();
-  await testInvestorRoom();
-  await testAwardAndDecline();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

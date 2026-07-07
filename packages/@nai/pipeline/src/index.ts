@@ -1,3 +1,11 @@
+/**
+ * @nai/pipeline — Research + evidence workflows for Nguyen AI
+ *
+ * P1-C.5: Pipeline — research + evidence workflows (haystack rebrand).
+ * Original source: https://github.com/deepset-ai/haystack
+ * License: Apache-2.0
+ */
+
 export const PACKAGE_INFO = {
   name: '@nai/pipeline',
   upstream: 'https://github.com/deepset-ai/haystack',
@@ -5,6 +13,8 @@ export const PACKAGE_INFO = {
   language: 'python',
   license: 'Apache-2.0',
 } as const;
+
+export type PackageInfo = typeof PACKAGE_INFO;
 
 export type StageStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
 
@@ -44,6 +54,9 @@ export interface PipelineResult {
   error?: string;
 }
 
+/**
+ * Create a new pipeline.
+ */
 export function createPipeline(pipeline: Omit<Pipeline, 'id'>): Pipeline {
   return {
     ...pipeline,
@@ -51,6 +64,9 @@ export function createPipeline(pipeline: Omit<Pipeline, 'id'>): Pipeline {
   };
 }
 
+/**
+ * Add a stage to a pipeline.
+ */
 export function addStage(pipeline: Pipeline, stage: Omit<PipelineStage, 'id'>): Pipeline {
   const newStage: PipelineStage = {
     ...stage,
@@ -62,12 +78,19 @@ export function addStage(pipeline: Pipeline, stage: Omit<PipelineStage, 'id'>): 
   };
 }
 
+/**
+ * Execute a pipeline.
+ */
 export async function executePipeline(pipeline: Pipeline, input: unknown): Promise<PipelineResult> {
   const startedAt = new Date().toISOString();
   const results: StageResult[] = [];
   const completed = new Set<string>();
   const failed = new Set<string>();
 
+  // Build dependency graph
+  const stageMap = new Map(pipeline.stages.map((s) => [s.id, s]));
+
+  // Execute stages in dependency order
   let progress = true;
   while (progress && completed.size + failed.size < pipeline.stages.length) {
     progress = false;
@@ -77,11 +100,13 @@ export async function executePipeline(pipeline: Pipeline, input: unknown): Promi
         continue;
       }
 
+      // Check if all dependencies are completed
       const deps = stage.dependsOn ?? [];
       const depsCompleted = deps.every((dep) => completed.has(dep));
       const depsFailed = deps.some((dep) => failed.has(dep));
 
       if (depsFailed) {
+        // Skip stage if dependency failed
         results.push({
           stageId: stage.id,
           status: 'skipped',
@@ -94,9 +119,11 @@ export async function executePipeline(pipeline: Pipeline, input: unknown): Promi
       }
 
       if (!depsCompleted) {
+        // Wait for dependencies
         continue;
       }
 
+      // Execute stage
       progress = true;
       const stageStartedAt = new Date().toISOString();
 
@@ -147,6 +174,9 @@ export async function executePipeline(pipeline: Pipeline, input: unknown): Promi
   };
 }
 
+/**
+ * Execute a function with timeout.
+ */
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
     promise,
@@ -156,10 +186,18 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   ]);
 }
 
+/**
+ * Get pipeline status (mock implementation).
+ */
 export async function getPipelineStatus(pipelineId: string): Promise<PipelineResult | null> {
+  // Mock implementation - in real system, this would query a database
   return null;
 }
 
+/**
+ * Cancel a running pipeline (mock implementation).
+ */
 export async function cancelPipeline(pipelineId: string): Promise<boolean> {
+  // Mock implementation - in real system, this would signal cancellation
   return true;
 }

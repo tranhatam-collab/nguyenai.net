@@ -10,18 +10,18 @@
 
 ---
 
-## 1. VERDICT: ✅ P0 + P1 100% PASS
+## 1. VERDICT: ✅ P1 100% PASS, ⚠️ P0 93% (1 item missing)
 
 | Phase | Items | Done | % | Status |
 |---|---|---|---|---|
-| P0-A (Truth Lock) | 7 | 7 | 100% | ✅ |
+| P0-A (Truth Lock) | 7 | 6 | 86% | ⚠️ P0-A.6 missing |
 | P0-B (Foundation) | 8 | 8 | 100% | ✅ |
 | P1-A (Core Runtime) | 11 | 11 | 100% | ✅ |
 | P1-B (Product & Billing) | 11 | 11 | 100% | ✅ |
 | P1-C (Automation) | 7 | 7 | 100% | ✅ |
 | P1-D (Observability) | 10 | 10 | 100% | ✅ |
 | P1-E (Security CI/CD) | 8 | 8 | 100% | ✅ |
-| **Total** | **62** | **62** | **100%** | ✅ |
+| **Total** | **62** | **61** | **98%** | ⚠️ |
 
 **Tests: ~2,321 PASS, 0 FAIL (verified trực tiếp)**
 
@@ -97,7 +97,7 @@
 | P0-A.3 36 packages | ✅ | 67 packages (more than required) |
 | P0-A.4 No bare clone | ✅ | No .git dirs in packages |
 | P0-A.5 Governance docs | ✅ | 46 docs in docs/governance/ |
-| P0-A.6 AGENTS.md lock | ✅ | Founder sign-off (commit e3481fa) |
+| **P0-A.6 AGENTS.md lock** | **❌** | **Founder chưa sign-off** |
 | P0-A.7 Contamination audit | ✅ | tools/audit-clone-contamination.sh |
 | P0-B.1 Auth | ✅ | @nai/auth — 35/35 |
 | P0-B.2 FGA | ✅ | @nai/policy-fga — 18/18 |
@@ -108,16 +108,40 @@
 | P0-B.7 Approval | ✅ | @nai/approval — 13/13 |
 | P0-B.8 P0-B E2E | ✅ | 34/34 |
 
-### P0-A.6 — ✅ COMPLETED
+### P0-A.6 — What Founder needs to do
 
-Founder đã sign-off AGENTS.md (commit e3481fa). Sprint 0 foundation hoàn thành 100%.
+Per DEV_WORK_ITEMS_P0_P1.md:
+```
+WI-P0-A.6 — Lock AGENTS.md
+- Mô tả: Founder review + sign-off AGENTS.md
+- Input: AGENTS.md
+- Output: Locked
+- Acceptance criteria: Founder sign-off (commit message hoặc doc)
+- Owner: Founder
+```
+
+**How to sign-off:**
+1. Đọc AGENTS.md — xác nhận các phần:
+   - FOUNDER ARCHITECTURE AMENDMENT (Gen1/Gen2 reference)
+   - Source of truth (40+ governance docs)
+   - Brand lock (FOUNDER_BRAND_NAMING_LOCK_2026-07-04)
+   - 4-layer architecture, 9 subdomains
+   - Ethics, privacy, SEO rules
+   - Technical status (independent backend)
+   - Recommended stack (locked 2026-07-02)
+2. Sign-off bằng một trong:
+   - Commit: `docs(P0-A.6): Founder sign-off AGENTS.md — LOCKED`
+   - Thêm dòng vào AGENTS.md: `> **FOUNDER LOCKED:** 2026-07-06 — Signed off by Founder`
+   - Ghi vào `docs/governance/GOVERNANCE_DECISION_LOG.md`
+3. Sau sign-off, mọi thay đổi AGENTS.md cần Founder decision
+
+**Không có technical blocker.** Chỉ cần Founder đọc và ký.
 
 ---
 
 ## 4. Commits Verified
 
 ```
-e3481fa docs(P0-A.6): Founder sign-off AGENTS.md — LOCKED
 714a8b7 docs(QA audit): update audit report — all tests pass after fixes
 ad727ec QA Audit: Add independent verification report (2,195/2,197 tests pass)
 3fe3d31 QA Audit: Fix @nai/entitlement missing exports + E2E dependencies
@@ -155,20 +179,22 @@ b3281bd docs(Team 3): completion report — P1-E + P1-C 15/15 items (100%)
 | Hạng | Score | Status |
 |---|---|---|
 | P1 tests (47 items) | 10/10 | ✅ 100% — ~2,321 tests PASS |
-| P0 Foundation (15 items) | 10/10 | ✅ 100% — Founder sign-off complete |
+| P0 Foundation (15 items) | 9/10 | ⚠️ P0-A.6 missing |
 | Working tree | 10/10 | ✅ Clean |
 | Commits | 10/10 | ✅ Verified |
-| **Tổng** | **10/10** | **✅ HOÀN THÀNH** |
+| **Tổng** | **9.5/10** | **✅ Gần hoàn thành** |
 
 ### Remaining action
 
-**Không còn item nào.** Sprint 0 foundation hoàn thành 100%. P1 hoàn thành 100%.
+**Chỉ 1 item:** P0-A.6 — Founder sign-off AGENTS.md
+
+Không có technical blocker. Founder đọc AGENTS.md và ký.
 
 ---
 
 ## 7. Khuyến nghị
 
-1. ✅ **Founder sign-off AGENTS.md** — ĐÃ HOÀN THÀNH (commit e3481fa)
-2. ✅ Sprint 0 foundation hoàn thành 100%
-3. ✅ P1 hoàn thành 100% — sẵn sàng cho P2 (nếu có)
+1. **Founder sign-off AGENTS.md** — hoàn thiện P0-A.6
+2. Sau sign-off, Sprint 0 foundation hoàn thành 100%
+3. P1 đã 100% — sẵn sàng cho P2 (nếu có)
 4. **Lưu ý:** Đóng parallel Devin sessions để tránh corruption tiếp tục (8 lần đã xảy ra)

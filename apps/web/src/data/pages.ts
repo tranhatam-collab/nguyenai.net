@@ -588,48 +588,6 @@ const vi: Record<RouteKey, PageContent> = {
       { question: 'Phòng đầu tư riêng có gì?', answer: 'Data room, mô hình tài chính 5 năm, cap table, báo cáo audit kỹ thuật, IP ownership, báo cáo security, hợp đồng pháp lý, và lịch họp với founder.' },
       { question: 'Thực thể pháp lý nào chịu trách nhiệm?', answer: 'VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống, sở hữu IP. Kasan JSC (MST 0315521422) chỉ là đại diện thương mại tại Việt Nam — đăng ký theo luật VN, phát hành VAT, tuân thủ PDPD,但不 chịu trách nhiệm pháp lý chính yếu.' }
     ]
-  },
-  terms: {
-    key: 'terms',
-    title: 'Điều khoản dịch vụ | Nguyen AI Computer',
-    description: 'Điều khoản dịch vụ và quy định sử dụng Nguyen AI Computer.',
-    eyebrow: 'Điều khoản dịch vụ',
-    heroTitle: 'Điều khoản dịch vụ',
-    heroText: 'Quy định sử dụng Nguyen AI Computer và các dịch vụ liên quan.',
-    primaryCta: 'Liên hệ hỗ trợ',
-    secondaryCta: 'Về trang chủ',
-    sections: [
-      { title: 'Chấp nhận điều khoản', body: 'Bằng việc sử dụng Nguyen AI Computer, bạn đồng ý tuân thủ các điều khoản dịch vụ này.' },
-      { title: 'Quy định sử dụng', body: 'Người dùng cam kết sử dụng dịch vụ cho mục đích hợp pháp và không vi phạm quy định pháp luật.' },
-      { title: 'Bảo mật dữ liệu', body: 'Chúng tôi cam kết bảo vệ dữ liệu cá nhân của người dùng theo chính sách bảo mật.' }
-    ],
-    trustBar: {
-      items: [
-        { label: 'Cập nhật', value: '2026-07-06' },
-        { label: 'Phiên bản', value: '1.0' }
-      ]
-    }
-  },
-  privacy: {
-    key: 'privacy',
-    title: 'Chính sách bảo mật | Nguyen AI Computer',
-    description: 'Chính sách bảo mật dữ liệu cá nhân của Nguyen AI Computer.',
-    eyebrow: 'Chính sách bảo mật',
-    heroTitle: 'Chính sách bảo mật',
-    heroText: 'Chúng tôi cam kết bảo vệ dữ liệu cá nhân của bạn.',
-    primaryCta: 'Liên hệ hỗ trợ',
-    secondaryCta: 'Về trang chủ',
-    sections: [
-      { title: 'Thu thập dữ liệu', body: 'Chúng tôi chỉ thu thập dữ liệu cần thiết để cung cấp dịch vụ.' },
-      { title: 'Sử dụng dữ liệu', body: 'Dữ liệu được sử dụng để cải thiện dịch vụ và trải nghiệm người dùng.' },
-      { title: 'Chia sẻ dữ liệu', body: 'Chúng tôi không chia sẻ dữ liệu cá nhân với bên thứ ba nếu không có sự đồng ý.' }
-    ],
-    trustBar: {
-      items: [
-        { label: 'Cập nhật', value: '2026-07-06' },
-        { label: 'Phiên bản', value: '1.0' }
-      ]
-    }
   }
 };
 
@@ -1111,48 +1069,6 @@ const en: Record<RouteKey, PageContent> = {
       { question: 'What is in the private investor room?', answer: 'Data room, 5-year financial model, cap table, technical audit reports, IP ownership, security reports, legal contracts, and meeting scheduling with the founder.' },
       { question: 'Which legal entity bears legal responsibility?', answer: 'VIET CAN NEW CORP (US) bears full legal responsibility for founding, operating the system, and owns all IP. Kasan JSC (Tax ID 0315521422) is a commercial representative in Vietnam — registered under VN law, issues VAT, complies with PDPD, but does not bear primary legal liability.' }
     ]
-  },
-  terms: {
-    key: 'terms',
-    title: 'Terms of Service | Nguyen AI Computer',
-    description: 'Terms of service and usage policies for Nguyen AI Computer.',
-    eyebrow: 'Terms of Service',
-    heroTitle: 'Terms of Service',
-    heroText: 'Usage policies and terms for Nguyen AI Computer and related services.',
-    primaryCta: 'Contact Support',
-    secondaryCta: 'Back to Home',
-    sections: [
-      { title: 'Acceptance of Terms', body: 'By using Nguyen AI Computer, you agree to comply with these terms of service.' },
-      { title: 'Usage Policies', body: 'Users commit to using the service for lawful purposes and not violating applicable laws.' },
-      { title: 'Data Privacy', body: 'We are committed to protecting user personal data in accordance with our privacy policy.' }
-    ],
-    trustBar: {
-      items: [
-        { label: 'Updated', value: '2026-07-06' },
-        { label: 'Version', value: '1.0' }
-      ]
-    }
-  },
-  privacy: {
-    key: 'privacy',
-    title: 'Privacy Policy | Nguyen AI Computer',
-    description: 'Privacy policy for personal data on Nguyen AI Computer.',
-    eyebrow: 'Privacy Policy',
-    heroTitle: 'Privacy Policy',
-    heroText: 'We are committed to protecting your personal data.',
-    primaryCta: 'Contact Support',
-    secondaryCta: 'Back to Home',
-    sections: [
-      { title: 'Data Collection', body: 'We only collect data necessary to provide our services.' },
-      { title: 'Data Usage', body: 'Data is used to improve services and user experience.' },
-      { title: 'Data Sharing', body: 'We do not share personal data with third parties without consent.' }
-    ],
-    trustBar: {
-      items: [
-        { label: 'Updated', value: '2026-07-06' },
-        { label: 'Version', value: '1.0' }
-      ]
-    }
   }
 };
 

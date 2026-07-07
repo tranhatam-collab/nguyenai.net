@@ -11,21 +11,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "echo \"TODO: eslint for @nai/dashboard\""
   },
-  "keywords": [
-    "dashboard",
-    "grafana",
-    "nai",
-    "nguyenai"
-  ],
+  "keywords": ["dashboard", "grafana", "nai", "nguyenai"],
   "upstream": "https://github.com/grafana/grafana",
   "dependencies": {},
   "devDependencies": {
     "typescript": "^5.5.0",
     "tsx": "^4.19.0",
     "@types/node": "^22.0.0"
-  },
-  "main": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
   }
 }

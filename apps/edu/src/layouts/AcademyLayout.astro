@@ -5,39 +5,71 @@ interface Props {
   title?: string;
   description?: string;
   activeNav?: string;
+  locale?: 'vi' | 'en';
+  ogImage?: string;
 }
 
 const {
-  title = 'Nguyen AI Academy',
-  description = 'Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more.',
+  title,
+  description,
   activeNav = '',
+  locale,
+  ogImage = '/og-default.png',
 } = Astro.props;
 
+// EDU-P0-1: derive locale from URL path so EN pages get lang="en".
+const pathname = Astro.url.pathname;
+const isEn = locale ? locale === 'en' : pathname.startsWith('/en');
+
+// EDU-P0-2: compute VI and EN paths without double-prefixing /en.
+// viPath strips the /en prefix; enPath prepends /en to the VI path.
+const viPath = isEn ? pathname.replace(/^\/en\/?/, '/') : pathname;
+const enPath = isEn ? pathname : `/en${pathname === '/' ? '/' : pathname}`;
+const canonicalPath = isEn ? pathname : viPath;
+
+// EDU-P0-4: locale-aware defaults. VI pages get Vietnamese title/description,
+// EN pages get English. Pages can still override via props.
 const siteName = 'Nguyen AI Academy';
-const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+const defaultTitle = isEn ? 'Nguyen AI Academy' : 'Nguyễn AI Academy';
+const defaultDescription = isEn
+  ? 'Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more.'
+  : 'Học AI miễn phí cho người đăng ký Nguyễn AI — 10 track học tập, chứng chỉ xác minh và hơn thế nữa.';
+const finalTitle = title ?? defaultTitle;
+const finalDescription = description ?? defaultDescription;
+const fullTitle = finalTitle === siteName ? finalTitle : `${finalTitle} — ${siteName}`;
+
+const SITE = 'https://edu.nguyenai.net';
 ---
 
 <!doctype html>
-<html lang="vi">
+<html lang={isEn ? 'en' : 'vi'}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
+    <meta name="description" content={finalDescription} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
-    <link rel="alternate" hreflang="vi" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
-    <link rel="alternate" hreflang="en" href={`https://edu.nguyenai.net/en${Astro.url.pathname}`} />
-    <link rel="alternate" hreflang="x-default" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
+    <link rel="canonical" href={`${SITE}${canonicalPath}`} />
+    <!-- EDU-P0-2/3: reciprocal hreflang + x-default points to Vietnamese root -->
+    <link rel="alternate" hreflang="vi" href={`${SITE}${viPath}`} />
+    <link rel="alternate" hreflang="en" href={`${SITE}${enPath}`} />
+    <link rel="alternate" hreflang="x-default" href={`${SITE}${viPath}`} />
     <link rel="sitemap" href="/sitemap.xml" />
 
-    <!-- Open Graph -->
+    <!-- Open Graph (EDU fix: use content= not href=, add og:image + og:locale) -->
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={finalDescription} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" href={`https://edu.nguyenai.net${Astro.url.pathname}`} />
+    <meta property="og:url" content={`${SITE}${canonicalPath}`} />
+    <meta property="og:image" content={`${SITE}${ogImage}`} />
+    <meta property="og:locale" content={isEn ? 'en_US' : 'vi_VN'} />
+    <meta property="og:locale:alternate" content={isEn ? 'vi_VN' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={finalDescription} />
+    <meta name="twitter:image" content={`${SITE}${ogImage}`} />
 
     <title>{fullTitle}</title>
   </head>
@@ -237,5 +269,9 @@ const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
         });
       }
     </script>
+  </body>
+</html>
+  </body>
+</html>
   </body>
 </html>

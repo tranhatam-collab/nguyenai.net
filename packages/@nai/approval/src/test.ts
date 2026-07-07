@@ -179,6 +179,79 @@ async function testListPending() {
   assert(pending.length === 2, '2 pending for t1');
 }
 
+async function testIDORCrossTenant() {
+  console.log('Test: IDOR — cross-tenant approve denied');
+  const approvalStore = new InMemoryApprovalStore();
+  setApprovalStore(approvalStore);
+
+  // User in tenant t1 creates approval
+  const id = await requestApproval({
+    user_id: 'u1',
+    tenant_id: 't1',
+    action: 'memory:delete',
+    resource: 'memory:m-idor',
+    requested_by: 'u1',
+  });
+
+  // User from tenant t2 tries to approve — must fail
+  try {
+    await approveRequest(id, 'attacker', 't2');
+    assert(false, 'cross-tenant approve should throw');
+  } catch (e) {
+    assert((e as Error).message.includes('tenant'), 'cross-tenant approve throws tenant error');
+  }
+
+  // User from tenant t2 tries to deny — must fail
+  try {
+    await denyRequest(id, 'attacker', 't2');
+    assert(false, 'cross-tenant deny should throw');
+  } catch (e) {
+    assert((e as Error).message.includes('tenant'), 'cross-tenant deny throws tenant error');
+  }
+
+  // Same-tenant approve still works
+  await approveRequest(id, 'admin-1', 't1');
+  const status = await checkApprovalStatus(id);
+  assert(status === 'approved', 'same-tenant approve still works after IDOR check');
+}
+
+async function main() {
+  console.log('=== @nai/approval unit tests ===\n');
+  await testRequestApproval();
+  await testApproveFlow();
+  await testDenyFlow();
+  await testExecuteFlow();
+  await testCannotExecuteWithoutApproval();
+  await testCannotApproveNonPending();
+  await testListPending();
+  await testIDORCrossTenant();
+  console.log(`\n${passed} passed, ${failed} failed`);
+  if (failed > 0) process.exit(1);
+}
+
+main();
+  // User from tenant t2 tries to approve — must fail
+  try {
+    await approveRequest(id, 'attacker', 't2');
+    assert(false, 'cross-tenant approve should throw');
+  } catch (e) {
+    assert((e as Error).message.includes('tenant'), 'cross-tenant approve throws tenant error');
+  }
+
+  // User from tenant t2 tries to deny — must fail
+  try {
+    await denyRequest(id, 'attacker', 't2');
+    assert(false, 'cross-tenant deny should throw');
+  } catch (e) {
+    assert((e as Error).message.includes('tenant'), 'cross-tenant deny throws tenant error');
+  }
+
+  // Same-tenant approve still works
+  await approveRequest(id, 'admin-1', 't1');
+  const status = await checkApprovalStatus(id);
+  assert(status === 'approved', 'same-tenant approve still works after IDOR check');
+}
+
 async function main() {
   console.log('=== @nai/approval unit tests ===\n');
   await testRequestApproval();

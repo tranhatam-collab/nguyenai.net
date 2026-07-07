@@ -13,26 +13,30 @@
 The Nguyen AI ecosystem is **one product system with four branded surfaces**, built on **two shared technology layers**.
 
 ```
-                         SHARED IDENTITY
-                                │
-         ┌──────────────────────┼──────────────────────┐
-         │                      │                      │
-  NGUYEN AI WEB          NGUYEN AI APP          INVEST PRIVATE
-  nguyenai.net           app.nguyenai.net       invest.nguyenai.net
-         │                      │                      │
-         └─────────── PRODUCT / GEN 2 ─────────────────┘
-                         maytinhai.org
-                                │
-                      GEN 1 RUNTIME
-                     computer.iai.one
-                                │
-         ┌──────────────────────┴───────────────────────┐
-         │                                            │
-  SHARED ACADEMY ENGINE                    PROOF / VERIFY SERVICE
-  academy.iai.one                          certificate registry
+┌─────────────────────────────────────────────────────────────┐
+│  Nguyen AI — vertical brand + distribution + content layer  │
+│  nguyenai.net · app.nguyenai.net · academy.nguyenai.net     │
+│  invest.nguyenai.net                                        │
+└─────────────────────────────────────────────────────────────┘
+          │                              │
+          ▼                              ▼
+┌──────────────────────────┐  ┌──────────────────────────────┐
+│ Gen 2 — maytinhai.org    │  │ Gen 1 — computer.iai.one     │
+│ Product / account /      │  │ Core runtime / orchestration │
+│ entitlement / billing    │  │ agent / model / memory /     │
+│ onboarding / workflow UI │  │ vault / evidence / approval  │
+└──────────────────────────┘  └──────────────────────────────┘
+          │                              │
+          └──────────────┬───────────────┘
+                         ▼
+            ┌──────────────────────────┐
+            │ Shared Identity Service  │
+            │ auth.nguyenai.net        │
+            │ + Proof / Verify service │
+            └──────────────────────────┘
 ```
 
-> **Note (Founder Amendment 2026-07-02):** Gen 1/Gen 2 giữ vai trò kiến trúc tham chiếu. Nguyen AI sở hữu backend riêng độc lập (per Founder Override Decision 1) nhưng phải duy trì compatibility contract khi integrate. Adapter/gateway không trở thành source of truth. Sơ đồ trên thể hiện kiến trúc tham chiếu; khi Nguyen AI backend chạy độc lập, nó thay thế vai trò execution cho vertical Nguyen AI.
+There is **no third engine**. Nguyen AI is not a runtime, not an auth system, not an academy engine, not a billing engine, not a certificate engine. It is a vertical brand and product family that uses Gen 1 + Gen 2 + shared services.
 
 ---
 
@@ -84,11 +88,9 @@ Owner of:
 - localization (VI / EN) for the Nguyen AI surfaces
 - **independent backend monorepo** (`nguyenai.net/` chứa `apps/api/`, `packages/@nai/*`) — Founder decision 2026-07-02
 
-> **FOUNDER OVERRIDE 2026-07-02 (Decision 1 — vẫn hiệu lực):** `nguyenai.net` sở hữu backend riêng độc lập cho vertical Nguyen AI (auth, runtime, agents, billing, evidence). Không phụ thuộc runtime Gen1 (`computer.iai.one`) hay Gen2 (`maytinhai.org`) lúc chạy. Gen1 và Gen2 đóng băng (reference only, không sửa, không deploy). Được phép copy có chọn lọc package từ `maytinhai-os` (fix security khi copy). See `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
->
-> **FOUNDER ARCHITECTURE AMENDMENT 2026-07-02 (bổ sung, không thay thế Decision 1):** Gen1/Gen2 giữ vai trò kiến trúc tham chiếu. Freezing repo ≠ revoked authority. Khi Nguyen AI integrate với Gen1/Gen2, một integration gateway có thể tồn tại nhưng không phải là system of record và không sở hữu command execution, identity, entitlement, billing, proof hoặc certificate authority — những authority này thuộc Gen1/Gen2 khi integrate. Bất kỳ thay thế nào cho Gen1/Gen2 authority yêu cầu Founder architecture decision riêng + migration plan + compatibility contract.
+> **FOUNDER OVERRIDE 2026-07-02:** `nguyenai.net` sở hữu backend riêng độc lập cho vertical Nguyen AI (auth, runtime, agents, billing, evidence). Không phụ thuộc runtime Gen1 (`computer.iai.one`) hay Gen2 (`maytinhai.org`) lúc chạy. Gen1 và Gen2 đóng băng (reference only, không sửa, không deploy). Được phép copy có chọn lọc package từ `maytinhai-os` (fix security khi copy). See `NGUYENAI_BACKEND_CONTINUOUS_DEV_PLAN_2026-07-02.md`.
 
-Nguyen AI **không còn là** brand-only static layer. Nó sở hữu runtime riêng cho vertical Nguyen AI. Gen1/Gen2 giữ vai trò kiến trúc tham chiếu — khi integrate, Nguyen AI phải duy trì compatibility contract.
+Nguyen AI **không còn là** brand-only static layer. Nó sở hữu runtime riêng cho vertical Nguyen AI. Gen1/Gen2 không còn là dependency runtime — chỉ là reference kiến trúc.
 
 ### 2.4 Shared Identity Service — `auth.nguyenai.net`
 
@@ -238,5 +240,7 @@ If any repo, doc, or commit conflicts with this document, **this document wins**
 ## 13. Change log
 
 | Date | Change | By |
+|---|---|---|
+| 2026-07-02 | Initial lock | Founder |
 |---|---|---|
 | 2026-07-02 | Initial lock | Founder |

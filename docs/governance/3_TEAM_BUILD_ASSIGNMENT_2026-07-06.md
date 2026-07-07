@@ -280,3 +280,12 @@ Mỗi team báo cáo hàng ngày:
 ---
 
 *Generated with [Devin](https://devin.ai) — 2026-07-06*
+- **Corruption watch:** nếu thấy partial-path files, stash + restore ngay
+
+---
+
+*Generated with [Devin](https://devin.ai) — 2026-07-06*
+
+---
+
+*Generated with [Devin](https://devin.ai) — 2026-07-06*

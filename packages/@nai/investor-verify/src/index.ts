@@ -52,3 +52,6 @@ export {
   checkGrant,
   sweepExpiredGrants,
 } from './service';
+
+export type { VerifyIaiOneAdapter, SmsAdapter, AuditContext, DeclareIdentityInput, InitiatePaymentInput, UploadReceiptInput, Enroll2FAInput, IssueGrantInput } from './service';
+export type { RoomScope } from './types';

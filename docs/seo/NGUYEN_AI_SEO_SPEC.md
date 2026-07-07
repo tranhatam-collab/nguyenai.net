@@ -180,6 +180,14 @@ Use only when visible page content supports it:
 - Main content must exist in initial HTML.
 - Canonical per language and per page.
 - hreflang vi-VN, en, x-default.
+- x-default phải trỏ về bản **tiếng Việt** (Vietnamese root) — LOCKED 2026-07-07.
+  Tiếng Việt là ngôn ngữ gốc của hệ Nguyễn AI. Bản tiếng Anh là quốc tế hóa,
+  không phải bản mặc định. Mọi app phải đặt x-default trỏ bản tiếng Việt.
+- Self-referencing hreflang trên mỗi trang (vi-VN tự trỏ vi-VN, en tự trỏ en).
+- hreflang phải reciprocal: trang VI trỏ EN và ngược lại, cả hai trỏ x-default VI.
+- Tuyệt đối không sinh URL `/en/en/*` (lỗi nối prefix hai lần).
+- Trang tiếng Việt phải có `<html lang="vi">`, trang tiếng Anh phải có `<html lang="en">`.
+- Tiêu đề và mô tả của trang tiếng Việt phải bằng tiếng Việt, không trộn tiếng Anh.
 - Sitemap index and language/content sitemaps.
 - robots.txt.
 - Open Graph and Twitter Card.

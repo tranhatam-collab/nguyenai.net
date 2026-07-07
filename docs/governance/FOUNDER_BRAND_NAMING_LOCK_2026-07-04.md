@@ -74,8 +74,8 @@ Founder quyết định: **giữ cả hai**, phân vai rõ ràng.
 | `NguyenAI` | Dính liền. Chuẩn: Nguyen AI (có khoảng trắng) |
 | `Nguyễn.AI` | Dấu chấm giữa. Không dùng |
 | `Nguyên AI` | Sai chính tả họ. Phải là Nguyễn (có g) |
-| `AI Nguyen` | Cấm làm public brand hoặc product surface. Ngoại lệ Founder 2026-07-07: chỉ được dùng làm assistant/model identity string trong policy trả lời "who are you", không được dùng làm thương hiệu public. |
-| `AI Nguyễn` | Cấm làm public brand hoặc product surface. Ngoại lệ Founder 2026-07-07: chỉ được dùng làm assistant/model identity string trong policy trả lời "bạn là ai", không được dùng làm thương hiệu public. |
+| `AI Nguyen` | Đảo thứ tự. Brand đứng trước |
+| `AI Nguyễn` | Đảo thứ tự. Brand đứng trước |
 | `Nguyen Artificial Intelligence` | Quá dài, không phải brand name |
 | `NAI` làm thương hiệu public | Chỉ dùng làm code scope nội bộ (@nai/*), không hiển thị public |
 | `NAI Edu` | Dùng code scope làm public brand. Chuẩn: Nguyen AI Edu |

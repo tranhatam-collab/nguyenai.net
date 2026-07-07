@@ -594,7 +594,7 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
     let results = [...this.cohorts.values()];
     if (filter?.program_code) results = results.filter((c) => c.program_code === filter.program_code);
     if (filter?.status) results = results.filter((c) => c.status === filter.status);
-    return results.sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return results.sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
   }
   async updateCohort(id: string, patch: Partial<Cohort>): Promise<void> {
     const existing = this.cohorts.get(id);
@@ -612,7 +612,7 @@ export class InMemoryScholarshipStore implements ScholarshipStore {
   async listEntitlementEvents(entitlementId: string): Promise<EntitlementEvent[]> {
     return [...this.entitlementEvents.values()]
       .filter((e) => e.entitlement_id === entitlementId)
-      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+      .sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''));
   }
 
   // ============================================================

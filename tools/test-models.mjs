@@ -107,7 +107,22 @@ async function testModel(model) {
   const startTime = Date.now();
   try {
     let response;
-    if (provider === 'google') {
+    if (provider === 'cloudflare-workers-ai') {
+      // Cloudflare Workers AI API
+      const url = `${baseUrl}/${providerModel}`;
+      response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: TEST_PROMPT }],
+          max_tokens: 100,
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+    } else if (provider === 'google') {
       // Google Gemini API
       const url = `${baseUrl}/models/${providerModel}:generateContent?key=${apiKey}`;
       response = await fetch(url, {
@@ -165,7 +180,9 @@ async function testModel(model) {
 
     const data = await response.json();
     let output = '';
-    if (provider === 'google') {
+    if (provider === 'cloudflare-workers-ai') {
+      output = data.result?.response ?? data.result?.choices?.[0]?.message?.content ?? '';
+    } else if (provider === 'google') {
       output = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     } else if (provider === 'anthropic') {
       output = data.content?.[0]?.text ?? '';
@@ -211,6 +228,72 @@ async function main() {
   }
 
   console.log(`\n=== Summary ===`);
+  const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const errors = results.filter((r) => r.status === 'error').length;
+  const skipped = results.filter((r) => r.status === 'skip').length;
+  console.log(`PASS: ${passed} | FAIL: ${failed} | ERROR: ${errors} | SKIP: ${skipped} | TOTAL: ${results.length}`);
+
+  if (failed > 0 || errors > 0) process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
+  console.log(`Models to test: ${testModels.length}`);
+  console.log(`Prompt: "${TEST_PROMPT}"\n`);
+
+  const results = [];
+  for (const model of testModels) {
+    process.stdout.write(`Testing ${model.id} (${model.provider}/${model.providerModel})... `);
+    const result = await testModel(model);
+    results.push(result);
+    console.log(`${result.status.toUpperCase()} ${result.elapsed ?? ''}ms${result.error ? ' — ' + result.error : ''}`);
+    if (args.verbose && result.output) {
+      console.log(`  Output: ${result.output}`);
+    }
+  }
+
+  console.log(`\n=== Summary ===`);
+  const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const errors = results.filter((r) => r.status === 'error').length;
+  const skipped = results.filter((r) => r.status === 'skip').length;
+  console.log(`PASS: ${passed} | FAIL: ${failed} | ERROR: ${errors} | SKIP: ${skipped} | TOTAL: ${results.length}`);
+
+  if (failed > 0 || errors > 0) process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
+  const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const errors = results.filter((r) => r.status === 'error').length;
+  const skipped = results.filter((r) => r.status === 'skip').length;
+  console.log(`PASS: ${passed} | FAIL: ${failed} | ERROR: ${errors} | SKIP: ${skipped} | TOTAL: ${results.length}`);
+
+  if (failed > 0 || errors > 0) process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const errors = results.filter((r) => r.status === 'error').length;
+  const skipped = results.filter((r) => r.status === 'skip').length;
+  console.log(`PASS: ${passed} | FAIL: ${failed} | ERROR: ${errors} | SKIP: ${skipped} | TOTAL: ${results.length}`);
+
+  if (failed > 0 || errors > 0) process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
   const passed = results.filter((r) => r.status === 'pass').length;
   const failed = results.filter((r) => r.status === 'fail').length;
   const errors = results.filter((r) => r.status === 'error').length;

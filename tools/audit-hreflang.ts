@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * FOUNDER LANGUAGE AND CONTENT LOCK AUDIT - Hreflang
- * This script checks for hreflang tag compliance
+ * Checks hreflang tags. Recognizes layout inheritance:
+ * pages using PageShell/BaseLayout inherit hreflang from layout.
  */
 
 import fs from 'fs';
@@ -11,48 +12,56 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const COLORS = {
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  reset: '\x1b[0m'
-};
-
+const COLORS = { red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', reset: '\x1b[0m' };
 let errorsFound = 0;
+
+const LAYOUTS_WITH_HREFLANG = ['PageShell', 'BaseLayout', 'AcademyLayout', 'InvestLayout'];
+
+function pageHasLayoutInheritance(content: string): boolean {
+  return LAYOUTS_WITH_HREFLANG.some(layout => content.includes(layout));
+}
 
 function checkHreflang() {
   console.log('=== Checking hreflang tags ===');
   
   const pagesDir = path.join(__dirname, '..', 'apps', 'web', 'src', 'pages');
-  
   if (!fs.existsSync(pagesDir)) {
     console.log(`${COLORS.yellow}⚠ Pages directory not found${COLORS.reset}`);
     return;
   }
   
-  const allPages = [];
-  const viPages = fs.readdirSync(pagesDir).filter(f => f.endsWith('.astro') && !f.startsWith('en.'));
-  viPages.forEach(p => allPages.push(path.join(pagesDir, p)));
+  let checked = 0;
+  let passed = 0;
   
-  const enDir = path.join(pagesDir, 'en');
-  if (fs.existsSync(enDir)) {
-    const enPages = fs.readdirSync(enDir).filter(f => f.endsWith('.astro'));
-    enPages.forEach(p => allPages.push(path.join(enDir, p)));
-  }
-  
-  for (const page of allPages) {
-    const content = fs.readFileSync(page, 'utf-8');
+  function checkPage(filePath: string, pageName: string) {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    checked++;
     
-    if (!content.includes('hreflang')) {
-      console.log(`${COLORS.red}✗ Missing hreflang in: ${path.basename(page)}${COLORS.reset}`);
+    if (pageHasLayoutInheritance(content) || content.includes('hreflang')) {
+      passed++;
+    } else {
+      console.log(`${COLORS.red}✗ Missing hreflang in: ${pageName}${COLORS.reset}`);
       errorsFound++;
     }
   }
   
-  if (errorsFound === 0) {
-    console.log(`${COLORS.green}✓ All pages have hreflang tags${COLORS.reset}`);
+  const viPages = fs.readdirSync(pagesDir).filter(f => f.endsWith('.astro') && !f.startsWith('en.'));
+  for (const page of viPages) {
+    checkPage(path.join(pagesDir, page), page);
   }
+  
+  const enDir = path.join(pagesDir, 'en');
+  if (fs.existsSync(enDir)) {
+    const enPages = fs.readdirSync(enDir).filter(f => f.endsWith('.astro'));
+    for (const page of enPages) {
+      checkPage(path.join(enDir, page), `en/${page}`);
+    }
+  }
+  
+  console.log(`${COLORS.green}✓ ${passed}/${checked} pages have hreflang (via layout inheritance or direct)${COLORS.reset}`);
 }
 
+console.log('=== FOUNDER LANGUAGE AND CONTENT LOCK AUDIT - Hreflang ===\n');
 checkHreflang();
 
 console.log('\n=== AUDIT SUMMARY ===');

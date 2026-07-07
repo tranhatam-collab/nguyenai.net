@@ -54,25 +54,27 @@ export const investorRoutes = new Hono<InvestorEnv>();
 
 // ============================================================
 // Auth middleware — all routes require authenticated session
+// SEC-P0-4: requireAuth/requireAdmin return a Hono Response on failure.
+// Callers MUST return that Response so the handler stops executing.
+// Previously requireAuth() called c.json() but discarded the return
+// value, so the 401 was never sent and the handler kept running.
 // ============================================================
 
-function requireAuth(c: any): { user_id: string; role: string } | null {
+function requireAuth(c: any): { user_id: string; role: string } | Response {
   const session = c.get('session');
   if (!session) {
-    c.json({ error: 'unauthorized' }, 401);
-    return null;
+    return c.json({ error: 'unauthorized' }, 401);
   }
   return session;
 }
 
-function requireAdmin(c: any): { user_id: string; role: string } | null {
-  const session = requireAuth(c);
-  if (!session) return null;
-  if (session.role !== 'admin' && session.role !== 'super_admin') {
-    c.json({ error: 'forbidden' }, 403);
-    return null;
+function requireAdmin(c: any): { user_id: string; role: string } | Response {
+  const result = requireAuth(c);
+  if (result instanceof Response) return result;
+  if (result.role !== 'admin' && result.role !== 'super_admin') {
+    return c.json({ error: 'forbidden' }, 403);
   }
-  return session;
+  return result;
 }
 
 function auditCtx(c: any) {

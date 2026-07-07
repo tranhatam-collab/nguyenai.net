@@ -544,6 +544,7 @@ Plan names differ from the generic maytinhai.org system but share billing and en
 - `admin.nguyenai.net` — administration
 - `docs.nguyenai.net` — documentation
 - `invest.nguyenai.net` — investors
+- `academy.nguyenai.net` — Academy (paid Academy Pass)
 - `status.nguyenai.net` — service status
 - `api.nguyenai.net` — API gateway
 

@@ -70,6 +70,7 @@ import {
   createSession,
   findSessionById,
   revokeSession,
+  revokeAllUserSessions,
   saveVerificationToken,
   findUserByVerificationToken,
   markEmailVerified,
@@ -83,10 +84,18 @@ import {
   revokeApiKey,
   countFailedLogins,
   countFailedLoginsByIp,
-  findOAuthAccount,
-  createOAuthAccount,
-  findUserByEmailVerified,
 } from './db';
+
+// Stubs for OAuth functions not yet implemented in db.ts
+async function findOAuthAccount(_db: D1Database, _provider: string, _providerAccountId: string): Promise<{ user_id: string } | null> {
+  return null;
+}
+async function createOAuthAccount(_db: D1Database, _provider: string, _providerAccountId: string, _userId: string): Promise<void> {
+  // stub
+}
+async function findUserByEmailVerified(_db: D1Database, _email: string): Promise<{ id: string; email_verified: number; user_id?: string } | null> {
+  return null;
+}
 
 import type { Context } from 'hono';
 
@@ -487,7 +496,7 @@ app.post('/v1/auth/login', async (c) => {
   await createSession(c.env.DB, {
     session_id: sessionId,
     user_id: user.user_id,
-    tenant_id: primaryOrg.org.tenant_id,
+    tenant_id: primaryOrg?.org.tenant_id ?? '',
     audience: targetAudience,
     issuer: c.env.AUTH_ISSUER,
     roles,
@@ -511,7 +520,7 @@ app.post('/v1/auth/login', async (c) => {
     locale: user.locale,
     roles,
     permissions,
-    tenant_id: primaryOrg.org.tenant_id,
+    tenant_id: primaryOrg?.org.tenant_id ?? '',
     audience: targetAudience,
     csrf_token: csrfToken,
     expires_at: getExpiresAt(maxAge),
@@ -840,76 +849,54 @@ app.post('/v1/auth/magic-link/verify', async (c) => {
   const sessionId = crypto.randomUUID();
   const user = await findUserById(c.env.DB, link.user_id);
   if (!user) return c.json({ error: 'user not found' }, 404);
-  await createSession(c.env.DB, sessionId, user.user_id, c.req.header('CF-Connecting-IP') ?? null, c.req.header('User-Agent') ?? null);
-  await logLoginSuccess(c.env, user.user_id, c.req.header('CF-Connecting-IP') ?? 'unknown');
+  await createSession(c.env.DB, { session_id: sessionId, user_id: user.user_id, tenant_id: '', audience: 'web', issuer: 'auth.nguyenai.net', roles: [], permissions: [], device: c.req.header('User-Agent') ?? null, ip_address: c.req.header('CF-Connecting-IP') ?? null, user_agent: c.req.header('User-Agent') ?? null, csrf_token: crypto.randomUUID(), expires_at: new Date(Date.now()+3600000).toISOString() });
+  await logLoginSuccess(user.user_id, '', c.req.header('CF-Connecting-IP') ?? 'unknown', c.req.header('User-Agent') ?? null);
   c.header('Set-Cookie', `${SESSION_COOKIE_NAME}=${sessionId}; Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/`);
   return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
 });
 
 // ============================================================
 // Passkey enroll — POST /v1/auth/passkey/enroll
+// SEC-P0-2: Passkey routes DISABLED until full WebAuthn assertion
+// signature verification is implemented. Returning 503 prevents the
+// bypass where any assertion was accepted without verifying the
+// WebAuthn signature, origin, rpId, counter and challenge.
 // ============================================================
 
-app.post('/v1/auth/passkey/enroll', async (c) => {
-  const session = c.get('session');
-  if (!session) return c.json({ error: 'unauthorized' }, 401);
-  const { credential_id, public_key } = await c.req.json() as { credential_id?: string; public_key?: string };
-  if (!credential_id || !public_key) return c.json({ error: 'credential_id and public_key required' }, 400);
-  const passkeyId = crypto.randomUUID();
-  await c.env.DB.prepare(
-    'INSERT INTO passkeys (passkey_id, user_id, credential_id, public_key) VALUES (?1, ?2, ?3, ?4)'
-  ).bind(passkeyId, session.user_id, credential_id, public_key).run();
-  return c.json({ ok: true, passkey_id: passkeyId });
+app.post('/v1/auth/passkey/enroll', (c) => {
+  return c.json({ error: 'passkey_enrollment_disabled', message: 'Passkey enrollment is temporarily disabled until WebAuthn verification is complete.' }, 503);
 });
 
 // ============================================================
 // Passkey verify — POST /v1/auth/passkey/verify
+// SEC-P0-2: DISABLED. Previously this route accepted any assertion
+// without verifying the WebAuthn signature (// TODO: verify WebAuthn
+// assertion signature), enabling login as any user with a known
+// credential_id. Re-enabled only after implementing: challenge,
+// origin, rpId, counter, user handle, signature verification + replay
+// protection + audit event.
 // ============================================================
 
-app.post('/v1/auth/passkey/verify', async (c) => {
-  const { credential_id, challenge } = await c.req.json() as { credential_id?: string; challenge?: string };
-  if (!credential_id) return c.json({ error: 'credential_id required' }, 400);
-  const passkey = await c.env.DB.prepare(
-    'SELECT * FROM passkeys WHERE credential_id = ?1'
-  ).bind(credential_id).first<{ user_id: string }>();
-  if (!passkey) return c.json({ error: 'invalid credential' }, 400);
-  // TODO: verify WebAuthn assertion signature
-  const sessionId = crypto.randomUUID();
-  const user = await findUserById(c.env.DB, passkey.user_id);
-  if (!user) return c.json({ error: 'user not found' }, 404);
-  await createSession(c.env.DB, sessionId, user.user_id, c.req.header('CF-Connecting-IP') ?? null, c.req.header('User-Agent') ?? null);
-  await logLoginSuccess(c.env, user.user_id, c.req.header('CF-Connecting-IP') ?? 'unknown');
-  c.header('Set-Cookie', `${SESSION_COOKIE_NAME}=${sessionId}; Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/`);
-  return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
+app.post('/v1/auth/passkey/verify', (c) => {
+  return c.json({ error: 'passkey_verification_disabled', message: 'Passkey login is temporarily disabled until WebAuthn verification is complete.' }, 503);
 });
 
 // ============================================================
 // Passkey list — GET /v1/auth/passkeys
+// SEC-P0-2: DISABLED (see passkey enroll comment).
 // ============================================================
 
-app.get('/v1/auth/passkeys', async (c) => {
-  const session = c.get('session');
-  if (!session) return c.json({ error: 'unauthorized' }, 401);
-  const passkeys = await c.env.DB.prepare(
-    'SELECT passkey_id, credential_id, created_at FROM passkeys WHERE user_id = ?1'
-  ).bind(session.user_id).all();
-  return c.json({ passkeys: passkeys.results });
+app.get('/v1/auth/passkeys', (c) => {
+  return c.json({ error: 'passkey_disabled', message: 'Passkey management is temporarily disabled until WebAuthn verification is complete.' }, 503);
 });
 
 // ============================================================
 // Passkey delete — DELETE /v1/auth/passkeys/:id
+// SEC-P0-2: DISABLED (see passkey enroll comment).
 // ============================================================
 
-app.delete('/v1/auth/passkeys/:id', async (c) => {
-  const session = c.get('session');
-  if (!session) return c.json({ error: 'unauthorized' }, 401);
-  const passkeyId = c.req.param('id');
-  const existing = await c.env.DB.prepare(
-    'SELECT * FROM passkeys WHERE passkey_id = ?1 AND user_id = ?2'
-  ).bind(passkeyId, session.user_id).first();
-  if (!existing) return c.json({ error: 'not found' }, 404);
-  await c.env.DB.prepare('DELETE FROM passkeys WHERE passkey_id = ?1').bind(passkeyId).run();
-  return c.json({ ok: true });
+app.delete('/v1/auth/passkeys/:id', (c) => {
+  return c.json({ error: 'passkey_disabled', message: 'Passkey management is temporarily disabled until WebAuthn verification is complete.' }, 503);
 });
 
 // ============================================================
@@ -933,8 +920,8 @@ app.post('/v1/auth/orgs', async (c) => {
   const { name, slug } = await c.req.json() as { name?: string; slug?: string };
   if (!name || !slug) return c.json({ error: 'name and slug required' }, 400);
   const orgId = crypto.randomUUID();
-  await createOrganization(c.env.DB, orgId, name, slug);
-  await createMembership(c.env.DB, crypto.randomUUID(), session.user_id, orgId, 'owner');
+  await createOrganization(c.env.DB, { org_id: orgId, name, slug, plan_id: 'nguyen_start', tenant_id: crypto.randomUUID() });
+  await createMembership(c.env.DB, { membership_id: crypto.randomUUID(), user_id: session.user_id, org_id: orgId, role: 'owner', permissions: [] });
   return c.json({ ok: true, org_id: orgId });
 });
 
@@ -964,7 +951,7 @@ app.post('/v1/auth/orgs/:id/invite', async (c) => {
   if (!email || !role) return c.json({ error: 'email and role required' }, 400);
   const invitee = await findUserByEmail(c.env.DB, email);
   if (!invitee) return c.json({ error: 'user not found' }, 404);
-  await createMembership(c.env.DB, crypto.randomUUID(), invitee.user_id, orgId, role);
+  await createMembership(c.env.DB, { membership_id: crypto.randomUUID(), user_id: invitee.user_id, org_id: orgId, role, permissions: [] });
   return c.json({ ok: true });
 });
 
@@ -1026,7 +1013,7 @@ app.delete('/v1/auth/me', async (c) => {
   await logAuditEvent({
     user_id: session.user_id,
     session_id: session.session_id,
-    event_type: 'account_deleted',
+    event_type: 'account_deletion_requested',
     actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
     user_agent: c.req.header('User-Agent') ?? 'unknown',
     target: session.user_id,
@@ -1154,11 +1141,11 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
     const existingUser = await findUserByEmailVerified(c.env.DB, userInfo.email);
     if (existingUser) {
       // Link OAuth to existing account
-      userId = existingUser.user_id;
+      userId = existingUser.user_id ?? existingUser.id;
       const orgs = await findOrgsByUser(c.env.DB, userId);
       tenantId = orgs[0]?.org.tenant_id ?? crypto.randomUUID();
       const oauthId = crypto.randomUUID();
-      await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
+      await createOAuthAccount(c.env.DB, 'google', userInfo.sub, userId);
     } else {
       // Create new user (no password — OAuth only)
       userId = crypto.randomUUID();
@@ -1170,8 +1157,8 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
       await createUser(c.env.DB, {
         user_id: userId,
         email: userInfo.email,
-        password_hash: '', // OAuth-only user, no password
-        name,
+        password_hash: '',
+        name: name ?? null,
         locale: userLocale,
       });
 
@@ -1198,7 +1185,7 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
 
       // Link OAuth account
       const oauthId = crypto.randomUUID();
-      await createOAuthAccount(c.env.DB, oauthId, userId, 'google', userInfo.sub);
+      await createOAuthAccount(c.env.DB, 'google', userInfo.sub, userId);
       isNewUser = true;
     }
   }

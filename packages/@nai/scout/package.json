@@ -16,6 +16,9 @@
   },
   "keywords": ["browser", "scraper", "automation", "nai", "nguyenai"],
   "upstream": "https://github.com/browser-use/browser-use",
+  "dependencies": {
+    "@nai/approval": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^5.5.0",
     "tsx": "^4.19.0",

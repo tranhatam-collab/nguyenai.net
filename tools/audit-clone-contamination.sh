@@ -114,3 +114,39 @@ if [ "$VIOLATIONS" -gt 0 ]; then
 fi
 
 echo "PASS: 0 contamination violations in user-facing surfaces."
+          for al in "${ALLOWLIST_PATTERNS[@]}"; do
+            case "$f" in
+              *"$al"*) skip=1; break ;;
+            esac
+          done
+        fi
+        if [ "$skip" -eq 0 ]; then
+          echo "FAIL: '$tok' found in $f"
+          VIOLATIONS=$((VIOLATIONS + 1))
+        fi
+      done <<< "$matches"
+    fi
+  done
+done
+
+echo
+if [ "$VIOLATIONS" -gt 0 ]; then
+  echo "FAIL: $VIOLATIONS contamination violation(s). Fix before merge."
+  exit 1
+fi
+
+echo "PASS: 0 contamination violations in user-facing surfaces."
+          VIOLATIONS=$((VIOLATIONS + 1))
+        fi
+      done <<< "$matches"
+    fi
+  done
+done
+
+echo
+if [ "$VIOLATIONS" -gt 0 ]; then
+  echo "FAIL: $VIOLATIONS contamination violation(s). Fix before merge."
+  exit 1
+fi
+
+echo "PASS: 0 contamination violations in user-facing surfaces."

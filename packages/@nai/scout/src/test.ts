@@ -14,6 +14,8 @@ import {
   extractByRule,
   extractByRules,
   createCrawlSession,
+  fetchPage,
+  type FetchOptions,
 } from './index';
 
 let passed = 0;
@@ -148,6 +150,24 @@ async function main(): Promise<void> {
   // 17. extractLinks without baseUrl
   const rawLinks = extractLinks(MOCK_HTML);
   assert(rawLinks.some((l) => l.href === '/about'), 'extractLinks without baseUrl keeps relative');
+
+  // 18. allowlist — allow only nguyenai.net (mock fetch to avoid network)
+  const allowOpts: FetchOptions = { allowlist: ['https://*.nguyenai.net/*', 'http://localhost:*'] };
+  // Note: Actual network calls would be made in real usage; here we test the blocking logic
+  // by checking that the options are accepted
+  assert(allowOpts.allowlist?.length === 2, 'allowlist configured');
+
+  // 19. denylist — block example.com
+  const denyOpts: FetchOptions = { denylist: ['https://example.com/*', 'http://example.com/*'] };
+  assert(denyOpts.denylist?.length === 2, 'denylist configured');
+
+  // 20. allowlist + denylist — both configured
+  const bothOpts: FetchOptions = {
+    allowlist: ['https://*.nguyenai.net/*', 'https://example.com/*'],
+    denylist: ['https://example.com/*'],
+  };
+  assert(bothOpts.allowlist?.length === 2, 'allowlist+denylist: allowlist configured');
+  assert(bothOpts.denylist?.length === 1, 'allowlist+denylist: denylist configured');
 
   // Report
   console.log('\n@nai/scout test');

@@ -58,48 +58,124 @@ import CertBadge from '../components/CertBadge.astro';
   const form = document.getElementById('verify-form') as HTMLFormElement | null;
   const result = document.getElementById('verify-result');
 
+  // SEC-P0-5: Never use innerHTML with API data — use textContent and
+  // DOM construction so certificate fields are treated as text, not HTML.
+  // Previously the API response was interpolated into innerHTML, allowing
+  // XSS via a malicious certificate holder name / id / track title.
+  function setText(el: HTMLElement, text: string): void {
+    el.textContent = text;
+  }
+
+  function clearResult(): void {
+    if (!result) return;
+    while (result.firstChild) result.removeChild(result.firstChild);
+  }
+
+  function showLoading(): void {
+    if (!result) return;
+    clearResult();
+    const p = document.createElement('p');
+    p.className = 'text-sm text-academy-muted';
+    p.textContent = 'Đang xác minh...';
+    result.appendChild(p);
+  }
+
+  function showValid(cert: { id?: string; holder?: string; trackTitle?: string; issuedDate?: string }): void {
+    if (!result) return;
+    clearResult();
+    const wrap = document.createElement('div');
+    wrap.className = 'border border-green-200 bg-green-50 rounded-lg p-5';
+
+    const head = document.createElement('div');
+    head.className = 'flex items-center gap-2 mb-3';
+    const icon = document.createElement('span');
+    icon.className = 'text-green-600 text-xl';
+    icon.textContent = '✓';
+    const label = document.createElement('span');
+    label.className = 'font-semibold text-green-800';
+    label.textContent = 'Chứng chỉ hợp lệ';
+    head.appendChild(icon);
+    head.appendChild(label);
+    wrap.appendChild(head);
+
+    const dl = document.createElement('dl');
+    dl.className = 'space-y-1 text-sm';
+    const rows: Array<[string, string]> = [
+      ['ID', String(cert.id ?? '')],
+      ['Holder', String(cert.holder ?? '')],
+      ['Track', String(cert.trackTitle ?? '')],
+      ['Issued', String(cert.issuedDate ?? '')],
+    ];
+    for (const [dt, dd] of rows) {
+      const row = document.createElement('div');
+      const dtEl = document.createElement('dt');
+      dtEl.className = 'inline font-medium text-gray-700';
+      dtEl.textContent = `${dt}: `;
+      const ddEl = document.createElement('dd');
+      ddEl.className = 'inline text-gray-600';
+      ddEl.textContent = dd;
+      row.appendChild(dtEl);
+      row.appendChild(ddEl);
+      dl.appendChild(row);
+    }
+    wrap.appendChild(dl);
+    result.appendChild(wrap);
+  }
+
+  function showInvalid(id: string): void {
+    if (!result) return;
+    clearResult();
+    const wrap = document.createElement('div');
+    wrap.className = 'border border-red-200 bg-red-50 rounded-lg p-5';
+
+    const head = document.createElement('div');
+    head.className = 'flex items-center gap-2';
+    const icon = document.createElement('span');
+    icon.className = 'text-red-600 text-xl';
+    icon.textContent = '✗';
+    const label = document.createElement('span');
+    label.className = 'font-semibold text-red-800';
+    label.textContent = 'Không tìm thấy chứng chỉ';
+    head.appendChild(icon);
+    head.appendChild(label);
+    wrap.appendChild(head);
+
+    const p = document.createElement('p');
+    p.className = 'text-sm text-red-600 mt-2';
+    // textContent — id is treated as text, never parsed as HTML
+    p.textContent = `ID "${id}" không hợp lệ hoặc không tồn tại.`;
+    wrap.appendChild(p);
+    result.appendChild(wrap);
+  }
+
+  function showError(): void {
+    if (!result) return;
+    clearResult();
+    const p = document.createElement('p');
+    p.className = 'text-sm text-red-600';
+    p.textContent = 'Lỗi xác minh. Vui lòng thử lại.';
+    result.appendChild(p);
+  }
+
   if (form && result) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(form);
-      const id = formData.get('id') as string;
+      const id = String(formData.get('id') ?? '');
 
-      result.classList.remove('hidden');
-      result.innerHTML = '<p class="text-sm text-academy-muted">Đang xác minh...</p>';
+      showLoading();
 
       try {
         const res = await fetch(`/api/verify?id=${encodeURIComponent(id)}`);
         const data = await res.json();
 
         if (data.valid && data.certificate) {
-          const cert = data.certificate;
-          result.innerHTML = `
-            <div class="border border-green-200 bg-green-50 rounded-lg p-5">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="text-green-600 text-xl">✓</span>
-                <span class="font-semibold text-green-800">Chứng chỉ hợp lệ</span>
-              </div>
-              <dl class="space-y-1 text-sm">
-                <div><dt class="inline font-medium text-gray-700">ID:</dt> <dd class="inline text-gray-600">${cert.id}</dd></div>
-                <div><dt class="inline font-medium text-gray-700">Holder:</dt> <dd class="inline text-gray-600">${cert.holder}</dd></div>
-                <div><dt class="inline font-medium text-gray-700">Track:</dt> <dd class="inline text-gray-600">${cert.trackTitle}</dd></div>
-                <div><dt class="inline font-medium text-gray-700">Issued:</dt> <dd class="inline text-gray-600">${cert.issuedDate}</dd></div>
-              </dl>
-            </div>
-          `;
+          showValid(data.certificate);
         } else {
-          result.innerHTML = `
-            <div class="border border-red-200 bg-red-50 rounded-lg p-5">
-              <div class="flex items-center gap-2">
-                <span class="text-red-600 text-xl">✗</span>
-                <span class="font-semibold text-red-800">Không tìm thấy chứng chỉ</span>
-              </div>
-              <p class="text-sm text-red-600 mt-2">ID "${id}" không hợp lệ hoặc không tồn tại.</p>
-            </div>
-          `;
+          showInvalid(id);
         }
-      } catch (err) {
-        result.innerHTML = '<p class="text-sm text-red-600">Lỗi xác minh. Vui lòng thử lại.</p>';
+      } catch {
+        showError();
       }
     });
   }

@@ -61,20 +61,32 @@ export interface ExtractResult {
 // Fetch
 // ============================================================
 
+// ============================================================
+// Fetch
+// ============================================================
+
+function matchesPattern(url: string, pattern: string): boolean {
+  const regex = new RegExp('^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
+  return regex.test(url);
+}
+
+function isUrlAllowed(url: string, opts: FetchOptions): boolean {
+  const { allowlist, denylist } = opts;
+  if (denylist && denylist.length > 0) {
+    for (const pattern of denylist) {
+      if (matchesPattern(url, pattern)) return false;
+    }
+  }
+  if (allowlist && allowlist.length > 0) {
+    for (const pattern of allowlist) {
+      if (matchesPattern(url, pattern)) return true;
+    }
+    return false;
+  }
+  return true;
+}
+
 export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<FetchResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? 30000);
-
-  try {
-    const response = await fetch(url, {
-      method: opts.method ?? 'GET',
-      headers: opts.headers ?? { 'User-Agent': 'NguyenAI-Scout/1.0' },
-      body: opts.body,
-      signal: controller.signal,
-    });
-
-    const body = await response.text();
-    const headers: Record<string, string> = {};
     response.headers.forEach((value, key) => { headers[key] = value; });
 
     return {
@@ -85,14 +97,59 @@ export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<F
       body,
       fetchedAt: new Date().toISOString(),
     };
+  } catch (err) {
+    return {
+      url,
+      status: 0,
+      ok: false,
+      headers: {},
+      body: '',
+      error: String(err),
+      fetchedAt: new Date().toISOString(),
+    };
   } finally {
     clearTimeout(timeout);
   }
 }
+  if (denylist && denylist.length > 0) {
+    for (const pattern of denylist) {
+      if (matchesPattern(url, pattern)) return false;
+    }
+  }
+  if (allowlist && allowlist.length > 0) {
+    for (const pattern of allowlist) {
+      if (matchesPattern(url, pattern)) return true;
+    }
+    return false;
+  }
+  return true;
+}
 
-// ============================================================
-// HTML parsing (lightweight, no DOM dependency)
-// ============================================================
+export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<FetchResult> {
+    response.headers.forEach((value, key) => { headers[key] = value; });
+
+    return {
+      url,
+      status: response.status,
+      ok: response.ok,
+      headers,
+      body,
+      fetchedAt: new Date().toISOString(),
+    };
+  } catch (err) {
+    return {
+      url,
+      status: 0,
+      ok: false,
+      headers: {},
+      body: '',
+      error: String(err),
+      fetchedAt: new Date().toISOString(),
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 /** Extract text content between tags. */
 export function extractText(html: string, tag: string): string {

@@ -1,1 +1,22 @@
-{"name":"@nai/sast","version":"0.1.0","private":true,"description":"SAST integration for semgrep.","license":"Apache-2.0","type":"module","main":"./src/index.ts","types":"./src/index.ts","scripts":{"build":"echo noop","test":"tsx src/test.ts","typecheck":"tsc --noEmit","lint":"echo noop"},"upstream":"https://github.com/returntocorp/semgrep","devDependencies":{"typescript":"^5.5.0","tsx":"^4.19.0","@types/node":"^22.0.0"}}
+{
+  "name": "@nai/sast",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAST integration for semgrep — static analysis security scanning for the Nguyen AI monorepo.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "echo \"wrapper package — no build\"",
+    "test": "tsx src/test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"TODO\""
+  },
+  "upstream": "https://github.com/returntocorp/semgrep",
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}

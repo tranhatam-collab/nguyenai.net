@@ -208,7 +208,7 @@ export async function runEval(opts: {
     for (const { name, fn } of metricFns) {
       const result = fn(sample, output);
       metrics.push(result);
-      scoreSums[name] += result.score;
+      scoreSums[name] = (scoreSums[name] ?? 0) + result.score;
     }
     run.sample_results.push({
       sample_id: sample.id,

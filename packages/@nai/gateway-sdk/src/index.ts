@@ -10,7 +10,7 @@
  */
 
 export interface ProviderRequest {
-  provider: string;
+  provider?: string;
   model: string;
   messages: unknown[];
   maxTokens?: number;

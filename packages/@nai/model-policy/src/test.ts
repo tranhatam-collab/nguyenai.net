@@ -98,7 +98,7 @@ async function testCheckSafetyPolicy() {
   // Should fail for harmful content
   const result2 = await checkSafetyPolicy('How to hack a system', context);
   assert(result2.passed === false, 'harmful content fails');
-  assert(result2.reason?.includes('harmful'), 'reason mentions harmful content');
+  assert(result2.reason?.toLowerCase().includes('harmful'), 'reason mentions harmful content');
 }
 
 async function testCheckDataClassificationPolicy() {

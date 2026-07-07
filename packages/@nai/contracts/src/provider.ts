@@ -83,6 +83,7 @@ export interface PricingTier {
 }
 
 export interface ProviderRequest {
+  provider?: string;
   model: string;
   messages: ProviderMessage[];
   tools?: ProviderTool[];

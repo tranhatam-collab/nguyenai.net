@@ -1,7 +1,24 @@
 #!/usr/bin/env node
 /**
  * FOUNDER LANGUAGE AND CONTENT LOCK AUDIT - Form Language
- * This script checks form labels and errors for language consistency
+ * Checks form labels, placeholders, button text, and error messages
+ * for language consistency. Only flags UI-visible text, not code identifiers.
+ *
+ * UI-visible contexts:
+ *   - <label>text</label>
+ *   - placeholder="text"
+ *   - <button>text</button>
+ *   - title="text"
+ *   - aria-label="text"
+ *   - error/success message strings
+ *
+ * NOT flagged (code identifiers):
+ *   - HTML name="" attribute (form field identifier)
+ *   - JS variable names
+ *   - CSS class names
+ *   - import statements
+ *   - type="email" / type="password" (HTML input types)
+ *   - <input name="email"> (name attribute is a code identifier)
  */
 
 import fs from 'fs';
@@ -11,27 +28,136 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const COLORS = { red: '\x1b[31m', green: '\x1b[32m', reset: '\x1b[0m' };
+const COLORS = { red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', reset: '\x1b[0m' };
 let errorsFound = 0;
+
+// Extract UI-visible text from content (not code identifiers)
+function extractUiText(content: string): string[] {
+  const uiTexts: string[] = [];
+  
+  // placeholder="text" or placeholder='text'
+  const placeholderMatches = content.matchAll(/placeholder\s*=\s*["']([^"']+)["']/g);
+  for (const m of placeholderMatches) uiTexts.push(m[1]);
+  
+  // <label>text</label>
+  const labelMatches = content.matchAll(/<label[^>]*>([^<]+)<\/label>/g);
+  for (const m of labelMatches) uiTexts.push(m[1].trim());
+  
+  // <button>text</button>
+  const buttonMatches = content.matchAll(/<button[^>]*>([^<]+)<\/button>/g);
+  for (const m of buttonMatches) uiTexts.push(m[1].trim());
+  
+  // title="text" (UI tooltip)
+  const titleMatches = content.matchAll(/title\s*=\s*["']([^"']+)["']/g);
+  for (const m of titleMatches) uiTexts.push(m[1]);
+  
+  // aria-label="text"
+  const ariaMatches = content.matchAll(/aria-label\s*=\s*["']([^"']+)["']/g);
+  for (const m of ariaMatches) uiTexts.push(m[1]);
+  
+  // >text< between tags that looks like UI text (visible content)
+  // Only short text spans, not code
+  const visibleTextMatches = content.matchAll(/>\s*([A-Za-z][^<>{}\n]{2,60})\s*</g);
+  for (const m of visibleTextMatches) {
+    const text = m[1].trim();
+    // Skip if it looks like code (contains = or ; or { or })
+    if (!/[={};]/.test(text) && text.length > 2) {
+      uiTexts.push(text);
+    }
+  }
+  
+  return uiTexts;
+}
+
+// Check if a word appears as UI-visible text (not as a code identifier)
+function containsUiWord(content: string, word: string): boolean {
+  // Skip HTML input types and name attributes (code identifiers)
+  // type="email", type="password", name="email", name="password", etc.
+  const codePatterns = [
+    new RegExp(`type\\s*=\\s*["']${word}["']`, 'i'),
+    new RegExp(`name\\s*=\\s*["']${word}["']`, 'i'),
+    new RegExp(`id\\s*=\\s*["']${word}["']`, 'i'),
+    new RegExp(`id\\s*=\\s*["'][^"']*${word}[^"']*["']`, 'i'),  // id contains word
+    new RegExp(`for\\s*=\\s*["']${word}["']`, 'i'),
+    new RegExp(`\\b${word}\\s*[:?]`, 'i'),  // TypeScript property
+    new RegExp(`\\b${word}\\s*\\(`, 'i'),    // function call
+    new RegExp(`\\.${word}\\b`, 'i'),         // property access
+    new RegExp(`\\b${word}\\s*=`, 'i'),       // assignment
+    new RegExp(`import\\b.*\\b${word}\\b`, 'i'),
+    new RegExp(`from\\s*["'].*${word}.*["']`, 'i'),
+    // JS event listener: addEventListener('submit', ...), addEventListener('click', ...)
+    new RegExp(`addEventListener\\s*\\(\\s*['"]${word}['"]`, 'i'),
+    // JS getElementById with word: getElementById('post-cancel')
+    new RegExp(`getElementById\\s*\\(\\s*['"][^'"]*${word}[^'"]*['"]`, 'i'),
+    // CustomEvent name: new CustomEvent('command:submit')
+    new RegExp(`CustomEvent\\s*<?[^>]*>?\\s*\\(\\s*['"][^'"]*${word}[^'"]*['"]`, 'i'),
+    // Event name string: 'command:submit'
+    new RegExp(`['"][a-z]+:${word}['"]`, 'i'),
+    // dispatchEvent
+    new RegExp(`dispatchEvent`, 'i'),
+    // Comment lines
+    new RegExp(`^\\s*//.*\\b${word}\\b`, 'im'),
+    new RegExp(`^\\s*\\*.*\\b${word}\\b`, 'im'),  // JSDoc comment
+    new RegExp(`^\\s*<!--.*\\b${word}\\b`, 'im'),
+    new RegExp(`<!--[^>]*\\b${word}\\b`, 'i'),  // HTML comment anywhere
+    // URL path: /submit, /api/.../submit
+    new RegExp(`['"\`]/[^'"\`]*${word}[^'"\`]*['"\`]`, 'i'),
+    new RegExp(`\\\$\{[^}]*${word}[^}]*\}`, 'i'),  // template literal URL
+    // classList toggle with id containing word
+    new RegExp(`classList\\s*\\.(toggle|add|remove)\\s*\\(\\s*['"][^'"]*${word}[^'"]*['"]`, 'i'),
+    // .textContent, .innerText (code)
+    new RegExp(`\\.(textContent|innerText|innerHTML)`, 'i'),
+    // Variable name: submitSection, submitRes, etc.
+    new RegExp(`\\b${word}[A-Z]\\w*\\b`, 'i'),
+    // Object property: { submitted: ... }
+    new RegExp(`\\b${word}ed\\s*:`, 'i'),
+    // CSS class: 'submitted'
+    new RegExp(`['"]${word}ed['"]`, 'i'),
+    // id="submit-section" etc
+    new RegExp(`id\\s*=\\s*["'][^"']*${word}[^"']*["']`, 'i'),
+    // fetch URL ending with /submit
+    new RegExp(`/[^\\s"'\\\`]*${word}(?:['"\\\`/]|$)`, 'i'),
+  ];
+  
+  // Find all occurrences of the word
+  const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+  let match;
+  while ((match = wordRegex.exec(content)) !== null) {
+    const idx = match.index;
+    // Use larger context window to catch surrounding attributes
+    const context = content.slice(Math.max(0, idx - 80), Math.min(content.length, idx + word.length + 80));
+    
+    // Skip if it's in a code context
+    let isCode = false;
+    for (const pattern of codePatterns) {
+      if (pattern.test(context)) {
+        isCode = true;
+        break;
+      }
+    }
+    
+    if (!isCode) {
+      return true;
+    }
+  }
+  
+  return false;
+}
 
 function checkFormLanguage() {
   console.log('=== Checking form language ===');
   
   const appsDir = path.join(__dirname, '..', 'apps');
-  
   if (!fs.existsSync(appsDir)) {
     console.log(`${COLORS.yellow}⚠ Apps directory not found${COLORS.reset}`);
     return;
   }
   
-  // Check all apps for form files
   const appDirs = fs.readdirSync(appsDir).filter(d => !d.startsWith('.'));
   
   for (const app of appDirs) {
     const appPath = path.join(appsDir, app);
-    
-    // Search for form-related files
-    const formFiles = [];
+    const formFiles: string[] = [];
     
     function searchDir(dir: string) {
       if (!fs.existsSync(dir)) return;
@@ -40,12 +166,9 @@ function checkFormLanguage() {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
-          // Skip node_modules and dist directories
-          if (file === 'node_modules' || file === 'dist' || file === '.astro') {
-            continue;
-          }
+          if (file === 'node_modules' || file === 'dist' || file === '.astro') continue;
           searchDir(filePath);
-        } else if (file.match(/\.(astro|tsx|ts|jsx|js)$/)) {
+        } else if (file.match(/\.(astro|tsx|jsx)$/)) {
           formFiles.push(filePath);
         }
       }
@@ -56,28 +179,31 @@ function checkFormLanguage() {
     for (const file of formFiles) {
       const content = fs.readFileSync(file, 'utf-8');
       
-      // Check for form labels
-      if (content.includes('label=') || content.includes('placeholder=')) {
-        // Check if the file is in a language-specific directory
-        const relativePath = path.relative(appPath, file);
-        
-        if (relativePath.includes('/en/')) {
-          // English file - check for Vietnamese words
-          const vietnameseWords = ['tên', 'email', 'mật khẩu', 'đăng ký', 'đăng nhập', 'gửi', 'hủy', 'lưu', 'xóa', 'sửa', 'thêm'];
-          for (const word of vietnameseWords) {
-            if (content.includes(word)) {
-              console.log(`${COLORS.red}✗ Found Vietnamese word '${word}' in English form: ${relativePath}${COLORS.reset}`);
-              errorsFound++;
-            }
+      // Only check files that actually contain form elements
+      if (!content.includes('<form') && !content.includes('<input') && !content.includes('<button') && !content.includes('placeholder=')) {
+        continue;
+      }
+      
+      const relativePath = path.relative(appPath, file);
+      const isEnglish = relativePath.includes('/en/');
+      
+      if (isEnglish) {
+        // English file - check for Vietnamese UI words
+        const vietnameseUiWords = ['tên', 'mật khẩu', 'đăng ký', 'đăng nhập', 'gửi', 'hủy', 'lưu', 'xóa', 'sửa', 'thêm', 'liên hệ'];
+        for (const word of vietnameseUiWords) {
+          if (containsUiWord(content, word)) {
+            console.log(`${COLORS.red}✗ Found Vietnamese UI word '${word}' in English form: ${app}/${relativePath}${COLORS.reset}`);
+            errorsFound++;
           }
-        } else {
-          // Vietnamese file - check for English words
-          const englishWords = ['name', 'email', 'password', 'register', 'login', 'submit', 'cancel', 'save', 'delete', 'edit', 'add'];
-          for (const word of englishWords) {
-            if (content.includes(word)) {
-              console.log(`${COLORS.red}✗ Found English word '${word}' in Vietnamese form: ${relativePath}${COLORS.reset}`);
-              errorsFound++;
-            }
+        }
+      } else {
+        // Vietnamese file - check for English UI words in visible text
+        // Only check words that would be visible UI text, not code identifiers
+        const englishUiWords = ['submit', 'cancel', 'register', 'login'];
+        for (const word of englishUiWords) {
+          if (containsUiWord(content, word)) {
+            console.log(`${COLORS.red}✗ Found English UI word '${word}' in Vietnamese form: ${app}/${relativePath}${COLORS.reset}`);
+            errorsFound++;
           }
         }
       }

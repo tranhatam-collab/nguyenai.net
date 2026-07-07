@@ -204,3 +204,69 @@ Sau khi deploy, test trên `https://nguyenai.net`:
    - Accessibility: 0 violations (was 5)
    - Clone contamination: 0 violations (was 20)
    - Tất cả 11 audits passing
+
+Sau khi deploy, test trên `https://nguyenai.net`:
+
+- [ ] Trang chủ load đúng (VI + EN)
+- [ ] /terms và /privacy render đầy đủ
+- [ ] Đăng ký email → nhận email verify → verify thành công
+- [ ] Đăng nhập Google OAuth → redirect về console
+- [ ] Xem plans → checkout Stripe → webhook nhận → entitlement cấp
+- [ ] /v1/models trả về danh sách models
+- [ ] Sitemap.xml accessible
+- [ ] robots.txt accessible
+
+---
+
+## Lưu ý quan trọng
+
+1. **Không deploy invest.nguyenai.net** cho đến khi legal entity + IP ownership + disclaimer review xong (per AGENTS.md)
+2. **Không bật payment live** cho đến khi test Stripe/VNPay ở test mode pass
+3. **Financial model là hypothesis only** — không phải forecast
+4. **Gen1/Gen2 frozen** — không sửa, chỉ reference
+5. **Sprint 0 governance OPEN** — cần lock trước khi production release
+
+---
+
+## Files quan trọng để Founder đọc
+
+| File | Mục đích |
+|---|---|
+| `docs/governance/QA_VERIFICATION_FINAL_2026-07-03.md` | Báo cáo QA cuối |
+| `docs/deployment/GO_LIVE_DEPLOYMENT_GUIDE.md` | Hướng dẫn deploy chi tiết |
+| `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` | Architecture lock |
+| `docs/governance/PRODUCT_BOUNDARY_CONTRACT.md` | 5 commercial objects |
+| `docs/governance/ENTITLEMENT_MODEL.md` | Plan → entitlement mapping |
+| `AGENTS.md` | Quy luật làm việc + brand lock |
+3. **Financial model là hypothesis only** — không phải forecast
+4. **Gen1/Gen2 frozen** — không sửa, chỉ reference
+5. **Sprint 0 governance OPEN** — cần lock trước khi production release
+
+---
+
+## Files quan trọng để Founder đọc
+
+| File | Mục đích |
+|---|---|
+| `docs/governance/QA_VERIFICATION_FINAL_2026-07-03.md` | Báo cáo QA cuối |
+| `docs/deployment/GO_LIVE_DEPLOYMENT_GUIDE.md` | Hướng dẫn deploy chi tiết |
+| `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` | Architecture lock |
+| `docs/governance/PRODUCT_BOUNDARY_CONTRACT.md` | 5 commercial objects |
+| `docs/governance/ENTITLEMENT_MODEL.md` | Plan → entitlement mapping |
+| `AGENTS.md` | Quy luật làm việc + brand lock |
+3. **Financial model là hypothesis only** — không phải forecast
+4. **Gen1/Gen2 frozen** — không sửa, chỉ reference
+5. **Sprint 0 governance OPEN** — cần lock trước khi production release
+
+---
+
+## Files quan trọng để Founder đọc
+
+| File | Mục đích |
+|---|---|
+| `docs/governance/QA_VERIFICATION_FINAL_2026-07-03.md` | Báo cáo QA cuối |
+| `docs/deployment/GO_LIVE_DEPLOYMENT_GUIDE.md` | Hướng dẫn deploy chi tiết |
+| `docs/governance/ECOSYSTEM_SOURCE_OF_TRUTH.md` | Architecture lock |
+| `docs/governance/PRODUCT_BOUNDARY_CONTRACT.md` | 5 commercial objects |
+| `docs/governance/ENTITLEMENT_MODEL.md` | Plan → entitlement mapping |
+| `AGENTS.md` | Quy luật làm việc + brand lock |

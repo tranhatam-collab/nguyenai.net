@@ -5,9 +5,11 @@ import {
   validateWorkflow,
   WorkflowExecutor,
   runWorkflow,
+  WorkflowScheduler,
   type Workflow,
   type WorkflowStep,
   type WorkflowEvent,
+  type ScheduledWorkflow,
 } from './index';
 
 let passed = 0;
@@ -165,6 +167,61 @@ async function main(): Promise<void> {
     't_123',
   );
   assert(exec7.results.get('t')?.output === 't_123', 'tenant context passed to steps');
+
+  // 12. WorkflowScheduler — scheduled trigger
+  const scheduler = new WorkflowScheduler();
+  const scheduled = scheduler.schedule(
+    { id: 'wf_scheduled', name: 'scheduled', steps: [{ id: 's', run: async () => 'scheduled-run' }] },
+    '0 */6 * * *',
+    { data: 'input' },
+  );
+  assert(scheduled.trigger.type === 'scheduled', 'scheduled trigger created');
+  assert(scheduled.trigger.cron === '0 */6 * * *', 'cron expression stored');
+  assert(scheduled.trigger.enabled === true, 'trigger enabled by default');
+  assert(scheduled.nextRunAt !== undefined, 'nextRunAt computed');
+
+  // 13. WorkflowScheduler — webhook trigger
+  const webhook = scheduler.registerWebhook(
+    { id: 'wf_webhook', name: 'webhook', steps: [{ id: 's', run: async () => 'webhook-run' }] },
+    '/webhook/test',
+  );
+  assert(webhook.trigger.type === 'webhook', 'webhook trigger created');
+  assert(webhook.trigger.webhookPath === '/webhook/test', 'webhook path stored');
+
+  // 14. WorkflowScheduler — event trigger
+  const event = scheduler.registerEvent(
+    { id: 'wf_event', name: 'event', steps: [{ id: 's', run: async () => 'event-run' }] },
+    'user.created',
+  );
+  assert(event.trigger.type === 'event', 'event trigger created');
+  assert(event.trigger.eventName === 'user.created', 'event name stored');
+
+  // 15. WorkflowScheduler — manual trigger
+  const manualExec = await scheduler.triggerManual(
+    { id: 'wf_manual', name: 'manual', steps: [{ id: 's', run: async () => 'manual-run' }] },
+    { data: 'manual' },
+  );
+  assert(manualExec.status === 'succeeded', 'manual trigger executes workflow');
+
+  // 16. WorkflowScheduler — handle webhook
+  const webhookExec = await scheduler.handleWebhook('/webhook/test', { payload: 'data' });
+  assert(webhookExec !== null, 'webhook handler finds matching workflow');
+  assert(webhookExec?.status === 'succeeded', 'webhook workflow executes');
+
+  // 17. WorkflowScheduler — handle event
+  const eventExec = await scheduler.handleEvent('user.created', { userId: '123' });
+  assert(eventExec !== null, 'event handler finds matching workflow');
+  assert(eventExec?.status === 'succeeded', 'event workflow executes');
+
+  // 18. WorkflowScheduler — enable/disable
+  scheduler.disable(scheduled.id);
+  assert(scheduled.trigger.enabled === false, 'trigger disabled');
+  scheduler.enable(scheduled.id);
+  assert(scheduled.trigger.enabled === true, 'trigger re-enabled');
+
+  // 19. WorkflowScheduler — remove
+  scheduler.remove(scheduled.id);
+  assert(scheduler.getScheduled().find((s: ScheduledWorkflow) => s.id === scheduled.id) === undefined, 'scheduled workflow removed');
 
   // Report
   console.log('\n@nai/aqueduct test');
