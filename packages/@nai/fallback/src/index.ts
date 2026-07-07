@@ -9,7 +9,7 @@
  * - Fallback event cannot bypass model/output policy
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -146,7 +146,7 @@ export async function requestFallback(
     approved_by: null,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'fallback',
     action: 'fallback_requested',
     target: requestId,
@@ -176,7 +176,7 @@ export async function approveFallback(
     approved_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'fallback',
     action: 'fallback_approved',
     target: requestId,
@@ -200,7 +200,7 @@ export async function denyFallback(
     approved_by: approvedBy,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'fallback',
     action: 'fallback_denied',
     target: requestId,
@@ -226,7 +226,7 @@ export async function executeFallback(
     executed_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'fallback',
     action: 'fallback_executed',
     target: requestId,

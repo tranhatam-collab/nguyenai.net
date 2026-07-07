@@ -8,7 +8,7 @@
  * - Audit trail for all notifications
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -170,7 +170,7 @@ export async function sendNotification(
     });
   }
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'notification',
     action: 'notification_sent',
     target: notificationId,
@@ -186,7 +186,7 @@ export async function getNotification(notificationId: string): Promise<Notificat
   return defaultStore.getNotification(notificationId);
 }
 
-export async function listNotifications(filters?: { status?: string; channel?: Channel }): Promise<Notification[]> {
+export async function listNotifications(filters?: { status?: Notification['status']; channel?: Channel }): Promise<Notification[]> {
   return defaultStore.listNotifications(filters);
 }
 

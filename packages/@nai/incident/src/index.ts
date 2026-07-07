@@ -8,7 +8,7 @@
  * - Admin notification integration
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -71,7 +71,7 @@ export class InMemoryIncidentStore implements IncidentStore {
       ...incident,
       incident_id: id,
       detected_at: now,
-      created_at: now,
+      created_by: detectedBy,
     };
     this.incidents.set(id, full);
     return id;
@@ -166,7 +166,7 @@ export async function createIncident(
     created_by: createdBy,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'incident',
     action: 'incident_detected',
     target: incidentId,
@@ -235,7 +235,7 @@ export async function resolveIncident(
     created_by: resolvedBy,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'incident',
     action: 'incident_resolved',
     target: incidentId,

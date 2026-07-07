@@ -53,8 +53,6 @@ export type AuditEventType =
   | 'certificate_issued'
   | 'certificate_revoked'
   | 'payment_received'
-  | 'payment_checkout_created'
-  | 'account_deleted'
   | 'investor_room_accessed'
   | 'scholarship_application_created'
   | 'scholarship_application_updated'
@@ -81,7 +79,21 @@ export type AuditEventType =
   | 'complaint_submitted'
   | 'appeal_submitted'
   | 'scholarship_data_exported'
-  | 'scholarship_retention_sweep';
+  | 'scholarship_retention_sweep'
+  | 'investor_interest_submitted'
+  | 'investor_identity_declared'
+  | 'investor_disclosure_accepted'
+  | 'investor_nda_signed'
+  | 'investor_identity_verified'
+  | 'investor_identity_rejected'
+  | 'investor_payment_submitted'
+  | 'investor_receipt_uploaded'
+  | 'investor_payment_mismatched'
+  | 'investor_payment_matched'
+  | 'investor_2fa_activated'
+  | 'investor_2fa_challenge'
+  | 'investor_access_expired'
+  | 'gen1_admin_proxy_call';
 
 export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'login_success', 'login_failure', 'logout', 'session_revoked', 'session_expired',
@@ -94,7 +106,7 @@ export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
   'approval_requested', 'approval_granted', 'approval_denied', 'sensitive_action_executed',
   'command_executed', 'command_failed', 'command_cancelled', 'tool_called', 'workflow_completed',
   'academy_lesson_completed', 'proof_submitted', 'certificate_issued', 'certificate_revoked',
-  'payment_received', 'payment_checkout_created', 'account_deleted', 'investor_room_accessed',
+  'payment_received', 'investor_room_accessed',
   'scholarship_application_created', 'scholarship_application_updated',
   'identity_verification_started', 'identity_verification_completed',
   'investor_access_granted', 'investor_access_revoked',
@@ -118,14 +130,15 @@ export type AuditResult = 'success' | 'failure' | 'denied';
 export interface AuditEvent {
   event_id?: string;
   timestamp?: string;
-  registry_version?: string;
   user_id: string | null;
   session_id: string | null;
+  tenant_id?: string | null;
   event_type: AuditEventType;
   actor_ip: string | null;
   user_agent: string | null;
   target: string | null;
   result: AuditResult;
+  category?: string;
   metadata: Record<string, unknown>;
 }
 
@@ -159,7 +172,7 @@ export class InMemoryAuditStore implements AuditStore {
   async log(event: AuditEvent): Promise<string> {
     const event_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    const stored: AuditEvent = { ...event, event_id, timestamp, registry_version: AUDIT_REGISTRY_VERSION };
+    const stored: AuditEvent = { ...event, event_id, timestamp };
     this.events.push(stored);
     return event_id;
   }
@@ -208,6 +221,29 @@ export function getAuditStore(): AuditStore {
 
 export async function logAuditEvent(event: AuditEvent): Promise<string> {
   return defaultStore.log(event);
+}
+
+// Helper for governance packages — converts category/action/details to event_type/metadata
+export async function logGovernanceAuditEvent(params: {
+  category: string;
+  action: string;
+  target: string;
+  details: Record<string, unknown>;
+  user_id: string;
+  tenant_id: string;
+}): Promise<string> {
+  return logAuditEvent({
+    user_id: params.user_id,
+    session_id: null,
+    tenant_id: params.tenant_id,
+    event_type: `${params.category}_${params.action}` as AuditEventType,
+    actor_ip: null,
+    user_agent: null,
+    target: params.target,
+    result: 'success',
+    category: params.category,
+    metadata: params.details,
+  });
 }
 
 export async function queryAuditLog(q: AuditQuery): Promise<AuditEvent[]> {

@@ -7,7 +7,7 @@
  * - Can block, modify, or allow output based on policy checks
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 import {
   checkAllPolicies,
   type Language,
@@ -137,7 +137,7 @@ export async function guardOutput(
   });
 
   // Audit event
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'output_guard',
     action: 'output_guarded',
     target: invocationId,

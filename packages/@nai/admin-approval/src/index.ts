@@ -8,7 +8,7 @@
  * - Audit trail for all approvals
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -122,7 +122,7 @@ export async function requestApproval(
     metadata,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'approval',
     action: 'approval_requested',
     target: requestId,
@@ -155,7 +155,7 @@ export async function approveRequest(
     approved_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'approval',
     action: 'approval_granted',
     target: requestId,
@@ -183,7 +183,7 @@ export async function denyRequest(
     denied_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'approval',
     action: 'approval_denied',
     target: requestId,

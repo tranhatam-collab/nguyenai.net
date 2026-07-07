@@ -9,7 +9,7 @@
  * - Policy version tracking
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -222,7 +222,7 @@ export async function invokeModel(
   await defaultStore.updateInvocation(invocationId, { receipt_id: receiptId });
 
   // Audit event
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'model_gateway',
     action: 'model_invoked',
     target: invocationId,

@@ -8,7 +8,7 @@
  * - Audit trail for all self-heal attempts
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 import {
   requestApproval,
   approveRequest,
@@ -130,11 +130,10 @@ export async function detectIssue(
     production_deployment_id: null,
     verification_results: null,
     error: null,
-    completed_at: null,
     requested_by: requestedBy,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'self_heal',
     action: 'issue_detected',
     target: attemptId,
@@ -270,7 +269,7 @@ export async function completeSelfHeal(
     completed_at: new Date().toISOString(),
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'self_heal',
     action: 'self_heal_completed',
     target: attemptId,
