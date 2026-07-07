@@ -188,11 +188,11 @@ const programs = SCHOLARSHIP_PROGRAMS;
         <h2 class="text-xl font-semibold mb-4">Phần 8 — Cam kết</h2>
         <div class="space-y-3">
           <label class="flex items-start gap-3">
-            <input type="checkbox" name="commits_to_attendance" class="mt-1" />
+            <input type="checkbox" name="commits_to_attendance" required class="mt-1" />
             <span>Tôi cam kết tham gia đầy đủ các buổi học *</span>
           </label>
           <label class="flex items-start gap-3">
-            <input type="checkbox" name="commits_to_graduation" class="mt-1" />
+            <input type="checkbox" name="commits_to_graduation" required class="mt-1" />
             <span>Tôi cam kết hoàn thành chương trình *</span>
           </label>
           <label class="flex items-start gap-3">
@@ -200,11 +200,11 @@ const programs = SCHOLARSHIP_PROGRAMS;
             <span>Tôi cam kết đóng góp cho cộng đồng Nguyễn AI</span>
           </label>
           <label class="flex items-start gap-3">
-            <input type="checkbox" name="consents_to_data_processing" class="mt-1" />
+            <input type="checkbox" name="consents_to_data_processing" required class="mt-1" />
             <span>Tôi đồng ý với việc xử lý dữ liệu cá nhân cho mục đích xét học bổng *</span>
           </label>
           <label class="flex items-start gap-3">
-            <input type="checkbox" name="consents_to_audit" class="mt-1" />
+            <input type="checkbox" name="consents_to_audit" required class="mt-1" />
             <span>Tôi đồng ý với việc hệ thống ghi lại audit log cho mọi thao tác *</span>
           </label>
         </div>
@@ -280,7 +280,37 @@ const programs = SCHOLARSHIP_PROGRAMS;
       currentPart = n;
     }
 
+    // Validate all required fields in the current part before advancing
+    function validatePart(n) {
+      const part = document.querySelector(`.form-part[data-part="${n}"]`);
+      if (!part) return true;
+      const requiredFields = part.querySelectorAll('[required]');
+      for (const field of requiredFields) {
+        if (field.type === 'checkbox') {
+          if (!field.checked) {
+            field.focus();
+            alert('Vui lòng đánh dấu ô bắt buộc trước khi tiếp tục.');
+            return false;
+          }
+        } else if (field.type === 'radio') {
+          const group = part.querySelectorAll(`input[name="${field.name}"]:checked`);
+          if (group.length === 0) {
+            alert('Vui lòng chọn một đáp án trước khi tiếp tục.');
+            return false;
+          }
+        } else {
+          if (!field.value.trim()) {
+            field.focus();
+            alert('Vui lòng điền trường bắt buộc trước khi tiếp tục.');
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
     nextBtn.addEventListener('click', () => {
+      if (!validatePart(currentPart)) return;
       if (currentPart < 8) showPart(currentPart + 1);
     });
     prevBtn.addEventListener('click', () => {
@@ -349,6 +379,13 @@ const programs = SCHOLARSHIP_PROGRAMS;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      // Validate all 8 parts before submitting
+      for (let n = 1; n <= 8; n++) {
+        if (!validatePart(n)) {
+          showPart(n);
+          return;
+        }
+      }
       await autosave();
       if (!applicationId) {
         alert('Vui lòng điền đủ thông tin cơ bản trước khi nộp');
