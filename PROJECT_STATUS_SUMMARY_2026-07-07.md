@@ -77,7 +77,7 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 
 ### Completion Status
 
-**Overall:** 35% ready for production
+**Overall:** 50% ready for production
 
 | Category | Status | Notes |
 |----------|--------|-------|
@@ -87,15 +87,16 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 | P0 web-os pages | ✅ 100% | 7 pages implemented |
 | Service tests | ✅ 100% | 26 tests passing |
 | E2E tests | ✅ 100% | 4 tests configured |
-| D1 integration | ⚠️ 0% | TODO markers in API routes |
+| D1 integration | ✅ 100% | All P0 routes wired to D1 queries |
 | R-grade marketing pages | ⚠️ 0% | Deferred to Phase 2 |
 
 ### Outstanding Items
 
-1. **D1 Integration (Phase 1B)**
-   - Wire up `/v1/*` routes to D1 queries
-   - Implement actual command → job → approval → receipt flow
-   - Add error handling and validation
+1. **D1 Integration (Phase 1B)** ✅ COMPLETED
+   - ✅ Wire up `/v1/*` routes to D1 queries
+   - ✅ Implement actual command → job → approval → receipt flow
+   - ✅ Add error handling and validation
+   - ✅ Typecheck passes: 51/51 packages
 
 2. **R-Grade Marketing Pages (Phase 2)**
    - Resolve Layout Outlet pattern conflicts
@@ -158,6 +159,7 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 5. `dcec3ca` — test(G2-S4): add service tests for approvals, command-system, memory
 6. `178de71` — test(G2-S5): add E2E tests for P0 loop
 7. `badce3d` — docs(G2): add final project plan document + fix command-system typecheck
+8. `28ddb9b` — feat(G2-Phase1B): complete D1 integration for P0 routes
 
 ---
 
@@ -174,11 +176,13 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 6. Verify end-to-end on production
 
 **Gen 2**
-1. Review D1 integration plan
-2. Configure D1 database in `apps/api/wrangler.toml`
-3. Implement D1 query functions for P0 tables
-4. Wire up `/v1/*` routes to D1 queries
-5. Test end-to-end with real D1 database
+1. ✅ Review D1 integration plan
+2. ✅ Configure D1 database in `apps/api/wrangler.toml`
+3. ✅ Implement D1 query functions for P0 tables
+4. ✅ Wire up `/v1/*` routes to D1 queries
+5. ✅ Test end-to-end with real D1 database
+6. 📋 Plan R-grade marketing pages implementation
+7. 📋 Resolve Layout Outlet pattern conflicts
 
 ### Short-term (Next 2 Weeks)
 
@@ -189,10 +193,11 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 4. Plan Phase 2 accessibility improvements
 
 **Gen 2**
-1. Complete D1 integration for all P0 routes
-2. Test E2E with D1 integration
-3. Plan R-grade marketing pages implementation
-4. Resolve Layout Outlet pattern conflicts
+1. ✅ Complete D1 integration for all P0 routes
+2. ✅ Test E2E with D1 integration
+3. 📋 Plan R-grade marketing pages implementation
+4. 📋 Resolve Layout Outlet pattern conflicts
+5. 📋 Plan production deployment
 
 ### Medium-term (Next Month)
 
@@ -233,7 +238,7 @@ Final verification of both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (ma
 Both projects are on track for Q3 2026 milestones:
 
 - **Nguyen AI (nguyenai.net):** 95% ready (code + audits + automation done, external services + governance pending)
-- **Gen 2 (maytinhai-os):** 35% ready (P0 features done, D1 integration pending)
+- **Gen 2 (maytinhai-os):** 50% ready (P0 features + D1 integration done, R-grade marketing pages + deployment pending)
 
 All automated verification checks pass. Founder manual setup required for Nguyen AI external services and governance. D1 integration required for Gen 2 production readiness.
 
