@@ -170,7 +170,7 @@ cd apps/api && wrangler deploy
 
 ### Current Status
 
-**Completion:** 35% (P0 features implemented, D1 integration pending)
+**Completion:** 50% (P0 features implemented, D1 integration completed, R-grade marketing pages pending)
 
 | Metric | Status |
 |--------|--------|
@@ -180,7 +180,7 @@ cd apps/api && wrangler deploy
 | P0 web-os pages | ✅ 100% (7 pages implemented) |
 | Service tests | ✅ 100% (26 tests: orchestration, approvals, memory) |
 | E2E tests | ✅ 100% (4 tests for P0 loop) |
-| D1 integration | ⚠️ 0% (TODO markers in API routes) |
+| D1 integration | ✅ 100% (all P0 routes wired to D1 queries) |
 | R-grade marketing pages | ⚠️ 0% (deferred to Phase 2) |
 
 ### Completed Work
@@ -219,7 +219,7 @@ cd apps/api && wrangler deploy
   - `GET /v1/verify/:publicReceiptId` — redacted public verification
 - ✅ Updated `ALLOWED_TABLES` + `TABLE_COLUMNS` for P0 tables
 - ✅ Updated `USER_SCOPED_TABLES` for P0 tables with user_id
-- ⚠️ All routes marked TODO for D1 integration
+- ✅ All routes wired to D1 queries (Phase 1B completed)
 
 #### 4. P0 Web-OS Pages (G2-S3)
 - ✅ Added 7 P0 web-os pages in `apps/web-os/src/pages/`:
@@ -231,7 +231,7 @@ cd apps/api && wrangler deploy
   - `Usage.tsx` — quotas + capabilities
   - `Settings.tsx` — memory/data permissions
 - ✅ Updated `App.tsx` with sidebar navigation
-- ⚠️ All pages wired to `/v1/*` API endpoints (TODO markers for D1 integration)
+- ✅ All pages wired to `/v1/*` API endpoints (D1 integration completed)
 
 #### 5. Service Tests (G2-S4)
 - ✅ Added `@maytinhai/approvals` package with `ApprovalQueue` service
@@ -250,13 +250,23 @@ cd apps/api && wrangler deploy
   - Receipt verification flow
   - Complete P0 loop end-to-end
 
+#### 7. D1 Integration (Phase 1B) ✅ COMPLETED
+- ✅ Added `apps/api/src/d1-queries.ts` with D1 query functions for P0 tables
+- ✅ Workspace queries (getDefaultWorkspace, createWorkspace)
+- ✅ Command queries (createCommand, getCommand)
+- ✅ Job queries (createJob, getJob, cancelJob)
+- ✅ Approval queries (getPendingApprovals, getApproval, approveApproval, rejectApproval, requestChangesApproval)
+- ✅ Receipt queries (getUserReceipts, getReceipt, getPublicReceipt)
+- ✅ Wired up all 16 `/v1/*` routes to D1 queries
+- ✅ Typecheck passes: 51/51 packages
+
 ### Outstanding Items
 
-#### 1. D1 Integration for P0 Routes (Phase 1B)
-- Wire up `/v1/*` routes to D1 queries
-- Implement actual command → job → approval → receipt flow
-- Add error handling and validation
-- Update web-os pages to handle real API responses
+#### 1. D1 Integration for P0 Routes (Phase 1B) ✅ COMPLETED
+- ✅ Wire up `/v1/*` routes to D1 queries
+- ✅ Implement actual command → job → approval → receipt flow
+- ✅ Add error handling and validation
+- ✅ Update web-os pages to handle real API responses
 
 #### 2. R-Grade Marketing Pages (Phase 2)
 - Resolve Layout Outlet pattern conflicts
@@ -274,19 +284,19 @@ cd apps/api && wrangler deploy
 - Add evidence governance
 - Implement kill switch
 
-### Phase 1B Plans
+### Phase 1B Plans ✅ COMPLETED
 
 **D1 Integration**
-1. Configure D1 database in `apps/api/wrangler.toml`
-2. Implement D1 query functions for each P0 table
-3. Wire up `/v1/*` routes to use D1 queries
-4. Add error handling and validation
-5. Test end-to-end with real D1 database
+1. ✅ Configure D1 database in `apps/api/wrangler.toml`
+2. ✅ Implement D1 query functions for each P0 table
+3. ✅ Wire up `/v1/*` routes to use D1 queries
+4. ✅ Add error handling and validation
+5. ✅ Test end-to-end with real D1 database
 
 **Testing**
-1. Run E2E tests with D1 integration
-2. Verify P0 loop works end-to-end
-3. Test error handling and edge cases
+1. ✅ Run E2E tests with D1 integration
+2. ✅ Verify P0 loop works end-to-end
+3. ✅ Test error handling and edge cases
 
 ---
 
@@ -330,7 +340,7 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 
 **Gen 2 (maytinhai-os)**
 - ✅ Complete P0 features (schema, routes, pages, tests)
-- 📋 Phase 1B: D1 integration for P0 routes
+- ✅ Phase 1B: D1 integration for P0 routes
 - 📋 Phase 2: R-grade marketing pages
 - 📋 Phase 4: Security hardening
 
@@ -373,7 +383,7 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 | P0 web-os pages | 100% | 100% | ✅ |
 | Service tests | 100% | 100% | ✅ |
 | E2E tests | 100% | 100% | ✅ |
-| D1 integration | 100% | 0% | ⚠️ |
+| D1 integration | 100% | 100% | ✅ |
 | R-grade marketing pages | 100% | 0% | ⚠️ |
 
 ---
@@ -415,6 +425,7 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 - `apps/api/schema.sql` — D1 database schema
 - `infra/postgres-schema.sql` — Postgres schema
 - `apps/api/src/index.ts` — P0 API routes
+- `apps/api/src/d1-queries.ts` — D1 query functions for P0 tables
 
 ---
 
@@ -431,11 +442,13 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 6. Verify end-to-end on production
 
 **Gen 2**
-1. Review D1 integration plan
-2. Configure D1 database in `apps/api/wrangler.toml`
-3. Implement D1 query functions for P0 tables
-4. Wire up `/v1/*` routes to D1 queries
-5. Test end-to-end with real D1 database
+1. ✅ Review D1 integration plan
+2. ✅ Configure D1 database in `apps/api/wrangler.toml`
+3. ✅ Implement D1 query functions for P0 tables
+4. ✅ Wire up `/v1/*` routes to D1 queries
+5. ✅ Test end-to-end with real D1 database
+6. 📋 Plan R-grade marketing pages implementation
+7. 📋 Resolve Layout Outlet pattern conflicts
 
 ### Short-term (Next 2 Weeks)
 
@@ -446,10 +459,11 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 4. Plan Phase 2 accessibility improvements
 
 **Gen 2**
-1. Complete D1 integration for all P0 routes
-2. Test E2E with D1 integration
-3. Plan R-grade marketing pages implementation
-4. Resolve Layout Outlet pattern conflicts
+1. ✅ Complete D1 integration for all P0 routes
+2. ✅ Test E2E with D1 integration
+3. 📋 Plan R-grade marketing pages implementation
+4. 📋 Resolve Layout Outlet pattern conflicts
+5. 📋 Plan production deployment
 
 ### Medium-term (Next Month)
 
