@@ -1,2 +1,5 @@
-$ echo 'no build'
+
+> @nai/e2e-tests@0.1.0 build /Users/tranhatam/Documents/Devnewproject/nguyenai.net/tests/e2e
+> echo 'no build'
+
 no build

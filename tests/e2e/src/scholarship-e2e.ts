@@ -389,4 +389,3 @@ console.log(`Assertions: ${assertCount}`);
 console.log(`Applications created: 3`);
 console.log(`Entitlement lifecycle: granted → suspended → restored → revoked`);
 console.log(`Email sends captured: ${sentEmails.length}`);
-console.log(`Steps: ${stepCount}`);
