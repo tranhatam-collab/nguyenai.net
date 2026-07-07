@@ -33,11 +33,14 @@ export interface ApprovalRequest {
   denied_at: string | null;
   expires_at: string | null;
   reason: string | null;
+  revoked_by: string | null;
+  revoked_at: string | null;
+  revocation_reason: string | null;
   metadata: Record<string, unknown>;
 }
 
 export interface ApprovalStore {
-  createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at'>): Promise<string>;
+  createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason'>): Promise<string>;
   getRequest(requestId: string): Promise<ApprovalRequest | null>;
   updateRequest(requestId: string, updates: Partial<ApprovalRequest>): Promise<void>;
   listRequests(filters?: { category?: ApprovalCategory; status?: ApprovalStatus; stage?: ApprovalStage; requester?: string }): Promise<ApprovalRequest[]>;
@@ -50,7 +53,7 @@ export interface ApprovalStore {
 export class InMemoryApprovalStore implements ApprovalStore {
   private requests = new Map<string, ApprovalRequest>();
 
-  async createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at'>): Promise<string> {
+  async createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason'>): Promise<string> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const full: ApprovalRequest = {
@@ -60,6 +63,9 @@ export class InMemoryApprovalStore implements ApprovalStore {
       requested_at: now,
       approved_at: null,
       denied_at: null,
+      revoked_by: null,
+      revoked_at: null,
+      revocation_reason: null,
     };
     this.requests.set(id, full);
     return id;
@@ -260,6 +266,50 @@ export function checkProtectedData(metadata: Record<string, unknown>): Protected
   }
 
   return { isProtected: false };
+}
+
+// ============================================================
+// Approval revocation
+// ============================================================
+
+export async function revokeApproval(
+  requestId: string,
+  revokedBy: string,
+  reason: string
+): Promise<void> {
+  if (!reason || reason.trim().length === 0) {
+    throw new Error('Revocation reason is required');
+  }
+
+  const request = await defaultStore.getRequest(requestId);
+  if (!request) {
+    throw new Error('Approval request not found');
+  }
+
+  if (request.status === 'pending') {
+    throw new Error('Cannot revoke pending request (use deny instead)');
+  }
+
+  // Revert to pending status
+  await defaultStore.updateRequest(requestId, {
+    status: 'pending',
+    approver: null,
+    approved_at: null,
+    denied_at: null,
+    reason: `Revoked: ${reason}`,
+    revoked_by: revokedBy,
+    revoked_at: new Date().toISOString(),
+    revocation_reason: reason,
+  });
+
+  await logGovernanceAuditEvent({
+    category: 'approval',
+    action: 'approval_revoked',
+    target: requestId,
+    details: { previous_status: request.status, reason },
+    user_id: revokedBy,
+    tenant_id: 'system',
+  });
 }
 
 // ============================================================

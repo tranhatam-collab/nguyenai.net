@@ -10,6 +10,7 @@ import {
   requestApproval,
   approveRequest,
   denyRequest,
+  revokeApproval,
   checkApprovalStatus,
   listPendingApprovals,
   checkProtectedData,
@@ -189,6 +190,41 @@ async function testApproveWithInvalidRole() {
   assert(roleErrorCaught === true, 'invalid approver role throws error');
 }
 
+async function testRevokeApproval() {
+  console.log('Test: revoke approval');
+  const store = new InMemoryApprovalStore();
+  setApprovalStore(store);
+
+  const id = await requestApproval('deployment', 'production', 'Test', 'Test', 'admin-1');
+  await approveRequest(id, 'admin-2', 'Approved', ['ADMIN']);
+
+  const approved = await store.getRequest(id);
+  assert(approved?.status === 'approved', 'status is approved');
+
+  await revokeApproval(id, 'admin-1', 'Mistaken approval');
+
+  const revoked = await store.getRequest(id);
+  assert(revoked?.status === 'pending', 'status reverted to pending');
+  assert(revoked?.revoked_by === 'admin-1', 'revoked_by set');
+  assert(revoked?.revocation_reason === 'Mistaken approval', 'revocation_reason set');
+}
+
+async function testRevokePendingRequest() {
+  console.log('Test: revoke pending request (should fail)');
+  const store = new InMemoryApprovalStore();
+  setApprovalStore(store);
+
+  const id = await requestApproval('deployment', 'production', 'Test', 'Test', 'admin-1');
+
+  let errorCaught = false;
+  try {
+    await revokeApproval(id, 'admin-1', 'Test');
+  } catch (e) {
+    errorCaught = true;
+  }
+  assert(errorCaught === true, 'revoking pending request throws error');
+}
+
 async function main() {
   console.log('=== @nai/admin-approval unit tests ===\n');
   await testRequestApproval();
@@ -200,6 +236,8 @@ async function main() {
   await testRequireReason();
   await testApproverRoleValidation();
   await testApproveWithInvalidRole();
+  await testRevokeApproval();
+  await testRevokePendingRequest();
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }

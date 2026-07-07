@@ -15,6 +15,7 @@ import {
   requestApproval,
   approveRequest,
   denyRequest,
+  revokeApproval,
   checkApprovalStatus,
   listPendingApprovals,
   getApprovalStore,
@@ -120,6 +121,26 @@ approvalRoutes.post('/v1/admin-approvals/:id/deny', async (c) => {
   const userRoles = session?.role ? [session.role] : [];
 
   await denyRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
+
+  return c.json({ success: true });
+});
+
+// ============================================================
+// POST /v1/admin-approvals/:id/revoke — revoke approval
+// ============================================================
+
+approvalRoutes.post('/v1/admin-approvals/:id/revoke', async (c) => {
+  const authError = requireAdmin(c);
+  if (authError) return authError;
+
+  const id = c.req.param('id');
+  const { reason } = await c.req.json();
+
+  if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+    return c.json({ error: 'Reason is required for revocation' }, 400);
+  }
+
+  await revokeApproval(id, c.get('session')?.user_id ?? 'system', reason.trim());
 
   return c.json({ success: true });
 });
