@@ -48,7 +48,7 @@ export interface IncidentEvent {
 }
 
 export interface IncidentStore {
-  createIncident(incident: Omit<Incident, 'incident_id' | 'detected_at' | 'created_at'>): Promise<string>;
+  createIncident(incident: Omit<Incident, 'incident_id' | 'detected_at'>): Promise<string>;
   getIncident(incidentId: string): Promise<Incident | null>;
   updateIncident(incidentId: string, updates: Partial<Incident>): Promise<void>;
   listIncidents(filters?: { severity?: Severity; status?: IncidentStatus; component?: string }): Promise<Incident[]>;
@@ -64,14 +64,13 @@ export class InMemoryIncidentStore implements IncidentStore {
   private incidents = new Map<string, Incident>();
   private events = new Map<string, IncidentEvent[]>();
 
-  async createIncident(incident: Omit<Incident, 'incident_id' | 'detected_at' | 'created_at'>): Promise<string> {
+  async createIncident(incident: Omit<Incident, 'incident_id' | 'detected_at'>): Promise<string> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const full: Incident = {
       ...incident,
       incident_id: id,
       detected_at: now,
-      created_by: detectedBy,
     };
     this.incidents.set(id, full);
     return id;
