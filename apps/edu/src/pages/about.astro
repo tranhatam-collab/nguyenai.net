@@ -6,8 +6,8 @@ const totalLessons = tracks.reduce((sum, t) => sum + t.lessonCount, 0);
 ---
 
 <AcademyLayout
-  title="About"
-  description="About Nguyen AI Academy — free AI learning for the global Nguyen community."
+  title="Giới thiệu"
+  description="Giới thiệu Nguyễn AI Academy — học AI miễn phí cho cộng đồng Nguyễn toàn cầu."
   activeNav="about"
 >
   <section class="academy-container py-12 max-w-3xl">
@@ -92,6 +92,18 @@ const totalLessons = tracks.reduce((sum, t) => sum + t.lessonCount, 0);
         AI Computer Console: <a href="https://app.nguyenai.net">app.nguyenai.net</a><br />
         Academy: <a href="https://edu.nguyenai.net">edu.nguyenai.net</a>
       </p>
+      <div class="mt-4 p-4 bg-academy-header rounded-lg border border-academy-border">
+        <div class="flex items-center gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-academy-accent">📞</span>
+            <span>Hotline: <a href="tel:0989660750" class="text-academy-accent font-medium hover:underline">0989660750</a></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-academy-accent">💬</span>
+            <span>Zalo: <a href="https://zalo.me/0989660750" class="text-academy-accent font-medium hover:underline">0989660750</a></span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </AcademyLayout>
