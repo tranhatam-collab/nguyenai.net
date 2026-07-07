@@ -90,8 +90,23 @@ import { scholarshipRoutes } from './scholarship-routes';
 import { createNguyenTools, type NguyenTools } from '@nai/nguyen-tools';
 import { idempotencyMiddleware } from './idempotency';
 import { defaultRateLimit, cleanupBuckets } from './rate-limiter';
+import { getProofStore, verifyCertificateId, verifyServiceAuth, type ReviewerResult, type ReviewDecision } from './stubs';
 
 import modelsData from '../../../packages/product-catalog/models.json';
+
+// Phase 1 — Incident and notification routes
+import incidentRoutes from './routes/incidents';
+import notificationRoutes from './routes/notifications';
+
+// Phase 2 — Admin approval and self-healing routes
+import adminApprovalRoutes from './routes/admin-approvals';
+import selfHealRoutes from './routes/self-heal';
+
+// Phase 3 — Model gateway route
+import modelGatewayRoutes from './routes/model-gateway';
+
+// Phase 4 — Fallback route
+import fallbackRoutes from './routes/fallback';
 
 // ============================================================
 // App context
@@ -113,6 +128,10 @@ interface AppEnv {
     // Gen1 upstream gateway (aiagent.iai.one — FROZEN reference, adapter only)
     GEN1_GATEWAY_URL: string;
     GEN1_ADMIN_KEY?: string;
+    RESEND_API_KEY?: string;
+    DEFAULT_AUDIENCE?: string;
+    SCHOLARSHIP_REVIEW_SECRET?: string;
+    INVESTOR_VERIFY_API_KEY?: string;
   };
   Variables: {
     session: Session | null;
@@ -294,7 +313,7 @@ app.post('/v1/approvals', async (c) => {
     requested_by: session.user_id,
     reason: body.reason,
     metadata: body.metadata,
-  }, { RESEND_API_KEY: c.env.RESEND_API_KEY, ENVIRONMENT: c.env.ENVIRONMENT });
+  });
   return c.json({ approval_id: id, status: 'pending' }, 201);
 });
 
@@ -497,8 +516,8 @@ async function resolveSessionFromCookie(sessionId: string, env: AppEnv['Bindings
           plan_id: data.plan_id ?? 'nguyen-start',
           audience: env.DEFAULT_AUDIENCE ?? 'app.nguyenai.net',
           issuer: authIssuer,
-          roles: data.roles ?? [],
-          permissions: data.permissions ?? [],
+          roles: (data.roles ?? []) as any,
+          permissions: (data.permissions ?? []) as any,
           device: null,
           ip_address: null,
           user_agent: null,
@@ -693,7 +712,7 @@ app.get('/v1/payment/vnpay/return', async (c) => {
   const queries = c.req.queries();
   for (const key of Object.keys(queries)) {
     const vals = queries[key];
-    params[key] = Array.isArray(vals) ? vals[0] : vals;
+    params[key] = Array.isArray(vals) ? String(vals[0] ?? '') : String(vals);
   }
 
   const valid = await verifyVnPayReturn(
@@ -824,7 +843,7 @@ app.get('/v1/me/proofs', async (c) => {
   const store = getProofStore();
   const proofs = await store.getProofsByUser(session.user_id);
   return c.json({
-    proofs: proofs.map((p) => ({
+    proofs: proofs.map((p: any) => ({
       proof_id: p.proof_id,
       program_id: p.program_id,
       status: p.status,
@@ -862,7 +881,7 @@ app.get('/v1/me/certificates', async (c) => {
   const store = getProofStore();
   const certs = await store.getCertificatesByUser(session.user_id);
   return c.json({
-    certificates: certs.map((cert) => ({
+    certificates: certs.map((cert: any) => ({
       certificate_id: cert.certificate_id,
       program_id: cert.program_id,
       issued_at: cert.issued_at,
@@ -881,7 +900,7 @@ app.get('/v1/review/queue', async (c) => {
   const store = getProofStore();
   const queue = await store.getReviewQueue();
   return c.json({
-    queue: queue.map((p) => ({
+    queue: queue.map((p: any) => ({
       proof_id: p.proof_id,
       user_id: p.user_id,
       program_id: p.program_id,
@@ -1405,5 +1424,4276 @@ app.get('/v1/nguyen/chapters/:id/events', async (c) => {
   const tools = getNguyenTools(getTenantId(c));
   return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
 });
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+  });
+});
+
+// POST /v1/audit/investor-access — record investor private room access event
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+// Called by invest.nguyenai.net middleware
+app.post('/v1/audit/investor-access', async (c) => {
+  const session = c.get('session');
+  // Allow internal calls (from invest middleware) with session
+  if (!session) {
+    // Allow service-authenticated calls
+    const auth = await verifyServiceAuth(c);
+    if (!auth.ok) return c.json({ error: auth.error }, (auth.status ?? 401) as any);
+  }
+
+  const { event_type, user_id, route, ip, user_agent } = await c.req.json().catch(() => ({}));
+  if (!event_type || !route) {
+    return c.json({ error: 'event_type and route required' }, 400);
+  }
+
+  await logAuditEvent({
+    user_id: user_id ?? session?.user_id ?? 'unknown',
+    tenant_id: session?.tenant_id ?? '',
+    session_id: session?.session_id ?? null,
+    event_type: event_type as any,
+    actor_ip: ip ?? c.req.header('CF-Connecting-IP') ?? null,
+    user_agent: user_agent ?? c.req.header('User-Agent') ?? null,
+    target: `route:${route}`,
+    result: event_type === 'private_route_denied' ? 'failure' : 'success',
+    metadata: { route },
+  });
+
+  return c.json({ recorded: true });
+});
+
+// POST /v1/investor-interest — request access form submission
+// Per INVESTOR_ACCESS_POLICY §10 (LOCKED): submit to real backend, store in Postgres, email verification
+app.post('/v1/investor-interest', async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const { full_name, email, company, jurisdiction, intended_investment_size_range, message, consent_to_contact } = body ?? {};
+
+  if (!full_name || !email || !jurisdiction || !intended_investment_size_range) {
+    return c.json({ error: 'full_name, email, jurisdiction, intended_investment_size_range required' }, 400);
+  }
+  if (!consent_to_contact) {
+    return c.json({ error: 'consent_to_contact must be true' }, 400);
+  }
+
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+  // Rate limit: max 3 per 24h per email (per §10.2)
+  // TODO: implement with KV — placeholder allows all
+  const ip = c.req.header('CF-Connecting-IP') ?? null;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+  // Store submission (TODO: insert into Postgres investor_interest table)
+  const submissionId = crypto.randomUUID();
+
+  await logAuditEvent({
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    user_id: email,
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    tenant_id: '',
+    session_id: null,
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+    event_type: 'investor_interest_submitted' as any,
+    actor_ip: ip,
+    user_agent: c.req.header('User-Agent') ?? null,
+    target: `submission:${submissionId}`,
+    result: 'success',
+    metadata: { full_name, email, company, jurisdiction, intended_investment_size_range },
+  });
+
+  // TODO: send verification email via @nai/email
+  // For now, return submission ID — production must wire email verification flow
+
+  return c.json({
+    submission_id: submissionId,
+    status: 'received',
+    next_step: 'check email for verification link',
+  }, 202);
+});
+
+
+// ============================================================
+// Nguyen Super Apps — 7 tools per P1-B.9
+// Mounted at /v1/nguyen/*
+// ============================================================
+
+// In-memory store per tenant (MVP — swap to D1/DO in production)
+const nguyenToolsStore = new Map<string, NguyenTools>();
+
+function getNguyenTools(tenantId: string): NguyenTools {
+  let tools = nguyenToolsStore.get(tenantId);
+  if (!tools) {
+    tools = createNguyenTools(tenantId);
+    nguyenToolsStore.set(tenantId, tools);
+  }
+  return tools;
+}
+
+function getTenantId(c: Context): string {
+  const session = c.get('session') as Session | undefined;
+  return session?.user_id ?? 'anonymous';
+}
+
+// --- Nguyen Roots ---
+
+// GET /v1/nguyen/roots/persons — list persons
+app.get('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ persons: tools.roots.listPersons() });
+});
+
+// POST /v1/nguyen/roots/persons — add person
+app.post('/v1/nguyen/roots/persons', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const person = { ...body, id: body.id ?? crypto.randomUUID() };
+  tools.roots.addPerson(person);
+  return c.json({ person }, 201);
+});
+
+// GET /v1/nguyen/roots/persons/:id — get person
+app.get('/v1/nguyen/roots/persons/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const person = tools.roots.getPerson(c.req.param('id'));
+  if (!person) return c.json({ error: 'Person not found' }, 404);
+  return c.json({ person });
+});
+
+// GET /v1/nguyen/roots/persons/:id/ancestors — get ancestors
+app.get('/v1/nguyen/roots/persons/:id/ancestors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ ancestors: tools.roots.getAncestors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/persons/:id/descendants — get descendants
+app.get('/v1/nguyen/roots/persons/:id/descendants', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ descendants: tools.roots.getDescendants(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/roots/search?q=... — search persons
+app.get('/v1/nguyen/roots/search', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const q = c.req.query('q') ?? '';
+  return c.json({ results: tools.roots.search(q) });
+});
+
+// --- Nguyen Memory ---
+
+// GET /v1/nguyen/memory — list memories
+app.get('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true' ? true : c.req.query('public') === 'false' ? false : undefined;
+  return c.json({ memories: tools.memory.listMemories({ isPublic }) });
+});
+
+// POST /v1/nguyen/memory — add memory
+app.post('/v1/nguyen/memory', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const memory = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.memory.addMemory(memory);
+  return c.json({ memory }, 201);
+});
+
+// GET /v1/nguyen/memory/:id — get memory
+app.get('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const memory = tools.memory.getMemory(c.req.param('id'));
+  if (!memory) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ memory });
+});
+
+// DELETE /v1/nguyen/memory/:id — delete memory
+app.delete('/v1/nguyen/memory/:id', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const deleted = tools.memory.deleteMemory(c.req.param('id'));
+  if (!deleted) return c.json({ error: 'Memory not found' }, 404);
+  return c.json({ deleted: true });
+});
+
+// --- Nguyen Knowledge ---
+
+// GET /v1/nguyen/knowledge — list entries
+app.get('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const category = c.req.query('category');
+  return c.json({ entries: tools.knowledge.listEntries({ category }) });
+});
+
+// POST /v1/nguyen/knowledge — add entry
+app.post('/v1/nguyen/knowledge', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const entry = { ...body, id: body.id ?? crypto.randomUUID(), updatedAt: new Date().toISOString() };
+  tools.knowledge.addEntry(entry);
+  return c.json({ entry }, 201);
+});
+
+// GET /v1/nguyen/knowledge/categories — list categories
+app.get('/v1/nguyen/knowledge/categories', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ categories: tools.knowledge.listCategories() });
+});
+
+// --- Nguyen Trust ---
+
+// GET /v1/nguyen/trust — list records
+app.get('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const status = c.req.query('status') as 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected' | undefined;
+  return c.json({ records: tools.trust.listRecords({ status }) });
+});
+
+// POST /v1/nguyen/trust — create record
+app.post('/v1/nguyen/trust', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const record = tools.trust.createRecord(body.entityId, body.entityType);
+  return c.json({ record }, 201);
+});
+
+// POST /v1/nguyen/trust/:id/verify — add verification
+app.post('/v1/nguyen/trust/:id/verify', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const verification = { ...body, id: body.id ?? crypto.randomUUID(), timestamp: new Date().toISOString() };
+  tools.trust.addVerification(c.req.param('id'), verification);
+  return c.json({ record: tools.trust.getRecord(c.req.param('id')) });
+});
+
+// --- Nguyen Network ---
+
+// GET /v1/nguyen/network/stats — network statistics
+app.get('/v1/nguyen/network/stats', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json(tools.network.stats());
+});
+
+// GET /v1/nguyen/network/nodes/:id/neighbors — get neighbors
+app.get('/v1/nguyen/network/nodes/:id/neighbors', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ neighbors: tools.network.getNeighbors(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/network/path?from=...&to=... — find path
+app.get('/v1/nguyen/network/path', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const from = c.req.query('from') ?? '';
+  const to = c.req.query('to') ?? '';
+  const path = tools.network.findPath(from, to);
+  return c.json({ path });
+});
+
+// --- Nguyen Founders ---
+
+// GET /v1/nguyen/founders — list profiles
+app.get('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const isPublic = c.req.query('public') === 'true';
+  return c.json({ profiles: tools.founders.listProfiles({ isPublic }) });
+});
+
+// POST /v1/nguyen/founders — submit profile
+app.post('/v1/nguyen/founders', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const profile = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.founders.submitProfile(profile);
+  return c.json({ profile }, 201);
+});
+
+// POST /v1/nguyen/founders/:id/approve — approve profile
+app.post('/v1/nguyen/founders/:id/approve', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  tools.founders.approveProfile(c.req.param('id'));
+  return c.json({ profile: tools.founders.getProfile(c.req.param('id')) });
+});
+
+// --- Nguyen Chapter OS ---
+
+// GET /v1/nguyen/chapters — list chapters
+app.get('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ chapters: tools.chapter.listChapters() });
+});
+
+// POST /v1/nguyen/chapters — create chapter
+app.post('/v1/nguyen/chapters', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  const chapter = { ...body, id: body.id ?? crypto.randomUUID(), createdAt: new Date().toISOString() };
+  tools.chapter.createChapter(chapter);
+  return c.json({ chapter }, 201);
+});
+
+// POST /v1/nguyen/chapters/:id/members — add member
+app.post('/v1/nguyen/chapters/:id/members', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  const body = await c.req.json();
+  tools.chapter.addMember(c.req.param('id'), body.memberId);
+  return c.json({ chapter: tools.chapter.getChapter(c.req.param('id')) });
+});
+
+// GET /v1/nguyen/chapters/:id/events — list events
+app.get('/v1/nguyen/chapters/:id/events', async (c) => {
+  const tools = getNguyenTools(getTenantId(c));
+  return c.json({ events: tools.chapter.listEvents(c.req.param('id')) });
+});
+
+// export default app;
+
+// ============================================================
+// Phase 1 — Mount incident and notification routes
+// ============================================================
+
+app.route('/', incidentRoutes);
+app.route('/', notificationRoutes);
+
+// ============================================================
+// Phase 2 — Mount admin approval and self-healing routes
+// ============================================================
+
+app.route('/', adminApprovalRoutes);
+app.route('/', selfHealRoutes);
+
+// ============================================================
+// Phase 3 — Mount model gateway route
+// ============================================================
+
+app.route('/', modelGatewayRoutes);
+
+// ============================================================
+// Phase 4 — Mount fallback route
+// ============================================================
+
+app.route('/', fallbackRoutes);
 
 export default app;

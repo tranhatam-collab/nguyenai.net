@@ -1,19 +1,18 @@
 {
-  "name": "@nai/runtime-sdk",
+  "name": "@nai/model-policy",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "dependencies": {
-    "@nai/contracts": "workspace:*",
-    "@nai/gateway-sdk": "workspace:*"
-  },
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
     "test": "tsx src/test.ts",
-    "lint": "echo 'no lint'"
+    "lint": "echo 'TODO'"
+  },
+  "dependencies": {
+    "@nai/audit": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

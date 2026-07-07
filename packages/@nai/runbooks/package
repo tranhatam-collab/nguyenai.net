@@ -1,20 +1,17 @@
 {
-  "name": "@nai/runtime-sdk",
+  "name": "@nai/runbooks",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "dependencies": {
-    "@nai/contracts": "workspace:*",
-    "@nai/gateway-sdk": "workspace:*"
-  },
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
     "test": "tsx src/test.ts",
-    "lint": "echo 'no lint'"
+    "lint": "echo 'TODO'"
   },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.5.0",
     "tsx": "^4.19.0",
