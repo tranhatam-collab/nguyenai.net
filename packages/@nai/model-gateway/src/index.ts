@@ -64,6 +64,7 @@ export interface ModelGatewayConfig {
 export interface ModelGatewayStore {
   createInvocation(invocation: Omit<ModelInvocation, 'invocation_id' | 'created_at'>): Promise<string>;
   getInvocation(invocationId: string): Promise<ModelInvocation | null>;
+  updateInvocation(invocationId: string, updates: Partial<ModelInvocation>): Promise<void>;
   listInvocations(filters?: { user_id?: string; tenant_id?: string; provider?: ModelProvider }): Promise<ModelInvocation[]>;
   createReceipt(receipt: Omit<ModelReceipt, 'receipt_id' | 'created_at' | 'signature'>): Promise<string>;
   getReceipt(receiptId: string): Promise<ModelReceipt | null>;
@@ -87,6 +88,13 @@ export class InMemoryModelGatewayStore implements ModelGatewayStore {
 
   async getInvocation(invocationId: string): Promise<ModelInvocation | null> {
     return this.invocations.get(invocationId) ?? null;
+  }
+
+  async updateInvocation(invocationId: string, updates: Partial<ModelInvocation>): Promise<void> {
+    const existing = this.invocations.get(invocationId);
+    if (existing) {
+      this.invocations.set(invocationId, { ...existing, ...updates });
+    }
   }
 
   async listInvocations(filters?: { user_id?: string; tenant_id?: string; provider?: ModelProvider }): Promise<ModelInvocation[]> {
@@ -211,11 +219,7 @@ export async function invokeModel(
   });
 
   // Update invocation with receipt_id
-  const invocation = await defaultStore.getInvocation(invocationId);
-  if (invocation) {
-    // In a real implementation, we'd update the record
-    // For now, we'll just log it
-  }
+  await defaultStore.updateInvocation(invocationId, { receipt_id: receiptId });
 
   // Audit event
   await logAuditEvent({
@@ -239,5 +243,5 @@ export async function getInvocationReceipt(invocationId: string): Promise<ModelR
 }
 
 export async function listUserInvocations(userId: string, tenantId: string): Promise<ModelInvocation[]> {
-  return defaultStore.listInvocations({ user_id: userId, tenant_id });
+  return defaultStore.listInvocations({ user_id: userId, tenant_id: tenantId });
 }

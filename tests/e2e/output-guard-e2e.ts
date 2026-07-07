@@ -7,50 +7,147 @@
  * - Blocked outputs are not returned to user
  */
 
-import { describe, it, expect } from 'vitest';
+import {
+  InMemoryOutputGuardStore,
+  setOutputGuardStore,
+  guardOutput,
+  listUserGuardResults,
+  type Language,
+  type DataClassification,
+} from '@nai/output-guard';
 
-describe('Output guard E2E', () => {
-  it('should allow safe and compliant output', async () => {
-    // TODO: Implement E2E test
-    // 1. Generate safe model output
-    // 2. Run output guard
-    // 3. Verify output is allowed
-    // 4. Verify all policy checks pass
-    expect(true).toBe(true);
-  });
+import {
+  InMemoryAuditStore,
+  setAuditStore,
+  queryAuditLog,
+} from '@nai/audit';
 
-  it('should block output with identity policy violation', async () => {
-    // TODO: Implement E2E test
-    // 1. Generate output with banned brand name
-    // 2. Run output guard
-    // 3. Verify output is blocked
-    // 4. Verify identity check fails
-    expect(true).toBe(true);
-  });
+let passed = 0;
+let failed = 0;
+const steps: string[] = [];
 
-  it('should block output with safety policy violation', async () => {
-    // TODO: Implement E2E test
-    // 1. Generate harmful output
-    // 2. Run output guard
-    // 3. Verify output is blocked
-    // 4. Verify safety check fails
-    expect(true).toBe(true);
-  });
+function assert(condition: boolean, msg: string) {
+  if (condition) {
+    passed++;
+    steps.push(`  ✓ ${msg}`);
+  } else {
+    failed++;
+    steps.push(`  ✗ ${msg}`);
+    console.error(`  ✗ ${msg}`);
+  }
+}
 
-  it('should require approval for secret data output', async () => {
-    // TODO: Implement E2E test
-    // 1. Generate output with secret data classification
-    // 2. Run output guard
-    // 3. Verify approval is required
-    // 4. Verify data classification check fails
-    expect(true).toBe(true);
-  });
+async function testAllowSafeAndCompliantOutput() {
+  console.log('Test: allow safe and compliant output');
+  const guardStore = new InMemoryOutputGuardStore();
+  const auditStore = new InMemoryAuditStore();
+  setOutputGuardStore(guardStore);
+  setAuditStore(auditStore);
 
-  it('should record all guard results in audit log', async () => {
-    // TODO: Implement E2E test
-    // 1. Run output guard multiple times
-    // 2. Verify all results are recorded
-    // 3. Verify audit trail is complete
-    expect(true).toBe(true);
-  });
-});
+  const result = await guardOutput(
+    'user-1',
+    'tenant-1',
+    'session-1',
+    'invocation-1',
+    'Xin chào, tôi là AI Nguyễn',
+    'vi' as Language,
+    'public' as DataClassification
+  );
+
+  assert(result.action === 'allow', 'output is allowed');
+  assert(result.policy_checks.identity.passed === true, 'identity check passed');
+  assert(result.policy_checks.language.passed === true, 'language check passed');
+  assert(result.policy_checks.safety.passed === true, 'safety check passed');
+  assert(result.policy_checks.data_classification.passed === true, 'data classification check passed');
+}
+
+async function testBlockOutputWithIdentityPolicyViolation() {
+  console.log('Test: block output with identity policy violation');
+  const guardStore = new InMemoryOutputGuardStore();
+  setOutputGuardStore(guardStore);
+
+  const result = await guardOutput(
+    'user-1',
+    'tenant-1',
+    'session-1',
+    'invocation-1',
+    'Welcome to Nguyên AI',
+    'en' as Language,
+    'public' as DataClassification
+  );
+
+  assert(result.action === 'block', 'output is blocked');
+  assert(result.reason?.includes('Nguyên AI'), 'reason mentions banned brand');
+  assert(result.policy_checks.identity.passed === false, 'identity check failed');
+}
+
+async function testBlockOutputWithSafetyPolicyViolation() {
+  console.log('Test: block output with safety policy violation');
+  const guardStore = new InMemoryOutputGuardStore();
+  setOutputGuardStore(guardStore);
+
+  const result = await guardOutput(
+    'user-1',
+    'tenant-1',
+    'session-1',
+    'invocation-1',
+    'How to hack a system',
+    'en' as Language,
+    'public' as DataClassification
+  );
+
+  assert(result.action === 'block', 'output is blocked');
+  assert(result.reason !== undefined, 'reason mentions harmful content');
+  assert(result.policy_checks.safety.passed === false, 'safety check failed');
+}
+
+async function testRequireApprovalForSecretDataOutput() {
+  console.log('Test: require approval for secret data output');
+  const guardStore = new InMemoryOutputGuardStore();
+  setOutputGuardStore(guardStore);
+
+  const result = await guardOutput(
+    'user-1',
+    'tenant-1',
+    'session-1',
+    'invocation-1',
+    'Secret data content',
+    'en' as Language,
+    'secret' as DataClassification
+  );
+
+  assert(result.action === 'require_approval', 'approval is required');
+  assert(result.reason?.includes('approval'), 'reason mentions approval');
+  assert(result.policy_checks.data_classification.passed === false, 'data classification check failed');
+}
+
+async function testRecordAllGuardResultsInAuditLog() {
+  console.log('Test: record all guard results in audit log');
+  const guardStore = new InMemoryOutputGuardStore();
+  const auditStore = new InMemoryAuditStore();
+  setOutputGuardStore(guardStore);
+  setAuditStore(auditStore);
+
+  await guardOutput('user-1', 'tenant-1', 'session-1', 'inv-1', 'Test', 'vi', 'public');
+  await guardOutput('user-1', 'tenant-1', 'session-1', 'inv-2', 'Test', 'en', 'public');
+  await guardOutput('user-1', 'tenant-1', 'session-1', 'inv-3', 'Test', 'vi', 'public');
+
+  const results = await listUserGuardResults('user-1', 'tenant-1');
+  assert(results.length === 3, '3 guard results recorded');
+
+  const auditEvents = await queryAuditLog({ action: 'output_guarded' });
+  assert(auditEvents.length >= 3, 'audit events logged');
+}
+
+async function main() {
+  console.log('=== Output guard E2E ===\n');
+  await testAllowSafeAndCompliantOutput();
+  await testBlockOutputWithIdentityPolicyViolation();
+  await testBlockOutputWithSafetyPolicyViolation();
+  await testRequireApprovalForSecretDataOutput();
+  await testRecordAllGuardResultsInAuditLog();
+  console.log(`\n${passed} passed, ${failed} failed`);
+  if (failed > 0) process.exit(1);
+}
+
+main();

@@ -271,3 +271,11 @@ export async function assignIncident(
     assigned_to: assignedTo,
   });
 }
+
+export async function getIncident(incidentId: string): Promise<Incident | null> {
+  return defaultStore.getIncident(incidentId);
+}
+
+export async function listIncidents(filters?: { status?: IncidentStatus; severity?: Severity }): Promise<Incident[]> {
+  return defaultStore.listIncidents(filters);
+}

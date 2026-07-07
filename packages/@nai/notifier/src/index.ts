@@ -182,6 +182,14 @@ export async function sendNotification(
   return notificationId;
 }
 
+export async function getNotification(notificationId: string): Promise<Notification | null> {
+  return defaultStore.getNotification(notificationId);
+}
+
+export async function listNotifications(filters?: { status?: string; channel?: Channel }): Promise<Notification[]> {
+  return defaultStore.listNotifications(filters);
+}
+
 // ============================================================
 // Convenience adapters (for testing)
 // ============================================================

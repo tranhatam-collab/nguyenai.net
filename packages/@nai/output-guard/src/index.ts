@@ -91,7 +91,7 @@ export async function guardOutput(
   invocationId: string,
   output: string,
   language: Language,
-  dataClassification: DataClassification
+  data_classification: DataClassification
 ): Promise<OutputGuardResult> {
   const context: PolicyCheckContext = {
     user_id: userId,
@@ -103,7 +103,7 @@ export async function guardOutput(
   };
 
   // Run all policy checks
-  const policyChecks = await checkAllPolicies(output, language, dataClassification, context);
+  const policyChecks = await checkAllPolicies(output, language, data_classification, context);
 
   // Determine action based on policy results
   let action: OutputGuardAction = 'allow';
@@ -149,7 +149,7 @@ export async function guardOutput(
   return {
     action,
     original_output: output,
-    modified_output,
+    modified_output: undefined,
     reason,
     policy_checks: {
       identity: { passed: policyChecks.identity.passed, reason: policyChecks.identity.reason },
