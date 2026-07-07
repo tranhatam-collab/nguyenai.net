@@ -10,7 +10,9 @@
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
     "GEN1_GATEWAY_URL": "https://aiagent-iai-one-api-prod.tranhatam.workers.dev",
-    "EVIDENCE_SIGNING_KEY": "dev-evidence-key-change-in-prod",
+    // SEC-P0-3: EVIDENCE_SIGNING_KEY removed from vars (old value leaked via git).
+    // Set via `wrangler secret put EVIDENCE_SIGNING_KEY`. resolveEvidenceSigningKey()
+    // throws in production when the secret is missing; dev uses a non-prod fallback.
     "LLM_PROVIDER_MODE": "gen1"
   },
   "d1_databases": [
@@ -23,6 +25,9 @@
   ],
   "r2_buckets": [
     { "binding": "AUDIT_ARCHIVE", "bucket_name": "nai-audit-archive" }
+  ],
+  "kv_namespaces": [
+    { "binding": "RATE_LIMIT", "id": "ea7823e56b0a44b9b41a6bb2c49dc95f" }
   ]
   // RESEND_API_KEY is set via `wrangler secret put RESEND_API_KEY` (not in vars for security)
   // Email sending uses Resend API directly via @nai/email package

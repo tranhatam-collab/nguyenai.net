@@ -7,7 +7,7 @@
  * wrong lang attributes, broken hreflang (/en/en/*), x-default pointing to
  * English, missing Open Graph, or English titles on Vietnamese pages.
  *
- * Run AFTER `pnpm build`. Scans dist/**/*.html for:
+ * Run AFTER `pnpm build`. Scans all .html files under dist/ for:
  *  - <html lang> matches the route locale (vi for /, en for /en/)
  *  - hreflang present, reciprocal, no /en/en/* double-prefix
  *  - x-default points to the Vietnamese root (not English)
@@ -90,26 +90,20 @@ function checkFile(app: AppSpec, file: string): void {
   if (!htmlLang) fails.push('missing <html lang>');
   else if (!htmlLang.startsWith(expectedLang)) fails.push(`html lang="${htmlLang}" expected "${expectedLang}"`);
 
+  // Detect noindex pages (private/auth) — skip hreflang/canonical/OG checks.
+  const robotsMeta = findTags(html, /<meta[^>]*name=["']robots["'][^>]*>/i)[0];
+  const isNoindexPage = robotsMeta ? /noindex/i.test(readAttr(robotsMeta, 'content') ?? '') : false;
+
   // hreflang links
   const altLinks = findTags(html, /<link[^>]*rel=["']alternate["'][^>]*>/gi);
   const hreflangs = altLinks.map((t) => ({ hreflang: readAttr(t, 'hreflang'), href: readAttr(t, 'href') }));
   const hasVi = hreflangs.some((h) => h.hreflang === 'vi' || h.hreflang === 'vi-VN');
   const hasEn = hreflangs.some((h) => h.hreflang === 'en');
   const xdef = hreflangs.find((h) => h.hreflang === 'x-default');
-  if (altLinks.length === 0) fails.push('no hreflang alternate links');
-  if (!hasVi) fails.push('missing hreflang vi');
-  if (!hasEn) fails.push('missing hreflang en');
-  if (!xdef) fails.push('missing hreflang x-default');
-  else if (xdef.href && /\/en(\/|$)/.test(xdef.href.replace(app.host, ''))) fails.push(`x-default points to EN: ${xdef.href}`);
-
-  // no /en/en/* double prefix in any hreflang href
-  for (const h of hreflangs) {
-    if (h.href && /\/en\/en\//.test(h.href)) fails.push(`double /en/en/ in hreflang ${h.hreflang}: ${h.href}`);
-  }
 
   // canonical
   const canonical = findTags(html, /<link[^>]*rel=["']canonical["'][^>]*>/i)[0];
-  if (!canonical) fails.push('missing canonical');
+  if (!canonical && !isNoindexPage) fails.push('missing canonical');
 
   // title + description
   const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
@@ -117,20 +111,33 @@ function checkFile(app: AppSpec, file: string): void {
   const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*>/i);
   if (!descMatch) fails.push('missing meta description');
 
-  // Open Graph (skip noindex pages)
-  const isNoindex = app.noindexPrefixes?.some((p) => rel.startsWith(p.slice(1))) ?? false;
-  if (!isNoindex) {
-    const ogTitle = findTags(html, /<meta[^>]*property=["']og:title["'][^>]*>/i)[0];
-    const ogDesc = findTags(html, /<meta[^>]*property=["']og:description["'][^>]*>/i)[0];
-    const ogUrl = findTags(html, /<meta[^>]*property=["']og:url["'][^>]*>/i)[0];
-    const ogImage = findTags(html, /<meta[^>]*property=["']og:image["'][^>]*>/i)[0];
-    if (!ogTitle) fails.push('missing og:title');
-    if (!ogDesc) fails.push('missing og:description');
-    if (!ogUrl) fails.push('missing og:url');
-    if (!ogImage) fails.push('missing og:image');
-    // OG meta must use content= not href=
-    for (const tag of [ogTitle, ogDesc, ogUrl, ogImage]) {
-      if (tag && !/content=/.test(tag) && /href=/.test(tag)) fails.push(`OG tag uses href= instead of content=: ${tag}`);
+  // hreflang + Open Graph (skip noindex pages — they are private/auth and
+  // intentionally have no hreflang, canonical or OG).
+  if (!isNoindexPage) {
+    if (altLinks.length === 0) fails.push('no hreflang alternate links');
+    if (!hasVi) fails.push('missing hreflang vi');
+    if (!hasEn) fails.push('missing hreflang en');
+    if (!xdef) fails.push('missing hreflang x-default');
+    else if (xdef.href && /\/en(\/|$)/.test(xdef.href.replace(app.host, ''))) fails.push(`x-default points to EN: ${xdef.href}`);
+
+    // no /en/en/* double prefix in any hreflang href
+    for (const h of hreflangs) {
+      if (h.href && /\/en\/en\//.test(h.href)) fails.push(`double /en/en/ in hreflang ${h.hreflang}: ${h.href}`);
+    }
+
+    const isNoindexRoute = app.noindexPrefixes?.some((p) => rel.startsWith(p.slice(1))) ?? false;
+    if (!isNoindexRoute) {
+      const ogTitle = findTags(html, /<meta[^>]*property=["']og:title["'][^>]*>/i)[0];
+      const ogDesc = findTags(html, /<meta[^>]*property=["']og:description["'][^>]*>/i)[0];
+      const ogUrl = findTags(html, /<meta[^>]*property=["']og:url["'][^>]*>/i)[0];
+      const ogImage = findTags(html, /<meta[^>]*property=["']og:image["'][^>]*>/i)[0];
+      if (!ogTitle) fails.push('missing og:title');
+      if (!ogDesc) fails.push('missing og:description');
+      if (!ogUrl) fails.push('missing og:url');
+      if (!ogImage) fails.push('missing og:image');
+      for (const tag of [ogTitle, ogDesc, ogUrl, ogImage]) {
+        if (tag && !/content=/.test(tag) && /href=/.test(tag)) fails.push(`OG tag uses href= instead of content=: ${tag}`);
+      }
     }
   }
 
@@ -156,6 +163,10 @@ function main(): void {
       continue;
     }
     const files = walkHtml(dist);
+    if (files.length === 0) {
+      console.log(`${COLORS.yellow}⚠ ${app.name}: no static HTML in dist (SSR/hybrid via Cloudflare adapter) — requires live audit against deployed URL${COLORS.reset}`);
+      continue;
+    }
     console.log(`\n--- ${app.name} (${files.length} HTML files) ---`);
     for (const f of files) checkFile(app, f);
   }

@@ -110,7 +110,7 @@ Founder hoặc QA đi user flow thật:
 
 `@astrojs/cloudflare` 11.x + `astro` 4.x có high vulns (miniflare/undici/ws) — chỉ dev/build time, không runtime. Nâng cấp Astro 4→5 + @astrojs/cloudflare 11→12 là major bump, deferred sang sprint sau. Founder directive: "ghi waiver nếu chỉ là dev dependency."
 
-**Founder xác nhận waiver:** ☐ Yes, waive — deferred sang sprint sau.
+**Founder xác nhận waiver:** [x] Yes, waive — deferred sang sprint sau.
 
 ---
 

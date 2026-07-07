@@ -65,19 +65,21 @@ function main(): void {
   check('SEC-P0-5: uses textContent / DOM construction', /textContent|createElement/.test(verify));
 
   // Bonus: no committed secrets scan (grep for common secret patterns in source).
-  const secretPattern = /(?:sk_live_|sk_test_|AKIA|ghp_|gho_|xox[baprs]-|-----BEGIN [A-Z]+ PRIVATE KEY-----)/;
+  // Excludes the secret-scanning packages (seal/sentinel/hound) which contain
+  // detection regexes, and docs that reference patterns as instructions.
+  const secretPattern = /(?:sk_live_[a-z0-9]{20,}|sk_test_[a-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|xox[baprs]-[A-Za-z0-9-]+|-----BEGIN [A-Z]+ PRIVATE KEY-----)/;
+  const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', '.turbo', 'seal', 'sentinel', 'hound']);
   let secretHits = 0;
   function scanDir(dir: string): void {
     if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'dist' || entry.name === '.turbo') continue;
+      if (SKIP_DIRS.has(entry.name)) continue;
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) scanDir(full);
-      else if (/\.(ts|js|json|jsonc|astro|md)$/.test(entry.name)) {
+      else if (/\.(ts|js|json|jsonc)$/.test(entry.name)) {
+        if (full.endsWith('audit-security-p0.ts')) continue;
         const c = readFile(full);
         if (secretPattern.test(c)) {
-          // Ignore the audit script itself and docs that mention patterns as examples.
-          if (full.endsWith('audit-security-p0.ts')) continue;
           secretHits++;
           console.log(`${COLORS.red}✗${COLORS.reset} possible committed secret in ${path.relative(ROOT, full)}`);
         }

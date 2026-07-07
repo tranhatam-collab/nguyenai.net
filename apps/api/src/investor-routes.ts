@@ -99,7 +99,7 @@ function investorIdFromSession(session: { user_id: string }): string {
 // GET /v1/investor/state — current verification state
 investorRoutes.get('/state', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const state = await getVerificationState(investor_id);
   return c.json({ investor_id, state });
@@ -108,7 +108,7 @@ investorRoutes.get('/state', async (c) => {
 // POST /v1/investor/identity — declare identity
 investorRoutes.post('/identity', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const body = await c.req.json().catch(() => ({}));
   const {
@@ -156,7 +156,7 @@ investorRoutes.post('/identity', async (c) => {
 // GET /v1/investor/identity — get declaration
 investorRoutes.get('/identity', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const decl = await getDeclaration(investor_id);
   if (!decl) return c.json({ error: 'not_found' }, 404);
@@ -181,7 +181,7 @@ investorRoutes.get('/identity', async (c) => {
 // POST /v1/investor/identity/verify/start
 investorRoutes.post('/identity/verify/start', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   try {
     const { external_session_id, widget_url } = await startIdentityVerification(investor_id, auditCtx(c));
@@ -194,7 +194,7 @@ investorRoutes.post('/identity/verify/start', async (c) => {
 // POST /v1/investor/identity/verify/complete
 investorRoutes.post('/identity/verify/complete', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   try {
     const record = await completeIdentityVerification(investor_id, auditCtx(c));
@@ -214,7 +214,7 @@ investorRoutes.post('/identity/verify/complete', async (c) => {
 // GET /v1/investor/identity/verify — get verification status
 investorRoutes.get('/identity/verify', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const record = await getIdentityVerification(investor_id);
   if (!record) return c.json({ error: 'not_started' }, 404);
@@ -236,7 +236,7 @@ investorRoutes.get('/identity/verify', async (c) => {
 // POST /v1/investor/payment — initiate payment
 investorRoutes.post('/payment', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const body = await c.req.json().catch(() => ({}));
   const { method, amount_vnd, amount_usd, exchange_rate, exchange_rate_date } = body ?? {};
@@ -267,7 +267,7 @@ investorRoutes.post('/payment', async (c) => {
 // GET /v1/investor/payment/qr — get VN QR checkout payload
 investorRoutes.get('/payment/qr', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const payment_id = c.req.query('payment_id');
   if (!payment_id) return c.json({ error: 'payment_id required' }, 400);
@@ -299,7 +299,7 @@ investorRoutes.get('/payment/qr', async (c) => {
 // GET /v1/investor/payment/wire — get USD wire instructions
 investorRoutes.get('/payment/wire', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   try {
     const instructions = await getUsdWireInstructions(investor_id);
@@ -312,7 +312,7 @@ investorRoutes.get('/payment/wire', async (c) => {
 // POST /v1/investor/payment/:id/submit — submit bank reference
 investorRoutes.post('/payment/:id/submit', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const payment_id = c.req.param('id');
   const body = await c.req.json().catch(() => ({}));
@@ -334,7 +334,7 @@ investorRoutes.post('/payment/:id/submit', async (c) => {
 // POST /v1/investor/payment/:id/receipt — upload receipt
 investorRoutes.post('/payment/:id/receipt', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const payment_id = c.req.param('id');
   const body = await c.req.json().catch(() => ({}));
@@ -378,7 +378,7 @@ investorRoutes.post('/payment/:id/receipt', async (c) => {
 // GET /v1/investor/payment/:id/receipts — list receipts for a payment
 investorRoutes.get('/payment/:id/receipts', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const payment_id = c.req.param('id');
   const receipts = await getReceiptsByPayment(payment_id);
   return c.json({ receipts });
@@ -391,7 +391,7 @@ investorRoutes.get('/payment/:id/receipts', async (c) => {
 // POST /v1/investor/2fa/enroll
 investorRoutes.post('/2fa/enroll', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const body = await c.req.json().catch(() => ({}));
   const { method, secret, phone } = body ?? {};
@@ -426,7 +426,7 @@ investorRoutes.post('/2fa/enroll', async (c) => {
 // POST /v1/investor/2fa/verify
 investorRoutes.post('/2fa/verify', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const body = await c.req.json().catch(() => ({}));
   const { code } = body ?? {};
@@ -443,7 +443,7 @@ investorRoutes.post('/2fa/verify', async (c) => {
 // GET /v1/investor/2fa — get enrollment status
 investorRoutes.get('/2fa', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const enrollment = await getEnrollment(investor_id);
   if (!enrollment) return c.json({ error: 'not_enrolled' }, 404);
@@ -462,7 +462,7 @@ investorRoutes.get('/2fa', async (c) => {
 // POST /v1/investor/grant — issue grant (admin only)
 investorRoutes.post('/grant', async (c) => {
   const session = requireAdmin(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const body = await c.req.json().catch(() => ({}));
   const { investor_id, room_scope, document_scope, download_allowed, duration_days } = body ?? {};
 
@@ -493,7 +493,7 @@ investorRoutes.post('/grant', async (c) => {
 // GET /v1/investor/grant — check current grant
 investorRoutes.get('/grant', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const grant = await getGrant(investor_id);
   if (!grant) return c.json({ error: 'no_grant' }, 404);
@@ -510,7 +510,7 @@ investorRoutes.get('/grant', async (c) => {
 // POST /v1/investor/grant/check — check grant for a scope
 investorRoutes.post('/grant/check', async (c) => {
   const session = requireAuth(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const investor_id = investorIdFromSession(session);
   const body = await c.req.json().catch(() => ({}));
   const { scope } = body ?? {};
@@ -523,7 +523,7 @@ investorRoutes.post('/grant/check', async (c) => {
 // POST /v1/investor/grant/revoke — revoke grant (admin only)
 investorRoutes.post('/grant/revoke', async (c) => {
   const session = requireAdmin(c);
-  if (!session) return;
+  if (session instanceof Response) return session;
   const body = await c.req.json().catch(() => ({}));
   const { investor_id } = body ?? {};
   if (!investor_id) return c.json({ error: 'investor_id required' }, 400);
