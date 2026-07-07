@@ -66,6 +66,8 @@ export function rateLimit(opts: RateLimitOptions) {
 export const defaultRateLimit = rateLimit({ windowMs: 60_000, max: 60 });
 export const formSubmitRateLimit = rateLimit({ windowMs: 60_000, max: 5 });
 export const authRateLimit = rateLimit({ windowMs: 60_000, max: 10 });
+export const chatRateLimit = rateLimit({ windowMs: 60_000, max: 30 });
+export const paymentRateLimit = rateLimit({ windowMs: 60_000, max: 10 });
 
 // Cleanup old buckets periodically (every 5 minutes)
 let lastCleanup = Date.now();
