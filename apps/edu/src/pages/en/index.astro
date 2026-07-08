@@ -12,7 +12,7 @@ const onboarding = getOnboardingTrack();
   activeNav="home"
 >
   <!-- Hero -->
-  <section class="bg-academy-header border-b border-academy-border">
+  <section class="bg-academy-header border-b border-academy-border" aria-label="Academy hero section">
     <div class="academy-container py-16 md:py-24">
       <div class="max-w-3xl">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-academy-accent/10 text-academy-accent text-sm font-medium mb-6">
@@ -52,14 +52,14 @@ const onboarding = getOnboardingTrack();
   </section>
 
   <!-- Onboarding track -->
-  <section class="academy-container py-12">
+  <section class="academy-container py-12" aria-label="Onboarding track">
     <h2 class="text-2xl font-bold text-academy-text mb-2">Start Here</h2>
     <p class="text-academy-muted mb-6">New to AI? Begin with the onboarding track.</p>
     <TrackCard track={onboarding} />
   </section>
 
   <!-- All tracks -->
-  <section class="academy-container py-12 border-t border-academy-border">
+  <section class="academy-container py-12 border-t border-academy-border" aria-label="All learning tracks">
     <h2 class="text-2xl font-bold text-academy-text mb-2">All Tracks</h2>
     <p class="text-academy-muted mb-6">10 learning tracks from beginner to advanced.</p>
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -68,7 +68,7 @@ const onboarding = getOnboardingTrack();
   </section>
 
   <!-- Lang switch -->
-  <section class="academy-container py-8 border-t border-academy-border text-center">
+  <section class="academy-container py-8 border-t border-academy-border text-center" aria-label="Language switch">
     <a href="/" class="text-academy-accent hover:underline">Tiếng Việt</a>
     <span class="mx-2 text-academy-muted">·</span>
     <span class="text-academy-text font-medium">English</span>
