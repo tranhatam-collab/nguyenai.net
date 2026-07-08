@@ -257,14 +257,14 @@ const vi: Record<RouteKey, PageContent> = {
         { name: 'Nguyen Creator', code: 'nguyen-creator', price: '999.000₫', period: '/tháng', target: 'Người sáng tạo', features: ['5 Tác nhân (+Creator)', '20GB bộ nhớ, 100GB kho dữ liệu', '500 commands/ngày', '+ AI Media, AI Browser'], cta: 'Chọn Creator' },
         { name: 'Nguyen Founder', code: 'nguyen-founder', price: '1.999.000₫', period: '/tháng', target: 'Nhà sáng lập', features: ['7 Tác nhân (+Founder, Business)', '50GB bộ nhớ, 200GB kho dữ liệu', '1.000 commands/ngày', '+ Founder OS, Finance, Legal'], cta: 'Chọn Founder', highlighted: true },
         { name: 'Nguyen Business', code: 'nguyen-business', price: '4.999.000₫', period: '/tháng', target: 'Doanh nghiệp 5-25 seat', features: ['8 Tác nhân (+Global Connector)', '200GB bộ nhớ, 1TB kho dữ liệu', '5.000 commands/ngày', '+ Business OS, Sales, Automation'], cta: 'Chọn Business' },
-        { name: 'Nguyen Chapter', code: 'nguyen-chapter', price: '7.999.000₫', period: '/tháng', target: 'Chi họ, hội, cộng đồng', features: ['9 Agent (all)', '500GB memory, 5TB vault', '10.000 commands/ngày', '+ Chapter OS, Network, Knowledge'], cta: 'Chọn Chapter' },
-        { name: 'Nguyen Enterprise', code: 'nguyen-enterprise', price: 'Báo giá', target: 'Tổ chức lớn 25+ seat', features: ['9 Agent + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Liên hệ' },
-        { name: 'Nguyen Sovereign', code: 'nguyen-sovereign', price: 'Báo giá', target: 'Dedicated/private, on-premise', features: ['9 Agent + custom', 'Dedicated memory, dedicated vault', 'Unlimited quota', 'Data residency, on-prem, sovereign deploy'], cta: 'Liên hệ' }
+        { name: 'Nguyen Chapter', code: 'nguyen-chapter', price: '7.999.000₫', period: '/tháng', target: 'Chi họ, hội, cộng đồng', features: ['9 Tác nhân (all)', '500GB bộ nhớ, 5TB kho dữ liệu', '10.000 commands/ngày', '+ Chapter OS, Network, Knowledge'], cta: 'Chọn Chapter' },
+        { name: 'Nguyen Enterprise', code: 'nguyen-enterprise', price: 'Báo giá', target: 'Tổ chức lớn 25+ seat', features: ['9 Tác nhân + custom', 'Custom bộ nhớ, custom kho dữ liệu', 'Custom hạn mức', 'SSO, SLA, compliance, audit export'], cta: 'Liên hệ' },
+        { name: 'Nguyen Sovereign', code: 'nguyen-sovereign', price: 'Báo giá', target: 'Dedicated/private, on-premise', features: ['9 Tác nhân + custom', 'Dedicated bộ nhớ, dedicated kho dữ liệu', 'Unlimited hạn mức', 'Data residency, on-prem, sovereign deploy'], cta: 'Liên hệ' }
       ]
     },
     comparisonTable: {
       title: 'So sánh chi tiết 9 Model',
-      body: 'So sánh năng lực, bộ nhớ, vault, agent, quota, Super App và approval gate giữa 9 Model máy.',
+      body: 'So sánh năng lực, bộ nhớ, kho dữ liệu, tác nhân, hạn mức, Siêu ứng dụng và cổng phê duyệt giữa 9 Mô hình máy.',
       columns: [
         { label: 'Start' }, { label: 'Personal' }, { label: 'Family' }, { label: 'Creator' },
         { label: 'Founder', highlight: true }, { label: 'Business' }, { label: 'Chapter' },
@@ -273,51 +273,51 @@ const vi: Record<RouteKey, PageContent> = {
       rows: [
         { label: 'Giá/tháng', values: ['Free', '299K', '599K', '999K', '1.999M', '4.999M', '7.999M', 'Báo giá', 'Báo giá'] },
         { label: 'Model tier', values: ['free', 'standard', 'standard', 'standard+', 'pro', 'pro', 'pro', 'enterprise', 'enterprise'] },
-        { label: 'Agents', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom', '9+custom'] },
-        { label: 'Memory', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom', 'Dedicated'] },
-        { label: 'Vault', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom', 'Dedicated'] },
-        { label: 'Quota/ngày', values: ['10', '100', '300', '500', '1.000', '5.000', '10.000', 'Custom', 'Unlimited'] },
-        { label: 'Super Apps', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+', 'All+'] },
-        { label: 'Approval', values: ['all', 'sensitive', 'sensitive', 'sensitive', 'sensitive', 'per-role', 'board', 'custom', 'custom'] }
+        { label: 'Tác nhân', values: ['2', '4', '5', '5', '7', '8', '9', '9+custom', '9+custom'] },
+        { label: 'Bộ nhớ', values: ['100MB', '5GB', '20GB', '20GB', '50GB', '200GB', '500GB', 'Custom', 'Dedicated'] },
+        { label: 'Kho dữ liệu', values: ['500MB', '10GB', '50GB', '100GB', '200GB', '1TB', '5TB', 'Custom', 'Dedicated'] },
+        { label: 'Hạn mức/ngày', values: ['10', '100', '300', '500', '1.000', '5.000', '10.000', 'Custom', 'Unlimited'] },
+        { label: 'Siêu ứng dụng', values: ['—', '3', '5', '5', '8', 'All', 'All+', 'All+', 'All+'] },
+        { label: 'Phê duyệt', values: ['all', 'sensitive', 'sensitive', 'sensitive', 'sensitive', 'per-role', 'board', 'custom', 'custom'] }
       ]
     },
     academySection: {
-      title: 'Học viện — Academy',
-      body: 'Academy tách biệt tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Nguyen AI Computer. Academy Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
-      items: ['Track cơ bản: Làm chủ AI Computer (free)', 'Track Founder: Strategy + Pitch + Fundraising', 'Track Business: Operations + SOP + Automation', 'Track Heritage: Genealogy + Oral History + Evidence', 'Certification: độc lập, có audit, không tự cấp']
+      title: 'Học viện — Học viện',
+      body: 'Học viện tách biệt tại academy.nguyenai.net, cung cấp học AI miễn phí cho người đăng ký, với track riêng cho Máy Tính AI Nguyễn. Học viện Pass là entitlement riêng, mua standalone, không grant mặc định trong gói nào.',
+      items: ['Track cơ bản: Làm chủ Máy Tính AI (free)', 'Track Founder: Strategy + Pitch + Fundraising', 'Track Business: Operations + SOP + Automation', 'Track Heritage: Genealogy + Oral History + Evidence', 'Certification: độc lập, có audit, không tự cấp']
     },
     memoryVaultSection: {
       title: 'Bộ nhớ và Kho dữ liệu',
       body: 'Mỗi người dùng có bộ nhớ dài hạn và kho dữ liệu riêng, không chia sẻ. Bộ nhớ bao gồm session, preference, project, decision. Kho dữ liệu mã hóa, quyền theo vai trò.',
-      items: ['Long-term Memory: session, preference, project, decision, family', 'Data Vault: mã hóa at-rest và in-transit', 'Quyền theo vai trò: owner, family, team, viewer', 'Export đầy đủ: memory, vault, audit log bất cứ lúc nào', 'Sync đa thiết bị, offline-first', 'Không dùng localStorage làm nguồn dữ liệu nghiệp vụ']
+      items: ['Bộ nhớ dài hạn: session, preference, project, decision, family', 'Kho dữ liệu riêng: mã hóa at-rest và in-transit', 'Quyền theo vai trò: owner, family, team, viewer', 'Xuất đầy đủ: bộ nhớ, kho dữ liệu, nhật ký kiểm tra bất cứ lúc nào', 'Đồng bộ đa thiết bị, ưu tiên dùng khi mất kết nối', 'Không dùng localStorage làm nguồn dữ liệu nghiệp vụ']
     },
     securitySection: {
       title: 'Bảo mật, quyền riêng tư và bằng chứng',
       body: 'Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được audit, mọi dữ liệu nằm trong boundary của người dùng. Bằng chứng được lưu cho mọi kết quả quan trọng.',
-      items: ['Approval Gates: phê duyệt trước hành động nhạy cảm', 'Audit & Replay: audit log mọi truy cập, có thể replay', 'Security Boundary: dữ liệu trong boundary người dùng', 'Cost Governor: giới hạn chi phí AI, cảnh báo quota', 'Evidence Engine: proof record, evidence pack cho mọi result', 'Privacy: living-person data private by default, family trees private by default', 'Labels: verified, primary, secondary, oral history, insufficient evidence, disputed, cannot conclude']
+      items: ['Cổng phê duyệt: phê duyệt trước hành động nhạy cảm', 'Nhật ký kiểm tra và phát lại: audit log mọi truy cập, có thể replay', 'Ranh giới bảo mật: dữ liệu trong boundary người dùng', 'Bộ kiểm soát chi phí: giới hạn chi phí AI, cảnh báo hạn mức', 'Bằng chứng: biên nhận, bộ bằng chứng cho mọi result', 'Privacy: living-person data private by default, family trees private by default', 'Labels: verified, primary, secondary, oral history, insufficient evidence, disputed, cannot conclude']
     },
     useCases: {
       title: 'Ca sử dụng Founder, Business và Family',
-      body: 'Ba ca sử dụng điển hình cho thấy Nguyen AI Computer phục vụ nhu cầu thực tế.',
+      body: 'Ba ca sử dụng điển hình cho thấy Máy Tính AI Nguyễn phục vụ nhu cầu thực tế.',
       cards: [
-        { name: 'Founder — Gọi vốn Seed', description: 'Pitch deck, financial model 5 năm, data room, diligence checklist, investor brief, KPI dashboard, board report.', tag: 'Founder' },
-        { name: 'Business — Vận hành 90 ngày', description: 'SOP 5 phòng ban, CRM pipeline, automation schedule, finance report, legal contract analysis, audit trail.', tag: 'Business' },
-        { name: 'Family — Di sản 3 thế hệ', description: 'Gia phả, oral history, ảnh số hóa, tài liệu gia đình, quyền theo thế hệ, evidence labels.', tag: 'Family' }
+        { name: 'Founder — Gọi vốn Seed', description: 'Pitch deck, financial model 5 năm, data room, diligence checklist, investor brief, KPI dashboard, board report.', tag: 'Sáng lập' },
+        { name: 'Business — Vận hành 90 ngày', description: 'SOP 5 phòng ban, CRM pipeline, automation schedule, finance report, legal contract analysis, audit trail.', tag: 'Doanh nghiệp' },
+        { name: 'Family — Di sản 3 thế hệ', description: 'Gia phả, oral history, ảnh số hóa, tài liệu gia đình, quyền theo thế hệ, evidence labels.', tag: 'Gia đình' }
       ]
     },
     ctaBanner: {
-      title: 'Sẵn sàng khởi tạo AI Computer của bạn?',
+      title: 'Sẵn sàng khởi tạo Máy Tính AI Nguyễn của bạn?',
       body: 'Bắt đầu miễn phí với Nguyen Start, hoặc chọn gói phù hợp từ Personal đến Enterprise. Mỗi người dùng có một máy riêng, bộ nhớ riêng, dữ liệu riêng.',
       primaryCta: 'Khởi tạo ngay',
       secondaryCta: 'Liên hệ tư vấn'
     },
     faq: [
-      { question: 'Nguyen AI Computer có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ 9 Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow dài hạn.' },
-      { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Super App quan trọng, nhưng sản phẩm còn bao gồm 12 tool family: AI Office, AI Research, AI Content, AI Media, AI Code, AI Automation, AI Founder OS, AI Business OS, AI Sales, AI Finance, AI Legal, và 7 Super App Nguyễn.' },
-      { question: 'Tôi chọn Model và Functional Product thế nào?', answer: 'Model là cấp độ máy (năng lực phần cứng: agent, memory, vault, quota). Functional Product là bộ tool chuyên biệt (chức năng). Bạn chọn 1 Model + 1 hoặc nhiều Functional Products. Ví dụ: Nguyen Founder + Founder Suite.' },
+      { question: 'Máy Tính AI Nguyễn có phải chatbot không?', answer: 'Không. Đây là một hệ thống Máy Tính AI cá nhân trên đám mây, với đội ngũ 9 Tác nhân, bộ nhớ dài hạn, kho dữ liệu, công cụ và quy trình dài hạn.' },
+      { question: 'Gia phả có phải toàn bộ sản phẩm không?', answer: 'Không. Gia phả và di sản là các Siêu ứng dụng quan trọng, nhưng sản phẩm còn bao gồm 12 họ công cụ: AI Office, AI Research, AI Content, AI Media, AI Code, AI Automation, AI Founder OS, AI Business OS, AI Sales, AI Finance, AI Legal, và 7 Siêu ứng dụng Nguyễn.' },
+      { question: 'Tôi chọn Mô hình máy và Sản phẩm chức năng thế nào?', answer: 'Mô hình máy là cấp độ máy (năng lực phần cứng: tác nhân, bộ nhớ, kho dữ liệu, hạn mức). Sản phẩm chức năng là bộ công cụ chuyên biệt (chức năng). Bạn chọn 1 Mô hình máy + 1 hoặc nhiều Sản phẩm chức năng. Ví dụ: Nguyen Founder + Founder Suite.' },
       { question: 'Giá hiện tại có phải giá cuối cùng không?', answer: 'Không. Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.' },
-      { question: 'Dữ liệu của tôi có an toàn không?', answer: 'Mỗi người dùng có instance riêng, không chia sẻ memory hay data. Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được audit log, dữ liệu nằm trong boundary của người dùng.' },
-      { question: 'Nguyen AI có phải chỉ cho người họ Nguyễn?', answer: 'Nguyen AI Computer được thiết kế cho hệ sinh thái Nguyễn toàn cầu, nhưng sản phẩm hoạt động cho mọi cá nhân, gia đình, founder và doanh nghiệp. Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống.' },
+      { question: 'Dữ liệu của tôi có an toàn không?', answer: 'Mỗi người dùng có máy riêng, không chia sẻ bộ nhớ hay dữ liệu. Mọi hành động nhạy cảm cần phê duyệt, mọi truy cập được nhật ký kiểm tra, dữ liệu nằm trong ranh giới bảo mật của người dùng.' },
+      { question: 'Nguyễn AI có phải chỉ cho người họ Nguyễn?', answer: 'Máy Tính AI Nguyễn được thiết kế cho hệ sinh thái Nguyễn toàn cầu, nhưng sản phẩm hoạt động cho mọi cá nhân, gia đình, sáng lập và doanh nghiệp. Nguyen Operating Profile là hồ sơ vận hành, không phải huyết thống.' },
       { question: 'Demo trên trang có phải sản phẩm thật không?', answer: 'Không. Mỗi demo được ghi rõ nhãn: Live demo, Interactive demo, Simulated demo, Product preview, hoặc Planned. Không giả lập demo như sản phẩm thật.' },
       { question: 'Tính năng nào đã có, đang thử nghiệm hoặc đang kế hoạch?', answer: 'Mỗi gói có trạng thái: Available, Beta, Planned, hoặc Enterprise only. Không công bố tính năng chưa tồn tại là đã hoàn thành.' }
     ]
