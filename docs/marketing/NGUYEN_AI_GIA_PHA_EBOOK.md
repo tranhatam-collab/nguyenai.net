@@ -1,0 +1,341 @@
+# Nguyen AI Computer — Hướng Dẫn Case Gia Phả
+
+**Phiên bản:** 1.0  
+**Ngày:** 2026-07-08  
+**Dành cho:** Gia đình họ Nguyễn muốn xông phá case gia phả với AI Computer
+
+---
+
+## MỤC LỤC
+
+1. [Tại sao cần AI Computer cho gia phả?](#1-tại-sao-cần-ai-computer-cho-gia-pha)
+2. [Cách nguyenai.net giải quyết](#2-cách-nguyenai-net-giải-quyết)
+3. [Khác biệt so với Discord/Facebook](#3-khác-biệt-so-discordfacebook)
+4. [Bước 1: Lập tài khoản](#4-bước-1-lập-tài-khoản)
+5. [Bước 2: Tạo profile họ hàng](#5-bước-2-tạo-profile-họ-hàng)
+6. [Bước 3: Upload hồ sơ & bằng chứng](#6-bước-3-upload-hồ-sơ-bằng-chứng)
+7. [Bước 4: Kết nối họ hàng](#7-bước-4-kết-nối-họ-hàng)
+8. [Bước 5: Trao truyền kinh nghiệm](#8-bước-5-trao-truyền-kinh-nghiệm)
+9. [Bước 6: Xưng hô tự động](#9-bước-6-xưng-họ-tự-động)
+10. [Bước 7: Verification & Audit Trail](#10-bước-7-verification-audit-trail)
+11. [Case Study: Xông phá trong họ 3 tuần](#11-case-study-xông-phá-trong-họ-3-tuần)
+12. [FAQ](#12-faq)
+
+---
+
+## 1. Tại sao cần AI Computer cho gia phả?
+
+### Vấn đề hiện tại
+
+**Trang gia phả truyền thống:**
+- Dữ liệu lưu trên server trung tâm (23andMe, MyHeritage, Facebook)
+- Không có encryption, không có private vault
+- Không có verification: ai cũng có thể claim quan hệ
+- Không có evidence: không có bằng chứng kiểm chứng
+- Không có AI-powered search: chỉ keyword-based
+
+**Discord/Facebook group:**
+- Chat cơ bản, không có structure
+- Không có verification, không có evidence
+- Không có private vault
+- Không có AI hỗ trợ nghiên cứu, xác minh
+
+### Giải pháp: Nguyen AI Computer
+
+**Private AI Computer Instance:**
+- Mỗi người có instance riêng, data vault riêng
+- Data người đang sống được encrypt, chỉ chủ sở hữu có key
+- Access control fine-grained: từng field, từng relation
+- Evidence-based: mọi claim có bằng chứng kiểm chứng
+- AI-powered: Multi-Agent tự động hóa nghiên cứu, xác minh, lưu trữ
+
+---
+
+## 2. Cách nguyenai.net giải quyết
+
+### 9 Super Apps cho gia phả
+
+| Super App | Chức năng gia phả |
+|-----------|-----------------|
+| **Nguyen Roots** | Lưu trữ gia phả, sơ đồ quan hệ, bằng chứng |
+| **Nguyen Knowledge** | Trao truyền kinh nghiệm, giá trị sống cho con cháu |
+| **Nguyen Researcher** | Nghiên cứu hồ sơ, bằng chứng, oral history |
+| **Nguyen Verifier** | Kiểm chứng bằng chứng, xác minh quan hệ |
+| **Nguyen Archivist** | Lưu trữ, version control, audit trail |
+| **Nguyen Guide** | Hỗ trợ user: "Họ hàng này có ai chưa kết nối?" |
+| **AI Research** | Semantic search trên hồ sơ, bằng chứng |
+| **AI Office** | Document collaboration, đồng thời edit |
+| **AI Content** | Tạo content, bài viết, video về gia phả |
+
+### Private Data Vault
+
+**Mỗi người có vault riêng:**
+- Data người đang sống: encrypt, chỉ chủ sở hữu có key
+- Data người đã mất: public (với permission)
+- Access control: user cấp quyền cho họ hàng (read-only, edit, admin)
+- Audit trail: mọi truy cập được log
+
+---
+
+## 3. Khác biệt so với Discord/Facebook
+
+| Đặc điểm | Discord/Facebook | Nguyen AI Computer |
+|---------|------------------|-------------------|
+| Data ownership | Server trung tâm | Private vault (user sở hữu) |
+| Privacy | Policy của platform | End-to-end encryption |
+| Access control | Public/Friends/Followers | FGA (fine-grained) |
+| Verification | Không có hoặc weak | Evidence-based |
+| AI-powered | Không hoặc cơ bản | Multi-Agent (9 Agents) |
+| Search | Keyword-based | Semantic search |
+| Collaboration | Comment, chat | Shared workspace |
+
+---
+
+## 4. Bước 1: Lập tài khoản
+
+### Cách đăng ký
+
+1. Truy cập: `https://nguyenai.net`
+2. Click: "Đăng ký" (Sign up)
+3. Chọn phương thức:
+   - **Google Login** (khuyên dùng): nhanh, secure
+   - **Email + Password**: truyền thống
+   - **Passkey**: passwordless, secure nhất
+
+### Tại sao cần tài khoản?
+
+- Private vault: mỗi người có vault riêng
+- Access control: user cấp quyền cho họ hàng
+- Audit trail: mọi hành động được log
+- Security: 2FA, session management
+
+---
+
+## 5. Bước 2: Tạo profile họ hàng
+
+### Thông tin profile
+
+- **Tên đầy đủ**: Nguyễn Văn A
+- **Thế hệ**: 3 (ông), 4 (bác), 5 (chú), 6 (anh), 7 (cháu)
+- **Branch**: Nguyễn Văn (nhánh chính), Nguyễn Văn (nhánh phụ)
+- **Location**: Làng X, huyện Y, tỉnh Z
+- **Quan hệ huyết thống**: (tự động điền từ hồ sơ)
+- **Permission**: Public hoặc Private
+
+### Cách điền thông tin
+
+1. Truy cập: "Nguyen Roots" Super App
+2. Click: "Tạo profile"
+3. Điền thông tin
+4. Upload avatar (tùy chọn)
+5. Save
+
+---
+
+## 6. Bước 3: Upload hồ sơ & bằng chứng
+
+### Hồ sơ cần upload
+
+- **Giấy khai sinh**: scan hoặc photo
+- **Chứng minh thư**: scan hoặc photo
+- **Photo họ hàng**: tùy chọn
+- **Oral history**: audio hoặc video (tùy chọn)
+- **Bằng chứng khác**: di chúc, giấy tờ cũ
+
+### Cách upload
+
+1. Truy cập: "Nguyen Roots" → "Hồ sơ"
+2. Click: "Upload hồ sơ"
+3. Chọn file
+4. Tag: "giấy khai sinh", "chứng minh thư", "photo"
+5. Save
+
+### Verification
+
+- **Nguyen Verifier Agent** tự động kiểm chứng:
+  - Primary source: giấy khai sinh, chứng minh thư
+  - Secondary source: di chúc, giấy tờ cũ
+  - Oral history: audio/video
+- Label: verified, primary source, secondary source, oral history, insufficient evidence
+
+---
+
+## 7. Bước 4: Kết nối họ hàng
+
+### Cách kết nối
+
+1. Truy cập: "Nguyen Roots" → "Kết nối họ hàng"
+2. **Nguyen Guide Agent** gợi ý:
+   - "Họ hàng này có ai chưa kết nối?"
+   - "Có thể kết nối với: Nguyễn Văn B (anh trai của ông)"
+3. Click: "Kết nối"
+4. **Nguyen Verifier Agent** yêu cầu bằng chứng:
+   - "Bằng chứng cho quan hệ cha-con này là gì?"
+5. Upload bằng chứng
+6. **Nguyen Verifier Agent** verify
+7. Nếu verified → kết nối thành công
+
+### Access control
+
+- **Read-only**: chỉ xem hồ sơ, không edit
+- **Edit**: có thể edit hồ sơ
+- **Admin**: full control
+
+---
+
+## 8. Bước 5: Trao truyền kinh nghiệm
+
+### Cách tạo knowledge entry
+
+1. Truy cập: "Nguyen Knowledge" Super App
+2. Click: "Tạo entry"
+3. Điền:
+   - **Tiêu đề**: "Kinh nghiệm làm ăn của ông Nguyễn Văn A"
+   - **Nội dung**: (viết kinh nghiệm)
+   - **Tag**: "kinh nghiệm sống", "giá trị đạo đức", "cách làm ăn"
+   - **Evidence**: attach bằng chứng (photo, video, audio)
+   - **Permission**: Public, Private, Restricted
+4. Save
+
+### Hiển thị
+
+- **Dashboard**: "Kinh nghiệm của ông bà", "Câu chuyện gia đình"
+- **Search**: "kinh nghiệm làm ăn + ông Nguyễn Văn A"
+- **Timeline**: "Kinh nghiệm theo thời gian"
+
+---
+
+## 9. Bước 6: Xưng hô tự động
+
+### Cách hoạt động
+
+1. Khi gặp người mới:
+   - **Nguyen Guide Agent** quét face (nếu có permission)
+   - Hoặc user nhập tên
+   - Agent lookup trong relationship graph
+2. Agent trả lời:
+   - "Chào chú, cháu là Nguyễn Văn D, cháu của ông Nguyễn Văn C (anh trai của ông)"
+3. Nếu không rõ quan hệ:
+   - Agent nói: "Chào bạn, tôi chưa có thông tin quan hệ giữa chúng ta. Bạn có thể cho tôi biết tên cha mẹ ông bà không?"
+
+### Degree of separation
+
+- Agent tính bậc quan hệ:
+  - "Cháu và ông cách nhau 2 bậc"
+  - "Cháu và họ hàng này cách nhau 4 bậc (cháu của bác dì của ông)"
+
+---
+
+## 10. Bước 7: Verification & Audit Trail
+
+### Verification
+
+- **Nguyen Verifier Agent** kiểm chứng:
+  - Primary source vs secondary source vs oral history
+  - Label: verified, primary source, secondary source, oral history, insufficient evidence
+- **Audit trail**: mọi hành động được log:
+  - User X truy cập hồ sơ của User Y
+  - User Z edit knowledge entry
+  - User A kết nối với User B
+
+### Audit log
+
+- **@nai/audit**: append-only audit log
+- Mỗi event: user_id, session_id, event_type, target, result, metadata
+- Không thể edit, không thể delete (append-only)
+
+---
+
+## 11. Case Study: Xông phá trong họ 3 tuần
+
+### Tuần 1: Lập tài khoản + Profile
+
+**Mục tiêu:** 10 người đăng ký
+
+**Cách làm:**
+1. Gửi link đăng ký: `https://nguyenai.net`
+2. Hướng dẫn đăng ký qua Google Login
+3. Hướng dẫn tạo profile họ hàng
+4. Hướng dẫn upload hồ sơ (giấy khai sinh, chứng minh thư)
+
+**Kết quả:**
+- 10 người đăng ký
+- 10 profile được tạo
+- 20 hồ sơ được upload
+
+### Tuần 2: Kết nối họ hàng + Trao truyền kinh nghiệm
+
+**Mục tiêu:** 20 kết nối + 10 knowledge entries
+
+**Cách làm:**
+1. **Nguyen Guide Agent** gợi ý kết nối
+2. User kết nối với họ hàng
+3. **Nguyen Verifier Agent** verify bằng chứng
+4. User tạo knowledge entry: "Kinh nghiệm làm ăn của ông..."
+5. User attach evidence
+
+**Kết quả:**
+- 20 kết nối thành công
+- 10 knowledge entries được tạo
+- 20 by chứng được upload
+
+### Tuần 3: Xưng hô tự động + Demo
+
+**Mục tiêu:** Demo xưng hô tự động
+
+**Cách làm:**
+1. Mời họ hàng mới đến
+2. **Nguyen Guide Agent** quét face → match profile
+3. Agent trả lời: "Chào chú, cháu là..."
+4. Demo: "Cháu và ông cách nhau 2 bậc"
+5. Demo: "Họ hàng này có ai chưa kết nối?"
+
+**Kết quả:**
+- 5 người mới được xưng hô đúng
+- Demo thành công cho cả họ hàng
+
+---
+
+## 12. FAQ
+
+### Q1: Dữ liệu có an toàn không?
+
+**A:** Có. Data người đang sống được encrypt, chỉ chủ sở hữu có key. Data người đã mất public (với permission). Access control fine-grained: user cấp quyền cho từng field, từng relation.
+
+### Q2: Có cần biết về AI không?
+
+**A:** Không cần. User chỉ cần nói: "Nghiên cứu gia phả ông Nguyễn Văn A". Agent tự động chọn model, tự động optimize cost + speed + quality.
+
+### Q3: Có khác so với Facebook không?
+
+**A:** Có rất nhiều. Facebook không có private vault, không có verification, không có evidence, không có AI-powered search. Nguyen AI có tất cả.
+
+### Q4: Có cần trả phí không?
+
+**A:** Có. Nguyen AI Computer là dịch vụ trả phí. Plan: Nguyen Start (free), Nguyen Personal (299K VND), Nguyen Family (599K), v.v. Xem chi tiết: `https://nguyenai.net/plans`
+
+### Q5: Có thể dùng offline không?
+
+**A:** Có thể. Private AI Computer Instance có thể chạy local (trên máy của user), không cần kết nối internet.
+
+---
+
+## KẾT LUẬN
+
+Nguyen AI Computer không chỉ là "trang web lưu gia phả" — nó là **AI Computer** có khả năng tự động hóa việc nghiên cứu, xác minh, lưu trữ bằng chứng, và kết nối họ hàng một cách có kiểm chứng.
+
+**Khác biệt cốt lõi:**
+- Private vault (user sở hữu)
+- Evidence-based verification
+- Multi-Agent support
+- Fine-grained access control
+- AI-powered search
+
+**Demo thật thụ:** 3 tuần xông phá trong họ → 10 người đăng ký → 20 kết nối → 10 knowledge entries → 5 người mới được xưng hô đúng.
+
+---
+
+**Liên hệ:**
+- Website: `https://nguyenai.net`
+- Email: `contact@nguyenai.net`
+- Docs: `https://docs.nguyenai.net`
