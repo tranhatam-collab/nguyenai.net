@@ -14,11 +14,11 @@ export const site = {
     en: 'Rooted identity. Powerful intelligence. Global execution.'
   },
   hero: {
-    vi: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
+    vi: 'Máy Tính AI Nguyễn cho thế hệ Nguyễn toàn cầu.',
     en: 'AI Computer for the Global Nguyen Generation.'
   },
   heroDescription: {
-    vi: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ AI Agent, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
+    vi: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một Máy Tính AI Nguyễn riêng trên đám mây — với đội ngũ Tác nhân AI, bộ nhớ, kho dữ liệu, công cụ làm việc, kinh doanh, sáng tạo, di sản và kết nối toàn cầu.',
     en: 'Each individual, family, founder, business and community has a private AI Computer on the cloud — with an Agent team, memory, data vault, work, business, creative, heritage and global connection tools.'
   }
 } as const;
@@ -38,11 +38,11 @@ export const colors = {
 
 export const routes = [
   { key: 'home', vi: '/', en: '/en/', labelVi: 'Trang chủ', labelEn: 'Home' },
-  { key: 'ai-computer', vi: '/ai-computer/', en: '/en/ai-computer/', labelVi: 'AI Computer', labelEn: 'AI Computer' },
+  { key: 'ai-computer', vi: '/ai-computer/', en: '/en/ai-computer/', labelVi: 'Máy Tính AI Nguyễn', labelEn: 'AI Computer' },
   { key: 'how-it-works', vi: '/how-it-works/', en: '/en/how-it-works/', labelVi: 'Cách vận hành', labelEn: 'How it works' },
-  { key: 'agents', vi: '/agents/', en: '/en/agents/', labelVi: 'Agent', labelEn: 'Agents' },
-  { key: 'super-apps', vi: '/super-apps/', en: '/en/super-apps/', labelVi: 'Super App', labelEn: 'Super Apps' },
-  { key: 'models', vi: '/models/', en: '/en/models/', labelVi: 'Model Mesh', labelEn: 'Models' },
+  { key: 'agents', vi: '/agents/', en: '/en/agents/', labelVi: 'Tác nhân', labelEn: 'Agents' },
+  { key: 'super-apps', vi: '/super-apps/', en: '/en/super-apps/', labelVi: 'Siêu ứng dụng', labelEn: 'Super Apps' },
+  { key: 'models', vi: '/models/', en: '/en/models/', labelVi: 'Mạng mô hình trí tuệ', labelEn: 'Models' },
   { key: 'command-packs', vi: '/command-packs/', en: '/en/command-packs/', labelVi: 'Command Pack', labelEn: 'Command Packs' },
   { key: 'plans', vi: '/plans/', en: '/en/plans/', labelVi: 'Gói dịch vụ', labelEn: 'Plans' },
   { key: 'personal', vi: '/personal/', en: '/en/personal/', labelVi: 'Cá nhân', labelEn: 'Personal' },
@@ -54,7 +54,7 @@ export const routes = [
   { key: 'enterprise', vi: '/enterprise/', en: '/en/enterprise/', labelVi: 'Enterprise', labelEn: 'Enterprise' },
   { key: 'heritage', vi: '/heritage/', en: '/en/heritage/', labelVi: 'Di sản', labelEn: 'Heritage' },
   { key: 'network', vi: '/network/', en: '/en/network/', labelVi: 'Kết nối', labelEn: 'Network' },
-  { key: 'academy', vi: '/academy/', en: '/en/academy/', labelVi: 'Academy', labelEn: 'Academy' },
+  { key: 'academy', vi: '/academy/', en: '/en/academy/', labelVi: 'Học viện', labelEn: 'Academy' },
   { key: 'security', vi: '/security/', en: '/en/security/', labelVi: 'Bảo mật', labelEn: 'Security' },
   { key: 'trust', vi: '/trust/', en: '/en/trust/', labelVi: 'Minh chứng', labelEn: 'Trust' },
   { key: 'docs', vi: '/docs/', en: '/en/docs/', labelVi: 'Tài liệu', labelEn: 'Docs' },
