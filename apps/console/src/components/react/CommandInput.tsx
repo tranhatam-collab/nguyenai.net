@@ -166,6 +166,7 @@ export default function CommandInput() {
             className="console-btn console-btn-secondary text-xs"
             onClick={() => setHistoryOpen((v) => !v)}
             aria-expanded={historyOpen}
+            aria-label="Toggle command history · Mở lịch sử lệnh"
           >
             History · Lịch sử ({recentHistory.length})
           </button>
@@ -183,6 +184,7 @@ export default function CommandInput() {
                         type="button"
                         className="w-full rounded px-2 py-2 text-left text-xs hover:bg-bg-hover"
                         onClick={() => handleHistoryPick(cmd)}
+                        aria-label={`Select command: ${cmd.text}`}
                       >
                         <p className="truncate font-mono text-slate-300">
                           {cmd.text}
@@ -253,6 +255,7 @@ export default function CommandInput() {
             className="console-btn console-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
             onClick={handleRun}
             disabled={running || !text.trim()}
+            aria-label={running ? "Running command · Đang chạy lệnh" : "Run command · Chạy lệnh"}
           >
             {running ? (
               <>

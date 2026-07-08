@@ -82,6 +82,7 @@ export default function MemoryPanel() {
         <button
           className="console-btn console-btn-primary text-xs"
           onClick={() => setShowForm((v) => !v)}
+          aria-label={showForm ? "Cancel · Hủy" : "Add memory · Ghi bộ nhớ"}
         >
           {showForm ? 'Hủy' : '+ Ghi bộ nhớ'}
         </button>
@@ -102,8 +103,9 @@ export default function MemoryPanel() {
               </select>
             </div>
             <div>
-              <label className="console-label">Key</label>
+              <label className="console-label" htmlFor="memory-key">Key</label>
               <input
+                id="memory-key"
                 className="console-input"
                 value={newMemory.key}
                 onChange={(e) => setNewMemory((m) => ({ ...m, key: e.target.value }))}
@@ -111,8 +113,9 @@ export default function MemoryPanel() {
               />
             </div>
             <div>
-              <label className="console-label">Value</label>
+              <label className="console-label" htmlFor="memory-value">Value</label>
               <input
+                id="memory-value"
                 className="console-input"
                 value={newMemory.value}
                 onChange={(e) => setNewMemory((m) => ({ ...m, value: e.target.value }))}
@@ -120,7 +123,7 @@ export default function MemoryPanel() {
               />
             </div>
           </div>
-          <button className="console-btn console-btn-primary mt-3 text-xs" onClick={handleWrite}>
+          <button className="console-btn console-btn-primary mt-3 text-xs" onClick={handleWrite} aria-label="Save memory · Lưu bộ nhớ">
             Save · Lưu
           </button>
         </div>
@@ -165,6 +168,7 @@ export default function MemoryPanel() {
                 <button
                   className="text-xs text-red-400 hover:text-red-300"
                   onClick={() => handleDelete(m.key)}
+                  aria-label={`Delete memory ${m.key} · Xóa bộ nhớ ${m.key}`}
                 >
                   Delete
                 </button>

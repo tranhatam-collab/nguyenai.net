@@ -37,7 +37,7 @@ const currentPath = Astro.url.pathname;
   </div>
 
   <!-- Navigation -->
-  <nav class="flex-1 overflow-y-auto px-3 py-4">
+  <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="Console navigation">
     <ul class="space-y-1">
       {navItems.map((item) => {
         const isActive = currentPath === item.href || currentPath.startsWith(item.href + '/');

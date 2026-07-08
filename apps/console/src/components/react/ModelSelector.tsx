@@ -69,6 +69,7 @@ export default function ModelSelector() {
             type="button"
             className="console-btn console-btn-primary text-xs"
             onClick={handleSetDefault}
+            aria-label={saved ? "Saved · Đã lưu" : "Set as default · Đặt mặc định"}
           >
             {saved ? 'Saved ✓ · Đã lưu' : 'Set as default · Đặt mặc định'}
           </button>
@@ -90,6 +91,7 @@ export default function ModelSelector() {
               }`}
               onClick={() => handleSelect(model.id)}
               aria-pressed={isSelected}
+              aria-label={`Select model ${model.name} · Chọn mô hình ${model.name}`}
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0">

@@ -23,7 +23,7 @@ import ConsoleLayout from '../layouts/ConsoleLayout.astro';
       </svg>
       <p class="text-sm text-slate-400">Drop files here · Kéo tệp vào đây</p>
       <p class="mt-1 text-xs text-slate-500">All files are encrypted at rest</p>
-      <button class="console-btn console-btn-secondary mt-4">Browse Files · Chọn tệp</button>
+      <button class="console-btn console-btn-secondary mt-4" aria-label="Browse files · Chọn tệp">Browse Files · Chọn tệp</button>
     </div>
   </div>
 
@@ -36,7 +36,7 @@ import ConsoleLayout from '../layouts/ConsoleLayout.astro';
           <h2 class="console-section-title">Files · Tệp tin</h2>
           <p class="console-section-subtitle">0 files stored</p>
         </div>
-        <input type="text" class="console-input max-w-xs text-sm" placeholder="Search files... · Tìm tệp..." />
+        <input id="file-search" type="text" class="console-input max-w-xs text-sm" placeholder="Search files... · Tìm tệp..." />
       </div>
       <table class="w-full text-sm">
         <thead>
@@ -65,28 +65,28 @@ import ConsoleLayout from '../layouts/ConsoleLayout.astro';
         <div>
           <label class="flex items-center justify-between">
             <span class="text-sm text-slate-300">Encryption at rest</span>
-            <input type="checkbox" checked class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+            <input type="checkbox" checked class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" aria-label="Encryption at rest · Mã hóa dữ liệu lưu trữ" />
           </label>
           <p class="mt-1 text-xs text-slate-500">Mã hóa dữ liệu lưu trữ</p>
         </div>
         <div>
           <label class="flex items-center justify-between">
             <span class="text-sm text-slate-300">Agent access</span>
-            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" aria-label="Agent access · Cho phép Agent truy cập" />
           </label>
           <p class="mt-1 text-xs text-slate-500">Cho phép Agent truy cập</p>
         </div>
         <div>
           <label class="flex items-center justify-between">
             <span class="text-sm text-slate-300">Auto-delete after 30 days</span>
-            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" aria-label="Auto-delete after 30 days · Tự xóa sau 30 ngày" />
           </label>
           <p class="mt-1 text-xs text-slate-500">Tự xóa sau 30 ngày</p>
         </div>
         <div>
           <label class="flex items-center justify-between">
             <span class="text-sm text-slate-300">Share with Nguyen Network</span>
-            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" />
+            <input type="checkbox" class="rounded border-slate-600 bg-bg-card text-accent focus:ring-accent" aria-label="Share with Nguyen Network · Chia sẻ với mạng lưới Nguyễn" />
           </label>
           <p class="mt-1 text-xs text-slate-500">Chia sẻ với mạng lưới Nguyen</p>
         </div>

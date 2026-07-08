@@ -91,6 +91,7 @@ export default function RoutingRules() {
             type="button"
             className="console-btn console-btn-primary text-xs"
             onClick={() => setAdding(true)}
+            aria-label="Add routing rule · Thêm quy tắc định tuyến"
           >
             Add Rule · Thêm quy tắc
           </button>
@@ -136,7 +137,7 @@ export default function RoutingRules() {
               </select>
             </div>
             <div className="flex items-end gap-2">
-              <button type="submit" className="console-btn console-btn-primary">
+              <button type="submit" className="console-btn console-btn-primary" aria-label="Save routing rule · Lưu quy tắc định tuyến">
                 Save · Lưu
               </button>
               <button
@@ -146,6 +147,7 @@ export default function RoutingRules() {
                   setAdding(false);
                   setCondition('');
                 }}
+                aria-label="Cancel · Hủy"
               >
                 Hủy
               </button>
@@ -188,6 +190,7 @@ export default function RoutingRules() {
                       type="button"
                       className="text-xs text-slate-500 hover:text-red-400"
                       onClick={() => handleDelete(rule.id)}
+                      aria-label={`Delete routing rule ${rule.condition} · Xóa quy tắc ${rule.condition}`}
                     >
                       Delete · Xóa
                     </button>

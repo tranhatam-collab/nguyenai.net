@@ -75,6 +75,7 @@ export default function CommandHistory() {
               <button
                 key={f.id}
                 type="button"
+                aria-label={`Filter by ${f.label}`}
                 className={`rounded px-2.5 py-1 text-xs transition-colors ${
                   filter === f.id
                     ? 'bg-accent text-white'
@@ -91,6 +92,7 @@ export default function CommandHistory() {
             className="console-btn console-btn-secondary text-xs"
             onClick={handleClear}
             disabled={history.length === 0}
+            aria-label="Clear command history · Xóa lịch sử lệnh"
           >
             Clear History
           </button>
@@ -137,6 +139,7 @@ export default function CommandHistory() {
                   type="button"
                   className="console-btn console-btn-secondary shrink-0 text-xs"
                   onClick={() => handleReRun(cmd)}
+                  aria-label="Re-run command · Chạy lại lệnh"
                 >
                   Re-run · Chạy lại
                 </button>

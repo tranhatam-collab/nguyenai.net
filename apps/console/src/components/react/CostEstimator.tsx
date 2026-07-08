@@ -89,6 +89,7 @@ export default function CostEstimator() {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 onClick={() => setCurrency(c)}
+                aria-label={`Switch to ${c} currency · Chuyển sang ${c}`}
               >
                 {c}
               </button>
