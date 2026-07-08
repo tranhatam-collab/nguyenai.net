@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PublicClaimBlock from '../components/PublicClaimBlock.astro';
+
+const title = 'Bằng chứng độc lập — Nguyễn AI';
+const description = 'Bằng chứng vận hành độc lập hoàn toàn. Mọi tuyên bố có biên nhận kiểm chứng.';
+---
+<BaseLayout locale="vi" routeKey="proof" title={title} description={description}>
+  <main class="proof-page">
+    <section class="hero">
+      <h1>Bằng chứng vận hành độc lập</h1>
+      <p>Nguyễn AI chạy trên phần nền sau riêng, tự chủ toàn bộ. Mọi tuyên bố dưới đây có biên nhận kiểm chứng.</p>
+    </section>
+    <section class="claims">
+      <h2>Tuyên bố công khai</h2>
+      <PublicClaimBlock claimId="independent-backend" text="Nguyễn AI sở hữu phần nền sau riêng, tự chủ toàn bộ." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="no-gen1-dependency" text="Không phụ thuộc hệ thống cũ trong vận hành mặc định." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="evidence-receipts" text="Mọi lệnh quan trọng có biên nhận kiểm chứng." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="bilingual" text="Giao diện song ngữ Việt — Anh, không trộn ngôn ngữ." grade="R1" locale="vi" />
+      <PublicClaimBlock claimId="heritage-not-bloodline" text="Di sản và gia phả là Super App quan trọng, không phải toàn bộ sản phẩm." grade="R2" locale="vi" />
+      <PublicClaimBlock claimId="no-profit-promise" text="Công cụ tài chính hỗ trợ phân tích, không phải tư vấn cấp phép." grade="R2" locale="vi" />
+    </section>
+    <section class="charter">
+      <h2>Câu chủ</h2>
+      <blockquote>Máy làm — người ký — mọi việc có biên nhận.</blockquote>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .proof-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .claims h2, .charter h2 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 1rem; }
+  .charter blockquote { font-size: 1.125rem; font-style: italic; color: #7c3aed; border-left: 3px solid #7c3aed; padding-left: 1rem; }
+</style>

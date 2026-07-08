@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductStatusMatrix from '../../components/ProductStatusMatrix.astro';
+
+const title = 'Product Status — Nguyen AI';
+const description = 'Capability × R-grade matrix. Every capability has a verification label.';
+---
+<BaseLayout locale="en" routeKey="status" title={title} description={description}>
+  <main class="status-page">
+    <section class="hero">
+      <h1>Product status</h1>
+      <p>Every capability has its R-grade label. R0 = unverified, R1 = internally verified, R2 = independently verified, R3 = live verified.</p>
+    </section>
+    <section class="matrix">
+      <ProductStatusMatrix locale="en" />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .status-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .matrix { margin-top: 2rem; }
+</style>

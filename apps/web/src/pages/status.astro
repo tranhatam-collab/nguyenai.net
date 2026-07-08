@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductStatusMatrix from '../components/ProductStatusMatrix.astro';
+
+const title = 'Trạng thái sản phẩm — Nguyễn AI';
+const description = 'Ma trận năng lực × nhãn tin cậy R0–R3. Mọi năng lực có nhãn kiểm chứng.';
+---
+<BaseLayout locale="vi" routeKey="status" title={title} description={description}>
+  <main class="status-page">
+    <section class="hero">
+      <h1>Trạng thái sản phẩm</h1>
+      <p>Mọi năng lực có nhãn tin cậy R0–R3. R0 = chưa kiểm chứng, R1 = kiểm chứng nội bộ, R2 = kiểm chứng độc lập, R3 = kiểm chứng sống.</p>
+    </section>
+    <section class="matrix">
+      <ProductStatusMatrix locale="vi" />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .status-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .matrix { margin-top: 2rem; }
+</style>

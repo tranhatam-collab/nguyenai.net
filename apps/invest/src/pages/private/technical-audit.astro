@@ -13,24 +13,16 @@ import Disclosure from '../../components/Disclosure.astro';
 
     <!-- Gen1/Gen2 status -->
     <div class="mt-10">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gen1 / Gen2 Status</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-bg-card border border-bg-border rounded-lg p-5">
-          <h3 class="font-semibold text-ink">Gen1 Core Engine (computer.iai.one)</h3>
-          <ul class="mt-3 space-y-2 text-sm text-ink-muted">
-            <li class="flex items-start gap-2"><span class="text-gold">▸</span> Runtime, agent, model routing — inherited</li>
-            <li class="flex items-start gap-2"><span class="text-gold">▸</span> Memory, tool, workflow, evidence — inherited</li>
-            <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> Live runtime: unverified</li>
-          </ul>
-        </div>
-        <div class="bg-bg-card border border-bg-border rounded-lg p-5">
-          <h3 class="font-semibold text-ink">Gen2 Product System (maytinhai.org)</h3>
-          <ul class="mt-3 space-y-2 text-sm text-ink-muted">
-            <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> AI Computer Console: not yet scaffolded</li>
-            <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> Authentication: not yet implemented</li>
-            <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> Data vault: not yet implemented</li>
-          </ul>
-        </div>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Independent Platform Status</h2>
+      <div class="bg-bg-card border border-bg-border rounded-lg p-5">
+        <h3 class="font-semibold text-ink">Nguyen AI Computer (nguyenai.net) — Independent</h3>
+        <ul class="mt-3 space-y-2 text-sm text-ink-muted">
+          <li class="flex items-start gap-2"><span class="text-gold">▸</span> Runtime, agent, model routing — own backend</li>
+          <li class="flex items-start gap-2"><span class="text-gold">▸</span> Memory, tool, workflow, evidence — own implementation</li>
+          <li class="flex items-start gap-2"><span class="text-gold">▸</span> Auth: magic-link + passkey (own SSO)</li>
+          <li class="flex items-start gap-2"><span class="text-gold">▸</span> Billing: Stripe (own account)</li>
+          <li class="flex items-start gap-2"><span class="text-ink-dim">▸</span> Live runtime: pending deploy</li>
+        </ul>
       </div>
     </div>
 

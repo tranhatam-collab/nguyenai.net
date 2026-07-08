@@ -28,5 +28,21 @@ $ tsx src/test.ts
   ✓ step_succeeded event emitted
   ✓ workflow_succeeded event emitted
   ✓ tenant context passed to steps
+  ✓ scheduled trigger created
+  ✓ cron expression stored
+  ✓ trigger enabled by default
+  ✓ nextRunAt computed
+  ✓ webhook trigger created
+  ✓ webhook path stored
+  ✓ event trigger created
+  ✓ event name stored
+  ✓ manual trigger executes workflow
+  ✓ webhook handler finds matching workflow
+  ✓ webhook workflow executes
+  ✓ event handler finds matching workflow
+  ✓ event workflow executes
+  ✓ trigger disabled
+  ✓ trigger re-enabled
+  ✓ scheduled workflow removed
 
-25 passed, 0 failed
+41 passed, 0 failed

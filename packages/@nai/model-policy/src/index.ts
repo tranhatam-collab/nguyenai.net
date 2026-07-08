@@ -8,7 +8,7 @@
  * - Data classification: Public/Confidential/Restricted/Secret
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -220,14 +220,14 @@ async function recordCheck(
     check_id: checkId,
     user_id: context.user_id,
     tenant_id: context.tenant_id,
-    check_type: checkType,
+    check_type: checkType as 'identity' | 'language' | 'safety' | 'data_classification',
     passed,
     reason,
     created_at: new Date().toISOString(),
   });
 
   if (!passed) {
-    await logAuditEvent({
+    await logGovernanceAuditEvent({
       category: 'model_policy',
       action: 'policy_check_failed',
       target: checkId,

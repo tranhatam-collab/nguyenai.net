@@ -140,6 +140,7 @@ export interface AuditEvent {
   result: AuditResult;
   category?: string;
   metadata: Record<string, unknown>;
+  registry_version?: string;
 }
 
 export interface AuditQuery {
@@ -172,7 +173,7 @@ export class InMemoryAuditStore implements AuditStore {
   async log(event: AuditEvent): Promise<string> {
     const event_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    const stored: AuditEvent = { ...event, event_id, timestamp };
+    const stored: AuditEvent = { ...event, event_id, timestamp, registry_version: AUDIT_REGISTRY_VERSION };
     this.events.push(stored);
     return event_id;
   }

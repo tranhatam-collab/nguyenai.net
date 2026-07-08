@@ -8,7 +8,7 @@
  * - Approval workflow for training runs
  */
 
-import { logAuditEvent } from '@nai/audit';
+import { logGovernanceAuditEvent } from '@nai/audit';
 
 // ============================================================
 // Types
@@ -77,7 +77,7 @@ export class InMemoryTrainingStore implements TrainingStore {
   }
 
   async listTrainings(filters?: { status?: TrainingStatus; type?: TrainingType; requested_by?: string }): Promise<TrainingRun[]> {
-    let results = [...this.trainings.values()];
+    let results = Array.from(this.trainings.values());
     if (filters?.status) results = results.filter((t) => t.status === filters.status);
     if (filters?.type) results = results.filter((t) => t.type === filters.type);
     if (filters?.requested_by) results = results.filter((t) => t.requested_by === filters.requested_by);
@@ -121,7 +121,7 @@ export async function requestTraining(
     approved_by: null,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'training',
     action: 'training_requested',
     target: trainingId,
@@ -141,7 +141,7 @@ export async function approveTraining(
     approved_by: approvedBy,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'training',
     action: 'training_approved',
     target: trainingId,
@@ -170,7 +170,7 @@ export async function completeTraining(
     metrics,
   });
 
-  await logAuditEvent({
+  await logGovernanceAuditEvent({
     category: 'training',
     action: 'training_completed',
     target: trainingId,

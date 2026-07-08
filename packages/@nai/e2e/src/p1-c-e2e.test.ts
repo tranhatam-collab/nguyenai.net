@@ -9,10 +9,10 @@
  * - P1-C.6: Approval gate integration
  */
 
-import { WorkflowEngine, Workflow, WorkflowStep, StepStatus } from '../aqueduct/src/index.js';
-import { fetchPage, createCrawlSession, crawlStep } from '../scout/src/index.js';
-import { createCrew, assignAgent, executeCrew } from '../crew/src/index.js';
-import { createPipeline, addStage, executePipeline } from '../pipeline/src/index.js';
+import { WorkflowExecutor, type Workflow, type WorkflowStep, type StepStatus } from '@nai/aqueduct';
+import { fetchPage, createCrawlSession, crawlStep } from '@nai/scout';
+import { createCrew, assignAgent, executeCrew } from '@nai/crew';
+import { createPipeline, addStage, executePipeline } from '@nai/pipeline';
 
 async function runE2ETests() {
   console.log('P1-C E2E — Full Automation Chain Tests\n');
@@ -23,14 +23,14 @@ async function runE2ETests() {
   // Test 1: Workflow with Approval Gate
   try {
     console.log('Test 1: Workflow with Approval Gate...');
-    const workflowEngine = new WorkflowEngine();
+    const workflowEngine = new WorkflowExecutor();
     const workflow: Workflow = {
       id: 'test-workflow-approval',
       name: 'Test Workflow with Approval',
       steps: [
         {
           id: 'step1',
-          run: async (ctx) => {
+          run: async (ctx: any) => {
             ctx.outputs['step1'] = 'completed';
             return 'step1 result';
           },
@@ -102,15 +102,14 @@ async function runE2ETests() {
   try {
     console.log('Test 4: Crew Runtime...');
     const crew = createCrew({
-      id: 'test-crew',
       name: 'Test Crew',
       description: 'Test crew for E2E',
     });
 
     assignAgent(crew, {
-      id: 'agent-1',
       name: 'Test Agent',
       role: 'researcher',
+      description: 'Test agent',
       capabilities: ['web_search', 'data_extraction'],
     });
 
@@ -135,23 +134,21 @@ async function runE2ETests() {
   try {
     console.log('Test 6: Pipeline Execution...');
     const pipeline = createPipeline({
-      id: 'test-pipeline',
       name: 'Test Pipeline',
       description: 'Test pipeline for E2E',
+      stages: [],
     });
 
     addStage(pipeline, {
-      id: 'stage1',
       name: 'Research Stage',
-      executor: async (input) => {
+      executor: async (input: any) => {
         return { researchData: 'mock research data' };
       },
     });
 
     addStage(pipeline, {
-      id: 'stage2',
       name: 'Evidence Stage',
-      executor: async (input) => {
+      executor: async (input: any) => {
         return { evidence: 'mock evidence' };
       },
       dependsOn: ['stage1'],
@@ -176,7 +173,7 @@ async function runE2ETests() {
   // Test 6: Full Chain Integration
   try {
     console.log('Test 6: Full Chain Integration (workflow + browser + crew + pipeline)...');
-    const workflowEngine = new WorkflowEngine();
+    const workflowEngine = new WorkflowExecutor();
 
     // Step 1: Browser fetch with allowlist
     const browserResult = await fetchPage('https://example.com', {
@@ -189,15 +186,14 @@ async function runE2ETests() {
 
     // Step 2: Crew execution
     const crew = createCrew({
-      id: 'full-chain-crew',
       name: 'Full Chain Crew',
       description: 'Crew for full chain test',
     });
 
     assignAgent(crew, {
-      id: 'agent-browser',
       name: 'Browser Agent',
-      role: 'browser_automation',
+      role: 'researcher',
+      description: 'Browser agent',
       capabilities: ['fetch', 'crawl'],
     });
 
@@ -212,23 +208,21 @@ async function runE2ETests() {
 
     // Step 3: Pipeline execution
     const pipeline = createPipeline({
-      id: 'full-chain-pipeline',
       name: 'Full Chain Pipeline',
       description: 'Pipeline for full chain test',
+      stages: [],
     });
 
     addStage(pipeline, {
-      id: 'research',
       name: 'Research',
-      executor: async (input) => {
+      executor: async (input: any) => {
         return { data: 'research data' };
       },
     });
 
     addStage(pipeline, {
-      id: 'evidence',
       name: 'Evidence',
-      executor: async (input) => {
+      executor: async (input: any) => {
         return { evidence: 'evidence data' };
       },
       dependsOn: ['research'],
@@ -249,7 +243,7 @@ async function runE2ETests() {
       steps: [
         {
           id: 'browser',
-          run: async (ctx) => {
+          run: async (ctx: any) => {
             const result = await fetchPage('https://example.com', {
               allowlist: ['*.example.com'],
             });
@@ -260,17 +254,16 @@ async function runE2ETests() {
         {
           id: 'crew',
           dependsOn: ['browser'],
-          run: async (ctx) => {
+          run: async (ctx: any) => {
             const crew = createCrew({
-              id: 'workflow-crew',
               name: 'Workflow Crew',
               description: 'Crew in workflow',
             });
 
             assignAgent(crew, {
-              id: 'agent',
               name: 'Agent',
-              role: 'executor',
+              role: 'verifier',
+              description: 'Workflow agent',
               capabilities: ['execute'],
             });
 
@@ -286,17 +279,16 @@ async function runE2ETests() {
         {
           id: 'pipeline',
           dependsOn: ['crew'],
-          run: async (ctx) => {
+          run: async (ctx: any) => {
             const pipeline = createPipeline({
-              id: 'workflow-pipeline',
               name: 'Workflow Pipeline',
               description: 'Pipeline in workflow',
+              stages: [],
             });
 
             addStage(pipeline, {
-              id: 'stage',
               name: 'Stage',
-              executor: async (input) => {
+              executor: async (input: any) => {
                 return { data: 'stage data' };
               },
             });
@@ -334,14 +326,14 @@ async function runE2ETests() {
   // Test 7: Workflow without approval
   try {
     console.log('Test 8: Workflow without approval requirement...');
-    const workflowEngine = new WorkflowEngine();
+    const workflowEngine = new WorkflowExecutor();
     const workflow: Workflow = {
       id: 'no-approval-workflow',
       name: 'No Approval Workflow',
       steps: [
         {
           id: 'step1',
-          run: async (ctx) => {
+          run: async (ctx: any) => {
             ctx.outputs['step1'] = 'completed';
             return 'step1 result';
           },

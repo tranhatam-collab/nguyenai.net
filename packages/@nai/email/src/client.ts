@@ -44,7 +44,7 @@ export class ResendClient implements EmailClient {
 
     const body: Record<string, unknown> = {
       from: formatAddress(from),
-      to: to.map(formatAddress),
+      to: to.map((email: string) => email),
       subject: message.subject,
       html: message.html,
       text: message.text,

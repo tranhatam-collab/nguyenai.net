@@ -1,3 +1,24 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ tsx src/validate.ts
-✅ Migration validation PASSED — 4 file(s), all required tables and roles present, audit_log append-only enforced
+[ELIFECYCLE] Test failed. See above for more details.
+❌ Migration validation FAILED:
+  005_incidents.sql: must be wrapped in BEGIN; ... COMMIT;
+  005_incidents.sql: must be wrapped in BEGIN; ... COMMIT;
+  006_incident_events.sql: must be wrapped in BEGIN; ... COMMIT;
+  006_incident_events.sql: must be wrapped in BEGIN; ... COMMIT;
+  007_admin_notifications.sql: must be wrapped in BEGIN; ... COMMIT;
+  007_admin_notifications.sql: must be wrapped in BEGIN; ... COMMIT;
+  008_admin_approvals.sql: must be wrapped in BEGIN; ... COMMIT;
+  008_admin_approvals.sql: must be wrapped in BEGIN; ... COMMIT;
+  009_self_heal_attempts.sql: must be wrapped in BEGIN; ... COMMIT;
+  009_self_heal_attempts.sql: must be wrapped in BEGIN; ... COMMIT;
+  010_runbooks.sql: must be wrapped in BEGIN; ... COMMIT;
+  010_runbooks.sql: must be wrapped in BEGIN; ... COMMIT;
+  011_model_invocations.sql: must be wrapped in BEGIN; ... COMMIT;
+  011_model_invocations.sql: must be wrapped in BEGIN; ... COMMIT;
+  012_model_policy_checks.sql: must be wrapped in BEGIN; ... COMMIT;
+  012_model_policy_checks.sql: must be wrapped in BEGIN; ... COMMIT;
+  013_output_receipts.sql: must be wrapped in BEGIN; ... COMMIT;
+  013_output_receipts.sql: must be wrapped in BEGIN; ... COMMIT;
+  014_fallback_events.sql: must be wrapped in BEGIN; ... COMMIT;
+  014_fallback_events.sql: must be wrapped in BEGIN; ... COMMIT;

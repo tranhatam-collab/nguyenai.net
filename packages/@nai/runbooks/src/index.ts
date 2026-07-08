@@ -50,7 +50,7 @@ export class InMemoryRunbookStore implements RunbookStore {
   }
 
   async listRunbooks(filters?: { component?: string; incident_type?: string }): Promise<Runbook[]> {
-    let results = [...this.runbooks.values()];
+    let results = Array.from(this.runbooks.values());
     if (filters?.component) results = results.filter((r) => r.component === filters.component);
     if (filters?.incident_type) results = results.filter((r) => r.incident_type === filters.incident_type);
     return results;

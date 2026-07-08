@@ -1,3 +1,41 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+$ tsx src/test.ts
+
+@nai/trace tests:
+  ✓ PACKAGE_INFO.name is string
+  ✓ PACKAGE_INFO.name is @nai/langfuse
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ registerPromptVersion sets name
+  ✓ registerPromptVersion sets version
+  ✓ registerPromptVersion sets created_at
+  ✓ getPromptVersion returns registered prompt
+  ✓ getPromptVersion returns template
+  ✓ getPromptVersion returns null for unknown
+  ✓ listPromptVersions returns 2 versions
+  ✓ listPromptVersions sorts by latest first
+  ✓ getLatestPromptVersion returns latest
+  ✓ renderPromptTemplate replaces variables
+  ✓ tagPromptVersion adds tag
+  ✓ getPromptByTag finds tagged version
+  ✓ renderPromptTemplate throws for unknown prompt
+  ✓ startSessionTrace generates session_id
+  ✓ startSessionTrace sets tenant_id
+  ✓ startSessionTrace sets started_at
+  ✓ startSessionTrace starts with empty prompts
+  ✓ startSessionTrace sets metadata
+  ✓ recordPromptCall adds 2 calls
+  ✓ recordPromptCall records name
+  ✓ recordPromptCall records version
+  ✓ recordPromptCall throws for unknown session
+  ✓ endSessionTrace sets ended_at
+  ✓ ended_at > started_at
+  ✓ getSessionDuration returns duration >= 10
+  ✓ getSessionDuration returns null for active session
+  ✓ listSessionTraces returns 2 for t1
+  ✓ listSessionTraces returns 1 for t2
+  ✓ getPromptUsageStats counts guide-system@1.0.0
+  ✓ getPromptUsageStats counts guide-system@1.1.0
+  ✓ clearSessionTraces empties sessions
+  ✓ clearPromptRegistry empties prompts
+
+35 passed, 0 failed

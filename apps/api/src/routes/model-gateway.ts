@@ -24,7 +24,7 @@ const modelGatewayRoutes = new Hono();
 // ============================================================
 
 function requireAuth(c: Context) {
-  const session = c.get('session');
+  const session = c.get('session') as { user_id: string; tenant_id: string; session_id: string } | null;
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
@@ -39,7 +39,7 @@ modelGatewayRoutes.post('/v1/model-gateway/invoke', async (c) => {
   const authError = requireAuth(c);
   if (authError) return authError;
 
-  const session = c.get('session');
+  const session = (c as Context).get('session') as { user_id: string; tenant_id: string; session_id: string };
   const body = await c.req.json();
   const { provider, model, prompt_tokens, completion_tokens, cost_usd, data_classification } = body;
 
@@ -88,7 +88,7 @@ modelGatewayRoutes.get('/v1/model-gateway/invocations', async (c) => {
   const authError = requireAuth(c);
   if (authError) return authError;
 
-  const session = c.get('session');
+  const session = (c as Context).get('session') as { user_id: string; tenant_id: string };
   const invocations = await listUserInvocations(session.user_id, session.tenant_id);
 
   return c.json({ invocations });

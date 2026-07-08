@@ -40,7 +40,7 @@ export interface ApprovalRequest {
 }
 
 export interface ApprovalStore {
-  createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason'>): Promise<string>;
+  createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason' | 'approver' | 'reason'>): Promise<string>;
   getRequest(requestId: string): Promise<ApprovalRequest | null>;
   updateRequest(requestId: string, updates: Partial<ApprovalRequest>): Promise<void>;
   listRequests(filters?: { category?: ApprovalCategory; status?: ApprovalStatus; stage?: ApprovalStage; requester?: string }): Promise<ApprovalRequest[]>;
@@ -53,7 +53,7 @@ export interface ApprovalStore {
 export class InMemoryApprovalStore implements ApprovalStore {
   private requests = new Map<string, ApprovalRequest>();
 
-  async createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason'>): Promise<string> {
+  async createRequest(request: Omit<ApprovalRequest, 'request_id' | 'status' | 'requested_at' | 'approved_at' | 'denied_at' | 'revoked_by' | 'revoked_at' | 'revocation_reason' | 'approver' | 'reason'>): Promise<string> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const full: ApprovalRequest = {
@@ -61,8 +61,10 @@ export class InMemoryApprovalStore implements ApprovalStore {
       request_id: id,
       status: 'pending',
       requested_at: now,
+      approver: null,
       approved_at: null,
       denied_at: null,
+      reason: null,
       revoked_by: null,
       revoked_at: null,
       revocation_reason: null,
@@ -83,7 +85,7 @@ export class InMemoryApprovalStore implements ApprovalStore {
   }
 
   async listRequests(filters?: { category?: ApprovalCategory; status?: ApprovalStatus; stage?: ApprovalStage; requester?: string }): Promise<ApprovalRequest[]> {
-    let results = [...this.requests.values()];
+    let results = Array.from(this.requests.values());
     if (filters?.category) results = results.filter((r) => r.category === filters.category);
     if (filters?.status) results = results.filter((r) => r.status === filters.status);
     if (filters?.stage) results = results.filter((r) => r.stage === filters.stage);
@@ -125,7 +127,6 @@ export async function requestApproval(
     title,
     description,
     requester,
-    approver: null,
     expires_at: expiresAt ?? null,
     metadata,
   });

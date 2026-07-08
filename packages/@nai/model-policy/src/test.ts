@@ -12,7 +12,7 @@ import {
   checkAllPolicies,
   type Language,
   type DataClassification,
-} from './index.ts';
+} from './index.js';
 
 let passed = 0;
 let failed = 0;
@@ -47,7 +47,7 @@ async function testCheckIdentityPolicy() {
   // Should fail for banned brand name
   const result2 = await checkIdentityPolicy('Welcome to Nguyên AI', context);
   assert(result2.passed === false, 'banned brand name fails');
-  assert(result2.reason?.includes('Nguyên AI'), 'reason mentions banned name');
+  assert(result2.reason?.includes('Nguyên AI') ?? false, 'reason mentions banned name');
 }
 
 async function testCheckLanguagePolicy() {
@@ -98,7 +98,7 @@ async function testCheckSafetyPolicy() {
   // Should fail for harmful content
   const result2 = await checkSafetyPolicy('How to hack a system', context);
   assert(result2.passed === false, 'harmful content fails');
-  assert(result2.reason?.toLowerCase().includes('harmful'), 'reason mentions harmful content');
+  assert(result2.reason?.toLowerCase().includes('harmful') ?? false, 'reason mentions harmful content');
 }
 
 async function testCheckDataClassificationPolicy() {
@@ -126,7 +126,7 @@ async function testCheckDataClassificationPolicy() {
   // Should fail for secret
   const result3 = await checkDataClassificationPolicy('secret', context);
   assert(result3.passed === false, 'secret fails');
-  assert(result3.reason?.includes('approval'), 'reason mentions approval');
+  assert(result3.reason?.includes('approval') ?? false, 'reason mentions approval');
 }
 
 async function testCheckAllPolicies() {

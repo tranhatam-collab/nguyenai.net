@@ -9,7 +9,7 @@ import {
   listUserGuardResults,
   type Language,
   type DataClassification,
-} from './index.ts';
+} from './index.js';
 
 let passed = 0;
 let failed = 0;
@@ -62,7 +62,7 @@ async function testGuardOutputBlock() {
   );
 
   assert(result.action === 'block', 'action is block');
-  assert(result.reason?.includes('Nguyên AI'), 'reason mentions banned brand');
+  assert(result.reason?.includes('Nguyên AI') ?? false, 'reason mentions banned brand');
   assert(result.policy_checks.identity.passed === false, 'identity check failed');
 }
 
@@ -82,7 +82,7 @@ async function testGuardOutputRequireApproval() {
   );
 
   assert(result.action === 'require_approval', 'action is require_approval');
-  assert(result.reason?.includes('approval'), 'reason mentions approval');
+  assert(result.reason?.includes('approval') ?? false, 'reason mentions approval');
   assert(result.policy_checks.data_classification.passed === false, 'data classification check failed');
 }
 

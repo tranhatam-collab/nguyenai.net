@@ -23,6 +23,7 @@ import {
   type ApprovalCategory,
   type ApprovalStage,
 } from '@nai/admin-approval';
+import type { Role } from '@nai/auth';
 
 const approvalRoutes = new Hono();
 
@@ -31,7 +32,7 @@ const approvalRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session');
+  const session = c.get('session') as { user_id: string; role: string } | null;
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
@@ -71,7 +72,7 @@ approvalRoutes.post('/v1/admin-approvals', async (c) => {
     stage,
     title,
     description,
-    c.get('session')?.user_id ?? 'system',
+    ((c as Context).get('session') as { user_id: string } | null)?.user_id ?? 'system',
     metadata ?? {},
     expires_at
   );
@@ -94,8 +95,8 @@ approvalRoutes.post('/v1/admin-approvals/:id/approve', async (c) => {
     return c.json({ error: 'Reason is required for approval' }, 400);
   }
 
-  const session = c.get('session');
-  const userRoles = session?.role ? [session.role] : [];
+  const session = (c as Context).get('session') as { user_id: string; role: string } | null;
+  const userRoles = session?.role ? [session.role] as Role[] : [];
 
   await approveRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 
@@ -117,8 +118,8 @@ approvalRoutes.post('/v1/admin-approvals/:id/deny', async (c) => {
     return c.json({ error: 'Reason is required for denial' }, 400);
   }
 
-  const session = c.get('session');
-  const userRoles = session?.role ? [session.role] : [];
+  const session = (c as Context).get('session') as { user_id: string; role: string } | null;
+  const userRoles = session?.role ? [session.role] as Role[] : [];
 
   await denyRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 
@@ -140,7 +141,7 @@ approvalRoutes.post('/v1/admin-approvals/:id/revoke', async (c) => {
     return c.json({ error: 'Reason is required for revocation' }, 400);
   }
 
-  await revokeApproval(id, c.get('session')?.user_id ?? 'system', reason.trim());
+  await revokeApproval(id, ((c as Context).get('session') as { user_id: string } | null)?.user_id ?? 'system', reason.trim());
 
   return c.json({ success: true });
 });

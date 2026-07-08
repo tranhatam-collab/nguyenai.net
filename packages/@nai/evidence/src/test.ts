@@ -19,7 +19,7 @@ import {
   getEvidenceForCommand,
   getEvidenceForTenant,
   type EvidenceRecord,
-} from './index.ts';
+} from './index.js';
 
 const SECRET = 'test-evidence-secret-v1';
 

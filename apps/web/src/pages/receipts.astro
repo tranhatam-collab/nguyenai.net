@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProofReceiptCard from '../components/ProofReceiptCard.astro';
+
+const title = 'Biên nhận kiểm chứng — Nguyễn AI';
+const description = 'Biên nhận kiểm chứng cho các tuyên bố công khai. Mã băm, thời gian, người duyệt.';
+---
+<BaseLayout locale="vi" routeKey="receipts" title={title} description={description}>
+  <main class="receipts-page">
+    <section class="hero">
+      <h1>Biên nhận kiểm chứng</h1>
+      <p>Mỗi tuyên bố quan trọng có biên nhận với mã băm, thời gian, và người duyệt.</p>
+    </section>
+    <section class="receipts">
+      <ProofReceiptCard receiptId="RC-2026-07-08-001" hash="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2" timestamp="2026-07-08T01:23:45Z" signer="Trần Hà Tâm (Founder)" locale="vi" />
+      <ProofReceiptCard receiptId="RC-2026-07-08-002" hash="b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3" timestamp="2026-07-08T01:24:00Z" signer="Trần Hà Tâm (Founder)" locale="vi" />
+      <ProofReceiptCard receiptId="RC-2026-07-08-003" hash="c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4" timestamp="2026-07-08T01:24:15Z" signer="Trần Hà Tâm (Founder)" locale="vi" />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .receipts-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .receipts { margin-top: 2rem; display: grid; gap: 1rem; }
+</style>

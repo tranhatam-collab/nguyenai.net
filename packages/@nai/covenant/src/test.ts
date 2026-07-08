@@ -76,11 +76,11 @@ async function main(): Promise<void> {
   // 7. JSON encrypt/decrypt
   const data = { name: 'Nguyen Van A', age: 30, tags: ['family', 'founder'] };
   const jsonPayload = await encryptJSON(data, 't_1');
-  const decryptedJSON = await decryptJSON(jsonPayload, 't_1');
+  const decryptedJSON = await decryptJSON(jsonPayload, 't_1') as Record<string, unknown>;
   assert(decryptedJSON.name === 'Nguyen Van A', 'decryptJSON preserves string fields');
   assert(decryptedJSON.age === 30, 'decryptJSON preserves number fields');
   assert(Array.isArray(decryptedJSON.tags), 'decryptJSON preserves array fields');
-  assert(decryptedJSON.tags.length === 2, 'decryptJSON array length preserved');
+  assert((decryptedJSON.tags as unknown[]).length === 2, 'decryptJSON array length preserved');
 
   // 8. Key rotation
   const newKey = await rotateTenantKey('t_1');

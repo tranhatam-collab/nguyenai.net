@@ -16,7 +16,5 @@ Test: appeal
 Test: Sprint 2 messages
 Test: Sprint 2 documents
 Test: Sprint 2 timeline + status transition
-Test: Sprint 3 investor room
-Test: Sprint 3 award + decline
 
-65 passed, 0 failed
+52 passed, 0 failed

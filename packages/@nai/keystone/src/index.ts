@@ -71,7 +71,7 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 async function sha256(data: Uint8Array): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', data);
+  const buf = await crypto.subtle.digest('SHA-256', data as BufferSource);
   return bufToHex(buf);
 }
 
@@ -96,7 +96,7 @@ async function gzipCompress(data: Uint8Array): Promise<{ bytes: Uint8Array; comp
   const cs = new CompressionStream('gzip');
   const writer = cs.writable.getWriter();
   const reader = cs.readable.getReader();
-  writer.write(data);
+  writer.write(data as BufferSource);
   writer.close();
   const chunks: Uint8Array[] = [];
   // eslint-disable-next-line no-constant-condition
@@ -121,7 +121,7 @@ async function gzipDecompress(data: Uint8Array, compressed: boolean): Promise<Ui
   const ds = new DecompressionStream('gzip');
   const writer = ds.writable.getWriter();
   const reader = ds.readable.getReader();
-  writer.write(data);
+  writer.write(data as BufferSource);
   writer.close();
   const chunks: Uint8Array[] = [];
   // eslint-disable-next-line no-constant-condition

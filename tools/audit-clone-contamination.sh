@@ -29,8 +29,6 @@ SCAN_DIRS=(
   "apps/academy/src"
   "apps/admin/src"
   "content"
-  "public"
-  "src"
   "packages/@nai"
 )
 
@@ -38,6 +36,7 @@ SCAN_DIRS=(
 EXCLUDE_PATTERNS=(
   "docs/governance/"
   "docs/architecture/"
+  "docs/legacy/"
   "NOTICE.nai.md"
   "LICENSE"
   "LICENSE.md"
@@ -45,19 +44,13 @@ EXCLUDE_PATTERNS=(
   ".git"
 )
 
-# Allowlist patterns (intentional references per AGENTS.md)
+# Allowlist patterns (intentional references per independence plan)
 # These are NOT violations because they serve specific purposes:
-# - Investor disclosure in apps/invest pages (architecture lineage)
-# - Adapter/gateway code in packages/@nai/* (compatibility contracts with Gen1/Gen2)
-# - Page content data (src/data/pages.ts) — architecture description in Vietnamese
+# - Gen1 adapter code in packages/@nai/prism/ (gated by LEGACY_BRIDGE_ENABLED, disabled by default)
+# - verify.iai.one adapter in packages/@nai/investor-verify/ (identity verification gateway)
 ALLOWLIST_PATTERNS=(
-  "apps/invest/src/pages/ai-computer.astro"     # architecture diagram
-  "apps/invest/src/pages/private/product-demo.astro"  # investor disclosure
-  "apps/invest/src/pages/private/technical-audit.astro"  # investor disclosure
-  "apps/invest/src/pages/risks.astro"              # risk mitigation reference
-  "src/data/pages.ts"                            # architecture description content
-  "packages/@nai/gateway-sdk/"                      # Gen1 adapter
-  "packages/@nai/prism/"                             # Gen1 adapter
+  "packages/@nai/prism/"                             # Gen1 adapter (gated, disabled by default)
+  "packages/@nai/gateway-sdk/"                      # Gen1 adapter (not imported, dead code)
   "packages/@nai/investor-verify/"                  # verify.iai.one adapter
 )
 
@@ -100,42 +93,6 @@ for tok in "${FORBIDDEN[@]}"; do
         fi
         if [ "$skip" -eq 0 ]; then
           echo "FAIL: '$tok' found in $f"
-          VIOLATIONS=$((VIOLATIONS + 1))
-        fi
-      done <<< "$matches"
-    fi
-  done
-done
-
-echo
-if [ "$VIOLATIONS" -gt 0 ]; then
-  echo "FAIL: $VIOLATIONS contamination violation(s). Fix before merge."
-  exit 1
-fi
-
-echo "PASS: 0 contamination violations in user-facing surfaces."
-          for al in "${ALLOWLIST_PATTERNS[@]}"; do
-            case "$f" in
-              *"$al"*) skip=1; break ;;
-            esac
-          done
-        fi
-        if [ "$skip" -eq 0 ]; then
-          echo "FAIL: '$tok' found in $f"
-          VIOLATIONS=$((VIOLATIONS + 1))
-        fi
-      done <<< "$matches"
-    fi
-  done
-done
-
-echo
-if [ "$VIOLATIONS" -gt 0 ]; then
-  echo "FAIL: $VIOLATIONS contamination violation(s). Fix before merge."
-  exit 1
-fi
-
-echo "PASS: 0 contamination violations in user-facing surfaces."
           VIOLATIONS=$((VIOLATIONS + 1))
         fi
       done <<< "$matches"

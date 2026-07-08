@@ -25,6 +25,8 @@ export interface FetchOptions {
   timeoutMs?: number;
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: string;
+  allowlist?: string[];
+  denylist?: string[];
 }
 
 export interface FetchResult {
@@ -34,6 +36,7 @@ export interface FetchResult {
   headers: Record<string, string>;
   body: string;
   fetchedAt: string;
+  error?: string;
 }
 
 export interface PageData {
@@ -61,10 +64,6 @@ export interface ExtractResult {
 // Fetch
 // ============================================================
 
-// ============================================================
-// Fetch
-// ============================================================
-
 function matchesPattern(url: string, pattern: string): boolean {
   const regex = new RegExp('^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
   return regex.test(url);
@@ -87,6 +86,18 @@ function isUrlAllowed(url: string, opts: FetchOptions): boolean {
 }
 
 export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<FetchResult> {
+  const { headers: customHeaders = {}, timeoutMs = 30000, method = 'GET', body } = opts;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const headers: Record<string, string> = {};
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: customHeaders,
+      body,
+      signal: controller.signal,
+    });
+    const responseBody = await response.text();
     response.headers.forEach((value, key) => { headers[key] = value; });
 
     return {
@@ -94,46 +105,7 @@ export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<F
       status: response.status,
       ok: response.ok,
       headers,
-      body,
-      fetchedAt: new Date().toISOString(),
-    };
-  } catch (err) {
-    return {
-      url,
-      status: 0,
-      ok: false,
-      headers: {},
-      body: '',
-      error: String(err),
-      fetchedAt: new Date().toISOString(),
-    };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-  if (denylist && denylist.length > 0) {
-    for (const pattern of denylist) {
-      if (matchesPattern(url, pattern)) return false;
-    }
-  }
-  if (allowlist && allowlist.length > 0) {
-    for (const pattern of allowlist) {
-      if (matchesPattern(url, pattern)) return true;
-    }
-    return false;
-  }
-  return true;
-}
-
-export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<FetchResult> {
-    response.headers.forEach((value, key) => { headers[key] = value; });
-
-    return {
-      url,
-      status: response.status,
-      ok: response.ok,
-      headers,
-      body,
+      body: responseBody,
       fetchedAt: new Date().toISOString(),
     };
   } catch (err) {

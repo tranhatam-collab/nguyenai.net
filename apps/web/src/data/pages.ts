@@ -113,9 +113,9 @@ export type PageContent = {
 const vi: Record<RouteKey, PageContent> = {
   home: {
     key: 'home',
-    title: 'Nguyen AI Computer | AI Computer cho thế hệ Nguyễn toàn cầu',
-    description: 'Nguyen AI Computer là dòng Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 Model máy + 9 Functional Products + 9 Agent chuyên biệt + 7 Super App di sản.',
-    eyebrow: 'Nguyen AI Computer',
+    title: 'Máy Tính AI Nguyễn | Máy Tính AI cho thế hệ Nguyễn toàn cầu',
+    description: 'Máy Tính AI Nguyễn là dòng Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 mô hình máy + 9 sản phẩm chức năng + 9 tác nhân chuyên biệt + 7 siêu ứng dụng di sản.',
+    eyebrow: 'Máy Tính AI Nguyễn',
     heroTitle: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
     heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ 9 AI Agent, bộ nhớ dài hạn, kho dữ liệu, 7 Super App di sản, 12 tool family làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
     primaryCta: 'Khởi tạo Nguyen AI Computer',
@@ -151,7 +151,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     architectureDiagram: {
       title: 'Kiến trúc Nguyen AI — Backend độc lập',
-      body: 'Nguyen AI sở hữu backend riêng độc lập. Gen 1 và Gen 2 đóng băng làm kiến trúc tham chiếu; adapter giữ compatibility contract khi integrate. Ba lớp vận hành, mỗi lớp có vai trò rõ ràng.',
+      body: 'Nguyễn AI vận hành trên phần nền riêng, tự chủ toàn bộ. Ba lớp vận hành, mỗi lớp có vai trò rõ ràng. Mọi năng lực đều có biên nhận kiểm chứng.',
       layers: [
         { name: 'Runtime độc lập — Lõi thực thi', role: 'Runtime, Agent, công cụ, bộ nhớ, bằng chứng', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
         { name: 'Identity & commerce', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
@@ -160,7 +160,7 @@ const vi: Record<RouteKey, PageContent> = {
     },
     featureGrid: {
       title: '9 Agent chuyên biệt',
-      body: 'Đội ngũ AI Agent mặc định vận hành trên nền tảng Gen1, mỗi Agent có vai trò rõ ràng.',
+      body: 'Chín tác nhân chuyên biệt vận hành trên nền tảng riêng của Nguyễn AI, mỗi tác nhân có vai trò rõ ràng.',
       cards: [
         { name: 'Nguyen Guide', description: 'Điều phối chính, tiếp nhận lệnh, lập kế hoạch và phân việc.', tag: 'Core' },
         { name: 'Nguyen Researcher', description: 'Nghiên cứu, tổng hợp nguồn, so sánh tài liệu.', tag: 'Research' },
@@ -360,9 +360,9 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   agents: {
-    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: '9 Agent chuyên biệt: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — vận hành trên nền Gen1.', eyebrow: 'Agent Team', heroTitle: '9 AI Agent chuyên biệt cho hệ sinh thái Nguyễn.', heroText: 'Chín Agent mặc định vận hành trên nền tảng Gen1, mỗi Agent có vai trò rõ ràng: điều phối, nghiên cứu, lưu trữ, kiểm chứng, gia đình, sáng lập, kinh doanh, kết nối, bảo mật.',
+    key: 'agents', title: 'Đội Tác Nhân — Máy Tính AI Nguyễn', description: '9 tác nhân chuyên biệt: Dẫn Đường, Nghiên Cứu, Lưu Trữ, Kiểm Chứng, Quản Gia Đình, Sáng Lập, Vận Hành Kinh Doanh, Kết Nối Toàn Cầu, Bảo Vệ — vận hành trên nền tảng riêng của Nguyễn AI.', eyebrow: 'Đội Tác Nhân', heroTitle: '9 tác nhân AI chuyên biệt cho hệ sinh thái Nguyễn.', heroText: 'Chín tác nhân mặc định vận hành trên nền tảng riêng của Nguyễn AI, mỗi tác nhân có vai trò rõ ràng: điều phối, nghiên cứu, lưu trữ, kiểm chứng, gia đình, sáng lập, kinh doanh, kết nối, bảo mật.',
     sections: [
-      { title: 'Nền tảng Gen1', body: '9 Agent Nguyễn vận hành trên nền 9 Agent Gen1: Router, Planner, Executor, Reviewer, Security, Cost, Fact Checker, Memory Curator, Human Gate.' }
+      { title: 'Nền tảng riêng', body: 'Chín tác nhân Nguyễn AI: Dẫn Đường, Nghiên Cứu, Lưu Trữ, Kiểm Chứng, Quản Gia Đình, Sáng Lập, Vận Hành Kinh Doanh, Kết Nối Toàn Cầu, Bảo Vệ.' }
     ],
     featureGrid: {
       title: '9 Agent chuyên biệt',
@@ -632,7 +632,7 @@ const en: Record<RouteKey, PageContent> = {
     },
     architectureDiagram: {
       title: 'Nguyen AI Architecture — Independent backend',
-      body: 'Nguyen AI owns an independent backend. Gen 1 and Gen 2 are frozen as reference architecture; an adapter maintains compatibility contract when integrating. Three operating layers, each with a clear role.',
+      body: 'Nguyen AI runs on its own backend, fully self-sufficient. Three operating layers, each with a clear role. Every capability comes with verifiable evidence.',
       layers: [
         { name: 'Independent runtime — Execution core', role: 'Runtime, Agent, tools, memory, evidence', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
         { name: 'Identity & commerce', role: 'Identity, account, plans, entitlements, billing', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
@@ -641,7 +641,7 @@ const en: Record<RouteKey, PageContent> = {
     },
     featureGrid: {
       title: '9 Specialized Agents',
-      body: 'The default Agent team operates on the Gen1 platform, each with a clear role.',
+      body: "The default Agent team runs on Nguyen AI's own platform, each with a clear role.",
       cards: [
         { name: 'Nguyen Guide', description: 'Primary coordinator, receives commands, plans and distributes work.', tag: 'Core' },
         { name: 'Nguyen Researcher', description: 'Research, source synthesis, document comparison.', tag: 'Research' },
@@ -841,9 +841,9 @@ const en: Record<RouteKey, PageContent> = {
     ]
   },
   agents: {
-    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: '9 specialized Agents: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — operating on the Gen1 platform.', eyebrow: 'Agent Team', heroTitle: '9 specialized AI Agents for the Nguyen ecosystem.', heroText: 'Nine default Agents operate on the Gen1 platform, each with a clear role: coordination, research, archive, verification, family, founder, business, network, security.',
+    key: 'agents', title: 'Agent Team — Nguyen AI Computer', description: "9 specialized Agents: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — running on Nguyen AI's own platform.", eyebrow: 'Agent Team', heroTitle: '9 specialized AI Agents for the Nguyen ecosystem.', heroText: "Nine default Agents run on Nguyen AI's own platform, each with a clear role: coordination, research, archive, verification, family, founder, business, network, security.",
     sections: [
-      { title: 'Gen1 platform', body: 'The 9 Nguyen Agents operate on top of the 9 Gen1 platform Agents: Router, Planner, Executor, Reviewer, Security, Cost, Fact Checker, Memory Curator, Human Gate.' }
+      { title: 'Nguyen AI platform', body: 'The 9 Nguyen Agents: Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian.' }
     ],
     featureGrid: {
       title: '9 Specialized Agents',

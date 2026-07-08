@@ -29,7 +29,7 @@ $ tsx src/test.ts
   ✅ Checksum is uppercase hex: A6E5
 
 === InMemoryProofStore ===
-  ✅ Proof created with ID: 38bd16bf-0d0c-422f-b08f-985326b50df6
+  ✅ Proof created with ID: 010ac5f4-2c52-4dd7-a2fb-1375de057d57
   ✅ Proof retrieved
   ✅ Default status is submitted: submitted
   ✅ User has 1 proof: 1

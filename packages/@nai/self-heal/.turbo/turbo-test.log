@@ -1,0 +1,13 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+=== @nai/self-heal unit tests ===
+
+Test: detect issue
+Test: self-heal workflow
+Test: preview approval
+Test: production approval
+Test: complete self-heal
+Test: fail self-heal
+Test: can mutate data
+
+21 passed, 0 failed

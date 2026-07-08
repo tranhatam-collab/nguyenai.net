@@ -85,7 +85,7 @@ export class InMemorySelfHealStore implements SelfHealStore {
   }
 
   async listAttempts(filters?: { status?: SelfHealStatus; component?: string }): Promise<SelfHealAttempt[]> {
-    let results = [...this.attempts.values()];
+    let results = Array.from(this.attempts.values());
     if (filters?.status) results = results.filter((a) => a.status === filters.status);
     if (filters?.component) results = results.filter((a) => a.component === filters.component);
     return results.sort((a, b) => b.detected_at.localeCompare(a.detected_at));

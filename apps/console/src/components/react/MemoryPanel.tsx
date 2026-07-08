@@ -83,7 +83,7 @@ export default function MemoryPanel() {
           className="console-btn console-btn-primary text-xs"
           onClick={() => setShowForm((v) => !v)}
         >
-          {showForm ? 'Cancel · Hủy' : '+ Write memory · Ghi bộ nhớ'}
+          {showForm ? 'Hủy' : '+ Ghi bộ nhớ'}
         </button>
       </div>
 

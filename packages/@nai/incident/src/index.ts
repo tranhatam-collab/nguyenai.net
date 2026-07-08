@@ -88,7 +88,7 @@ export class InMemoryIncidentStore implements IncidentStore {
   }
 
   async listIncidents(filters?: { severity?: Severity; status?: IncidentStatus; component?: string }): Promise<Incident[]> {
-    let results = [...this.incidents.values()];
+    let results = Array.from(this.incidents.values());
     if (filters?.severity) results = results.filter((i) => i.severity === filters.severity);
     if (filters?.status) results = results.filter((i) => i.status === filters.status);
     if (filters?.component) results = results.filter((i) => i.component === filters.component);

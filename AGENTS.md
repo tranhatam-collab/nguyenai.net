@@ -2,6 +2,27 @@
 
 Nguyen AI Computer — a specialized cloud AI Computer line for individuals, families, founders, businesses and the global Nguyen community. Each user owns a private AI Computer Instance with multi-model intelligence, an Agent team, tools, memory, data vault, workflows, evidence, approval gates and a secure execution environment. Heritage and genealogy are important Super Apps, not the whole product.
 
+## FOUNDER INDEPENDENCE LOCK — 2026-07-08 (BINDING, overrides Amendment 2026-07-02)
+
+> **FOUNDER DECISION QD-2026-07-08-01:** nguyenai.net độc lập hoàn toàn khỏi Gen1/Gen2.
+> Đây là Founder architecture decision riêng theo yêu cầu của Amendment 2026-07-02.
+>
+> - `/v1/chat` đi qua direct LLM provider (OpenAI/Anthropic/Google), KHÔNG qua `proxyToGen1`.
+> - `LEGACY_BRIDGE_ENABLED=false` mặc định. `/v1/gen1/*` trả 404.
+> - `GEN1_GATEWAY_URL` gỡ khỏi `wrangler.jsonc` vars — chỉ set qua secret khi failoff.
+> - 8 route files mounted (trước là dead code).
+> - 13 Gen1/Gen2 vi phạm gỡ khỏi nội dung công khai.
+> - `src/` legacy root site cách ly vào `docs/legacy/`.
+> - `audit:independence` CI gate — build fail nếu vi phạm.
+>
+> Kế hoạch chính thức: `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`
+> Nhật ký quyết định: `docs/governance/GOVERNANCE_DECISION_LOG.md`
+>
+> **Amendment 2026-07-02 nói "phải duy trì compatibility contract khi integrate".**
+> Quyết định 2026-07-08 **là** Founder decision thay thế: KHÔNG integrate.
+> `LEGACY_BRIDGE_ENABLED=true` + `GEN1_GATEWAY_URL` secret = compatibility contract
+> khi cần failoff. Mặc định tắt.
+
 ## FOUNDER ARCHITECTURE AMENDMENT — 2026-07-02 (BỔ SUNG, không thay thế)
 
 > **Lưu ý:** Amendment này BỔ SUNG ràng buộc lên Decision 1 (Founder Override:
@@ -61,6 +82,8 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/DEV_WORK_ITEMS_P0_P1.md` — 62 P0+P1 work items with estimates (BINDING)
 - `docs/governance/RELEASE_EVIDENCE_PACK_2026-07-02.md` — Pre-deploy verification pass (50 routes, SEO, accessibility)
 - `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md` — FOUNDER LOCKED brand naming standard (BINDING, overrides all prior brand docs)
+- `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md` — FOUNDER LOCKED independence plan (BINDING, overrides Cross-Project Integration)
+- `docs/governance/GOVERNANCE_DECISION_LOG.md` — Founder decision log (QD-2026-07-08-01: independence lock)
 
 ### Strategy + Investor (canonical)
 
@@ -222,7 +245,7 @@ Current state:
 - Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
 - Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
-- Gen1 gateway adapter: deployed trong `apps/api` — proxy 8 endpoints tới `aiagent.iai-one-api-prod.tranhatam.workers.dev`. See `docs/architecture/GEN1_GATEWAY_ADAPTER.md`.
+- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` now uses direct LLM provider. See `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`.
 - Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
 - Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
 - Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).
@@ -462,7 +485,7 @@ Build currently runs `astro build` for the static public website.
 - Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
 - Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
-- Gen1 gateway adapter: deployed trong `apps/api` — proxy 8 endpoints tới `aiagent.iai-one-api-prod.tranhatam.workers.dev`. See `docs/architecture/GEN1_GATEWAY_ADAPTER.md`.
+- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` now uses direct LLM provider. See `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`.
 - Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
 - Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
 - Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).

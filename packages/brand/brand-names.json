@@ -1,0 +1,39 @@
+{
+  "master_brand": {
+    "vi": "Nguyễn AI",
+    "en": "Nguyen AI"
+  },
+  "core_product": {
+    "vi": "Máy Tính AI Nguyễn",
+    "en": "Nguyen AI Computer"
+  },
+  "product_surfaces": {
+    "vi": {
+      "edu": "Nguyễn AI Edu",
+      "invest": "Nguyễn AI Invest",
+      "docs": "Nguyễn AI Docs",
+      "academy": "Nguyễn AI Academy",
+      "scholarships": "Nguyễn AI Scholarships",
+      "forum": "Nguyễn AI Forum"
+    },
+    "en": {
+      "edu": "Nguyen AI Edu",
+      "invest": "Nguyen AI Invest",
+      "docs": "Nguyen AI Docs",
+      "academy": "Nguyen AI Academy",
+      "scholarships": "Nguyen AI Scholarships",
+      "forum": "Nguyen AI Forum"
+    }
+  },
+  "domain": "nguyenai.net",
+  "code_identifier": "nguyenai",
+  "code_scope": "@nai/*",
+  "tagline": {
+    "vi": "Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.",
+    "en": "Rooted identity. Powerful intelligence. Global execution."
+  },
+  "charter_sentence": {
+    "vi": "Máy làm — người ký — mọi việc có biên nhận.",
+    "en": "Machines work — humans sign — everything has a receipt."
+  }
+}

@@ -130,9 +130,9 @@ export async function hashPassword(password: string): Promise<string> {
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   const parts = stored.split(':');
   if (parts.length !== 4 || parts[0] !== 'pbkdf2') return false;
-  const iterations = parseInt(parts[1], 10);
-  const salt = fromBase64(parts[2]);
-  const expectedHash = fromBase64(parts[3]);
+  const iterations = parseInt(parts[1]!, 10);
+  const salt = fromBase64(parts[2]!);
+  const expectedHash = fromBase64(parts[3]!);
 
   const crypto = getCrypto();
   const keyMaterial = await crypto.subtle.importKey(
@@ -143,7 +143,7 @@ export async function verifyPassword(password: string, stored: string): Promise<
     ['deriveBits']
   );
   const derived = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt: salt as BufferSource, iterations, hash: 'SHA-256' },
     keyMaterial,
     KEY_LENGTH * 8
   );
@@ -329,7 +329,7 @@ function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
   for (let i = 0; i < a.length; i++) {
-    result |= a[i] ^ b[i];
+    result |= a[i]! ^ b[i]!;
   }
   return result === 0;
 }

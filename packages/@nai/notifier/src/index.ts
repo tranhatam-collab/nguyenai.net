@@ -79,7 +79,7 @@ export class InMemoryNotificationStore implements NotificationStore {
   }
 
   async listNotifications(filters?: { channel?: Channel; recipient?: string; status?: Notification['status'] }): Promise<Notification[]> {
-    let results = [...this.notifications.values()];
+    let results = Array.from(this.notifications.values());
     if (filters?.channel) results = results.filter((n) => n.channel === filters.channel);
     if (filters?.recipient) results = results.filter((n) => n.recipient === filters.recipient);
     if (filters?.status) results = results.filter((n) => n.status === filters.status);

@@ -58,6 +58,8 @@ import {
 } from '@nai/approval';
 
 import { getAllPlans, getPlan, type PlanId } from '@nai/product-catalog';
+// WI-1.2: resolveEntitlements is async and needs PlanId — re-imported for clarity.
+import { resolveEntitlements as resolveEntitlementsAsync } from '@nai/entitlement';
 import {
   createStripeCheckout,
   createVnPayCheckout,
@@ -93,12 +95,23 @@ import {
   setModelRegistry as setPrismModelRegistry,
   configureGen1Adapter,
   configureMockProvider,
+  configureDirectProvider,
   chat as prismChat,
   type ModelDescriptor,
 } from '@nai/prism';
 import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
 import { chatRateLimit, paymentRateLimit } from './rate-limiter';
+
+// WI-1.1: Route modules — mounted for independent operation.
+import modelGatewayRoutes from './routes/model-gateway';
+import fallbackRoutes from './routes/fallback';
+import incidentRoutes from './routes/incidents';
+import selfHealRoutes from './routes/self-heal';
+import notificationRoutes from './routes/notifications';
+import approvalRoutes from './routes/admin-approvals';
+import { scholarshipRoutes } from './scholarship-routes';
+import investorRoutes from './investor-routes';
 import {
   writeMemory,
   readMemory,
@@ -129,8 +142,17 @@ interface AppEnv {
     VNPAY_PAY_URL: string;
     VNPAY_RETURN_URL: string;
     // Gen1 upstream gateway (aiagent.iai.one — FROZEN reference, adapter only)
-    GEN1_GATEWAY_URL: string;
+    // WI-1.3: GEN1_GATEWAY_URL is now optional — only used when LEGACY_BRIDGE_ENABLED=true.
+    GEN1_GATEWAY_URL?: string;
     GEN1_ADMIN_KEY?: string;
+    // WI-1.3: Legacy bridge flag. Default: disabled (undefined = false).
+    // When false, /v1/gen1/* routes return 404 and /v1/chat uses direct providers.
+    // When true, Gen1 proxy is enabled for failoff only.
+    LEGACY_BRIDGE_ENABLED?: string;
+    // WI-1.2: Direct LLM provider keys (set via `wrangler secret put`).
+    OPENAI_API_KEY?: string;
+    ANTHROPIC_API_KEY?: string;
+    GOOGLE_AI_API_KEY?: string;
     // Phase 3 — evidence signing secret (HMAC-SHA256 for evidence packs)
     // SEC-P0-3: Must be set via `wrangler secret put EVIDENCE_SIGNING_KEY`.
     // Never committed. In production (ENVIRONMENT !== 'development') the
@@ -211,18 +233,31 @@ function initStores(env: AppEnv['Bindings']): void {
   // Load model registry from product-catalog models.json (bundled at build time)
   setPrismModelRegistry(modelsData as unknown as ModelDescriptor[]);
 
-  // Configure LLM provider: 'gen1' (default) or 'mock' (for tests/dev)
-  const mode = env.LLM_PROVIDER_MODE ?? 'gen1';
+  // WI-1.2: Configure LLM provider — direct providers take priority.
+  // Gen1 adapter is only used when LEGACY_BRIDGE_ENABLED=true (failoff).
+  const mode = env.LLM_PROVIDER_MODE ?? 'auto';
   if (mode === 'mock') {
     configureMockProvider();
-  } else if (env.GEN1_GATEWAY_URL) {
-    configureGen1Adapter({
-      baseUrl: env.GEN1_GATEWAY_URL,
-      adminKey: env.GEN1_ADMIN_KEY,
-    });
   } else {
-    // No GEN1 URL configured — fall back to mock so the API still responds.
-    configureMockProvider();
+    // Try direct providers first (OpenAI, Anthropic, Google)
+    const hasDirect = configureDirectProvider({
+      openaiApiKey: env.OPENAI_API_KEY,
+      anthropicApiKey: env.ANTHROPIC_API_KEY,
+      googleApiKey: env.GOOGLE_AI_API_KEY,
+    });
+    if (!hasDirect) {
+      // No direct keys — try Gen1 adapter only if legacy bridge is enabled
+      const legacyEnabled = env.LEGACY_BRIDGE_ENABLED === 'true';
+      if (legacyEnabled && env.GEN1_GATEWAY_URL) {
+        configureGen1Adapter({
+          baseUrl: env.GEN1_GATEWAY_URL,
+          adminKey: env.GEN1_ADMIN_KEY,
+        });
+      } else {
+        // No keys at all — fall back to mock so the API still responds.
+        configureMockProvider();
+      }
+    }
   }
 
   storesInitialized = true;
@@ -438,6 +473,11 @@ async function proxyToGen1(
   path: string,
   method: string = 'POST',
 ): Promise<Response> {
+  // WI-1.3: Legacy bridge is disabled by default. Only enable when
+  // LEGACY_BRIDGE_ENABLED=true (set via wrangler secret for failoff).
+  if (c.env.LEGACY_BRIDGE_ENABLED !== 'true') {
+    return c.json({ error: 'legacy_bridge_disabled', message: 'Gen1 proxy is disabled. Set LEGACY_BRIDGE_ENABLED=true to enable failoff.' }, 404);
+  }
   const base = c.env.GEN1_GATEWAY_URL;
   if (!base) return c.json({ error: 'GEN1_GATEWAY_URL not configured' }, 500);
 
@@ -512,29 +552,149 @@ async function proxyToGen1(
   }
 }
 
-// POST /v1/chat — proxy to Gen1 /v1/chat (P1-3: rate limited)
-app.post('/v1/chat', chatRateLimit, (c) => proxyToGen1(c, '/v1/chat', 'POST'));
+// POST /v1/chat — local LLM via prism (direct provider, no Gen1 proxy)
+// WI-1.2: Routed through @nai/prism which uses direct OpenAI/Anthropic/Google
+// providers. Gen1 adapter is only used when LEGACY_BRIDGE_ENABLED=true (failoff).
+app.post('/v1/chat', chatRateLimit, async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
 
-// POST /v1/stream — proxy to Gen1 /v1/stream (SSE passthrough, P1-3: rate limited)
-app.post('/v1/stream', chatRateLimit, (c) => proxyToGen1(c, '/v1/stream', 'POST'));
+  const body = await c.req.json().catch(() => ({})) as {
+    model?: string;
+    messages?: Array<{ role: string; content: string }>;
+    max_tokens?: number;
+    temperature?: number;
+  };
 
-// GET /v1/gen1/models — list Gen1 native models (separate from local catalog)
+  if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
+    return c.json({ error: 'messages is required and must be a non-empty array' }, 400);
+  }
+
+  // Resolve user tier from entitlements
+  const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
+  const userTier = ents.machine.model_tier ?? 'free';
+
+  const result = await prismChat({
+    tenant_id: session.tenant_id,
+    user_id: session.user_id,
+    plan_id: session.plan_id,
+    model: body.model ?? 'auto-route',
+    messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
+    max_tokens: body.max_tokens,
+    temperature: body.temperature,
+  }, userTier);
+
+  if (!result.tier_allowed) {
+    return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
+  }
+
+  // Record evidence for the chat call
+  try {
+    await recordEvidence({
+      command_id: `chat-${Date.now()}`,
+      tenant_id: session.tenant_id,
+      user_id: session.user_id,
+      agent_id: 'chat-endpoint',
+      proof_type: 'execution' as never,
+      payload: {
+        model: result.model,
+        served_by: result.served_by,
+        usage: result.usage,
+      },
+    }, resolveEvidenceSigningKey(c.env));
+  } catch {
+    // Evidence recording failure must not mask the chat response.
+  }
+
+  return c.json({
+    model: result.model,
+    content: result.content,
+    finish_reason: result.finish_reason,
+    usage: result.usage,
+    served_by: result.served_by,
+  });
+});
+
+// POST /v1/stream — streaming chat via prism (SSE)
+// WI-1.2: Uses prism for the first token, then streams. For now, non-streaming
+// fallback wrapped in SSE format. Full streaming requires provider SDK support.
+app.post('/v1/stream', chatRateLimit, async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  const body = await c.req.json().catch(() => ({})) as {
+    model?: string;
+    messages?: Array<{ role: string; content: string }>;
+    max_tokens?: number;
+    temperature?: number;
+  };
+
+  if (!body.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
+    return c.json({ error: 'messages is required and must be a non-empty array' }, 400);
+  }
+
+  const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
+  const userTier = ents.machine.model_tier ?? 'free';
+
+  const result = await prismChat({
+    tenant_id: session.tenant_id,
+    user_id: session.user_id,
+    plan_id: session.plan_id,
+    model: body.model ?? 'auto-route',
+    messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
+    max_tokens: body.max_tokens,
+    temperature: body.temperature,
+  }, userTier);
+
+  if (!result.tier_allowed) {
+    return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
+  }
+
+  // Wrap as SSE — single data event with the full response (non-streaming fallback)
+  const sseData = JSON.stringify({
+    model: result.model,
+    content: result.content,
+    finish_reason: result.finish_reason,
+    usage: result.usage,
+    served_by: result.served_by,
+  });
+  return new Response(`data: ${sseData}\n\ndata: [DONE]\n\n`, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+});
+
+// GET /v1/gen1/models — Gen1 native models (LEGACY BRIDGE ONLY)
+// WI-1.3: Returns 404 when LEGACY_BRIDGE_ENABLED is not set.
 app.get('/v1/gen1/models', (c) => proxyToGen1(c, '/v1/models', 'GET'));
 
-// GET /v1/gen1/health — check Gen1 upstream health
+// GET /v1/gen1/health — check Gen1 upstream health (LEGACY BRIDGE ONLY)
 app.get('/v1/gen1/health', (c) => proxyToGen1(c, '/v1/health', 'GET'));
 
-// GET /v1/gen1/quota — check Gen1 quota for current session
+// GET /v1/gen1/quota — check Gen1 quota for current session (LEGACY BRIDGE ONLY)
 app.get('/v1/gen1/quota', (c) => proxyToGen1(c, '/v1/quota', 'GET'));
 
-// GET /v1/gen1/tos — fetch Gen1 Terms of Service
+// GET /v1/gen1/tos — fetch Gen1 Terms of Service (LEGACY BRIDGE ONLY)
 app.get('/v1/gen1/tos', (c) => proxyToGen1(c, '/v1/tos', 'GET'));
 
-// POST /v1/gen1/tos/accept — accept Gen1 TOS on behalf of user
+// POST /v1/gen1/tos/accept — accept Gen1 TOS on behalf of user (LEGACY BRIDGE ONLY)
 app.post('/v1/gen1/tos/accept', (c) => proxyToGen1(c, '/v1/tos/accept', 'POST'));
 
-// POST /v1/workflows — proxy to Gen1 /v1/workflows
-app.post('/v1/workflows', (c) => proxyToGen1(c, '/v1/workflows', 'POST'));
+// POST /v1/workflows — local workflow execution (WI-1.2: no Gen1 proxy)
+// For now, returns 501 until @nai/aqueduct workflow executor is wired.
+app.post('/v1/workflows', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'unauthorized' }, 401);
+  // If legacy bridge is enabled, fall back to Gen1 for workflows
+  if (c.env.LEGACY_BRIDGE_ENABLED === 'true') {
+    return proxyToGen1(c, '/v1/workflows', 'POST');
+  }
+  return c.json({ error: 'workflows_not_yet_implemented', message: 'Local workflow executor is not yet wired. Enable LEGACY_BRIDGE_ENABLED=true for Gen1 failoff.' }, 501);
+});
 
 // ============================================================
 // Phase 3 — Core Runtime: /v1/command, /v1/agents, /v1/memory, /v1/evidence
@@ -1091,5 +1251,20 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
 
   return c.json({ received: true, processed: true, payment: result, invoice });
 });
+
+// ============================================================
+// WI-1.1: Mount route modules — independent operation
+// These route files were previously dead code (written but not imported).
+// They are now mounted and accessible.
+// ============================================================
+
+app.route('/', modelGatewayRoutes);
+app.route('/', fallbackRoutes);
+app.route('/', incidentRoutes);
+app.route('/', selfHealRoutes);
+app.route('/', notificationRoutes);
+app.route('/', approvalRoutes);
+app.route('/', scholarshipRoutes);
+app.route('/', investorRoutes);
 
 export default app;

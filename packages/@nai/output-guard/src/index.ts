@@ -15,6 +15,8 @@ import {
   type PolicyCheckContext,
 } from '@nai/model-policy';
 
+export type { Language, DataClassification, PolicyCheckContext };
+
 // ============================================================
 // Types
 // ============================================================

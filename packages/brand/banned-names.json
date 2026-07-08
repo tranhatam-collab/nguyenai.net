@@ -1,0 +1,18 @@
+{
+  "banned_names": [
+    "Nguyên AI",
+    "AI Nguyen",
+    "AI Nguyễn",
+    "NguyenAI",
+    "Nguyễn.AI",
+    "Nguyen Artificial Intelligence",
+    "NAI Network",
+    "NAI Edu",
+    "NAI Invest",
+    "NAI Computer",
+    "Nguyen Computer AI",
+    "Nguyen Ai Computer"
+  ],
+  "note": "Nguyên may only be used in philosophy/editorial copy, not as the brand name. NAI may only be used as internal code scope (@nai/*), never as a public brand.",
+  "ci_gate": "tools/audit-brand-naming-lock.sh"
+}

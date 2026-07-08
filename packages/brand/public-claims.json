@@ -1,0 +1,46 @@
+{
+  "claims": [
+    {
+      "id": "independent-backend",
+      "vi": "Nguyễn AI sở hữu phần nền sau riêng, tự chủ toàn bộ.",
+      "en": "Nguyen AI owns its own backend, fully self-sufficient.",
+      "evidence_type": "architecture_audit",
+      "status": "R1"
+    },
+    {
+      "id": "no-gen1-dependency",
+      "vi": "Không phụ thuộc Gen1 trong vận hành mặc định.",
+      "en": "No Gen1 dependency in default operation.",
+      "evidence_type": "chaos_drill",
+      "status": "R1"
+    },
+    {
+      "id": "evidence-receipts",
+      "vi": "Mọi lệnh quan trọng có biên nhận kiểm chứng.",
+      "en": "Every important command has a verification receipt.",
+      "evidence_type": "evidence_pack",
+      "status": "R1"
+    },
+    {
+      "id": "bilingual",
+      "vi": "Giao diện song ngữ Việt — Anh, không trộn ngôn ngữ.",
+      "en": "Bilingual Vietnamese — English interface, no language mixing.",
+      "evidence_type": "language_audit",
+      "status": "R1"
+    },
+    {
+      "id": "heritage-not-bloodline",
+      "vi": "Di sản và gia phả là Super App quan trọng, không phải toàn bộ sản phẩm. Không tuyên bố chung một huyết thống.",
+      "en": "Heritage and genealogy are important Super Apps, not the whole product. No shared bloodline claims.",
+      "evidence_type": "policy_charter",
+      "status": "R2"
+    },
+    {
+      "id": "no-profit-promise",
+      "vi": "Công cụ tài chính hỗ trợ phân tích, không phải tư vấn cấp phép.",
+      "en": "Financial tools support analysis only, not licensed advisory services.",
+      "evidence_type": "policy_charter",
+      "status": "R2"
+    }
+  ]
+}

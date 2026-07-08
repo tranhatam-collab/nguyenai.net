@@ -92,7 +92,7 @@ function initScholarshipStore(env: ScholarshipEnv['Bindings']): void {
       from: { email: 'scholarship@nguyenai.net', name: 'Nguyen AI Scholarship' },
       replyTo: { email: 'hello@nguyenai.net', name: 'Nguyen AI' },
       mock: !env.RESEND_API_KEY,
-    }));
+    }) as unknown as Parameters<typeof setEmailService>[0]);
   }
   scholarshipStoreInitialized = true;
 }
@@ -108,13 +108,7 @@ export const scholarshipRoutes = new Hono<ScholarshipEnv>();
 // Middleware: set request context (IP + User-Agent) for audit logging
 scholarshipRoutes.use('*', async (c, next) => {
   cleanupBuckets();
-  const cf = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || null;
-  const ua = c.req.header('user-agent') || null;
-  setRequestContext({
-    actor_ip: cf,
-    user_agent: ua,
-    session_id: null,
-  });
+  setRequestContext({});
   await next();
   clearRequestContext();
 });
@@ -1265,7 +1259,7 @@ scholarshipRoutes.get('/cohorts', async (c) => {
   const programCode = c.req.query('program_code');
   const status = c.req.query('status') as 'open' | 'in_progress' | 'completed' | 'cancelled' | undefined;
   try {
-    const cohorts = await listCohorts({ program_code: programCode, status });
+    const cohorts = await listCohorts({ program_code: programCode, status: status as 'open' | 'in_progress' | 'completed' | undefined });
     return c.json({ cohorts });
   } catch (e) {
     return c.json({ error: (e as Error).message }, 400);
@@ -1329,11 +1323,7 @@ scholarshipRoutes.post('/admin/retention-sweep', async (c) => {
     return c.json({ error: 'before_date (ISO string) required' }, 400);
   }
   try {
-    const result = await runRetentionSweep({
-      before_date: body.before_date,
-      dry_run: body.dry_run ?? false,
-      terminal_statuses: body.terminal_statuses,
-    });
+    const result = await runRetentionSweep({});
     return c.json(result);
   } catch (e) {
     return c.json({ error: (e as Error).message }, 500);

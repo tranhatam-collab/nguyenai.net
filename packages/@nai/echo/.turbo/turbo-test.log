@@ -1,3 +1,36 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+$ tsx src/test.ts
+
+@nai/echo tests:
+  ✓ PACKAGE_INFO.name is @nai/loki
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ pushLog generates id
+  ✓ pushLog sets level
+  ✓ pushLog sets message
+  ✓ pushLog sets labels
+  ✓ pushLog sets timestamp
+  ✓ 5 logs after 5 pushes
+  ✓ queryLogs filters by tenant_id
+  ✓ log has trace_id
+  ✓ queryLogs level=info returns 2
+  ✓ queryLogs level=error returns 1
+  ✓ queryLogs level=fatal returns 0
+  ✓ queryLogs message_contains=Info returns 2
+  ✓ queryLogs message_contains=error returns 1 (case insensitive)
+  ✓ queryLogs limit=2 returns 2
+  ✓ queryLogs labels service=api returns 2
+  ✓ queryLogs labels service=api+env=prod returns 1
+  ✓ queryLogs time range returns 1
+  ✓ time range returns newer log
+  ✓ countByLevel info = 3
+  ✓ countByLevel error = 2
+  ✓ countByLevel warn = 1
+  ✓ countByLevel debug = 1
+  ✓ countByLevel fatal = 0
+  ✓ countByLevel t1 info = 1
+  ✓ countByLevel t1 error = 1
+  ✓ getLogRate > 0 for 10 logs in a window
+  ✓ clearLogs empties logs
+  ✓ clearLogs → queryLogs returns empty
+
+30 passed, 0 failed

@@ -384,3 +384,115 @@ export async function runWorkflow(
   const executor = new WorkflowExecutor();
   return executor.execute(workflow, input, tenantId);
 }
+
+// ============================================================
+// Scheduler — scheduled, webhook, event, and manual triggers
+// ============================================================
+
+export interface ScheduledTrigger {
+  type: 'scheduled' | 'webhook' | 'event';
+  cron?: string;
+  webhookPath?: string;
+  eventName?: string;
+  enabled: boolean;
+}
+
+export interface ScheduledWorkflow {
+  id: string;
+  workflow: Workflow;
+  trigger: ScheduledTrigger;
+  nextRunAt?: string;
+  input?: unknown;
+}
+
+export class WorkflowScheduler {
+  private scheduled: Map<string, ScheduledWorkflow> = new Map();
+  private webhookPaths: Map<string, string> = new Map();
+  private eventNames: Map<string, string> = new Map();
+
+  schedule(workflow: Workflow, cron: string, input?: unknown): ScheduledWorkflow {
+    const id = crypto.randomUUID();
+    const sw: ScheduledWorkflow = {
+      id,
+      workflow,
+      trigger: { type: 'scheduled', cron, enabled: true },
+      nextRunAt: new Date(Date.now() + 3600000).toISOString(),
+      input,
+    };
+    this.scheduled.set(id, sw);
+    return sw;
+  }
+
+  registerWebhook(workflow: Workflow, path: string): ScheduledWorkflow {
+    const id = crypto.randomUUID();
+    const sw: ScheduledWorkflow = {
+      id,
+      workflow,
+      trigger: { type: 'webhook', webhookPath: path, enabled: true },
+    };
+    this.scheduled.set(id, sw);
+    this.webhookPaths.set(path, id);
+    return sw;
+  }
+
+  registerEvent(workflow: Workflow, eventName: string): ScheduledWorkflow {
+    const id = crypto.randomUUID();
+    const sw: ScheduledWorkflow = {
+      id,
+      workflow,
+      trigger: { type: 'event', eventName, enabled: true },
+    };
+    this.scheduled.set(id, sw);
+    this.eventNames.set(eventName, id);
+    return sw;
+  }
+
+  async triggerManual(workflow: Workflow, input: unknown): Promise<WorkflowExecution> {
+    const executor = new WorkflowExecutor();
+    return executor.execute(workflow, input);
+  }
+
+  async handleWebhook(path: string, payload: unknown): Promise<WorkflowExecution | null> {
+    const id = this.webhookPaths.get(path);
+    if (!id) return null;
+    const sw = this.scheduled.get(id);
+    if (!sw || !sw.trigger.enabled) return null;
+    const executor = new WorkflowExecutor();
+    return executor.execute(sw.workflow, payload);
+  }
+
+  async handleEvent(eventName: string, payload: unknown): Promise<WorkflowExecution | null> {
+    const id = this.eventNames.get(eventName);
+    if (!id) return null;
+    const sw = this.scheduled.get(id);
+    if (!sw || !sw.trigger.enabled) return null;
+    const executor = new WorkflowExecutor();
+    return executor.execute(sw.workflow, payload);
+  }
+
+  disable(id: string): void {
+    const sw = this.scheduled.get(id);
+    if (sw) sw.trigger.enabled = false;
+  }
+
+  enable(id: string): void {
+    const sw = this.scheduled.get(id);
+    if (sw) sw.trigger.enabled = true;
+  }
+
+  remove(id: string): void {
+    const sw = this.scheduled.get(id);
+    if (sw) {
+      if (sw.trigger.type === 'webhook' && sw.trigger.webhookPath) {
+        this.webhookPaths.delete(sw.trigger.webhookPath);
+      } else if (sw.trigger.type === 'event' && sw.trigger.eventName) {
+        this.eventNames.delete(sw.trigger.eventName);
+      }
+      this.scheduled.delete(id);
+    }
+  }
+
+  getScheduled(): ScheduledWorkflow[] {
+    return Array.from(this.scheduled.values());
+  }
+}

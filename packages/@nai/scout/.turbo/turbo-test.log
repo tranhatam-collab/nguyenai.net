@@ -44,5 +44,9 @@ $ tsx src/test.ts
   ✓ stripHtml simple tag
   ✓ stripHtml decodes entities
   ✓ extractLinks without baseUrl keeps relative
+  ✓ allowlist configured
+  ✓ denylist configured
+  ✓ allowlist+denylist: allowlist configured
+  ✓ allowlist+denylist: denylist configured
 
-41 passed, 0 failed
+45 passed, 0 failed

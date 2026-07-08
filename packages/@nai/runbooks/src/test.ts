@@ -7,7 +7,7 @@ import {
   setRunbookStore,
   seedDefaultRunbooks,
   findRunbookForIncident,
-} from './index.ts';
+} from './index.js';
 
 let passed = 0;
 let failed = 0;
@@ -62,8 +62,8 @@ async function testRunbookStructure() {
   const apiRunbook = runbooks.find((r) => r.name === 'API High Latency');
 
   assert(apiRunbook !== undefined, 'API runbook exists');
-  assert(apiRunbook?.diagnostic_steps.length > 0, 'has diagnostic steps');
-  assert(apiRunbook?.remediation_steps.length > 0, 'has remediation steps');
+  assert((apiRunbook?.diagnostic_steps.length ?? 0) > 0, 'has diagnostic steps');
+  assert((apiRunbook?.remediation_steps.length ?? 0) > 0, 'has remediation steps');
   assert(apiRunbook?.approval_required === true, 'approval required');
   assert(apiRunbook?.risk_level === 'medium', 'risk level is medium');
 }

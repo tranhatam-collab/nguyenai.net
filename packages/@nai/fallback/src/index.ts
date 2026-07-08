@@ -79,7 +79,7 @@ export class InMemoryFallbackStore implements FallbackStore {
   }
 
   async listRequests(filters?: { severity?: FallbackSeverity; target?: FallbackTarget; status?: FallbackStatus }): Promise<FallbackRequest[]> {
-    let results = [...this.requests.values()];
+    let results = Array.from(this.requests.values());
     if (filters?.severity) results = results.filter((r) => r.severity === filters.severity);
     if (filters?.target) results = results.filter((r) => r.target === filters.target);
     if (filters?.status) results = results.filter((r) => r.status === filters.status);

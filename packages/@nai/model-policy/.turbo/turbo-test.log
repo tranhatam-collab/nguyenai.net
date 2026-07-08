@@ -1,0 +1,11 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+=== @nai/model-policy unit tests ===
+
+Test: check identity policy
+Test: check language policy
+Test: check safety policy
+Test: check data classification policy
+Test: check all policies
+
+18 passed, 0 failed

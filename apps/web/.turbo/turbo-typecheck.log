@@ -1,8 +1,12 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ astro check
-17:19:24 [types] Generated 323ms
-17:19:24 [check] Getting diagnostics for Astro files in /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/web...
-Result (60 files): 
-- 0 errors
-- 0 warnings
-- 0 hints
+To continue, Astro requires the following dependency to be installed: @astrojs/check.
 
+  Astro will run the following command:
+  If you skip this step, you can always run it yourself later
+
+ ╭────────────────────────────────────────╮
+ │ npm install @astrojs/check typescript  │
+ ╰────────────────────────────────────────╯
+
+[?25l[2K[1G[36m?[39m [1mContinue?[22m [90m›[39m [90m(Y/n)[39m

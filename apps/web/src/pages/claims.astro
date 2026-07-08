@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PublicClaimBlock from '../components/PublicClaimBlock.astro';
+
+const title = 'Tuyên bố công khai — Nguyễn AI';
+const description = 'Danh sách tuyên bố công khai được phép, kèm nhãn tin cậy và biên nhận.';
+---
+<BaseLayout locale="vi" routeKey="claims" title={title} description={description}>
+  <main class="claims-page">
+    <section class="hero">
+      <h1>Tuyên bố công khai</h1>
+      <p>Danh sách tuyên bố công khai được phép. Mọi tuyên bố ngoài danh sách này cần phê duyệt Founder.</p>
+    </section>
+    <section class="claims">
+      <PublicClaimBlock claimId="independent-backend" text="Nguyễn AI sở hữu phần nền sau riêng, tự chủ toàn bộ." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="no-gen1-dependency" text="Không phụ thuộc hệ thống cũ trong vận hành mặc định." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="evidence-receipts" text="Mọi lệnh quan trọng có biên nhận kiểm chứng." grade="R1" locale="vi" evidenceUrl="/receipts/" />
+      <PublicClaimBlock claimId="bilingual" text="Giao diện song ngữ Việt — Anh, không trộn ngôn ngữ." grade="R1" locale="vi" />
+      <PublicClaimBlock claimId="heritage-not-bloodline" text="Di sản và gia phả là Super App quan trọng, không phải toàn bộ sản phẩm. Không tuyên bố chung một huyết thống." grade="R2" locale="vi" />
+      <PublicClaimBlock claimId="no-profit-promise" text="Công cụ tài chính hỗ trợ phân tích, không phải tư vấn cấp phép." grade="R2" locale="vi" />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .claims-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .claims { margin-top: 2rem; display: grid; gap: 0.75rem; }
+</style>

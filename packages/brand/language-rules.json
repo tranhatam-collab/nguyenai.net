@@ -1,0 +1,41 @@
+{
+  "replacements": {
+    "instance": "máy riêng",
+    "Agent": "tác nhân",
+    "Agent Team": "đội tác nhân",
+    "backend": "phần nền sau",
+    "workflow": "luồng công việc",
+    "model": "mô hình",
+    "adapter": "cầu chuyển tiếp",
+    "compatibility contract": "hợp đồng tương thích",
+    "integrate": "tích hợp",
+    "Automation": "tự động hóa",
+    "trigger": "điểm kích hoạt",
+    "scheduled task": "tác vụ hẹn giờ",
+    "multi-step": "nhiều bước",
+    "Command Center": "Trung Tâm Lệnh",
+    "Model Mesh": "Lưới Mô Hình",
+    "Tool Kernel": "Nhân Công Cụ",
+    "Data Vault": "Két Dữ Liệu",
+    "Long-term Memory": "Bộ Nhớ Dài Hạn",
+    "Workflow Engine": "Bộ Máy Luồng Việc",
+    "Approval Gates": "Cổng Phê Duyệt",
+    "Security Boundary": "Ranh Giới Bảo Mật",
+    "Cost Governor": "Bộ Quản Chi Phí",
+    "Audit & Replay": "Kiểm Định & Phát Lại",
+    "Sync Layer": "Tầng Đồng Bộ",
+    "Self-Upgrade Registry": "Sổ Tự Nâng Cấp",
+    "Identity": "Danh Tính",
+    "Evidence": "Bằng Chứng",
+    "Super Apps": "Siêu Ứng Dụng",
+    "Verification": "Kiểm Chứng"
+  },
+  "component_names": {
+    "RGradeBadge": { "vi": "Huy Hiệu Nhãn Tin Cậy", "en": "R-Grade Badge" },
+    "ProofReceiptCard": { "vi": "Thẻ Biên Nhận", "en": "Proof Receipt Card" },
+    "PublicClaimBlock": { "vi": "Khối Tuyên Bố Công Khai", "en": "Public Claim Block" },
+    "ProductStatusMatrix": { "vi": "Ma Trận Trạng Thái Sản Phẩm", "en": "Product Status Matrix" },
+    "LanguageBoundaryNotice": { "vi": "Ghi Chú Ranh Giới Ngôn Ngữ", "en": "Language Boundary Notice" },
+    "EvidenceTimeline": { "vi": "Dòng Thời Gian Bằng Chứng", "en": "Evidence Timeline" }
+  }
+}

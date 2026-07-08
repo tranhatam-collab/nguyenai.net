@@ -9,11 +9,13 @@
     "AUTH_ISSUER": "auth.nguyenai.net",
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
-    "GEN1_GATEWAY_URL": "https://aiagent-iai-one-api-prod.tranhatam.workers.dev",
+    // WI-1.3/WI-2.3: GEN1_GATEWAY_URL removed from vars — Gen1 proxy disabled by default.
+    // To enable failoff: `wrangler secret put GEN1_GATEWAY_URL` + `wrangler secret put LEGACY_BRIDGE_ENABLED` (value: true)
     // SEC-P0-3: EVIDENCE_SIGNING_KEY removed from vars (old value leaked via git).
     // Set via `wrangler secret put EVIDENCE_SIGNING_KEY`. resolveEvidenceSigningKey()
     // throws in production when the secret is missing; dev uses a non-prod fallback.
-    "LLM_PROVIDER_MODE": "gen1"
+    // WI-1.2: LLM_PROVIDER_MODE changed from 'gen1' to 'auto' (direct providers first).
+    "LLM_PROVIDER_MODE": "auto"
   },
   "d1_databases": [
     {
@@ -28,7 +30,8 @@
   ],
   "kv_namespaces": [
     { "binding": "RATE_LIMIT", "id": "ea7823e56b0a44b9b41a6bb2c49dc95f" }
-  ]
+  ],
+  "no_bundle": true
   // RESEND_API_KEY is set via `wrangler secret put RESEND_API_KEY` (not in vars for security)
   // Email sending uses Resend API directly via @nai/email package
 }

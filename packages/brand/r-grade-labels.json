@@ -1,0 +1,40 @@
+{
+  "grades": [
+    {
+      "id": "R0",
+      "label": { "vi": "Chưa kiểm chứng", "en": "Unverified" },
+      "color": "#6b7280",
+      "description": {
+        "vi": "Năng lực đã khai báo nhưng chưa có biên nhận kiểm chứng.",
+        "en": "Capability declared but no verification receipt."
+      }
+    },
+    {
+      "id": "R1",
+      "label": { "vi": "Kiểm chứng nội bộ", "en": "Internally verified" },
+      "color": "#3b82f6",
+      "description": {
+        "vi": "Đã qua test nội bộ, có biên nhận, chưa kiểm chứng độc lập bên ngoài.",
+        "en": "Passed internal tests with receipt, no independent external verification yet."
+      }
+    },
+    {
+      "id": "R2",
+      "label": { "vi": "Kiểm chứng độc lập", "en": "Independently verified" },
+      "color": "#8b5cf6",
+      "description": {
+        "vi": "Đã qua kiểm chứng bởi bên độc lập, có biên nhận công khai.",
+        "en": "Verified by an independent party with public receipt."
+      }
+    },
+    {
+      "id": "R3",
+      "label": { "vi": "Kiểm chứng sống", "en": "Live verified" },
+      "color": "#10b981",
+      "description": {
+        "vi": "Đang chạy thật, người dùng thật, kết quả thật, biên nhận công khai.",
+        "en": "Running live with real users, real results, public receipts."
+      }
+    }
+  ]
+}

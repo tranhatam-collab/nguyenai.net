@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PublicClaimBlock from '../../components/PublicClaimBlock.astro';
+
+const title = 'Public Claims — Nguyen AI';
+const description = 'List of approved public claims with R-grade labels and evidence receipts.';
+---
+<BaseLayout locale="en" routeKey="claims" title={title} description={description}>
+  <main class="claims-page">
+    <section class="hero">
+      <h1>Public claims</h1>
+      <p>List of approved public claims. Any claim outside this list requires Founder approval.</p>
+    </section>
+    <section class="claims">
+      <PublicClaimBlock claimId="independent-backend" text="Nguyen AI owns its own backend, fully self-sufficient." grade="R1" locale="en" evidenceUrl="/en/receipts/" />
+      <PublicClaimBlock claimId="no-gen1-dependency" text="No legacy system dependency in default operation." grade="R1" locale="en" evidenceUrl="/en/receipts/" />
+      <PublicClaimBlock claimId="evidence-receipts" text="Every important command has a verification receipt." grade="R1" locale="en" evidenceUrl="/en/receipts/" />
+      <PublicClaimBlock claimId="bilingual" text="Bilingual Vietnamese — English interface, no language mixing." grade="R1" locale="en" />
+      <PublicClaimBlock claimId="heritage-not-bloodline" text="Heritage and genealogy are important Super Apps, not the whole product." grade="R2" locale="en" />
+      <PublicClaimBlock claimId="no-profit-promise" text="Financial tools support analysis only, not licensed advisory services." grade="R2" locale="en" />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .claims-page { max-width: 768px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero p { color: #4b5563; line-height: 1.6; }
+  .claims { margin-top: 2rem; display: grid; gap: 0.75rem; }
+</style>

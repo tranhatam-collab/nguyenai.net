@@ -147,7 +147,7 @@ export default function RoutingRules() {
                   setCondition('');
                 }}
               >
-                Cancel · Hủy
+                Hủy
               </button>
             </div>
           </div>

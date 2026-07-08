@@ -1,0 +1,142 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ astro build
+11:09:53 AM [content] No content directory found. Skipping type generation.
+11:09:53 AM [build] output target: static
+11:09:53 AM [build] Collecting build info...
+11:09:53 AM [build] Completed in 104ms.
+11:09:53 AM [build] Building static entrypoints...
+11:09:56 AM [build] Completed in 2.85s.
+
+ generating static routes 
+▶ src/pages/index.astro
+  └─ /index.html (+34ms)
+▶ src/pages/command-packs.astro
+  └─ /command-packs/index.html (+2ms)
+▶ src/pages/how-it-works.astro
+  └─ /how-it-works/index.html (+2ms)
+▶ src/pages/ai-computer.astro
+  └─ /ai-computer/index.html (+5ms)
+▶ src/pages/enterprise.astro
+  └─ /enterprise/index.html (+4ms)
+▶ src/pages/super-apps.astro
+  └─ /super-apps/index.html (+2ms)
+▶ src/pages/business.astro
+  └─ /business/index.html (+3ms)
+▶ src/pages/heritage.astro
+  └─ /heritage/index.html (+10ms)
+▶ src/pages/personal.astro
+  └─ /personal/index.html (+22ms)
+▶ src/pages/receipts.astro
+  └─ /receipts/index.html (+31ms)
+▶ src/pages/research.astro
+  └─ /research/index.html (+3ms)
+▶ src/pages/security.astro
+  └─ /security/index.html (+11ms)
+▶ src/pages/academy.astro
+  └─ /academy/index.html (+13ms)
+▶ src/pages/chapter.astro
+  └─ /chapter/index.html (+4ms)
+▶ src/pages/contact.astro
+  └─ /contact/index.html (+3ms)
+▶ src/pages/creator.astro
+  └─ /creator/index.html (+3ms)
+▶ src/pages/founder.astro
+  └─ /founder/index.html (+8ms)
+▶ src/pages/network.astro
+  └─ /network/index.html (+4ms)
+▶ src/pages/privacy.astro
+  └─ /privacy/index.html (+6ms)
+▶ src/pages/agents.astro
+  └─ /agents/index.html (+2ms)
+▶ src/pages/claims.astro
+  └─ /claims/index.html (+2ms)
+▶ src/pages/family.astro
+  └─ /family/index.html (+1ms)
+▶ src/pages/invest.astro
+  └─ /invest/index.html (+2ms)
+▶ src/pages/models.astro
+  └─ /models/index.html (+2ms)
+▶ src/pages/status.astro
+  └─ /status/index.html (+2ms)
+▶ src/pages/about.astro
+  └─ /about/index.html (+2ms)
+▶ src/pages/plans.astro
+  └─ /plans/index.html (+4ms)
+▶ src/pages/proof.astro
+  └─ /proof/index.html (+2ms)
+▶ src/pages/terms.astro
+  └─ /terms/index.html (+5ms)
+▶ src/pages/trust.astro
+  └─ /trust/index.html (+2ms)
+▶ src/pages/demo.astro
+  └─ /demo/index.html (+7ms)
+▶ src/pages/docs.astro
+  └─ /docs/index.html (+2ms)
+▶ src/pages/en/index.astro
+  └─ /en/index.html (+6ms)
+▶ src/pages/en/command-packs.astro
+  └─ /en/command-packs/index.html (+3ms)
+▶ src/pages/en/how-it-works.astro
+  └─ /en/how-it-works/index.html (+3ms)
+▶ src/pages/en/ai-computer.astro
+  └─ /en/ai-computer/index.html (+3ms)
+▶ src/pages/en/enterprise.astro
+  └─ /en/enterprise/index.html (+4ms)
+▶ src/pages/en/super-apps.astro
+  └─ /en/super-apps/index.html (+2ms)
+▶ src/pages/en/business.astro
+  └─ /en/business/index.html (+2ms)
+▶ src/pages/en/heritage.astro
+  └─ /en/heritage/index.html (+2ms)
+▶ src/pages/en/personal.astro
+  └─ /en/personal/index.html (+2ms)
+▶ src/pages/en/receipts.astro
+  └─ /en/receipts/index.html (+8ms)
+▶ src/pages/en/research.astro
+  └─ /en/research/index.html (+2ms)
+▶ src/pages/en/security.astro
+  └─ /en/security/index.html (+2ms)
+▶ src/pages/en/academy.astro
+  └─ /en/academy/index.html (+1ms)
+▶ src/pages/en/chapter.astro
+  └─ /en/chapter/index.html (+1ms)
+▶ src/pages/en/contact.astro
+  └─ /en/contact/index.html (+2ms)
+▶ src/pages/en/creator.astro
+  └─ /en/creator/index.html (+1ms)
+▶ src/pages/en/founder.astro
+  └─ /en/founder/index.html (+3ms)
+▶ src/pages/en/network.astro
+  └─ /en/network/index.html (+2ms)
+▶ src/pages/en/privacy.astro
+  └─ /en/privacy/index.html (+7ms)
+▶ src/pages/en/agents.astro
+  └─ /en/agents/index.html (+2ms)
+▶ src/pages/en/claims.astro
+  └─ /en/claims/index.html (+1ms)
+▶ src/pages/en/family.astro
+  └─ /en/family/index.html (+2ms)
+▶ src/pages/en/invest.astro
+  └─ /en/invest/index.html (+3ms)
+▶ src/pages/en/models.astro
+  └─ /en/models/index.html (+1ms)
+▶ src/pages/en/status.astro
+  └─ /en/status/index.html (+3ms)
+▶ src/pages/en/about.astro
+  └─ /en/about/index.html (+2ms)
+▶ src/pages/en/plans.astro
+  └─ /en/plans/index.html (+25ms)
+▶ src/pages/en/proof.astro
+  └─ /en/proof/index.html (+12ms)
+▶ src/pages/en/terms.astro
+  └─ /en/terms/index.html (+11ms)
+▶ src/pages/en/trust.astro
+  └─ /en/trust/index.html (+5ms)
+▶ src/pages/en/demo.astro
+  └─ /en/demo/index.html (+6ms)
+▶ src/pages/en/docs.astro
+  └─ /en/docs/index.html (+4ms)
+Completed in 406ms.
+
+11:09:57 AM [build] 64 page(s) built in 3.45s
+11:09:57 AM [build] Complete!

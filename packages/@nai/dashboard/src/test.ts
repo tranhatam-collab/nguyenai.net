@@ -190,12 +190,3 @@ main().catch((err) => {
   console.error('FATAL:', err);
   process.exit(1);
 });
-  process.exit(1);
-});
-  console.error('FATAL:', err);
-  process.exit(1);
-});
-  console.error('FATAL:', err);
-  process.exit(1);
-});
-});

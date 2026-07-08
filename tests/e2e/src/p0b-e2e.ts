@@ -123,6 +123,7 @@ async function main() {
     session_id: sessionId,
     user_id: userId,
     tenant_id: tenantId,
+    plan_id: 'nguyen-start',
     audience: 'app.nguyenai.net',
     issuer: 'auth.nguyenai.net',
     roles,

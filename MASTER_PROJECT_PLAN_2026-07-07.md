@@ -1,8 +1,16 @@
-# Master Project Plan — 2026-07-07
+# Master Project Plan — 2026-07-07 (UPDATED 2026-07-08)
+
+> **⚠️ FOUNDER LOCK 2026-07-08:** nguyenai.net là dự án PUBLIC độc lập hoàn toàn.
+> KHÔNG đụng tới Gen 1 (computer.iai.one) và Gen 2 (maytinhai.org).
+> Kế hoạch độc lập chính thức: `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`
+> CI gate: `pnpm run audit:independence` — build fail nếu vi phạm độc lập.
+> Phần Cross-Project Integration cũ (Part 3) đã bị XÓA — nguyenai.net không integrate Gen1/Gen2.
 
 ## Overview
 
 This document provides a comprehensive project plan for both Nguyen AI (nguyenai.net) and Gen 2 AI Computer OS (maytinhai-os) projects.
+
+**Lưu ý quan trọng (2026-07-08):** Hai dự án này HOÀN TOÀN TÁCH RỜI. nguyenai.net không phụ thuộc Gen 2 (maytinhai-os). Phần Cross-Project Integration cũ đã bị xóa. Mỗi dự án có kế hoạch riêng.
 
 ---
 
@@ -10,16 +18,32 @@ This document provides a comprehensive project plan for both Nguyen AI (nguyenai
 
 ### Current Status
 
-**Completion:** 95% (code + audits + automation done, external services + governance pending)
+**Completion:** 95% (code + audits + automation + independence lock done, external services + deploy pending)
 
 | Metric | Status |
 |--------|--------|
-| Code quality | ✅ 100% (typecheck, build, lint) |
-| QA audits | ✅ 100% (11/11 critical categories passing) |
+| Code quality | ✅ 100% (typecheck 139/139, build 64 pages, lint) |
+| QA audits | ✅ 100% (12/12 critical categories passing, including independence) |
 | Automation | ✅ 100% (CI/CD, scripts, status checker) |
+| **Independence lock** | ✅ **100% (Phase 0 COMPLETE 2026-07-08)** |
 | External services | ⚠️ 0% (Founder manual setup) |
 | Deployment | ⚠️ 0% (Founder manual deploy) |
 | Governance | ⚠️ 0% (Sprint 0 lock OPEN) |
+
+### Phase 0 — Independence Lock (✅ COMPLETED 2026-07-08)
+
+- [x] `audit:independence` created and added to `audit:all` + CI
+- [x] 3 legacy repos archived (nguyenai-console, nguyenai-invest, nguyenai-api-gateway)
+- [x] Old gateway verified: proxied to Gen1 (violated independence) — replaced by independent gateway
+- [x] Gate G0: `audit:all` green including independence test
+- [x] 8 route files mounted (were dead code)
+- [x] `/v1/chat` routed through direct LLM provider (OpenAI/Anthropic/Google), no Gen1 proxy
+- [x] `LEGACY_BRIDGE_ENABLED=false` by default, `proxyToGen1` gated
+- [x] `GEN1_GATEWAY_URL` removed from wrangler.jsonc vars
+- [x] 13 Gen1/Gen2 violations removed from public content
+- [x] `src/` legacy root site quarantined to `docs/legacy/`
+- [x] 5 brand data files + 5 UI components + 10 evidence pages created
+- [x] Governance decision log created (QD-2026-07-08-01)
 
 ### Completed Work
 
@@ -300,29 +324,35 @@ cd apps/api && wrangler deploy
 
 ---
 
-## Part 3: Cross-Project Integration
+## Part 3: Project Separation (UPDATED 2026-07-08)
 
-### Architecture Relationship
+> **⚠️ FOUNDER LOCK 2026-07-08:** Phần này từng là "Cross-Project Integration" —
+> đã bị XÓA và thay bằng "Project Separation" vì nguyenai.net độc lập hoàn toàn.
 
-Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
+### Architecture Relationship (SEPARATED, NOT INTEGRATED)
 
-- **Gen1 (`computer.iai.one`)**: FROZEN reference-only (runtime, agent, model routing, memory, tool, workflow, evidence)
-- **Gen2 (`maytinhai.org`)**: FROZEN reference-only (product system, package, sell, operate AI Computers)
-- **Nguyen AI (`nguyenai.net`)**: Independent backend with compatibility contracts to Gen1/Gen2
+- **Gen1 (`computer.iai.one`)**: FROZEN, reference-only. nguyenai.net KHÔNG gọi runtime, KHÔNG import code.
+- **Gen2 (`maytinhai.org` / `maytinhai-os`)**: FROZEN, reference-only. nguyenai.net KHÔNG dùng chung DB, auth, billing.
+- **Nguyen AI (`nguyenai.net`)**: Independent backend, direct LLM providers, own DB, own auth, own billing.
 
-### Integration Points
+### No Integration Points (BY DESIGN)
 
-1. **Model Mesh Integration**
-   - Nguyen AI can use Gen2 Model Mesh API (when available)
-   - Currently using upstream demo API (3 requests/session limit)
+nguyenai.net does NOT integrate with Gen1 or Gen2. Specifically:
 
-2. **Agent Team Integration**
-   - Nguyen AI Agent Team based on Gen1 Agent architecture
-   - Adapter pattern for compatibility
+1. **No Model Mesh Integration** — nguyenai.net uses direct OpenAI/Anthropic/Google providers via `@nai/prism` `DirectLLMProvider`.
+2. **No Agent Team Integration** — nguyenai.net has its own 9-agent team (`@nai/conductor`), not based on Gen1 agent architecture.
+3. **No Receipt System Integration** — nguyenai.net has its own evidence system (`@nai/evidence`), not compatible with Gen2 R-grade.
+4. **No runtime dependency** — `LEGACY_BRIDGE_ENABLED=false` by default. `proxyToGen1` returns 404.
+5. **No code import** — `audit:contamination` + `audit:independence` enforce zero imports from Gen1/Gen2.
 
-3. **Receipt System Integration**
-   - Nguyen AI receipts compatible with Gen2 R-grade system
-   - Public verification endpoint aligned
+### CI Gate (BINDING)
+
+```bash
+pnpm run audit:independence  # MUST pass — 0 violations
+pnpm run audit:contamination # MUST pass — 0 violations
+```
+
+Both are part of `pnpm run audit:all` and CI. Build fails if either fails.
 
 ---
 
@@ -369,6 +399,7 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 | Code quality (typecheck/build/lint) | 100% | 100% | ✅ |
 | QA audits (critical categories) | 100% | 100% | ✅ |
 | Automation coverage | 100% | 100% | ✅ |
+| **Independence violations (CI)** | **0** | **0** | **✅** |
 | External services setup | 100% | 0% | ⚠️ |
 | Deployment | 100% | 0% | ⚠️ |
 | Governance lock | 100% | 0% | ⚠️ |
@@ -394,10 +425,12 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 
 | Risk | Impact | Mitigation | Status |
 |------|--------|------------|--------|
+| Vô tình gọi Gen 1/Gen 2 | High | `audit:independence` CI gate | ✅ mitigated |
 | External services setup delay | High | Founder priority, clear documentation | ⚠️ |
 | Sprint 0 governance lock | High | Founder priority, clear checklist | ⚠️ |
 | Legal entity formation | High | Founder priority, legal counsel | ⚠️ |
 | IP ownership transfer | High | Founder priority, legal counsel | ⚠️ |
+| Drift repo lẻ ↔ monorepo | Medium | Archive repo lẻ; chỉ phát triển monorepo | ✅ mitigated |
 
 ### Gen 2 Risks
 
@@ -434,12 +467,17 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 ### Immediate (This Week)
 
 **Nguyen AI**
-1. Founder provisions external services (Neon, Google OAuth, Stripe, Resend)
-2. Founder sets Cloudflare secrets
-3. Founder locks Sprint 0 governance
-4. Run `pnpm db:migrate` after DATABASE_URL set
-5. Deploy via CI/CD (push to main)
-6. Verify end-to-end on production
+1. ✅ Phase 0 independence lock COMPLETE (2026-07-08)
+2. ✅ `audit:independence` added to `audit:all` + CI
+3. ✅ 3 legacy repos archived
+4. ✅ Old gateway verified (proxied Gen1 — replaced)
+5. ✅ Gate G0: `audit:all` green
+6. ⚠️ Founder provisions external services (Neon, Google OAuth, Stripe, Resend, LLM provider keys)
+7. ⚠️ Founder sets Cloudflare secrets (including `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_AI_API_KEY`)
+8. ⚠️ Founder locks Sprint 0 governance
+9. ⚠️ Run `pnpm db:migrate` after DATABASE_URL set
+10. ⚠️ Deploy via CI/CD (push to main)
+11. ⚠️ Verify end-to-end on production — confirm NO calls to Gen1/Gen2
 
 **Gen 2**
 1. ✅ Review D1 integration plan
@@ -482,5 +520,7 @@ Per AGENTS.md FOUNDER ARCHITECTURE AMENDMENT:
 ---
 
 **Generated:** 2026-07-07
+**Updated:** 2026-07-08 (independence lock added, Cross-Project Integration removed)
 **Agent:** Devin AI
-**Status:** Both projects on track for Q3 2026 milestones
+**Status:** nguyenai.net Phase 0 COMPLETE (independent). Gen 2 on track for Q3 2026 milestones.
+**Binding:** `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md` — overrides any conflicting prior plan.

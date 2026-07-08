@@ -14,7 +14,7 @@ import {
   listPendingFallbacks,
   isSensitiveData,
   requiresFallbackApproval,
-} from './index.ts';
+} from './index.js';
 
 let passed = 0;
 let failed = 0;

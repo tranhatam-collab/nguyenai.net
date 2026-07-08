@@ -39,5 +39,34 @@ $ tsx src/test.ts
   ✓ child span has parentSpanId in nested runInSpan
   ✓ clearTraces empties traces
   ✓ clearTraces resets current span
+  ✓ recordLLMCall generates call_id
+  ✓ recordLLMCall computes total_tokens
+  ✓ recordLLMCall computes cost_usd > 0 for standard tier
+  ✓ recordLLMCall computes cost_vnd > 0
+  ✓ recordLLMCall default status is success
+  ✓ free tier cost_usd is 0
+  ✓ pro tier cost > standard tier cost
+  ✓ observeLLMCall returns function result
+  ✓ observeLLMCall records completion_tokens
+  ✓ observeLLMCall records latency_ms
+  ✓ observeLLMCall status is success
+  ✓ observeLLMCall rethrows error
+  ✓ observeLLMCall recorded error call
+  ✓ error call status is error
+  ✓ error call records error message
+  ✓ queryLLMCalls filters by tenant
+  ✓ queryLLMCalls returns all without filter
+  ✓ queryLLMCalls filters by agent
+  ✓ getLLMMetrics total_calls
+  ✓ getLLMMetrics total_tokens
+  ✓ getLLMMetrics total_prompt_tokens
+  ✓ getLLMMetrics total_completion_tokens
+  ✓ getLLMMetrics avg_latency_ms
+  ✓ getLLMMetrics error_count
+  ✓ getLLMMetrics by_model has 2 models
+  ✓ getLLMMetrics by_agent nguyen-guide calls
+  ✓ getLLMMetrics by_agent nguyen-researcher calls
+  ✓ higher VND rate → higher cost_vnd
+  ✓ clearLLMCalls empties log
 
-37 passed, 0 failed
+66 passed, 0 failed

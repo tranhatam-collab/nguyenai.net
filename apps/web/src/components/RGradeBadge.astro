@@ -1,0 +1,50 @@
+---
+/**
+ * RGradeBadge — Huy hiệu nhãn tin cậy R0–R3
+ * Displays the reliability grade for a capability or claim.
+ */
+export interface Props {
+  grade: 'R0' | 'R1' | 'R2' | 'R3';
+  locale?: 'vi' | 'en';
+}
+
+const { grade, locale = 'vi' } = Astro.props;
+
+const LABELS: Record<string, { vi: string; en: string; color: string }> = {
+  R0: { vi: 'Chưa kiểm chứng', en: 'Unverified', color: '#6b7280' },
+  R1: { vi: 'Kiểm chứng nội bộ', en: 'Internally verified', color: '#3b82f6' },
+  R2: { vi: 'Kiểm chứng độc lập', en: 'Independently verified', color: '#8b5cf6' },
+  R3: { vi: 'Kiểm chứng sống', en: 'Live verified', color: '#10b981' },
+};
+
+const info = LABELS[grade] ?? LABELS.R0;
+const label = locale === 'vi' ? info.vi : info.en;
+---
+
+<span
+  class="r-grade-badge"
+  style={`--badge-color: ${info.color}`}
+  title={label}
+>
+  <span class="r-grade-code">{grade}</span>
+  <span class="r-grade-label">{label}</span>
+</span>
+
+<style>
+  .r-grade-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--badge-color);
+    color: var(--badge-color);
+    background: color-mix(in srgb, var(--badge-color) 8%, transparent);
+  }
+  .r-grade-code {
+    font-weight: 700;
+    letter-spacing: 0.025em;
+  }
+</style>

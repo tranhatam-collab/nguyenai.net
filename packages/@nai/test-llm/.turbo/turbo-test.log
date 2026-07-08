@@ -1,0 +1,62 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/test-llm tests:
+  ✓ PACKAGE_INFO.name is @nai/deepeval
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ ALL_AGENT_IDS has 9 agents
+  ✓ includes nguyen-guide
+  ✓ includes nguyen-guardian
+  ✓ includes nguyen-founder
+  ✓ contains: hello in Hello World
+  ✓ contains: goodbye not in Hello World
+  ✓ not_contains: secret not in Hello World
+  ✓ not_contains: hello in Hello World fails
+  ✓ equals: 42 = 42
+  ✓ equals: 42 != 43
+  ✓ starts_with: Hello
+  ✓ ends_with: World
+  ✓ min_length: 11 >= 5
+  ✓ min_length: 11 < 20 fails
+  ✓ max_length: 11 <= 20
+  ✓ max_length: 11 > 5 fails
+  ✓ regex_match: digits found
+  ✓ regex_match: not all digits
+  ✓ json_valid: valid JSON
+  ✓ json_valid: invalid JSON
+  ✓ language_vi: Vietnamese chars detected
+  ✓ language_vi: no Vietnamese chars
+  ✓ language_en: English only
+  ✓ language_en: has Vietnamese chars
+  ✓ no_pii: no PII
+  ✓ no_pii: email detected
+  ✓ no_harmful: safe content
+  ✓ no_harmful: weapon detected
+  ✓ response_time_ms: 500 <= 1000
+  ✓ response_time_ms: 200 > 100 fails
+  ✓ runTest sets test_id
+  ✓ runTest sets agent_id
+  ✓ runTest passes when all assertions pass
+  ✓ runTest score = 1.0 when all pass
+  ✓ runTest has 3 assertion results
+  ✓ runTest records latency
+  ✓ runTest fails when assertion fails
+  ✓ runTest score = 0.5 when 1 of 2 pass
+  ✓ runTest fails on error
+  ✓ runTest records error message
+  ✓ runTest score = 0 on error
+  ✓ getDefaultAgentTests returns 9 tests
+  ✓ getDefaultAgentTests covers all 9 unique agents
+  ✓ runTestSuite sets suite_name
+  ✓ runTestSuite total = 9
+  ✓ runTestSuite all 9 pass with mock
+  ✓ runTestSuite failed = 0
+  ✓ runTestSuite avg_score = 1.0
+  ✓ runTestSuite by_agent has 9 entries
+  ✓ runTestSuite nguyen-guide passed
+  ✓ runTestSuite duration_ms >= 0
+  ✓ failing suite total = 3
+  ✓ failing suite has failures (min_length fails)
+  ✓ failing suite avg_score < 1
+
+56 passed, 0 failed

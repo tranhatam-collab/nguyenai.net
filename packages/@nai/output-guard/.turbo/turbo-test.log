@@ -1,0 +1,10 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+=== @nai/output-guard unit tests ===
+
+Test: guard output (allow)
+Test: guard output (block)
+Test: guard output (require approval)
+Test: list user guard results
+
+14 passed, 0 failed

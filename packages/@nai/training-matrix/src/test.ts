@@ -12,7 +12,7 @@ import {
   failTraining,
   cancelTraining,
   listPendingTrainings,
-} from './index.ts';
+} from './index.js';
 
 let passed = 0;
 let failed = 0;

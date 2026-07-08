@@ -43,7 +43,7 @@ async function main(): Promise<void> {
   assert(plans.length === 9, 'catalog has 9 plans');
   const startPlan = getPlan('nguyen-start');
   assert(startPlan !== undefined, 'Start plan exists');
-  assert(startPlan.price_vnd === 0, 'Start plan is free');
+  assert(startPlan!.price_vnd === 0, 'Start plan is free');
   const entitlements = getPlanEntitlements('nguyen-start');
   assert(entitlements['machine.plan'] === 'free', 'Start plan entitlement is free');
 
@@ -66,6 +66,8 @@ async function main(): Promise<void> {
   const invoice = generateInvoice(
     {
       payment_id: 'pay-123',
+      gateway: 'stripe',
+      gateway_payment_id: 'gw_pay_123',
       user_id: 'u1',
       tenant_id: 't1',
       price_id: 'personal',
@@ -99,17 +101,20 @@ async function main(): Promise<void> {
   // P1-B.5: LLM cost tracking
   logCall({
     model: 'gpt-4',
+    prompt: '',
+    response: '',
     tokensIn: 1000,
     tokensOut: 500,
+    latencyMs: 0,
     tenantId: 'tenant-1',
-    userId: 'user-1',
+    metadata: { userId: 'user-1' },
   });
   const stats = getStats('tenant-1');
   assert(stats.totalCalls === 1, 'tally logged 1 call');
 
   // P1-B.6: Vault crypto
   const certId = generateCertificateId('OPR', 2026, 1);
-  assert(certId.match(/^NGAI-OPR-2026-000001-[A-F0-9]{4}$/), 'certificate ID format correct');
+  assert(certId.match(/^NGAI-OPR-2026-000001-[A-F0-9]{4}$/) !== null, 'certificate ID format correct');
 
   // P1-B.7: Backup
   const backup = await createBackup('tenant-1', { data: 'test' });
@@ -128,17 +133,17 @@ async function main(): Promise<void> {
   assert(wfExec.results.get('step2')?.output === 'B', 'step2 output is B');
 
   // P1-B.8.4: Crew
-  const crew = createAgent('test-crew', { type: 'crew' });
+  const crew = createAgent('test-crew', 'Test Crew', 'coordinator', async () => 'result');
   assert(crew !== undefined, 'crew agent created');
 
   // P1-B.8.5: Content
-  const content = await generateContent({ content: 'Test content about AI', variables: { topic: 'AI' } });
+  const content = await generateContent({ content: 'Test content about AI', format: 'text', variables: { topic: 'AI' } });
   assert(content !== undefined, 'content generated');
   assert(content.content.length > 0, 'content not empty');
 
   // P1-B.9: Nguyen Tools — instantiate classes
-  const roots = new NguyenRoots();
-  const memory = new NguyenMemory();
+  const roots = new NguyenRoots('tenant-1');
+  const memory = new NguyenMemory('tenant-1');
   const knowledge = new NguyenKnowledge();
   assert(roots !== undefined, 'NguyenRoots instantiated');
   assert(memory !== undefined, 'NguyenMemory instantiated');

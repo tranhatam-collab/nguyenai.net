@@ -63,7 +63,13 @@ export const routes = [
   { key: 'invest', vi: '/invest/', en: '/en/invest/', labelVi: 'Đầu tư', labelEn: 'Invest' },
   { key: 'contact', vi: '/contact/', en: '/en/contact/', labelVi: 'Liên hệ', labelEn: 'Contact' },
   { key: 'terms', vi: '/terms/', en: '/en/terms/', labelVi: 'Điều khoản', labelEn: 'Terms' },
-  { key: 'privacy', vi: '/privacy/', en: '/en/privacy/', labelVi: 'Quyền riêng tư', labelEn: 'Privacy' }
+  { key: 'privacy', vi: '/privacy/', en: '/en/privacy/', labelVi: 'Quyền riêng tư', labelEn: 'Privacy' },
+  // WI-3.3: Evidence pages — bilingual proof layer
+  { key: 'proof', vi: '/proof/', en: '/en/proof/', labelVi: 'Bằng chứng', labelEn: 'Proof' },
+  { key: 'status', vi: '/status/', en: '/en/status/', labelVi: 'Trạng thái', labelEn: 'Status' },
+  { key: 'claims', vi: '/claims/', en: '/en/claims/', labelVi: 'Tuyên bố', labelEn: 'Claims' },
+  { key: 'receipts', vi: '/receipts/', en: '/en/receipts/', labelVi: 'Biên nhận', labelEn: 'Receipts' },
+  { key: 'demo', vi: '/demo/', en: '/en/demo/', labelVi: 'Chứng minh', labelEn: 'Demo' }
 ] as const;
 
 export type RouteKey = typeof routes[number]['key'];

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nguyễn AI — Chuẩn Thực Thi Hệ Nhận Diện Độc Lập v2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --heritage-dark:#7A2212; --heritage-red:#A6260C; --burnt:#E55B09; --sun:#F48B0D;
+  --gold:#FFB810; --cream:#FFFACC; --ink:#4A1D14; --paper:#FFFFFF;
+  --bg:#FFFDF4; --surface:#FFFFFF; --line:#EBDDC3; --muted:#8A6A5C; --dim:#B49A8C;
+  --ok:#2E7D4F; --ok-dim:#E8F5EC; --warn:#B4530A; --warn-dim:#FDF0E0; --bad:#A6260C; --bad-dim:#FBEAE6;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-size:15.5px;line-height:1.74;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(255,184,16,.45)}
+
+/* Thanh trạng thái khóa */
+.lockbar{position:sticky;top:0;z-index:60;background:rgba(255,253,244,.95);backdrop-filter:blur(10px);border-bottom:2px solid var(--gold);padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.lockbar .docid{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.lockbar .docid strong{color:var(--heritage-red);font-weight:600}
+.lockbar .spacer{flex:1}
+.lockstate{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.lockstate .dot{width:9px;height:9px;border-radius:50%;background:var(--sun);box-shadow:0 0 6px var(--sun)}
+.lockstate.locked .dot{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.meter{width:130px;height:7px;background:var(--line);border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--sun),var(--heritage-red));transition:width .4s}
+
+/* Bố cục */
+.shell{display:grid;grid-template-columns:256px 1fr;max-width:1260px;margin:0 auto}
+nav.toc{position:sticky;top:66px;align-self:start;height:calc(100vh - 66px);overflow-y:auto;padding:28px 14px 60px 20px;border-right:1px solid var(--line)}
+nav.toc .toclabel{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--dim);margin-bottom:12px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;font-size:12.5px;padding:5px 10px;border-left:2px solid transparent;border-radius:0 6px 6px 0;line-height:1.45}
+nav.toc a:hover{color:var(--heritage-red);background:var(--cream)}
+nav.toc a.active{color:var(--heritage-red);border-left-color:var(--heritage-red);background:var(--cream);font-weight:600}
+main{padding:34px 42px 120px;min-width:0}
+@media(max-width:1023px){
+  .shell{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;padding:12px 16px;white-space:nowrap}
+  nav.toc .toclabel{display:none}
+  nav.toc a{border-left:none;border:1px solid var(--line);border-radius:99px;padding:5px 12px;flex:0 0 auto}
+  nav.toc a.active{border-color:var(--heritage-red)}
+  main{padding:26px 18px 100px}
+}
+
+/* Chữ */
+h1,h2,h3{font-family:'Noto Serif',Georgia,serif;letter-spacing:-.01em}
+.hero{border-bottom:3px solid var(--gold);padding-bottom:28px}
+.hero h1{font-size:clamp(27px,4.4vw,44px);font-weight:700;line-height:1.16;margin:10px 0 14px;color:var(--heritage-dark)}
+.hero .sub{color:var(--muted);max-width:780px;font-size:16px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--heritage-red);text-transform:uppercase}
+section{margin-top:74px}
+section>h2{font-size:clamp(21px,2.6vw,28px);font-weight:700;margin:6px 0 6px;color:var(--heritage-dark)}
+.secmeta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;margin-bottom:18px}
+h3{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--heritage-dark)}
+p{margin:0 0 14px;max-width:80ch}
+p.lead{font-size:16.5px;color:#5E3428}
+strong{color:var(--heritage-dark);font-weight:700}
+em{color:#6E4033}
+code,.mono{font-family:'JetBrains Mono',monospace;font-size:.85em;background:#F6EEDD;padding:2px 7px;border-radius:5px;color:#7A2212;border:1px solid var(--line)}
+ul.plain{list-style:none;margin:0 0 14px}
+ul.plain li{padding:4px 0 4px 22px;position:relative;max-width:80ch}
+ul.plain li::before{content:"—";position:absolute;left:0;color:var(--sun);font-weight:700}
+
+/* Thẻ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:16px 0;box-shadow:0 1px 3px rgba(122,34,18,.05)}
+.card.ok{border-left:4px solid var(--ok);background:linear-gradient(180deg,var(--ok-dim),var(--surface))}
+.card.warn{border-left:4px solid var(--sun);background:linear-gradient(180deg,var(--warn-dim),var(--surface))}
+.card.bad{border-left:4px solid var(--heritage-red);background:linear-gradient(180deg,var(--bad-dim),var(--surface))}
+.card.gold{border-left:4px solid var(--gold);background:linear-gradient(180deg,#FFF8E0,var(--surface))}
+.cardlabel{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;color:var(--muted)}
+.card.ok .cardlabel{color:var(--ok)}
+.card.warn .cardlabel{color:var(--warn)}
+.card.bad .cardlabel{color:var(--heritage-red)}
+.card.gold .cardlabel{color:#9A6E00}
+.keyline{font-family:'Noto Serif',Georgia,serif;font-size:18px;font-weight:700;line-height:1.55;color:var(--heritage-dark)}
+
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+th{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8A6A5C;text-align:left;padding:10px 12px;border-bottom:2px solid var(--gold);background:#FFF6DE}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:#5E3428}
+tr td:first-child{color:var(--heritage-dark);font-weight:600}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.tablewrap table{margin:0}
+.ok-t{color:var(--ok);font-weight:700}
+.no-t{color:var(--heritage-red);font-weight:700}
+.part-t{color:var(--warn);font-weight:700}
+
+.chip{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;padding:3px 9px;border-radius:99px;font-weight:700}
+.chip.p0{background:var(--bad-dim);color:var(--heritage-red);border:1px solid #E8B3A8}
+.chip.p1{background:var(--warn-dim);color:var(--warn);border:1px solid #F0CFA0}
+.chip.p2{background:#FFF6DE;color:#9A6E00;border:1px solid var(--gold)}
+.chip.r0{background:#EAF2FB;color:#2B5FA3;border:1px solid #BDD4EE}
+.chip.r1{background:#FFF6DE;color:#9A6E00;border:1px solid var(--gold)}
+.chip.r2{background:var(--warn-dim);color:var(--warn);border:1px solid #F0CFA0}
+.chip.r3{background:var(--ok-dim);color:var(--ok);border:1px solid #BBDCC7}
+
+.flow{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#3B160E;border-radius:var(--radius);padding:16px 18px;overflow-x:auto;white-space:pre;color:#FFE9C2;margin:14px 0;line-height:1.7}
+.flow b{color:var(--gold)}
+
+/* Cặp vi phạm → thay thế */
+.fix{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:14px 0;background:var(--surface)}
+.fix .where{font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 14px;background:#FFF6DE;border-bottom:1px solid var(--line);color:#7A5A00}
+.fix .old,.fix .new{padding:12px 16px;font-size:13.5px;line-height:1.65}
+.fix .old{background:var(--bad-dim);color:#7A3A2E;border-bottom:1px dashed var(--line)}
+.fix .old::before{content:"SAI · gỡ bỏ";display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--heritage-red);margin-bottom:5px}
+.fix .new{background:var(--ok-dim);color:#2E5540}
+.fix .new::before{content:"ĐÚNG · thay bằng";display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--ok);margin-bottom:5px}
+.fix .new.en::before{content:"ENGLISH · replace with"}
+
+/* Hạng mục công việc */
+.wi{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;margin:9px 0;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.wi:hover{border-color:var(--sun);box-shadow:0 2px 8px rgba(229,91,9,.12)}
+.wi.pass{border-color:var(--ok);background:linear-gradient(180deg,var(--ok-dim),var(--surface))}
+.wi .box{flex:0 0 auto;width:20px;height:20px;border:2px solid var(--dim);border-radius:5px;margin-top:3px;display:grid;place-items:center;font-size:12px;color:transparent}
+.wi.pass .box{border-color:var(--ok);background:var(--ok);color:#fff;font-weight:800}
+.wi .wid{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)}
+.wi h4{font-family:'Be Vietnam Pro',sans-serif;font-size:14.5px;font-weight:700;color:var(--heritage-dark);margin:1px 0 4px}
+.wi p{font-size:13px;color:var(--muted);margin:0 0 4px}
+.wi .crit{font-size:12.5px;color:var(--ok)}
+.wi .crit::before{content:"NGHIỆM THU ⇢ ";font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--dim)}
+
+.verdict{position:sticky;bottom:14px;margin-top:24px;background:var(--surface);border:2px solid var(--gold);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 26px rgba(122,34,18,.18)}
+.verdict .vmeter{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.verdict .vmeter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sun),var(--heritage-red));transition:width .35s}
+.verdict .vtext{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.verdict.done{border-color:var(--ok)}
+.verdict.done .vtext{color:var(--ok)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.footer{margin-top:90px;border-top:3px solid var(--gold);padding-top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);line-height:2}
+.en{font-style:normal}
+@media print{.lockbar,nav.toc,.verdict{display:none}main{padding:0}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="lockbar">
+  <div class="docid"><strong>NGUYEN_AI_NET_INDEPENDENT_IDENTITY_EXECUTION_STANDARD</strong> · v2.0 · 2026-07-06</div>
+  <div class="spacer"></div>
+  <div class="meter" aria-hidden="true"><i id="topMeter"></i></div>
+  <div class="lockstate" id="lockState"><span class="dot"></span><span id="lockText">CHỜ THI CÔNG — 0/14</span></div>
+</div>
+
+<div class="shell">
+<nav class="toc" id="toc">
+  <div class="toclabel">MỤC LỤC THI CÔNG</div>
+  <a href="#m1">1 · Kết quả kiểm tra hiện trạng</a>
+  <a href="#m2">2 · Phán quyết độc lập</a>
+  <a href="#m3">3 · Hệ nhận diện đã khóa</a>
+  <a href="#m4">4 · Chuẩn song ngữ thuần khiết</a>
+  <a href="#m5">5 · Bảng vá nội dung</a>
+  <a href="#m6">6 · Mười bốn hạng mục công việc</a>
+  <a href="#m7">7 · Thành phần &amp; trang phải tạo</a>
+  <a href="#m8">8 · Sáu tệp quản trị phải tạo</a>
+  <a href="#m9">9 · Cổng kiểm tra &amp; lệnh phát hành</a>
+  <a href="#m10">10 · Tám cổng duyệt trước công bố</a>
+  <a href="#m11">11 · English Execution Brief</a>
+</nav>
+
+<main>
+
+<div class="hero">
+  <div class="eyebrow">Nguyễn AI · Văn kiện thực thi cho đội phát triển · Bản nâng cấp của kế hoạch 2026-07-04</div>
+  <h1>Chuẩn Thực Thi<br>Hệ Nhận Diện Độc Lập nguyenai.net</h1>
+  <p class="sub">Văn kiện này được viết sau khi kiểm tra trang đang chạy, toàn bộ kho mã <code>tranhatam-collab/nguyenai.net</code> (nhánh <code>main</code>, mốc <code>714a8b7</code>), các báo cáo kiểm định trong thư mục quản trị, và kế hoạch nhận diện độc lập cũ. Đây là bản kế thừa và thay thế kế hoạch cũ: mọi kết luận đều gắn bằng chứng đường dẫn tệp và số dòng. Tiếng Việt là ngôn ngữ gốc; bản tóm tắt tiếng Anh cho đội quốc tế đặt ở mục cuối, hai phần không trộn lẫn.</p>
+</div>
+
+<div class="card gold">
+  <div class="cardlabel">Câu chủ đã khóa — mọi nội dung công khai quy về câu này</div>
+  <p class="keyline" style="margin:0">Máy làm — người ký — mọi việc có biên nhận.</p>
+</div>
+
+<!-- ============================================================ -->
+<section id="m1">
+  <div class="eyebrow">Mục 1</div>
+  <h2>Kết quả kiểm tra hiện trạng — có bằng chứng</h2>
+  <div class="secmeta">NGUỒN: TRANG ĐANG CHẠY · KHO MÃ · BÁO CÁO KIỂM ĐỊNH 2026-07-06 · KẾ HOẠCH CŨ 2026-07-04</div>
+
+  <h3>1.1 · Điều đã đạt (giữ nguyên, không đụng)</h3>
+  <div class="card ok">
+    <div class="cardlabel">Phần nền sau đã độc lập về kỹ thuật</div>
+    <p style="margin:0">Báo cáo kiểm định độc lập ngày 2026-07-06 xác nhận: 62/62 hạng mục nền tảng và vận hành hoàn tất, khoảng 2.321 bài kiểm thử đạt, 0 bài hỏng, trên 67 gói mã riêng (<code>@nai/*</code>) — bao gồm các gói tương ứng trực tiếp với năm tên lõi đã khóa: <code>@nai/proof</code>, <code>@nai/evidence</code>, <code>@nai/approval</code>, <code>@nai/audit</code>, <code>@nai/policy-engine</code>, <code>@nai/conductor</code>. Nghĩa là: <strong>phần nền riêng để vận hành độc lập ĐÃ TỒN TẠI và ĐÃ ĐƯỢC KIỂM CHỨNG.</strong> Văn kiện này không yêu cầu xây lại nền — chỉ yêu cầu hoàn tất lớp nhận diện và cắt các sợi dây phụ thuộc còn sót.</p>
+  </div>
+  <ul class="plain">
+    <li><strong>Nguồn phát hành thật:</strong> luồng phát hành <code>.github/workflows/deploy.yml</code> dựng và đưa lên từ <code>apps/web</code> — đây là trang công khai chính thức của <code>nguyenai.net</code>.</li>
+    <li><strong>Bộ mã hiệu thương hiệu đã khóa:</strong> <code>brand/nguyenai/</code> (bảng màu, chữ, biểu trưng, trạng thái FOUNDER LOCKED ngày 2026-07-02) và văn kiện khóa tên <code>docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md</code> — văn kiện này dùng nguyên các chuẩn đó.</li>
+    <li><strong>Công cụ quét có sẵn:</strong> <code>tools/audit-language-boundary.sh</code>, <code>tools/audit-public-claims.ts</code>, <code>tools/audit-brand-naming-lock.sh</code>, <code>tools/audit-clone-contamination.sh</code> — tận dụng, không viết lại.</li>
+  </ul>
+
+  <h3>1.2 · Bốn vi phạm phải xử lý (bằng chứng cụ thể)</h3>
+
+  <div class="card bad">
+    <div class="cardlabel">Vi phạm 1 — Nội dung công khai vẫn tuyên bố phụ thuộc hai nền cũ</div>
+    <p>Trang tác nhân bản tiếng Việt và tiếng Anh đang nói máy "vận hành trên nền tảng Gen1": <code>apps/web/src/data/pages.ts</code> dòng 363, 365 (bản Việt) và 886, 888 (bản Anh). Trang niềm tin dòng 154 và 677 còn mô tả cả cơ chế nội bộ ("đóng băng làm kiến trúc tham chiếu", "bộ chuyển tiếp giữ hợp đồng tương thích") — vừa vi phạm độc lập, vừa lộ vùng cơ chế ra ngoài vòng công khai.</p>
+  </div>
+  <div class="card bad">
+    <div class="cardlabel">Vi phạm 2 — Còn một trang gốc cũ nặng nhất chưa cách ly</div>
+    <p>Thư mục <code>src/</code> ở gốc kho là bản trang cũ, tuyên bố thẳng "kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org)" tại <code>src/data/pages.ts</code> các dòng 28, 147–148, 198, 317–318. Dù luồng phát hành hiện dùng <code>apps/web</code>, trang gốc cũ này vẫn nằm trong kho như một nguồn sự thật thứ hai — trái nguyên tắc một nguồn sự thật và có nguy cơ bị dựng nhầm.</p>
+  </div>
+  <div class="card bad">
+    <div class="cardlabel">Vi phạm 3 — Phụ thuộc lúc chạy thật vào nền cũ</div>
+    <p>Phần dịch vụ <code>apps/api/src/index.ts</code> dòng 113–115 và 360–389 có cầu chuyển tiếp <code>proxyToGen1</code> trỏ tới <code>aiagent.iai.one</code> qua biến <code>GEN1_GATEWAY_URL</code>, tự sinh mã phiên và chuyển tiếp trò chuyện, mô hình, luồng việc. Đây là <strong>phụ thuộc vận hành thật</strong>, không chỉ là câu chữ. Trong khi đó phần nền riêng 67 gói đã đạt kiểm thử — tức đường chạy độc lập đã có, chỉ chưa được đặt làm mặc định duy nhất.</p>
+  </div>
+  <div class="card bad">
+    <div class="cardlabel">Vi phạm 4 — Trộn ngôn ngữ tràn lan trong bản tiếng Việt</div>
+    <p>Nội dung tiếng Việt đang chèn dày đặc từ tiếng Anh ngoài danh sách tên khóa: "instance", "Agent", "workflow", "model", "backend", "adapter", "compatibility contract", "integrate", "Automation", "trigger", "scheduled task", "Command Center", "Model Mesh", "Tool Kernel", "Data Vault", "Workflow Engine", "multi-step"… (bằng chứng: <code>apps/web/src/data/pages.ts</code> dòng 124–125, 154, 186, 315, 326–342). Ngay tiêu đề trang đang chạy cũng trộn hai ngôn ngữ trong một chuỗi: <code>Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu</code>.</p>
+  </div>
+
+  <h3>1.3 · Lớp nhận diện theo kế hoạch cũ: chưa được thi công</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Hạng mục kế hoạch cũ yêu cầu</th><th>Trạng thái kiểm tra 2026-07-06</th></tr>
+    <tr><td>Sáu tệp quản trị nhận diện (hiến chương độc lập, hiến chương tuyên bố công khai, chuẩn máy tính AI thật, sổ đăng ký lõi mật, chính sách nhãn tin cậy, chính sách tách ngôn ngữ)</td><td class="no-t">THIẾU cả sáu</td></tr>
+    <tr><td>Năm thành phần giao diện nhận diện (huy hiệu nhãn tin cậy, thẻ biên nhận, khối tuyên bố công khai, ma trận trạng thái sản phẩm, ghi chú ranh giới ngôn ngữ)</td><td class="no-t">THIẾU cả năm</td></tr>
+    <tr><td>Các trang bằng chứng: <code>/proof</code> · <code>/status</code> · <code>/claims</code> · <code>/receipts</code> · <code>/demo</code> (bản Việt và bản Anh)</td><td class="no-t">THIẾU toàn bộ</td></tr>
+    <tr><td>Tệp dữ liệu thương hiệu: tên chuẩn, tên cấm, nhãn tin cậy, tuyên bố công khai, quy tắc ngôn ngữ</td><td class="no-t">THIẾU (mới có bảng màu, chữ, biểu trưng)</td></tr>
+    <tr><td>Câu chủ và khối nhận diện bằng bằng chứng trên trang chủ</td><td class="no-t">CHƯA có</td></tr>
+  </table></div>
+
+  <div class="card warn">
+    <div class="cardlabel">Phán quyết kiểm tra tổng</div>
+    <p style="margin:0"><strong>Nền đã độc lập — nhận diện chưa độc lập.</strong> Phần nền sau tự chủ đã được kiểm chứng bằng số liệu; nhưng lời nói công khai vẫn tựa vào hai nền cũ, một trang cũ chưa cách ly, một cầu chuyển tiếp chưa đóng, và toàn bộ lớp nhận diện bằng bằng chứng chưa được dựng. Văn kiện này là lệnh thi công phần còn thiếu: mười bốn hạng mục, có tiêu chí nghiệm thu từng hạng mục.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m2">
+  <div class="eyebrow">Mục 2</div>
+  <h2>Phán quyết độc lập — khóa</h2>
+  <div class="secmeta">HIỆU LỰC: MỌI KHO MÃ, MỌI TRANG, MỌI TÀI LIỆU, MỌI LỜI CÔNG KHAI CỦA NGUYỄN AI</div>
+
+  <div class="card gold">
+    <div class="cardlabel">Định nghĩa độc lập vận hành — dùng nguyên văn</div>
+    <p class="keyline" style="margin:0">Nguyễn AI là một hệ nhận diện và hệ sản phẩm độc lập. Khi chạy thật, mọi năng lực công bố cho người dùng phải chạy trên phần nền riêng của Nguyễn AI. Hai nền cũ chỉ còn là nguồn tham chiếu kỹ thuật nội bộ đã đóng băng — không xuất hiện trong lời hứa công khai, không là điều kiện vận hành, không được làm người dùng nghĩ sản phẩm phụ thuộc chúng.</p>
+  </div>
+
+  <h3>2.1 · Chính sách cầu chuyển tiếp nền cũ (ba điều khoản)</h3>
+  <ul class="plain">
+    <li><strong>Điều 1 — Tắt mặc định:</strong> cầu chuyển tiếp trong phần dịch vụ phải ở trạng thái tắt khi phát hành; đường chạy mặc định duy nhất là phần nền riêng đã kiểm chứng.</li>
+    <li><strong>Điều 2 — Bật phải có phê duyệt và biên nhận:</strong> chỉ được bật bằng cờ cấu hình nội bộ, cho mục đích đối chiếu kỹ thuật, có phê duyệt của người sáng lập, và mỗi lần bật/tắt ghi một biên nhận vào nhật ký kiểm định.</li>
+    <li><strong>Điều 3 — Không bao giờ công khai:</strong> tên hai nền cũ không xuất hiện trong giao diện, tiêu đề, mô tả, siêu dữ liệu, bản đồ trang, thư gửi người dùng, hay bất kỳ lời hứa nào. Vi phạm điều này là lỗi chặn phát hành.</li>
+  </ul>
+
+  <h3>2.2 · Ngoại lệ được phép: cổng xác minh danh tính</h3>
+  <p>Dịch vụ xác minh danh tính dùng trong quy trình nhà đầu tư là hạ tầng cấp hệ sinh thái, không thuộc hai nền cũ, nên <strong>được phép dùng tiếp</strong>. Quy tắc gọi tên: trong nội dung người dùng chỉ gọi là <strong>"Cổng xác minh danh tính"</strong> (bản Anh: <span class="en">"Identity Verification Gateway"</span>); địa chỉ kỹ thuật <code>verify.iai.one</code> chỉ đặt trong khối kỹ thuật hoặc tài liệu hướng dẫn, không đứng trong câu tiếp thị.</p>
+
+  <h3>2.3 · Câu cấm và câu thay chuẩn</h3>
+  <div class="grid2">
+    <div class="card bad">
+      <div class="cardlabel">Cấm tuyệt đối trong nội dung công khai</div>
+      <ul class="plain" style="margin:0">
+        <li>"kế thừa Gen1" · "vận hành trên nền Gen1" · "Gen2 product system"</li>
+        <li>Mọi tên miền hai nền cũ trong tiêu đề, mô tả, lời kêu gọi, giá, học bổng, đầu tư, bản đồ trang</li>
+        <li>Mô tả cơ chế nội bộ: "bộ chuyển tiếp", "hợp đồng tương thích", "đóng băng kiến trúc tham chiếu"</li>
+        <li>Bán năng lực chưa đạt nhãn tin cậy sản xuất như đã đạt</li>
+      </ul>
+    </div>
+    <div class="card ok">
+      <div class="cardlabel">Câu thay chuẩn — dùng nguyên văn</div>
+      <ul class="plain" style="margin:0">
+        <li>"Nguyễn AI vận hành trên phần nền riêng, tự chủ toàn bộ."</li>
+        <li>"Mọi năng lực công bố đều có nhãn trạng thái và biên nhận kiểm chứng được."</li>
+        <li>"Chín tác nhân chuyên biệt vận hành trên nền tảng riêng của Nguyễn AI."</li>
+        <li>"Máy làm — người ký — mọi việc có biên nhận."</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- ============================================================ -->
+<section id="m3">
+  <div class="eyebrow">Mục 3</div>
+  <h2>Hệ nhận diện đã khóa — bản dùng cho nguyenai.net</h2>
+  <div class="secmeta">KẾ THỪA VĂN KIỆN KHÓA TÊN 2026-07-04 · CÂU CHỦ VÀ NĂM TÊN LÕI ĐÃ ĐƯỢC NGƯỜI SÁNG LẬP NIÊM PHONG</div>
+
+  <h3>3.1 · Câu chủ và câu định vị</h3>
+  <div class="card gold">
+    <div class="cardlabel">Câu chủ</div>
+    <p class="keyline">Máy làm — người ký — mọi việc có biên nhận.</p>
+    <div class="cardlabel" style="margin-top:14px">Câu định vị tiếng Việt</div>
+    <p style="margin:0">Nguyễn AI xây dựng Máy Tính AI Nguyễn — một nền tảng máy tính trí tuệ nhân tạo độc lập cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp, giáo dục, học bổng, đầu tư và cộng đồng người mang họ Nguyễn tại Việt Nam và trên thế giới.</p>
+  </div>
+
+  <h3>3.2 · Năm tên lõi được phép công bố (tên hộp đen)</h3>
+  <p>Các tên sau chỉ mô tả kết quả nhìn từ bên ngoài. Cấm mô tả cách cài đặt, sơ đồ bên trong, mã nguồn hoặc tham số nội bộ ở mọi nơi công khai.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Tên quốc tế (khóa)</th><th>Tên tiếng Việt (khóa)</th><th>Câu nhận diện duy nhất được phép dùng</th><th>Gói nền tương ứng (khối kỹ thuật)</th></tr>
+    <tr><td>Proof Receipt Chain</td><td>Chuỗi Biên Nhận</td><td>"Mọi việc máy làm đều có biên nhận bạn tự kiểm chứng được."</td><td><code>@nai/proof</code> · <code>@nai/evidence</code> · <code>@nai/provenance</code></td></tr>
+    <tr><td>Authority Matrix</td><td>Ma Trận Thẩm Quyền</td><td>"Không gì quan trọng xảy ra khi chưa có chữ ký của bạn."</td><td><code>@nai/approval</code> · <code>@nai/policy-engine</code> · <code>@nai/policy-fga</code></td></tr>
+    <tr><td>Command Pack Registry</td><td>Kho Lệnh Nghiệm Thu</td><td>"Máy chỉ nhận việc nó đã chứng minh làm được, có số liệu từng loại việc."</td><td><code>@nai/conductor</code> · <code>@nai/harness</code> · <code>@nai/eval</code></td></tr>
+    <tr><td>Threshold Flywheel</td><td>Vòng Hiệu Chỉnh</td><td>"Máy của bạn giỏi lên mỗi quý bằng chính dữ liệu công việc của bạn."</td><td><code>@nai/drift</code> · <code>@nai/seismograph</code> · <code>@nai/telemetry</code></td></tr>
+    <tr><td>ProofCore</td><td>Lõi Bằng Chứng</td><td>"Lõi vận hành được niêm phong. Bạn không cần thấy bên trong, vì mọi đầu ra đều có bằng chứng."</td><td>Tên gộp — không trỏ tới gói cụ thể ở nơi công khai</td></tr>
+  </table></div>
+  <p><em>Ghi chú thi công:</em> cột gói nền chỉ dùng trong tài liệu nội bộ này để đội biết nơi nối; tuyệt đối không đưa tên gói vào giao diện hay tài liệu công khai.</p>
+
+  <h3>3.3 · Bốn nhãn trạng thái tin cậy</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Nhãn</th><th>Tên tiếng Việt</th><th>Được nói</th><th>Không được nói</th></tr>
+    <tr><td><span class="chip r0">R0</span></td><td>Bản chứng minh</td><td>"Có bản thử, có bằng chứng ban đầu."</td><td>"Sẵn sàng dùng thật."</td></tr>
+    <tr><td><span class="chip r1">R1</span></td><td>Vận hành nội bộ</td><td>"Đội ngũ đang dùng thật mỗi ngày, có giám sát."</td><td>"Mở bán đại trà."</td></tr>
+    <tr><td><span class="chip r2">R2</span></td><td>Thử nghiệm có kiểm soát</td><td>"Mời dùng có điều kiện, giới hạn nói rõ trước."</td><td>"Cam kết như bản sản xuất."</td></tr>
+    <tr><td><span class="chip r3">R3</span></td><td>Tin cậy sản xuất</td><td>"Mở bán theo cam kết đã đo, có phê duyệt, có biên nhận."</td><td>Nói vượt số đã đo.</td></tr>
+  </table></div>
+  <div class="card gold">
+    <div class="cardlabel">Câu hiến chương — đặt ở chân mọi trang công khai</div>
+    <p class="keyline" style="font-size:16px;margin:0">Chúng tôi dán nhãn trạng thái thật cho từng năng lực. Thứ chưa đạt tin cậy sản xuất sẽ không bao giờ được bán như tin cậy sản xuất.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m4">
+  <div class="eyebrow">Mục 4</div>
+  <h2>Chuẩn song ngữ thuần khiết</h2>
+  <div class="secmeta">TIẾNG VIỆT LÀ NGÔN NGỮ GỐC · TIẾNG ANH LÀ BẢN QUỐC TẾ · HAI BẢN KHÔNG TRỘN TỪ TRONG CÙNG MỘT ĐOẠN NỘI DUNG NGƯỜI DÙNG</div>
+
+  <h3>4.1 · Bốn quy tắc nền</h3>
+  <ul class="plain">
+    <li><strong>Quy tắc 1 — Câu thuần:</strong> trong phần tiếng Việt chỉ dùng câu tiếng Việt hoàn chỉnh; trong phần tiếng Anh chỉ dùng câu tiếng Anh hoàn chỉnh. Không chèn từ của ngôn ngữ kia nếu đã có từ tương đương.</li>
+    <li><strong>Quy tắc 2 — Tên khóa được giữ nguyên:</strong> các tên riêng đã niêm phong (Nguyễn AI, Máy Tính AI Nguyễn; bản Anh: <span class="en">Nguyen AI, Nguyen AI Computer, Nguyen AI Edu, Nguyen AI Invest, Nguyen AI Docs, Nguyen AI Academy</span>; năm tên lõi quốc tế) là danh từ riêng, được đứng trong cả hai bản mà không bị coi là trộn ngữ.</li>
+    <li><strong>Quy tắc 3 — Khối kỹ thuật:</strong> đường dẫn, tên tệp, tên gói, đoạn mã, tên miền đặt trong khối kỹ thuật riêng (thẻ mã), không nằm trong câu tiếp thị. Nội dung trong khối kỹ thuật không tính là trộn ngữ.</li>
+    <li><strong>Quy tắc 4 — Tách theo bản ngữ đến tận siêu dữ liệu:</strong> tiêu đề trang, mô tả, dữ liệu chia sẻ mạng xã hội, bản đồ trang, thư gửi người dùng — mỗi bản ngữ một bộ riêng, nối nhau bằng liên kết thay thế ngôn ngữ. Cấm một chuỗi chứa cả hai ngôn ngữ.</li>
+  </ul>
+
+  <h3>4.2 · Bảng từ thay thế bắt buộc (bản tiếng Việt)</h3>
+  <p>Đội phát triển quét toàn bộ nội dung tiếng Việt và thay theo bảng. Bảng này đồng thời là dữ liệu nguồn cho tệp <code>packages/brand/language-rules.json</code>.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Từ đang dùng sai</th><th>Từ tiếng Việt chuẩn</th><th>Từ đang dùng sai</th><th>Từ tiếng Việt chuẩn</th></tr>
+    <tr><td>instance</td><td>máy riêng</td><td>workflow</td><td>luồng công việc</td></tr>
+    <tr><td>Agent / Agent Team</td><td>tác nhân / đội tác nhân</td><td>model</td><td>mô hình</td></tr>
+    <tr><td>backend</td><td>phần nền sau</td><td>adapter</td><td>cầu chuyển tiếp</td></tr>
+    <tr><td>compatibility contract</td><td>hợp đồng tương thích</td><td>integrate</td><td>tích hợp</td></tr>
+    <tr><td>Automation</td><td>tự động hóa</td><td>trigger</td><td>điểm kích hoạt</td></tr>
+    <tr><td>scheduled task</td><td>tác vụ hẹn giờ</td><td>multi-step</td><td>nhiều bước</td></tr>
+    <tr><td>Command Center</td><td>Trung Tâm Lệnh</td><td>Model Mesh</td><td>Lưới Mô Hình</td></tr>
+    <tr><td>Tool Kernel</td><td>Nhân Công Cụ</td><td>Data Vault</td><td>Két Dữ Liệu</td></tr>
+    <tr><td>Long-term Memory</td><td>Bộ Nhớ Dài Hạn</td><td>Workflow Engine</td><td>Bộ Máy Luồng Việc</td></tr>
+    <tr><td>Approval Gates</td><td>Cổng Phê Duyệt</td><td>Security Boundary</td><td>Ranh Giới Bảo Mật</td></tr>
+    <tr><td>Cost Governor</td><td>Bộ Quản Chi Phí</td><td>Audit &amp; Replay</td><td>Kiểm Định &amp; Phát Lại</td></tr>
+    <tr><td>Sync Layer</td><td>Tầng Đồng Bộ</td><td>Self-Upgrade Registry</td><td>Sổ Tự Nâng Cấp</td></tr>
+    <tr><td>Identity (thành phần)</td><td>Danh Tính</td><td>Super Apps</td><td>Siêu Ứng Dụng</td></tr>
+    <tr><td>Evidence (thành phần)</td><td>Bằng Chứng</td><td>Verification</td><td>Kiểm Chứng</td></tr>
+  </table></div>
+  <p><em>Chiều ngược lại:</em> bản tiếng Anh không được chứa từ tiếng Việt thường (ngoài tên riêng đã khóa như <span class="en">Nguyễn</span> trong ngữ cảnh họ tên và các tên có dấu trong bản sắc thương hiệu khi bắt buộc).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="m5">
+  <div class="eyebrow">Mục 5</div>
+  <h2>Bảng vá nội dung — chuỗi sai và chuỗi thay chính xác</h2>
+  <div class="secmeta">ĐỘI PHÁT TRIỂN SAO CHÉP NGUYÊN VĂN CỘT "ĐÚNG" · KHÔNG TỰ BIÊN LẠI</div>
+
+  <div class="fix">
+    <div class="where">apps/web/src/data/pages.ts · dòng 363 và 365 · trang tác nhân · bản tiếng Việt</div>
+    <div class="old">"9 Agent chuyên biệt: … — vận hành trên nền Gen1." · "Chín Agent mặc định vận hành trên nền tảng Gen1…" · "9 Agent Nguyễn vận hành trên nền 9 Agent Gen1: Router, Planner, Executor…"</div>
+    <div class="new">"Chín tác nhân chuyên biệt: Dẫn Đường, Nghiên Cứu, Lưu Trữ, Kiểm Chứng, Quản Gia Đình, Sáng Lập, Vận Hành Kinh Doanh, Kết Nối Toàn Cầu, Bảo Vệ — vận hành trên nền tảng riêng của Nguyễn AI. Mỗi tác nhân có vai trò rõ ràng, chạy trong chính sách, chịu phê duyệt của bạn, và mọi việc đều có biên nhận."</div>
+  </div>
+
+  <div class="fix">
+    <div class="where">apps/web/src/data/pages.ts · dòng 886 và 888 · trang tác nhân · bản tiếng Anh</div>
+    <div class="old">"…operating on the Gen1 platform." · "The 9 Nguyen Agents operate on top of the 9 Gen1 platform Agents…"</div>
+    <div class="new en">"Nine specialized agents — Guide, Researcher, Archivist, Verifier, Family Steward, Founder, Business Operator, Global Connector, Guardian — run on Nguyen AI's own platform. Each agent has a clear role, operates within policy, waits for your approval at risk points, and every action produces a verifiable receipt."</div>
+  </div>
+
+  <div class="fix">
+    <div class="where">apps/web/src/data/pages.ts · dòng 154 · trang niềm tin · bản tiếng Việt (bản Anh dòng 677 sửa tương ứng)</div>
+    <div class="old">"Nguyen AI sở hữu backend riêng độc lập. Gen 1 và Gen 2 đóng băng làm kiến trúc tham chiếu; adapter giữ compatibility contract khi integrate. Ba lớp vận hành, mỗi lớp có vai trò rõ ràng."</div>
+    <div class="new">"Nguyễn AI vận hành trên phần nền riêng, tự chủ toàn bộ: sáu mươi bảy gói dịch vụ, hơn hai nghìn ba trăm bài kiểm thử đạt, có nhật ký kiểm định. Chúng tôi không mô tả cơ chế bên trong — chúng tôi công bố kết quả kèm biên nhận để bạn tự kiểm chứng."</div>
+  </div>
+
+  <div class="fix">
+    <div class="where">apps/web/src/data/pages.ts · dòng 124–125, 315, 326–342 · mô tả máy · bản tiếng Việt</div>
+    <div class="old">"Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow…" · "…tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn…" · "16 thành phần: Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine…"</div>
+    <div class="new">"Mỗi người dùng có một máy riêng trên đám mây với đội tác nhân, bộ nhớ dài hạn, kho dữ liệu, công cụ và luồng công việc." · "Máy tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn mô hình, phân việc cho tác nhân, gọi công cụ, chạy luồng công việc dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm chứng kết quả và phục hồi khi lỗi." · "Mười sáu thành phần: Danh Tính, Trung Tâm Lệnh, Lưới Mô Hình, Đội Tác Nhân, Siêu Ứng Dụng, Nhân Công Cụ, Két Dữ Liệu, Bộ Nhớ Dài Hạn, Bộ Máy Luồng Việc, Kiểm Chứng, Cổng Phê Duyệt, Ranh Giới Bảo Mật, Bộ Quản Chi Phí, Kiểm Định &amp; Phát Lại, Tầng Đồng Bộ, Sổ Tự Nâng Cấp." <em>(bản Anh giữ mười sáu tên quốc tế hiện có — hai bản nối nhau qua khóa dữ liệu, không dịch trong cùng chuỗi)</em></div>
+  </div>
+
+  <div class="fix">
+    <div class="where">Tiêu đề trang chủ đang chạy · thẻ tiêu đề</div>
+    <div class="old">Nguyen AI Computer | Máy Tính AI của thế hệ Nguyễn toàn cầu &nbsp;(một chuỗi trộn hai ngôn ngữ)</div>
+    <div class="new">Bản Việt: "Máy Tính AI Nguyễn — Máy Tính AI của thế hệ Nguyễn toàn cầu | Nguyễn AI" · <span class="en">Bản Anh: "Nguyen AI Computer — The AI Computer for the global Nguyen generation | Nguyen AI"</span> — mỗi bản ngữ một thẻ tiêu đề riêng, nối bằng liên kết thay thế ngôn ngữ.</div>
+  </div>
+
+  <div class="fix">
+    <div class="where">src/ · toàn bộ trang gốc cũ ở gốc kho (dòng 28, 147–148, 160–179, 198, 317–349)</div>
+    <div class="old">"Nguyen AI Computer kế thừa Gen1 core engine (computer.iai.one), mô hình sản phẩm Gen2 (maytinhai.org)…" và toàn bộ kiến trúc bốn lớp nêu tên hai nền cũ.</div>
+    <div class="new">Không sửa từng câu — cách ly toàn bộ: chuyển <code>src/</code>, <code>public/</code> gốc và hai trang <code>invest.astro</code> vào <code>docs/legacy/root-site-2026-07/</code>, gỡ khỏi mọi lệnh dựng, ghi một dòng vào nhật ký quyết định quản trị. Nguồn sự thật duy nhất của trang công khai là <code>apps/web</code>.</div>
+  </div>
+
+  <div class="fix">
+    <div class="where">apps/web/src/data/pages.ts · dòng 171–179 · quy trình nhà đầu tư · bản tiếng Việt</div>
+    <div class="old">"Bước 3: Xác minh danh tính qua verify.iai.one" · "Bắt buộc xác minh danh tính qua verify.iai.one"</div>
+    <div class="new">"Bước 3: Xác minh danh tính qua Cổng xác minh danh tính của hệ sinh thái" · "Bắt buộc xác minh qua Cổng xác minh danh tính" — địa chỉ kỹ thuật chỉ hiện trong trang hướng dẫn kỹ thuật, đặt trong khối mã.</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m6">
+  <div class="eyebrow">Mục 6</div>
+  <h2>Mười bốn hạng mục công việc — danh mục thi công</h2>
+  <div class="secmeta">CHẠM VÀO TỪNG HẠNG MỤC ĐỂ ĐÁNH DẤU HOÀN TẤT · KẾT QUẢ CHÍNH THỨC PHẢI CÓ BIÊN NHẬN TRONG NHẬT KÝ KIỂM ĐỊNH</div>
+
+  <div class="wi" data-w="1"><div class="box">✓</div><div><div class="wid">WI-01 · <span class="chip p0">P0</span></div><h4>Cách ly trang gốc cũ</h4><p>Chuyển toàn bộ <code>src/</code> gốc vào <code>docs/legacy/root-site-2026-07/</code>; gỡ khỏi mọi lệnh dựng và bản đồ trang; ghi quyết định vào <code>docs/governance/GOVERNANCE_DECISION_LOG.md</code>.</p><div class="crit">Quét toàn kho: không còn đường dựng nào trỏ tới trang gốc cũ; nội dung cũ chỉ còn trong vùng lịch sử.</div></div></div>
+  <div class="wi" data-w="2"><div class="box">✓</div><div><div class="wid">WI-02 · <span class="chip p0">P0</span></div><h4>Gỡ mọi tuyên bố phụ thuộc trong trang công khai</h4><p>Áp dụng nguyên văn Bảng vá Mục 5 cho <code>apps/web/src/data/pages.ts</code> (cả bản Việt và bản Anh).</p><div class="crit">Quét nội dung công khai: không còn chuỗi nào khớp hai nền cũ; công cụ quét độc lập (WI-12) chạy đạt.</div></div></div>
+  <div class="wi" data-w="3"><div class="box">✓</div><div><div class="wid">WI-03 · <span class="chip p0">P0</span></div><h4>Đóng cầu chuyển tiếp nền cũ theo ba điều khoản</h4><p>Trong <code>apps/api/src/index.ts</code>: đặt cờ <code>LEGACY_BRIDGE_ENABLED=false</code> mặc định; mọi tuyến của cầu trả mã 404 khi cờ tắt; mỗi lần đổi cờ ghi biên nhận qua <code>@nai/audit</code>.</p><div class="crit">Kiểm thử: cờ tắt → mọi tuyến cầu không hoạt động, đường chạy riêng vẫn đạt; bật/tắt có biên nhận.</div></div></div>
+  <div class="wi" data-w="4"><div class="box">✓</div><div><div class="wid">WI-04 · <span class="chip p0">P0</span></div><h4>Tạo sáu tệp quản trị nhận diện</h4><p>Theo khung ở Mục 8, đặt trong <code>docs/governance/</code>.</p><div class="crit">Cả sáu tệp tồn tại, có phần trạng thái, ngày khóa, người phê duyệt; nhật ký quyết định ghi nhận.</div></div></div>
+  <div class="wi" data-w="5"><div class="box">✓</div><div><div class="wid">WI-05 · <span class="chip p0">P0</span></div><h4>Tạo năm tệp dữ liệu thương hiệu</h4><p><code>packages/brand/brand-names.json</code> · <code>banned-names.json</code> · <code>r-grade-labels.json</code> · <code>public-claims.json</code> · <code>language-rules.json</code> — nội dung lấy từ Mục 3, Mục 4 và văn kiện khóa tên.</p><div class="crit">Năm tệp hợp lệ theo lược đồ; các công cụ quét đọc dữ liệu từ đây thay vì mã cứng.</div></div></div>
+  <div class="wi" data-w="6"><div class="box">✓</div><div><div class="wid">WI-06 · <span class="chip p0">P0</span></div><h4>Dựng năm thành phần giao diện nhận diện</h4><p>Huy hiệu nhãn tin cậy · Thẻ biên nhận · Khối tuyên bố công khai · Ma trận trạng thái sản phẩm · Ghi chú ranh giới ngôn ngữ (đặc tả Mục 7).</p><div class="crit">Năm thành phần dựng đạt, hiển thị đúng ở cả hai bản ngữ, dùng mã hiệu thương hiệu đã khóa.</div></div></div>
+  <div class="wi" data-w="7"><div class="box">✓</div><div><div class="wid">WI-07 · <span class="chip p0">P0</span></div><h4>Dựng các trang bằng chứng song ngữ</h4><p><code>/proof</code> · <code>/status</code> · <code>/claims</code> · <code>/receipts</code> · <code>/demo</code> và năm bản Anh tương ứng dưới <code>/en/</code> (đặc tả Mục 7).</p><div class="crit">Mười tuyến hoạt động, có trong bản đồ trang, nối liên kết thay thế ngôn ngữ, mọi năng lực hiển thị nhãn.</div></div></div>
+  <div class="wi" data-w="8"><div class="box">✓</div><div><div class="wid">WI-08 · <span class="chip p0">P0</span></div><h4>Đưa câu chủ và khối nhận diện lên trang chủ</h4><p>Trang chủ hai bản ngữ có: câu chủ, khối "nhận diện bằng bằng chứng" (ba vế nối ba tên lõi), câu hiến chương ở chân trang.</p><div class="crit">Hiển thị đúng nguyên văn đã khóa; không thêm lời hứa ngoài hiến chương tuyên bố công khai.</div></div></div>
+  <div class="wi" data-w="9"><div class="box">✓</div><div><div class="wid">WI-09 · <span class="chip p1">P1</span></div><h4>Dán nhãn tin cậy cho mọi năng lực và gói</h4><p>Trang sản phẩm, trang giá, trang siêu ứng dụng: mỗi năng lực một huy hiệu nhãn; gói nào ở mức nào ghi rõ.</p><div class="crit">Không còn năng lực nào thiếu nhãn; nhãn lấy từ tệp dữ liệu, không mã cứng.</div></div></div>
+  <div class="wi" data-w="10"><div class="box">✓</div><div><div class="wid">WI-10 · <span class="chip p1">P1</span></div><h4>Thuần ngữ toàn bộ nội dung tiếng Việt</h4><p>Quét theo bảng từ Mục 4.2, sửa toàn bộ; các tên thành phần dùng bảng mười sáu tên tiếng Việt.</p><div class="crit">Công cụ quét ranh giới ngôn ngữ chạy đạt trên toàn bộ nội dung người dùng.</div></div></div>
+  <div class="wi" data-w="11"><div class="box">✓</div><div><div class="wid">WI-11 · <span class="chip p1">P1</span></div><h4>Tách siêu dữ liệu theo bản ngữ</h4><p>Tiêu đề, mô tả, dữ liệu chia sẻ, bản đồ trang, thư gửi người dùng: mỗi bản ngữ một bộ; liên kết thay thế ngôn ngữ đủ hai chiều.</p><div class="crit">Các công cụ quét song ngữ có sẵn chạy đạt; không chuỗi nào chứa hai ngôn ngữ.</div></div></div>
+  <div class="wi" data-w="12"><div class="box">✓</div><div><div class="wid">WI-12 · <span class="chip p1">P1</span></div><h4>Viết hai công cụ quét mới</h4><p><code>tools/audit-independence.sh</code>: chặn bản dựng nếu nội dung công khai chứa hai nền cũ. <code>tools/audit-r-grade-claims.ts</code>: chặn nếu năng lực thiếu nhãn hoặc lời nói vượt nhãn (đối chiếu <code>public-claims.json</code>).</p><div class="crit">Hai công cụ chạy trong chuỗi kiểm tra; cố tình vi phạm thử nghiệm → bản dựng thất bại đúng.</div></div></div>
+  <div class="wi" data-w="13"><div class="box">✓</div><div><div class="wid">WI-13 · <span class="chip p2">P2</span></div><h4>Nâng trang đầu tư theo nhận diện độc lập</h4><p>Thêm ma trận rủi ro và giả định; mọi con số gọi vốn gắn giả định; đổi cách gọi cổng xác minh theo Mục 2.2; giữ nguyên chính sách phòng riêng.</p><div class="crit">Không cam kết lợi nhuận; không định giá thiếu giả định; nhãn xác minh và nhãn truy cập hiển thị.</div></div></div>
+  <div class="wi" data-w="14"><div class="box">✓</div><div><div class="wid">WI-14 · <span class="chip p2">P2</span></div><h4>Gói bằng chứng phát hành</h4><p>Mỗi lần phát hành sinh một tệp bằng chứng: kết quả các cổng kiểm tra, mã nguồn mốc, người duyệt, thời gian, mã băm — ghi vào <code>docs/governance/</code> và biên nhận qua <code>@nai/audit</code>.</p><div class="crit">Bản phát hành đầu tiên theo chuẩn này có gói bằng chứng đầy đủ, truy vết được.</div></div></div>
+
+  <div class="verdict" id="verdict">
+    <div class="vmeter"><i id="vBar"></i></div>
+    <div class="vtext" id="vText">0/14 HOÀN TẤT — CHƯA ĐỦ ĐIỀU KIỆN CÔNG BỐ ĐỘC LẬP</div>
+  </div>
+</section>
+<!-- ============================================================ -->
+<section id="m7">
+  <div class="eyebrow">Mục 7</div>
+  <h2>Đặc tả thành phần giao diện và trang phải tạo</h2>
+  <div class="secmeta">ĐỦ ĐỂ THI CÔNG · DÙNG MÃ HIỆU THƯƠNG HIỆU TRONG <span style="text-transform:none">brand/nguyenai/</span> · MỌI CHỮ HIỂN THỊ LẤY TỪ TỆP DỮ LIỆU</div>
+
+  <h3>7.1 · Năm thành phần giao diện</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Tệp thành phần</th><th>Nhiệm vụ</th><th>Đầu vào</th><th>Quy tắc</th></tr>
+    <tr><td><code>RGradeBadge.astro</code></td><td>Huy hiệu nhãn tin cậy R0–R3</td><td>mã nhãn, bản ngữ</td><td>Chữ và màu lấy từ <code>r-grade-labels.json</code>; luôn kèm chú giải khi di chuột hoặc chạm.</td></tr>
+    <tr><td><code>ProofReceiptCard.astro</code></td><td>Thẻ biên nhận: mã băm, thời gian, loại việc, người duyệt, nút sao chép mã</td><td>bản ghi biên nhận</td><td>Chỉ hiển thị mã băm và dữ liệu mô tả; không lộ nội dung nhạy cảm.</td></tr>
+    <tr><td><code>PublicClaimBlock.astro</code></td><td>Khối tuyên bố công khai kèm nhãn và mã biên nhận</td><td>mã tuyên bố</td><td>Chỉ nhận tuyên bố có trong <code>public-claims.json</code>; tuyên bố ngoài danh sách → lỗi dựng.</td></tr>
+    <tr><td><code>ProductStatusMatrix.astro</code></td><td>Ma trận năng lực × nhãn trạng thái cho trang trạng thái</td><td>danh sách năng lực</td><td>Dữ liệu từ <code>claim-status.json</code>; mỗi ô nối tới biên nhận nếu có.</td></tr>
+    <tr><td><code>LanguageBoundaryNotice.astro</code></td><td>Ghi chú ranh giới ngôn ngữ ở đầu vùng nội dung kỹ thuật</td><td>bản ngữ</td><td>Một câu chuẩn mỗi bản ngữ, lấy từ <code>language-rules.json</code>.</td></tr>
+  </table></div>
+
+  <h3>7.2 · Năm cặp trang bằng chứng song ngữ</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Tuyến bản Việt</th><th>Tuyến bản Anh</th><th>Nội dung bắt buộc</th></tr>
+    <tr><td><code>/proof</code></td><td><code>/en/proof</code></td><td>Cổng dán mã biên nhận để kiểm chứng; giải thích Chuỗi Biên Nhận bằng câu được phép; không mô tả cơ chế.</td></tr>
+    <tr><td><code>/status</code></td><td><code>/en/status</code></td><td>Ma trận trạng thái toàn bộ năng lực và gói theo nhãn R0–R3; ngày cập nhật; ghi chú trạng thái theo khuôn trung thực.</td></tr>
+    <tr><td><code>/claims</code></td><td><code>/en/claims</code></td><td>Toàn văn hiến chương tuyên bố công khai: danh sách câu được phép nói, câu cấm, quy tắc nhãn.</td></tr>
+    <tr><td><code>/receipts</code></td><td><code>/en/receipts</code></td><td>Danh sách biên nhận công khai gần nhất (phát hành, kiểm định, chứng nhận); mỗi mục một thẻ biên nhận.</td></tr>
+    <tr><td><code>/demo</code></td><td><code>/en/demo</code></td><td>Bản thử có nhãn R0/R1 rõ ràng; câu "đây là bản chứng minh, chưa phải cam kết sản xuất" đặt trên đầu.</td></tr>
+  </table></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m8">
+  <div class="eyebrow">Mục 8</div>
+  <h2>Sáu tệp quản trị phải tạo — khung nội dung</h2>
+  <div class="secmeta">ĐẶT TRONG <span style="text-transform:none">docs/governance/</span> · MỖI TỆP CÓ TRẠNG THÁI, NGÀY KHÓA, NGƯỜI PHÊ DUYỆT</div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Tệp</th><th>Mục đích</th><th>Mục bắt buộc</th></tr>
+    <tr><td><code>INDEPENDENT_IDENTITY_SYSTEM_CHARTER.md</code></td><td>Hiến chương hệ nhận diện độc lập</td><td>Câu chủ; câu định vị; kiến trúc nhận diện bằng bằng chứng; ba tầng thương hiệu; ngày niêm phong; chữ ký người sáng lập.</td></tr>
+    <tr><td><code>PUBLIC_CLAIMS_CHARTER.md</code></td><td>Nguồn duy nhất của mọi câu công khai</td><td>Danh sách câu được phép (từng câu một mã); câu cấm; quy tắc "không câu nào ngoài hiến chương được tồn tại"; quy trình thêm câu mới.</td></tr>
+    <tr><td><code>TRUE_AI_COMPUTER_STANDARD_V1_1.md</code></td><td>Chuẩn kỹ thuật vòng đối tác (bản nội bộ)</td><td>Mười chín lớp; ngưỡng tin cậy bốn cấp; hai mươi ba bài kiểm chứng; ghi chú trạng thái; nhãn độ mật từng mục.</td></tr>
+    <tr><td><code>AIOS_CORE_SECRET_REGISTER.md</code></td><td>Sổ đăng ký tài sản lõi mật (vòng trong cùng)</td><td>Sáu tài sản lõi; người được truy cập; biện pháp bảo vệ; trạng thái pháp lý; nhật ký truy cập. Tệp này không đưa vào kho công khai — đặt ở kho riêng tư, kho công khai chỉ giữ một dòng trỏ.</td></tr>
+    <tr><td><code>R_GRADE_STATUS_POLICY.md</code></td><td>Chính sách nhãn tin cậy</td><td>Định nghĩa bốn nhãn; ngưỡng số từng nhãn; quy trình lên nhãn và xuống nhãn; ai được cấp nhãn; biên nhận cấp nhãn.</td></tr>
+    <tr><td><code>BRAND_LANGUAGE_SEPARATION_POLICY.md</code></td><td>Chính sách tách ngôn ngữ</td><td>Bốn quy tắc nền; bảng từ thay thế; bảng mười sáu tên thành phần song ngữ; danh sách tên khóa được miễn trừ; quy tắc khối kỹ thuật.</td></tr>
+  </table></div>
+
+  <div class="card warn">
+    <div class="cardlabel">Lưu ý an ninh cho tệp sổ đăng ký lõi mật</div>
+    <p style="margin:0">Kho <code>tranhatam-collab/nguyenai.net</code> là kho công khai. Vì vậy sổ đăng ký lõi mật và mọi nội dung vòng trong cùng <strong>tuyệt đối không được đưa vào kho này</strong> — kể cả trong thư mục quản trị. Đặt tại kho riêng tư có kiểm soát truy cập; kho công khai chỉ giữ tên tệp và nơi lưu. Đây cũng là quy tắc chung: tài liệu vòng trong không sống chung kho với mã công khai.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m9">
+  <div class="eyebrow">Mục 9</div>
+  <h2>Cổng kiểm tra tự động và trình tự lệnh phát hành</h2>
+  <div class="secmeta">BẢN DỰNG PHẢI THẤT BẠI KHI CÓ VI PHẠM · KHÔNG CÓ NGOẠI LỆ THỦ CÔNG</div>
+
+  <p>Chuỗi kiểm tra dùng lại các công cụ có sẵn trong <code>tools/</code>, bổ sung hai công cụ mới của WI-12. Trình tự phát hành chuẩn:</p>
+  <div class="flow">pnpm install
+pnpm audit:contamination      <b># quét nhiễm bản sao</b>
+bash tools/audit-brand-naming-lock.sh   <b># tên cấm → chặn</b>
+pnpm audit:language           <b># ranh giới ngôn ngữ, khóa dịch, song ngữ, thư, biểu mẫu</b>
+bash tools/audit-independence.sh        <b># MỚI: hai nền cũ trong nội dung công khai → chặn</b>
+tsx tools/audit-r-grade-claims.ts       <b># MỚI: năng lực thiếu nhãn / nói vượt nhãn → chặn</b>
+pnpm typecheck &amp;&amp; pnpm lint &amp;&amp; pnpm test
+pnpm build:web &amp;&amp; pnpm preview:web
+bash tools/audit-live-routes.sh         <b># kiểm tra tuyến trên bản xem trước</b>
+bash tools/audit-release-evidence.sh    <b># sinh gói bằng chứng phát hành</b></div>
+  <p>Quy tắc nối vào luồng phát hành: hai công cụ mới được thêm vào <code>deploy.yml</code> trước bước dựng; bất kỳ cổng nào hỏng thì dừng toàn bộ, không đưa lên.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="m10">
+  <div class="eyebrow">Mục 10</div>
+  <h2>Tám cổng duyệt trước công bố</h2>
+  <div class="secmeta">CỔNG KHÔNG ĐƯỢC VƯỢT · MỖI CỔNG CÓ CÁCH XỬ LÝ KHI KHÔNG ĐẠT</div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Cổng</th><th>Điều kiện đạt</th><th>Không đạt thì</th></tr>
+    <tr><td>1 · Tên thương hiệu</td><td>Không còn tên cấm ở bất kỳ đâu</td><td>Dừng bản dựng</td></tr>
+    <tr><td>2 · Ngôn ngữ</td><td>Không trộn ngôn ngữ trong nội dung người dùng; siêu dữ liệu tách bản ngữ</td><td>Sửa bản dịch trước khi tiếp tục</td></tr>
+    <tr><td>3 · Độc lập</td><td>Không lời hứa phụ thuộc hai nền cũ; cầu chuyển tiếp tắt, có biên nhận</td><td>Sửa trước khi phát hành</td></tr>
+    <tr><td>4 · Nhãn trạng thái</td><td>Mọi năng lực công bố có nhãn đúng chính sách</td><td>Không công bố năng lực đó</td></tr>
+    <tr><td>5 · Biên nhận</td><td>Tuyên bố quan trọng có mã biên nhận kiểm chứng được</td><td>Chuyển về bản nháp</td></tr>
+    <tr><td>6 · Tuyên bố công khai</td><td>Mọi câu nằm trong hiến chương tuyên bố công khai</td><td>Gỡ câu ngoài hiến chương</td></tr>
+    <tr><td>7 · Đầu tư</td><td>Không cam kết lợi nhuận; định giá gắn giả định; phòng riêng đúng chính sách truy cập</td><td>Khóa trang đầu tư</td></tr>
+    <tr><td>8 · Bằng chứng phát hành</td><td>Gói bằng chứng đầy đủ, có mã băm, có người duyệt</td><td>Không được ghi hoàn tất</td></tr>
+  </table></div>
+
+  <div class="card gold">
+    <div class="cardlabel">Câu khóa toàn văn kiện</div>
+    <p class="keyline" style="margin:0">Nền đã tự đứng — giờ lời nói phải tự đứng. Không một câu công khai nào được tựa vào hai nền cũ, không một năng lực nào được nói vượt nhãn, và không một tuyên bố quan trọng nào thiếu biên nhận.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="m11" lang="en">
+  <div class="eyebrow">Section 11 · English Execution Brief</div>
+  <h2 class="en">English Execution Brief — for the international team</h2>
+  <div class="secmeta">THIS SECTION IS PURE ENGLISH. THE VIETNAMESE TEXT ABOVE IS THE SOURCE OF TRUTH.</div>
+
+  <p class="en"><strong>Verdict.</strong> The backend is already technically independent: 62/62 P0+P1 items complete, ~2,321 tests passing across 67 native packages (audit of 2026-07-06, HEAD <code>714a8b7</code>). The public identity is not yet independent: public copy still claims the product "runs on the Gen1 platform" (<code>apps/web/src/data/pages.ts</code> lines 363/365/886/888, 154/677), a legacy root site with the heaviest dependency claims remains un-quarantined (<code>src/</code>), a live runtime bridge to the legacy gateway exists (<code>apps/api/src/index.ts</code> 360–389), and the entire evidence-identity layer from the 2026-07-04 plan (six governance charters, five UI components, proof/status/claims/receipts/demo pages, five brand data files) was never built.</p>
+
+  <p class="en"><strong>Independence policy (locked).</strong> Nguyen AI is an independent identity and product system. At runtime, every publicly claimed capability must run on Nguyen AI's own backend. The two legacy platforms are frozen internal technical references only: the bridge ships disabled by default, may only be enabled via an internal flag with founder approval and an audit receipt, and legacy names must never appear in any public surface — titles, descriptions, metadata, sitemaps, or emails. The ecosystem identity service remains permitted; call it the "Identity Verification Gateway" in user copy and keep its technical address in code blocks only.</p>
+
+  <p class="en"><strong>Locked identity.</strong> Master sentence: "The machine works — you sign — every action has a receipt." Four trust grades R0 Demo-capable, R1 Internal-operational, R2 Controlled beta, R3 Production-reliable; never speak above the grade. Five sealed black-box names: Proof Receipt Chain, Authority Matrix, Command Pack Registry, Threshold Flywheel, ProofCore — one approved sentence each, never describe internals. Public charter line for every footer: "We label every capability with its real status. Nothing below production-reliable will ever be sold as production-reliable."</p>
+
+  <p class="en"><strong>Language purity.</strong> Vietnamese is the root language, English the international edition. No mixed-language strings anywhere in user content, titles, or metadata; locked proper names and code blocks are the only exemptions. Apply the substitution table in Section 4.2 and the sixteen-component bilingual name table in Section 5.</p>
+
+  <p class="en"><strong>Fourteen work items.</strong> WI-01 quarantine the legacy root site; WI-02 apply the content patch table verbatim; WI-03 disable the legacy bridge behind an audited flag; WI-04 create the six governance charters (the core secret register lives in a private repository, never in this public one); WI-05 create the five brand data files; WI-06 build the five identity components; WI-07 build the five bilingual evidence page pairs; WI-08 put the master sentence and evidence-identity block on both homepages; WI-09 grade-label every capability and plan; WI-10 purify all Vietnamese copy; WI-11 split all metadata per locale with full hreflang; WI-12 add the two new CI gates (independence scan, grade-claim scan); WI-13 upgrade the invest pages with a risk-and-assumptions matrix; WI-14 produce a release evidence pack for every deploy. Eight release gates in Section 10 are blocking: brand names, language, independence, status labels, receipts, public claims, investment, release evidence.</p>
+
+  <p class="en"><strong>Definition of done.</strong> All fourteen work items checked with receipts in the audit log, all CI gates green, and the live site speaks only sentences from the Public Claims Charter, in one pure language per locale, with a status label and a verifiable receipt behind every important claim.</p>
+</section>
+
+<div class="footer">
+  NGUYEN_AI_NET_INDEPENDENT_IDENTITY_EXECUTION_STANDARD · v2.0 · 2026-07-06 · Thay thế kế hoạch 2026-07-04<br>
+  Căn cứ: kho mã tranhatam-collab/nguyenai.net (mốc 714a8b7) · báo cáo kiểm định 2026-07-06 · văn kiện khóa tên 2026-07-04 · bộ mã hiệu thương hiệu FOUNDER LOCKED 2026-07-02<br>
+  Câu chủ: Máy làm — người ký — mọi việc có biên nhận. · Nguyên tắc: không công bố vượt trạng thái vận hành đã kiểm chứng.<br>
+  Người phê duyệt cuối: Trần Hà Tâm.
+</div>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var TOTAL=14;
+  var items=document.querySelectorAll('.wi');
+  var vBar=document.getElementById('vBar'), vText=document.getElementById('vText'),
+      verdict=document.getElementById('verdict'), topMeter=document.getElementById('topMeter'),
+      lockText=document.getElementById('lockText'), lockState=document.getElementById('lockState');
+  function refresh(){
+    var passed=document.querySelectorAll('.wi.pass').length;
+    var pct=Math.round(passed/TOTAL*100);
+    vBar.style.width=pct+'%'; topMeter.style.width=pct+'%';
+    if(passed===TOTAL){
+      vText.textContent=TOTAL+'/'+TOTAL+' HOÀN TẤT — ĐỦ ĐIỀU KIỆN CÔNG BỐ ĐỘC LẬP (kèm biên nhận)';
+      verdict.classList.add('done'); lockState.classList.add('locked');
+      lockText.textContent='ĐỦ ĐIỀU KIỆN — '+TOTAL+'/'+TOTAL;
+    }else{
+      vText.textContent=passed+'/'+TOTAL+' HOÀN TẤT — CHƯA ĐỦ ĐIỀU KIỆN CÔNG BỐ ĐỘC LẬP';
+      verdict.classList.remove('done'); lockState.classList.remove('locked');
+      lockText.textContent='CHỜ THI CÔNG — '+passed+'/'+TOTAL;
+    }
+  }
+  items.forEach(function(t){
+    t.setAttribute('role','checkbox'); t.setAttribute('tabindex','0'); t.setAttribute('aria-checked','false');
+    function toggle(){
+      t.classList.toggle('pass');
+      t.setAttribute('aria-checked', t.classList.contains('pass')?'true':'false');
+      refresh();
+    }
+    t.addEventListener('click',toggle);
+    t.addEventListener('keydown',function(e){ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
+  });
+  refresh();
+  var links=document.querySelectorAll('nav.toc a');
+  var secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute('href'));});
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(a){a.classList.remove('active');});
+        var idx=secs.indexOf(en.target);
+        if(idx>-1)links[idx].classList.add('active');
+      }
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(function(s){ if(s) io.observe(s); });
+})();
+</script>
+</body>
+</html>

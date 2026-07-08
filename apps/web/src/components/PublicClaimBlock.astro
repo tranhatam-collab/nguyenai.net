@@ -1,0 +1,60 @@
+---
+/**
+ * PublicClaimBlock — Khối tuyên bố công khai
+ * Displays a public claim with its R-grade badge and evidence link.
+ */
+import RGradeBadge from './RGradeBadge.astro';
+
+export interface Props {
+  claimId: string;
+  text: string;
+  grade: 'R0' | 'R1' | 'R2' | 'R3';
+  locale: 'vi' | 'en';
+  evidenceUrl?: string;
+}
+
+const { claimId, text, grade, locale, evidenceUrl } = Astro.props;
+const evidenceLabel = locale === 'vi' ? 'Xem biên nhận' : 'View receipt';
+---
+
+<div class="public-claim-block" data-claim-id={claimId}>
+  <div class="claim-content">
+    <p class="claim-text">{text}</p>
+    <div class="claim-meta">
+      <RGradeBadge grade={grade} locale={locale} />
+      {evidenceUrl && (
+        <a href={evidenceUrl} class="claim-evidence-link">{evidenceLabel} →</a>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .public-claim-block {
+    border-left: 3px solid #8b5cf6;
+    padding: 0.75rem 1rem;
+    background: #f5f3ff;
+    border-radius: 0 0.5rem 0.5rem 0;
+    margin: 0.5rem 0;
+  }
+  .claim-text {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: #1f2937;
+  }
+  .claim-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .claim-evidence-link {
+    font-size: 0.8125rem;
+    color: #7c3aed;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .claim-evidence-link:hover {
+    text-decoration: underline;
+  }
+</style>

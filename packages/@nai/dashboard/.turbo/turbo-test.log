@@ -1,0 +1,53 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/dashboard tests:
+  ✓ PACKAGE_INFO.name is @nai/grafana
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ createDashboard generates id
+  ✓ createDashboard sets name
+  ✓ createDashboard sets tags
+  ✓ createDashboard sets refresh_interval_ms
+  ✓ createDashboard sets created_at
+  ✓ createDashboard sets updated_at
+  ✓ getDashboard returns dashboard
+  ✓ getDashboard returns null for unknown
+  ✓ listDashboards returns 1
+  ✓ addPanel generates panel id
+  ✓ addPanel sets panel title
+  ✓ addPanel adds panel to dashboard
+  ✓ removePanel returns true for existing panel
+  ✓ removePanel removes panel
+  ✓ removePanel returns false for unknown panel
+  ✓ listDashboardsByTag returns 2 for system
+  ✓ listDashboardsByTag returns 1 for business
+  ✓ registerKPI stores KPI
+  ✓ getKPI returns null for unknown
+  ✓ listKPIs returns 1
+  ✓ listKPIsByCategory returns 1 for system
+  ✓ listKPIsByCategory returns 0 for business
+  ✓ recordKPIValue sets kpi_id
+  ✓ recordKPIValue sets value
+  ✓ recordKPIValue status = ok for 50 (below warning)
+  ✓ recordKPIValue status = warning for 85 (>= warning 80)
+  ✓ recordKPIValue status = critical for 95 (>= critical 90)
+  ✓ getLatestKPIValue returns latest value
+  ✓ getKPIValues returns 3 values
+  ✓ getKPIValues sorted by timestamp (oldest first)
+  ✓ getKPISummary returns 2 KPIs
+  ✓ summary includes test_kpi
+  ✓ summary includes latest value for test_kpi (95 from earlier)
+  ✓ summary includes latest value for kpi2
+  ✓ registerDefaultKPIs registers 6 KPIs
+  ✓ 3 system KPIs
+  ✓ 2 business KPIs
+  ✓ 1 user KPI
+  ✓ createSystemDashboard name is System Overview
+  ✓ createSystemDashboard has 4 panels
+  ✓ createSystemDashboard has system tag
+  ✓ createBusinessDashboard name is Business Overview
+  ✓ createBusinessDashboard has 4 panels
+  ✓ clearDashboardData empties dashboards
+  ✓ clearDashboardData empties KPIs
+
+47 passed, 0 failed

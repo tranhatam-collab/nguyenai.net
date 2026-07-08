@@ -1,0 +1,17 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+=== @nai/admin-approval unit tests ===
+
+Test: request approval
+Test: approve request
+Test: deny request
+Test: check approval status
+Test: list pending approvals
+Test: check protected data
+Test: require reason for approval/deny
+Test: approver role validation
+Test: approve with invalid role
+Test: revoke approval
+Test: revoke pending request (should fail)
+
+36 passed, 0 failed

@@ -1,0 +1,78 @@
+---
+/**
+ * ProofReceiptCard — Thẻ biên nhận kiểm chứng
+ * Displays a verification receipt with hash, timestamp, and signer.
+ */
+export interface Props {
+  receiptId: string;
+  hash: string;
+  timestamp: string;
+  signer: string;
+  locale?: 'vi' | 'en';
+}
+
+const { receiptId, hash, signer, timestamp, locale = 'vi' } = Astro.props;
+
+const L = {
+  vi: { receipt: 'Biên nhận', hash: 'Mã băm', time: 'Thời gian', signer: 'Người duyệt' },
+  en: { receipt: 'Receipt', hash: 'Hash', time: 'Timestamp', signer: 'Signer' },
+};
+const t = L[locale];
+const shortHash = hash.length > 16 ? `${hash.slice(0, 8)}…${hash.slice(-8)}` : hash;
+---
+
+<div class="proof-receipt-card">
+  <div class="receipt-header">
+    <span class="receipt-icon" aria-hidden="true">✓</span>
+    <span class="receipt-title">{t.receipt}</span>
+  </div>
+  <dl class="receipt-body">
+    <div><dt>{t.receipt} ID</dt><dd>{receiptId}</dd></div>
+    <div><dt>{t.hash}</dt><dd><code>{shortHash}</code></dd></div>
+    <div><dt>{t.time}</dt><dd>{timestamp}</dd></div>
+    <div><dt>{t.signer}</dt><dd>{signer}</dd></div>
+  </dl>
+</div>
+
+<style>
+  .proof-receipt-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background: #fafafa;
+  }
+  .receipt-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+  .receipt-icon {
+    font-size: 1.25rem;
+  }
+  .receipt-body {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .receipt-body > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+  .receipt-body dt {
+    color: #6b7280;
+    font-weight: 500;
+  }
+  .receipt-body dd {
+    margin: 0;
+    text-align: right;
+  }
+  .receipt-body code {
+    font-family: monospace;
+    font-size: 0.8rem;
+  }
+</style>

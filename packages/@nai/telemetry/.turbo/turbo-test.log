@@ -1,0 +1,46 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+
+@nai/telemetry tests:
+  ✓ PACKAGE_INFO.name is @nai/opentelemetry
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ descriptor type counter
+  ✓ descriptor type gauge
+  ✓ descriptor unit ms
+  ✓ unknown metric returns null
+  ✓ counter incremented by 1
+  ✓ counter incremented by 5 → 6
+  ✓ counter with attributes
+  ✓ counter without attributes unchanged
+  ✓ separate counter tracks independently
+  ✓ nonexistent counter returns 0
+  ✓ gauge set to 42
+  ✓ gauge updated to 50
+  ✓ gauge with attributes
+  ✓ gauge without attributes unchanged
+  ✓ nonexistent gauge returns 0
+  ✓ histogram stats returned
+  ✓ histogram count = 3
+  ✓ histogram sum = 350
+  ✓ histogram min = 50
+  ✓ histogram max = 200
+  ✓ histogram avg = 116.67
+  ✓ histogram with attrs count = 1
+  ✓ histogram with attrs max = 500
+  ✓ nonexistent histogram returns null
+  ✓ InMemoryExporter received metrics
+  ✓ InMemoryExporter received histograms
+  ✓ ConsoleExporter type is console
+  ✓ OTLPExporter type is otlp
+  ✓ OTLPExporter endpoint set
+  ✓ getMetricRecords returns records
+  ✓ records include counter
+  ✓ records include gauge
+  ✓ getHistogramRecords returns records
+  ✓ histogram records have buckets
+  ✓ clearTelemetry resets counters
+  ✓ clearTelemetry resets gauges
+  ✓ clearTelemetry resets metric records
+  ✓ clearTelemetry resets histogram records
+
+40 passed, 0 failed

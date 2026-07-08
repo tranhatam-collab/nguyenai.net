@@ -1,3 +1,11 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
-$ echo "wrapper package — tests in integration"
-wrapper package — tests in integration
+$ tsx src/test.ts
+
+=== @nai/opik smoke test ===
+  ✓ PACKAGE_INFO.name is string
+  ✓ PACKAGE_INFO.upstream is string
+  ✓ PACKAGE_INFO.upstream is https URL
+  ✓ PACKAGE_INFO.license is string
+
+Passed: 4 | Failed: 0
+✅ ALL TESTS PASSED

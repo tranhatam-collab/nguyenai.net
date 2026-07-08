@@ -85,11 +85,3 @@ main().catch((err) => {
   console.error('AUDIT REGISTRY E2E FAILED:', err);
   process.exit(1);
 });
-});
-  console.error('AUDIT REGISTRY E2E FAILED:', err);
-  process.exit(1);
-});
-});
-  console.error('AUDIT REGISTRY E2E FAILED:', err);
-  process.exit(1);
-});

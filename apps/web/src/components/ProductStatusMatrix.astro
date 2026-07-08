@@ -1,0 +1,76 @@
+---
+/**
+ * ProductStatusMatrix — Ma trận năng lực × nhãn R
+ * Shows all product capabilities and their verification status.
+ */
+import RGradeBadge from './RGradeBadge.astro';
+
+export interface Props {
+  locale?: 'vi' | 'en';
+}
+
+const { locale = 'vi' } = Astro.props;
+
+const CAPABILITIES = [
+  { id: 'chat', vi: 'Trò chuyện AI', en: 'AI Chat', grade: 'R1' as const },
+  { id: 'agents', vi: 'Đội tác nhân 9 người', en: '9-Agent team', grade: 'R1' as const },
+  { id: 'memory', vi: 'Bộ nhớ dài hạn', en: 'Long-term memory', grade: 'R1' as const },
+  { id: 'evidence', vi: 'Biên nhận bằng chứng', en: 'Evidence receipts', grade: 'R1' as const },
+  { id: 'approvals', vi: 'Cổng phê duyệt', en: 'Approval gates', grade: 'R1' as const },
+  { id: 'billing', vi: 'Thanh toán Stripe + VNPay', en: 'Stripe + VNPay billing', grade: 'R1' as const },
+  { id: 'scholarships', vi: 'Học bổng', en: 'Scholarships', grade: 'R0' as const },
+  { id: 'investor', vi: 'Phòng đầu tư', en: 'Investor room', grade: 'R1' as const },
+  { id: 'academy', vi: 'Học viện', en: 'Academy', grade: 'R1' as const },
+  { id: 'model-gateway', vi: 'Cổng mô hình', en: 'Model gateway', grade: 'R1' as const },
+  { id: 'fallback', vi: 'Dự phòng', en: 'Fallback chain', grade: 'R0' as const },
+  { id: 'incidents', vi: 'Quản lý sự cố', en: 'Incident management', grade: 'R0' as const },
+  { id: 'self-heal', vi: 'Tự phục hồi', en: 'Self-healing', grade: 'R0' as const },
+  { id: 'notifications', vi: 'Thông báo', en: 'Notifications', grade: 'R0' as const },
+  { id: 'admin-approvals', vi: 'Phê duyệt quản trị', en: 'Admin approvals', grade: 'R0' as const },
+];
+
+const headers = locale === 'vi'
+  ? { capability: 'Năng lực', status: 'Trạng thái' }
+  : { capability: 'Capability', status: 'Status' };
+---
+
+<div class="product-status-matrix">
+  <table>
+    <thead>
+      <tr>
+        <th>{headers.capability}</th>
+        <th>{headers.status}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CAPABILITIES.map((cap) => (
+        <tr>
+          <td>{locale === 'vi' ? cap.vi : cap.en}</td>
+          <td><RGradeBadge grade={cap.grade} locale={locale} /></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .product-status-matrix table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .product-status-matrix th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+  }
+  .product-status-matrix td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .product-status-matrix tr:hover {
+    background: #f9fafb;
+  }
+</style>
