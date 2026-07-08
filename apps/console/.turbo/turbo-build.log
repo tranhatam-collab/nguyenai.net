@@ -1,36 +1,36 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ astro build
-11:09:55 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
-11:09:55 [types] Generated 156ms
-11:09:55 [build] output: "hybrid"
-11:09:55 [build] directory: /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/console/dist/
-11:09:55 [build] adapter: @astrojs/cloudflare
-11:09:55 [build] Collecting build info...
-11:09:55 [build] ✓ Completed in 250ms.
-11:09:55 [build] Building hybrid entrypoints...
+12:22:37 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
+12:22:37 [types] Generated 50ms
+12:22:37 [build] output: "hybrid"
+12:22:37 [build] directory: /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/console/dist/
+12:22:37 [build] adapter: @astrojs/cloudflare
+12:22:37 [build] Collecting build info...
+12:22:37 [build] ✓ Completed in 115ms.
+12:22:37 [build] Building hybrid entrypoints...
 Generated an empty chunk: "astro/env-setup".
-11:09:57 [vite] ✓ built in 2.47s
-11:09:57 [build] ✓ Completed in 2.52s.
+12:22:39 [vite] ✓ built in 2.24s
+12:22:39 [build] ✓ Completed in 2.26s.
 
  building client (vite) 
-11:09:57 [vite] transforming...
-11:09:58 [vite] ✓ 47 modules transformed.
-11:09:58 [vite] rendering chunks...
-11:09:58 [vite] computing gzip size...
-11:09:58 [vite] dist/_astro/storage.BWFkCyQ6.js           0.38 kB │ gzip:  0.23 kB
-11:09:58 [vite] dist/_astro/jsx-runtime.TBa3i5EZ.js       0.92 kB │ gzip:  0.58 kB
-11:09:58 [vite] dist/_astro/AgentList.s-yaA9MV.js         1.80 kB │ gzip:  0.84 kB
-11:09:58 [vite] dist/_astro/models.CYWyxhpj.js            1.82 kB │ gzip:  0.61 kB
-11:09:58 [vite] dist/_astro/api.DnQ5kvt5.js               2.00 kB │ gzip:  1.01 kB
-11:09:58 [vite] dist/_astro/CommandHistory.DvtsaIpU.js    3.21 kB │ gzip:  1.33 kB
-11:09:58 [vite] dist/_astro/ModelSelector.Bjm3O7cQ.js     3.65 kB │ gzip:  1.39 kB
-11:09:58 [vite] dist/_astro/RoutingRules.BNWsh22s.js      3.94 kB │ gzip:  1.55 kB
-11:09:58 [vite] dist/_astro/MemoryPanel.CFTy9aGF.js       4.12 kB │ gzip:  1.49 kB
-11:09:58 [vite] dist/_astro/CostEstimator.BTHiF1JX.js     4.90 kB │ gzip:  1.73 kB
-11:09:58 [vite] dist/_astro/CommandInput.DrUi4DhP.js      6.22 kB │ gzip:  2.48 kB
-11:09:58 [vite] dist/_astro/index.CVf8TyFT.js             6.72 kB │ gzip:  2.68 kB
-11:09:58 [vite] dist/_astro/client.DrE9CFQR.js          135.60 kB │ gzip: 43.80 kB
-11:09:58 [vite] ✓ built in 574ms
-11:09:58 [build] Rearranging server assets...
-11:09:58 [build] Server built in 3.40s
-11:09:58 [build] Complete!
+12:22:39 [vite] transforming...
+12:22:39 [vite] ✓ 47 modules transformed.
+12:22:40 [vite] rendering chunks...
+12:22:40 [vite] computing gzip size...
+12:22:40 [vite] dist/_astro/storage.BWFkCyQ6.js           0.38 kB │ gzip:  0.23 kB
+12:22:40 [vite] dist/_astro/jsx-runtime.TBa3i5EZ.js       0.92 kB │ gzip:  0.58 kB
+12:22:40 [vite] dist/_astro/AgentList.s-yaA9MV.js         1.80 kB │ gzip:  0.84 kB
+12:22:40 [vite] dist/_astro/models.CYWyxhpj.js            1.82 kB │ gzip:  0.61 kB
+12:22:40 [vite] dist/_astro/api.DnQ5kvt5.js               2.00 kB │ gzip:  1.01 kB
+12:22:40 [vite] dist/_astro/CommandHistory.DvtsaIpU.js    3.21 kB │ gzip:  1.33 kB
+12:22:40 [vite] dist/_astro/ModelSelector.Bjm3O7cQ.js     3.65 kB │ gzip:  1.39 kB
+12:22:40 [vite] dist/_astro/RoutingRules.BNWsh22s.js      3.94 kB │ gzip:  1.55 kB
+12:22:40 [vite] dist/_astro/MemoryPanel.CFTy9aGF.js       4.12 kB │ gzip:  1.49 kB
+12:22:40 [vite] dist/_astro/CostEstimator.BTHiF1JX.js     4.90 kB │ gzip:  1.73 kB
+12:22:40 [vite] dist/_astro/CommandInput.DrUi4DhP.js      6.22 kB │ gzip:  2.48 kB
+12:22:40 [vite] dist/_astro/index.CVf8TyFT.js             6.72 kB │ gzip:  2.68 kB
+12:22:40 [vite] dist/_astro/client.DrE9CFQR.js          135.60 kB │ gzip: 43.80 kB
+12:22:40 [vite] ✓ built in 714ms
+12:22:40 [build] Rearranging server assets...
+12:22:40 [build] Server built in 3.12s
+12:22:40 [build] Complete!

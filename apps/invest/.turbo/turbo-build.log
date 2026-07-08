@@ -1,26 +1,26 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ astro build
-11:09:55 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
-11:09:55 [types] Generated 229ms
-11:09:55 [build] output: "server"
-11:09:55 [build] directory: /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/invest/dist/
-11:09:55 [build] adapter: @astrojs/cloudflare
-11:09:55 [build] Collecting build info...
-11:09:55 [build] ✓ Completed in 328ms.
-11:09:55 [build] Building server entrypoints...
+12:22:37 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
+12:22:37 [types] Generated 55ms
+12:22:37 [build] output: "server"
+12:22:37 [build] directory: /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/invest/dist/
+12:22:37 [build] adapter: @astrojs/cloudflare
+12:22:37 [build] Collecting build info...
+12:22:37 [build] ✓ Completed in 121ms.
+12:22:37 [build] Building server entrypoints...
 Generated an empty chunk: "astro/env-setup".
-11:09:58 [vite] ✓ built in 2.85s
-11:09:58 [build] ✓ Completed in 2.90s.
+12:22:39 [vite] ✓ built in 2.71s
+12:22:39 [build] ✓ Completed in 2.73s.
 
  building client (vite) 
-11:09:58 [vite] transforming...
-11:09:58 [vite] ✓ 6 modules transformed.
-11:09:58 [vite] rendering chunks...
-11:09:58 [vite] computing gzip size...
-11:09:58 [vite] dist/_astro/hoisted.2znN6LC-.js  0.15 kB │ gzip: 0.13 kB
-11:09:58 [vite] dist/_astro/hoisted.7KWPZFDj.js  0.23 kB │ gzip: 0.18 kB
-11:09:58 [vite] dist/_astro/hoisted.Qqjl3qh9.js  0.27 kB │ gzip: 0.21 kB
-11:09:58 [vite] ✓ built in 64ms
-11:09:58 [build] Rearranging server assets...
-11:09:58 [build] Server built in 3.35s
-11:09:58 [build] Complete!
+12:22:39 [vite] transforming...
+12:22:39 [vite] ✓ 6 modules transformed.
+12:22:39 [vite] rendering chunks...
+12:22:39 [vite] computing gzip size...
+12:22:39 [vite] dist/_astro/hoisted.2znN6LC-.js  0.15 kB │ gzip: 0.13 kB
+12:22:39 [vite] dist/_astro/hoisted.7KWPZFDj.js  0.23 kB │ gzip: 0.18 kB
+12:22:39 [vite] dist/_astro/hoisted.Qqjl3qh9.js  0.27 kB │ gzip: 0.21 kB
+12:22:39 [vite] ✓ built in 43ms
+12:22:39 [build] Rearranging server assets...
+12:22:39 [build] Server built in 2.98s
+12:22:39 [build] Complete!

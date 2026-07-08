@@ -37,7 +37,7 @@ const selfHealRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session');
+  const session = c.get('session') as { role?: string } | undefined;
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
@@ -45,6 +45,11 @@ function requireAdmin(c: Context) {
     return c.json({ error: 'Forbidden: admin only' }, 403);
   }
   return null;
+}
+
+function getSessionUserId(c: Context): string {
+  const session = c.get('session') as { user_id?: string } | undefined;
+  return session?.user_id ?? 'system';
 }
 
 // ============================================================
@@ -65,7 +70,7 @@ selfHealRoutes.post('/v1/self-heal/detect', async (c) => {
   const attemptId = await detectIssue(
     component,
     issue_description,
-    c.get('session')?.user_id ?? 'system',
+    getSessionUserId(c),
     incident_id
   );
 
@@ -144,7 +149,7 @@ selfHealRoutes.post('/v1/self-heal/:id/request-preview-approval', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  const approvalId = await requestPreviewApproval(id, c.get('session')?.user_id ?? 'system');
+  const approvalId = await requestPreviewApproval(id, getSessionUserId(c));
 
   return c.json({ approval_id: approvalId });
 });
@@ -200,7 +205,7 @@ selfHealRoutes.post('/v1/self-heal/:id/request-production-approval', async (c) =
   if (authError) return authError;
 
   const id = c.req.param('id');
-  const approvalId = await requestProductionApproval(id, c.get('session')?.user_id ?? 'system');
+  const approvalId = await requestProductionApproval(id, getSessionUserId(c));
 
   return c.json({ approval_id: approvalId });
 });

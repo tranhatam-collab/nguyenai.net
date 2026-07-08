@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@nai/audit": "workspace:*",
-    "@nai/admin-approval": "workspace:*"
+    "@nai/admin-approval": "workspace:*",
+    "@nai/qa-loop": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

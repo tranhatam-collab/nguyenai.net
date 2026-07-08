@@ -1,6 +1,7 @@
 -- Migration: output_receipts
 -- Phase 3 — Model Gateway and output guard
 -- Per MODEL_GATEWAY_IDENTITY_POLICY.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS output_receipts (
   receipt_id TEXT PRIMARY KEY,
@@ -19,3 +20,5 @@ CREATE TABLE IF NOT EXISTS output_receipts (
 
 CREATE INDEX IF NOT EXISTS idx_output_receipts_invocation_id ON output_receipts(invocation_id);
 CREATE INDEX IF NOT EXISTS idx_output_receipts_created_at ON output_receipts(created_at);
+
+COMMIT;

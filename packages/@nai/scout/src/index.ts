@@ -86,6 +86,18 @@ function isUrlAllowed(url: string, opts: FetchOptions): boolean {
 }
 
 export async function fetchPage(url: string, opts: FetchOptions = {}): Promise<FetchResult> {
+  // Check allowlist/denylist before fetching
+  if (!isUrlAllowed(url, opts)) {
+    return {
+      url,
+      status: 403,
+      ok: false,
+      headers: {},
+      body: '',
+      error: 'URL blocked by allowlist/denylist',
+      fetchedAt: new Date().toISOString(),
+    };
+  }
   const { headers: customHeaders = {}, timeoutMs = 30000, method = 'GET', body } = opts;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);

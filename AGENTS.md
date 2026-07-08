@@ -595,3 +595,61 @@ pnpm --filter ./apps/web preview
 ```
 
 Build currently runs `astro build` for the static public website (`apps/web/`).
+
+## QA Loop + Self-Learning (2026-07-08)
+
+> **Continuous QA + self-learning mechanism.** See `docs/governance/SELF_LEARNING_POLICY.md` for full policy.
+
+### QA Loop — one command to verify everything
+
+```bash
+bash tools/qa-loop.sh              # audit:all + typecheck + build + test
+```
+
+- Exit 0 = ALL GREEN, Exit 1 = HAS FAILURES
+- Log appended to `QA_LOOP_LOG.md`
+
+### Self-upgrade report
+
+```bash
+bash tools/self-upgrade-report.sh  # generates report + appends to history
+```
+
+- Creates `docs/governance/SELF_UPGRADE_REPORT_YYYY-MM-DD.md`
+- Appends row to `docs/governance/SELF_UPGRADE_HISTORY.md`
+
+### Programmatic QA (for self-heal, console, API)
+
+```typescript
+import { runQALoop, getQALoopHistory, generateUpgradeReport } from '@nai/qa-loop';
+
+const result = runQALoop();  // runs audit:all + typecheck + build + test
+if (result.allGreen) {
+  generateUpgradeReport();  // creates report + history entry
+}
+```
+
+### Self-heal → QA loop wiring
+
+`@nai/self-heal` uses `@nai/qa-loop` to verify fixes before requesting admin approval:
+
+```typescript
+import { runQAVerification } from '@nai/self-heal';
+const result = await runQAVerification(attemptId);
+// if result.allGreen → request admin approval
+// if !result.allGreen → retry fix or escalate
+```
+
+### Verification criteria ("XANH TOÀN BỘ")
+
+| Check | Tiêu chí | Lệnh |
+|-------|----------|------|
+| Audits | 15/15 PASS | `pnpm run audit:all` |
+| Typecheck | 0 errors | `pnpm run typecheck` |
+| Build | 88/88 PASS | `pnpm run build` |
+| Tests | 0 failures | `pnpm run test` |
+| QA Loop | exit 0 | `bash tools/qa-loop.sh` |
+
+### CI gates (deploy.yml)
+
+15 audits + typecheck + build + seo-build audit + test + self-upgrade report + QA artifacts upload.

@@ -1,6 +1,7 @@
 -- Migration: incident_events
 -- Phase 1 — Incident and notification
 -- Per INCIDENT_NOTIFICATION_POLICY_2026-07-07.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS incident_events (
   event_id TEXT PRIMARY KEY,
@@ -15,3 +16,5 @@ CREATE TABLE IF NOT EXISTS incident_events (
 
 CREATE INDEX IF NOT EXISTS idx_incident_events_incident_id ON incident_events(incident_id);
 CREATE INDEX IF NOT EXISTS idx_incident_events_created_at ON incident_events(created_at);
+
+COMMIT;

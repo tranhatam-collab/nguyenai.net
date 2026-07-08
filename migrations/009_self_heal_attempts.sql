@@ -1,6 +1,7 @@
 -- Migration: self_heal_attempts
 -- Phase 2 — Admin approval and self-healing
 -- Per AI_AGENT_SELF_HEALING_APPROVAL_POLICY_2026-07-07.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS self_heal_attempts (
   attempt_id TEXT PRIMARY KEY,
@@ -27,3 +28,5 @@ CREATE TABLE IF NOT EXISTS self_heal_attempts (
 CREATE INDEX IF NOT EXISTS idx_self_heal_attempts_status ON self_heal_attempts(status);
 CREATE INDEX IF NOT EXISTS idx_self_heal_attempts_component ON self_heal_attempts(component);
 CREATE INDEX IF NOT EXISTS idx_self_heal_attempts_detected_at ON self_heal_attempts(detected_at);
+
+COMMIT;

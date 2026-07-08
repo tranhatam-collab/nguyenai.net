@@ -57,14 +57,39 @@ jobs:
       - name: Form language audit
         run: npx tsx tools/audit-form-language.ts
 
+      - name: Independence audit
+        run: bash tools/audit-independence.sh
+
+      - name: Security P0 audit
+        run: npx tsx tools/audit-security-p0.ts
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Build
         run: pnpm build
 
+      - name: SEO build audit (rendered HTML)
+        run: npx tsx tools/audit-seo-build.ts
+
       - name: Test
         run: pnpm test
+
+      - name: Generate self-upgrade report
+        if: always()
+        run: bash tools/self-upgrade-report.sh
+
+      - name: Upload QA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-report
+          path: |
+            QA_LOOP_LOG.md
+            CHANGELOG.md
+            docs/governance/SELF_UPGRADE_REPORT_*.md
+            docs/governance/SELF_UPGRADE_HISTORY.md
+          retention-days: 30
 
       - name: Upload web dist
         uses: actions/upload-artifact@v4

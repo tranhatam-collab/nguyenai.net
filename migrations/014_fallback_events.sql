@@ -1,6 +1,7 @@
 -- Migration: fallback_events
 -- Phase 4 — Gen 1/Gen2 fallback
 -- Per FALLBACK_TO_GEN1_GEN2_POLICY.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS fallback_events (
   request_id TEXT PRIMARY KEY,
@@ -24,3 +25,5 @@ CREATE INDEX IF NOT EXISTS idx_fallback_events_severity ON fallback_events(sever
 CREATE INDEX IF NOT EXISTS idx_fallback_events_target ON fallback_events(target);
 CREATE INDEX IF NOT EXISTS idx_fallback_events_status ON fallback_events(status);
 CREATE INDEX IF NOT EXISTS idx_fallback_events_created_at ON fallback_events(created_at);
+
+COMMIT;

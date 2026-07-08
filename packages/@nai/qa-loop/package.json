@@ -1,0 +1,17 @@
+{
+  "name": "@nai/qa-loop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "echo 'no build'",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx src/test.ts"
+  },
+  "dependencies": {
+    "typescript": "catalog:devTools",
+    "@types/node": "^22.0.0"
+  }
+}

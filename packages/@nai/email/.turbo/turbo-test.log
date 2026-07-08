@@ -3,16 +3,18 @@ $ tsx src/test.ts
 === @nai/email unit tests ===
 
 Templates: 25
-/Users/tranhatam/Documents/Devnewproject/nguyenai.net/packages/@nai/email/src/test.ts:17
-  if (!cond) throw new Error(`ASSERT FAILED: ${msg}`);
-                   ^
+✓ Test 1: 25 templates exist
+✓ Test 2: 50 template renders (20 templates × 2 locales) all valid
+✓ Test 3: MockEmailClient captures sends
+✓ Test 4: EN template renders English
+✓ Test 5: Audit event mapping covers 24 events
+✓ Test 6: All 8 categories present
+✓ Test 7: Dev service uses MockEmailClient
+✓ Test 8: Certificate ID format in template
+✓ Test 9: Account deletion reference code
+✓ Test 10: HTML email has proper structure
 
-Error: ASSERT FAILED: should have 20 templates, got 25
-    at assert (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/packages/@nai/email/src/test.ts:17:20)
-    at <anonymous> (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/packages/@nai/email/src/test.ts:25:1)
-    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
-    at async node:internal/modules/esm/loader:639:26
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
-
-Node.js v24.15.0
-[ELIFECYCLE] Test failed. See above for more details.
+=== ALL EMAIL TESTS PASSED ===
+Templates: 25
+Renders tested: 50
+Audit event mappings: 24

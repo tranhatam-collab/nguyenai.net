@@ -2,12 +2,12 @@
 $ tsx src/test.ts
 === @nai/sast tests ===
 ▶ @nai/sast
-  ✔ PACKAGE_INFO has correct tool name (0.449208ms)
-  ✔ isSemgrepInstalled returns boolean (234.170708ms)
-  ✔ summarizeFindings counts by severity (0.752292ms)
-  ✔ passesCIGate fails on ERROR (0.124209ms)
-  ✔ passesCIGate passes with only WARNING (0.085708ms)
-✔ @nai/sast (236.3075ms)
+  ✔ PACKAGE_INFO has correct tool name (0.441209ms)
+  ✔ isSemgrepInstalled returns boolean (10.190208ms)
+  ✔ summarizeFindings counts by severity (0.663875ms)
+  ✔ passesCIGate fails on ERROR (0.123583ms)
+  ✔ passesCIGate passes with only WARNING (0.083208ms)
+✔ @nai/sast (12.239ms)
 ℹ tests 5
 ℹ suites 1
 ℹ pass 5
@@ -15,4 +15,4 @@ $ tsx src/test.ts
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 261.923083
+ℹ duration_ms 26.041125

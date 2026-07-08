@@ -1,0 +1,18 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+$ tsx src/test.ts
+=== @nai/grype tests ===
+▶ @nai/grype
+  ✔ PACKAGE_INFO has correct tool name (0.44075ms)
+  ✔ isGrypeInstalled returns boolean (7.428083ms)
+  ✔ summarizeVulns counts by severity (0.475125ms)
+  ✔ passesCIGate fails on Critical (0.271292ms)
+  ✔ passesCIGate passes with only High (0.098833ms)
+✔ @nai/grype (9.54075ms)
+ℹ tests 5
+ℹ suites 1
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17.103167

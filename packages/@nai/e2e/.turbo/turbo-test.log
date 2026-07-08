@@ -3,10 +3,10 @@ $ tsx src/p1-c-e2e.test.ts
 P1-C E2E — Full Automation Chain Tests
 
 Test 1: Workflow with Approval Gate...
-❌ FAIL: Workflow step should fail with approval required
+✅ PASS: Workflow step with approval requirement
 
 Test 2: Browser Agent with Denylist...
-❌ FAIL: Browser agent should block denylist URLs
+✅ PASS: Browser agent blocks denylist URLs
 
 Test 3: Browser Agent with Allowlist...
 ✅ PASS: Browser agent allows allowlist URLs
@@ -15,7 +15,7 @@ Test 4: Crew Runtime...
 ✅ PASS: Crew runtime executed
 
 Test 6: Pipeline Execution...
-❌ FAIL: Pipeline should complete with 2 stages
+✅ PASS: Pipeline executed with 2 stages
 
 Test 6: Full Chain Integration (workflow + browser + crew + pipeline)...
 ✅ PASS: Full chain integration completed
@@ -24,6 +24,5 @@ Test 8: Workflow without approval requirement...
 ✅ PASS: Workflow executes without approval when not required
 
 ========================================
-Total: 7 | Passed: 4 | Failed: 3
+Total: 7 | Passed: 7 | Failed: 0
 ========================================
-[ELIFECYCLE] Test failed. See above for more details.

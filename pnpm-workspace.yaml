@@ -208,7 +208,27 @@ allowBuilds:
   eslint-plugin-markdown-preferences: ^0.0.0
   eslint-plugin-no-barrel-files: ^0.0.0
   vite-plus: ^0.0.0
+  '@biomejs/biome': set this to true or false
+  lefthook: set this to true or false
 catalogs:
+  default:
+    '@types/qs': 6.9.15
+    '@types/semver': ^7.7.0
+    axios: 1.18.0
+    esbuild: ^0.28.1
+    eslint: ^9.0.0
+    eslint-config-prettier: ^9.0.0
+    eslint-plugin-n: ^17.0.0
+    get-tsconfig: ^4.13.0
+    pdf-parse: 2.4.5
+    pdfjs-dist: 5.4.296
+    prettier: ^3.0.0
+    qs: 6.15.2
+    semver: 7.7.3
+    stylelint: ^16.23.0
+    tar: ^7.5.16
+    typescript: ^5.5.0
+    yaml: 2.8.3
   e2e:
     '@currents/playwright': ^2.0.0
     '@playwright/cli': 0.1.0
@@ -287,7 +307,7 @@ catalogs:
 catalogMode: strict
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-- '@n8n/*'
-- '@n8n_io/*'
-- 'astro'
-- '@astrojs/*'
+  - '@n8n/*'
+  - '@n8n_io/*'
+  - 'astro'
+  - '@astrojs/*'

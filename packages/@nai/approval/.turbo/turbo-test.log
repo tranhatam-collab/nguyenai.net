@@ -1,23 +1,14 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ tsx src/test.ts
-node:internal/modules/run_main:107
-    triggerUncaughtException(
-    ^
+=== @nai/approval unit tests ===
 
-Error: Transform failed with 1 error:
-/Users/tranhatam/Documents/Devnewproject/nguyenai.net/packages/@nai/approval/src/test.ts:253:0: ERROR: Unexpected "}"
-    at failureErrorWithLog (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:1748:15)
-    at /Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:1017:50
-    at responseCallbacks.<computed> (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:884:9)
-    at handleIncomingPacket (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:939:12)
-    at Socket.readFromStdout (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:862:7)
-    at Socket.emit (node:events:509:28)
-    at addChunk (node:internal/streams/readable:563:12)
-    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
-    at Readable.push (node:internal/streams/readable:394:5)
-    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
-  name: 'TransformError'
-}
+Test: request approval
+Test: approve flow
+Test: deny flow
+Test: execute flow
+Test: cannot execute without approval
+Test: cannot approve non-pending
+Test: list pending
+Test: IDOR — cross-tenant approve denied
 
-Node.js v24.15.0
-[ELIFECYCLE] Test failed. See above for more details.
+16 passed, 0 failed

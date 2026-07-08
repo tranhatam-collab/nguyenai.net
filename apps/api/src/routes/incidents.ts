@@ -30,7 +30,7 @@ const incidentRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session');
+  const session = c.get('session') as { role?: string } | undefined;
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
@@ -38,6 +38,11 @@ function requireAdmin(c: Context) {
     return c.json({ error: 'Forbidden: admin only' }, 403);
   }
   return null;
+}
+
+function getSessionUserId(c: Context): string {
+  const session = c.get('session') as { user_id?: string } | undefined;
+  return session?.user_id ?? 'system';
 }
 
 // ============================================================
@@ -66,7 +71,7 @@ incidentRoutes.post('/v1/incidents', async (c) => {
     description,
     component,
     affected_users,
-    c.get('session')?.user_id ?? 'system'
+    getSessionUserId(c)
   );
 
   return c.json({ incident_id: incidentId }, 201);
@@ -129,7 +134,7 @@ incidentRoutes.post('/v1/incidents/:id/diagnose', async (c) => {
     return c.json({ error: 'Missing required field: root_cause' }, 400);
   }
 
-  await diagnoseIncident(id, root_cause, c.get('session')?.user_id ?? 'system');
+  await diagnoseIncident(id, root_cause, getSessionUserId(c));
 
   return c.json({ success: true });
 });
@@ -143,7 +148,7 @@ incidentRoutes.post('/v1/incidents/:id/contain', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await containIncident(id, c.get('session')?.user_id ?? 'system');
+  await containIncident(id, getSessionUserId(c));
 
   return c.json({ success: true });
 });
@@ -164,7 +169,7 @@ incidentRoutes.post('/v1/incidents/:id/resolve', async (c) => {
     return c.json({ error: 'Missing required field: resolution' }, 400);
   }
 
-  await resolveIncident(id, resolution, c.get('session')?.user_id ?? 'system');
+  await resolveIncident(id, resolution, getSessionUserId(c));
 
   return c.json({ success: true });
 });
@@ -178,7 +183,7 @@ incidentRoutes.post('/v1/incidents/:id/close', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await closeIncident(id, c.get('session')?.user_id ?? 'system');
+  await closeIncident(id, getSessionUserId(c));
 
   return c.json({ success: true });
 });

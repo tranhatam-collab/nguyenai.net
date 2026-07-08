@@ -34,7 +34,7 @@ const fallbackRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session');
+  const session = c.get('session') as { role?: string } | undefined;
   if (!session) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
@@ -42,6 +42,11 @@ function requireAdmin(c: Context) {
     return c.json({ error: 'Forbidden: admin only' }, 403);
   }
   return null;
+}
+
+function getSessionUserId(c: Context): string {
+  const session = c.get('session') as { user_id?: string } | undefined;
+  return session?.user_id ?? 'system';
 }
 
 // ============================================================
@@ -87,7 +92,7 @@ fallbackRoutes.post('/v1/fallback/request', async (c) => {
     data_classification,
     purpose,
     retention_period ?? null,
-    c.get('session')?.user_id ?? 'system'
+    getSessionUserId(c)
   );
 
   return c.json({ request_id: requestId }, 201);
@@ -102,7 +107,7 @@ fallbackRoutes.post('/v1/fallback/:id/approve', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await approveFallback(id, c.get('session')?.user_id ?? 'system');
+  await approveFallback(id, getSessionUserId(c));
 
   return c.json({ success: true });
 });
@@ -116,7 +121,7 @@ fallbackRoutes.post('/v1/fallback/:id/deny', async (c) => {
   if (authError) return authError;
 
   const id = c.req.param('id');
-  await denyFallback(id, c.get('session')?.user_id ?? 'system');
+  await denyFallback(id, getSessionUserId(c));
 
   return c.json({ success: true });
 });

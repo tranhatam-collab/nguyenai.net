@@ -1,23 +1,18 @@
 [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
 $ tsx src/test.ts
-node:internal/modules/run_main:107
-    triggerUncaughtException(
-    ^
+=== @nai/entitlement unit tests ===
 
-Error: Transform failed with 1 error:
-/Users/tranhatam/Documents/Devnewproject/nguyenai.net/packages/@nai/entitlement/src/test.ts:292:0: ERROR: Unexpected "}"
-    at failureErrorWithLog (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:1748:15)
-    at /Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:1017:50
-    at responseCallbacks.<computed> (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:884:9)
-    at handleIncomingPacket (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:939:12)
-    at Socket.readFromStdout (/Users/tranhatam/Documents/Devnewproject/nguyenai.net/node_modules/.pnpm/esbuild@0.28.1/node_modules/esbuild/lib/main.js:862:7)
-    at Socket.emit (node:events:509:28)
-    at addChunk (node:internal/streams/readable:563:12)
-    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
-    at Readable.push (node:internal/streams/readable:394:5)
-    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
-  name: 'TransformError'
-}
+Test: resolve Start plan entitlements
+Test: resolve Founder plan entitlements
+Test: command quota enforcement
+Test: token quota enforcement
+Test: academy access
+Test: model tier gating
+Test: model tier access check
+Test: plan upgrade
+Test: plan downgrade
+Test: plan cancel
+Test: subscription create
+Test: subscription cancellation
 
-Node.js v24.15.0
-[ELIFECYCLE] Test failed. See above for more details.
+60 passed, 0 failed

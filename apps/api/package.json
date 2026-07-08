@@ -22,7 +22,18 @@
     "@nai/product-catalog": "workspace:*",
     "@nai/email": "workspace:*",
     "@nai/billing": "workspace:*",
-    "@nai/scholarship": "workspace:*"
+    "@nai/scholarship": "workspace:*",
+    "@nai/self-heal": "workspace:*",
+    "@nai/incident": "workspace:*",
+    "@nai/fallback": "workspace:*",
+    "@nai/conductor": "workspace:*",
+    "@nai/prism": "workspace:*",
+    "@nai/evidence": "workspace:*",
+    "@nai/relic": "workspace:*",
+    "@nai/investor-verify": "workspace:*",
+    "@nai/admin-approval": "workspace:*",
+    "@nai/model-gateway": "workspace:*",
+    "@nai/notifier": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

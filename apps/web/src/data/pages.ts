@@ -588,6 +588,97 @@ const vi: Record<RouteKey, PageContent> = {
       { question: 'Phòng đầu tư riêng có gì?', answer: 'Data room, mô hình tài chính 5 năm, cap table, báo cáo audit kỹ thuật, IP ownership, báo cáo security, hợp đồng pháp lý, và lịch họp với founder.' },
       { question: 'Thực thể pháp lý nào chịu trách nhiệm?', answer: 'VIET CAN NEW CORP (Hoa Kỳ) chịu trách nhiệm pháp lý hoàn toàn về sáng lập, vận hành hệ thống, sở hữu IP. Kasan JSC (MST 0315521422) chỉ là đại diện thương mại tại Việt Nam — đăng ký theo luật VN, phát hành VAT, tuân thủ PDPD,但不 chịu trách nhiệm pháp lý chính yếu.' }
     ]
+  },
+  status: {
+    key: 'status',
+    title: 'Trạng thái hệ thống — Nguyen AI',
+    description: 'Trạng thái vận hành thời gian thực của hệ thống Nguyen AI.',
+    eyebrow: 'Trạng thái',
+    heroTitle: 'Tất cả hệ thống hoạt động',
+    heroText: 'Giám sát thời gian thực các dịch vụ, API, và hạ tầng.',
+    primaryCta: 'Xem chi tiết',
+    secondaryCta: 'Đăng ký nhận thông báo',
+    sections: [{ title: 'Dịch vụ', body: 'Tất cả dịch vụ hoạt động bình thường.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  terms: {
+    key: 'terms',
+    title: 'Điều khoản sử dụng — Nguyen AI',
+    description: 'Điều khoản và điều kiện sử dụng dịch vụ Nguyen AI.',
+    eyebrow: 'Pháp lý',
+    heroTitle: 'Điều khoản sử dụng',
+    heroText: 'Vui lòng đọc kỹ trước khi sử dụng dịch vụ.',
+    primaryCta: 'Tải PDF',
+    secondaryCta: 'Liên hệ pháp lý',
+    sections: [{ title: 'Chấp nhận', body: 'Bằng việc sử dụng dịch vụ, bạn đồng ý với các điều khoản này.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  privacy: {
+    key: 'privacy',
+    title: 'Chính sách quyền riêng tư — Nguyen AI',
+    description: 'Chính sách bảo vệ dữ liệu và quyền riêng tư.',
+    eyebrow: 'Pháp lý',
+    heroTitle: 'Quyền riêng tư của bạn',
+    heroText: 'Chúng tôi cam kết bảo vệ dữ liệu của bạn.',
+    primaryCta: 'Tải PDF',
+    secondaryCta: 'Liên hệ DPO',
+    sections: [{ title: 'Thu thập', body: 'Chúng tôi chỉ thu thập dữ liệu cần thiết để cung cấp dịch vụ.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  proof: {
+    key: 'proof',
+    title: 'Bằng chứng độc lập — Nguyen AI',
+    description: 'Bằng chứng kỹ thuật về độc lập hệ thống từ legacy systems.',
+    eyebrow: 'Bằng chứng',
+    heroTitle: 'Độc lập đầy đủ',
+    heroText: 'Backend riêng, không phụ thuộc legacy systems.',
+    primaryCta: 'Xem audit',
+    secondaryCta: 'Tải báo cáo',
+    sections: [{ title: 'Kiến trúc', body: 'Backend độc lập, adapter riêng, không inherit legacy systems.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  claims: {
+    key: 'claims',
+    title: 'Tuyên bố công khai — Nguyen AI',
+    description: 'Tuyên bố công khai và kiểm chứng.',
+    eyebrow: 'Minh bạch',
+    heroTitle: 'Minh bạch đầy đủ',
+    heroText: 'Mọi tuyên bố đều có bằng chứng kiểm chứng.',
+    primaryCta: 'Xem chi tiết',
+    secondaryCta: 'Kiểm chứng',
+    sections: [{ title: 'Tuyên bố', body: 'Danh sách tuyên bố công khai với trạng thái kiểm chứng.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  receipts: {
+    key: 'receipts',
+    title: 'Biên nhận — Nguyen AI',
+    description: 'Biên nhận kiểm chứng và audit trail.',
+    eyebrow: 'Biên nhận',
+    heroTitle: 'Audit trail đầy đủ',
+    heroText: 'Mọi hành động đều có biên nhận kiểm chứng.',
+    primaryCta: 'Xem biên nhận',
+    secondaryCta: 'Tải log',
+    sections: [{ title: 'Biên nhận', body: 'Danh sách biên nhận kiểm chứng.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  demo: {
+    key: 'demo',
+    title: 'Chứng minh trực tiếp — Nguyen AI',
+    description: 'Demo trực tiếp khả năng của hệ thống.',
+    eyebrow: 'Demo',
+    heroTitle: 'Xem hệ thống hoạt động',
+    heroText: 'Demo trực tiếp các tính năng chính.',
+    primaryCta: 'Thử ngay',
+    secondaryCta: 'Liên hệ demo',
+    sections: [{ title: 'Demo', body: 'Demo trực tiếp các tính năng.' }],
+    trustBar: { items: [] },
+    faq: []
   }
 };
 
@@ -1069,6 +1160,97 @@ const en: Record<RouteKey, PageContent> = {
       { question: 'What is in the private investor room?', answer: 'Data room, 5-year financial model, cap table, technical audit reports, IP ownership, security reports, legal contracts, and meeting scheduling with the founder.' },
       { question: 'Which legal entity bears legal responsibility?', answer: 'VIET CAN NEW CORP (US) bears full legal responsibility for founding, operating the system, and owns all IP. Kasan JSC (Tax ID 0315521422) is a commercial representative in Vietnam — registered under VN law, issues VAT, complies with PDPD, but does not bear primary legal liability.' }
     ]
+  },
+  status: {
+    key: 'status',
+    title: 'System Status — Nguyen AI',
+    description: 'Real-time operational status of the Nguyen AI system.',
+    eyebrow: 'Status',
+    heroTitle: 'All systems operational',
+    heroText: 'Real-time monitoring of services, APIs, and infrastructure.',
+    primaryCta: 'View details',
+    secondaryCta: 'Subscribe to updates',
+    sections: [{ title: 'Services', body: 'All services are operating normally.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  terms: {
+    key: 'terms',
+    title: 'Terms of Service — Nguyen AI',
+    description: 'Terms and conditions for using Nguyen AI services.',
+    eyebrow: 'Legal',
+    heroTitle: 'Terms of Service',
+    heroText: 'Please read carefully before using the service.',
+    primaryCta: 'Download PDF',
+    secondaryCta: 'Contact legal',
+    sections: [{ title: 'Acceptance', body: 'By using the service, you agree to these terms.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  privacy: {
+    key: 'privacy',
+    title: 'Privacy Policy — Nguyen AI',
+    description: 'Data protection and privacy policy.',
+    eyebrow: 'Legal',
+    heroTitle: 'Your privacy',
+    heroText: 'We are committed to protecting your data.',
+    primaryCta: 'Download PDF',
+    secondaryCta: 'Contact DPO',
+    sections: [{ title: 'Collection', body: 'We only collect data necessary to provide the service.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  proof: {
+    key: 'proof',
+    title: 'Independence Proof — Nguyen AI',
+    description: 'Technical proof of system independence from legacy systems.',
+    eyebrow: 'Proof',
+    heroTitle: 'Full independence',
+    heroText: 'Independent backend, no legacy systems dependency.',
+    primaryCta: 'View audit',
+    secondaryCta: 'Download report',
+    sections: [{ title: 'Architecture', body: 'Independent backend, dedicated adapter, no legacy systems inheritance.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  claims: {
+    key: 'claims',
+    title: 'Public Claims — Nguyen AI',
+    description: 'Public claims and verification.',
+    eyebrow: 'Transparency',
+    heroTitle: 'Full transparency',
+    heroText: 'Every claim has verified evidence.',
+    primaryCta: 'View details',
+    secondaryCta: 'Verify',
+    sections: [{ title: 'Claims', body: 'List of public claims with verification status.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  receipts: {
+    key: 'receipts',
+    title: 'Receipts — Nguyen AI',
+    description: 'Verification receipts and audit trail.',
+    eyebrow: 'Receipts',
+    heroTitle: 'Full audit trail',
+    heroText: 'Every action has a verification receipt.',
+    primaryCta: 'View receipts',
+    secondaryCta: 'Download log',
+    sections: [{ title: 'Receipts', body: 'List of verification receipts.' }],
+    trustBar: { items: [] },
+    faq: []
+  },
+  demo: {
+    key: 'demo',
+    title: 'Live Demo — Nguyen AI',
+    description: 'Live demonstration of system capabilities.',
+    eyebrow: 'Demo',
+    heroTitle: 'See the system in action',
+    heroText: 'Live demo of key features.',
+    primaryCta: 'Try now',
+    secondaryCta: 'Contact for demo',
+    sections: [{ title: 'Demo', body: 'Live demonstration of features.' }],
+    trustBar: { items: [] },
+    faq: []
   }
 };
 

@@ -177,6 +177,58 @@ export async function runTests(
   });
 }
 
+/**
+ * Run QA loop verification for a self-heal attempt.
+ * Uses @nai/qa-loop to run audit:all + typecheck + build + test.
+ * Returns the QA loop result with pass/fail status per step.
+ */
+export async function runQAVerification(
+  attemptId: string,
+  cwd?: string
+): Promise<{ allGreen: boolean; results: Array<{ step: string; passed: boolean; detail: string }> }> {
+  const attempt = await defaultStore.getAttempt(attemptId);
+  if (!attempt) {
+    throw new Error('Self-heal attempt not found');
+  }
+
+  await defaultStore.updateAttempt(attemptId, {
+    status: 'testing',
+    test_results: 'Running QA loop verification...',
+  });
+
+  try {
+    const { runQALoop } = await import('@nai/qa-loop');
+    const qaResult = runQALoop(cwd);
+
+    const summary = qaResult.results
+      .map((r) => `${r.step}: ${r.passed ? 'PASS' : 'FAIL'} (${r.detail})`)
+      .join('; ');
+
+    await defaultStore.updateAttempt(attemptId, {
+      status: qaResult.allGreen ? 'awaiting_preview_approval' : 'failed',
+      test_results: summary,
+    });
+
+    return {
+      allGreen: qaResult.allGreen,
+      results: qaResult.results.map((r) => ({
+        step: r.step,
+        passed: r.passed,
+        detail: r.detail,
+      })),
+    };
+  } catch (err) {
+    await defaultStore.updateAttempt(attemptId, {
+      status: 'failed',
+      test_results: `QA loop error: ${String(err)}`,
+    });
+    return {
+      allGreen: false,
+      results: [{ step: 'qa-loop', passed: false, detail: String(err) }],
+    };
+  }
+}
+
 export async function requestPreviewApproval(
   attemptId: string,
   approver: string

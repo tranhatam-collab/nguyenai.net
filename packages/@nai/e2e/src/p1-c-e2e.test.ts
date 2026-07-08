@@ -40,12 +40,7 @@ async function runE2ETests() {
       ],
     };
 
-    const execution = await workflowEngine.execute(workflow, {
-      input: {},
-      outputs: {},
-      state: {},
-      tenantId: 'test-tenant',
-    });
+    const execution = await workflowEngine.execute(workflow, { input: {}, outputs: {}, state: {} }, 'test-tenant');
 
     const stepResult = execution.results.get('step1');
     if (stepResult?.status === 'failed' && stepResult?.error?.includes('Approval required')) {
@@ -133,25 +128,25 @@ async function runE2ETests() {
   // Test 5: Pipeline Execution
   try {
     console.log('Test 6: Pipeline Execution...');
-    const pipeline = createPipeline({
+    let pipeline = createPipeline({
       name: 'Test Pipeline',
       description: 'Test pipeline for E2E',
       stages: [],
     });
 
-    addStage(pipeline, {
+    pipeline = addStage(pipeline, {
       name: 'Research Stage',
       executor: async (input: any) => {
         return { researchData: 'mock research data' };
       },
     });
 
-    addStage(pipeline, {
+    pipeline = addStage(pipeline, {
       name: 'Evidence Stage',
       executor: async (input: any) => {
         return { evidence: 'mock evidence' };
       },
-      dependsOn: ['stage1'],
+      dependsOn: ['stage-0'],
     });
 
     const result = await executePipeline(pipeline, {
@@ -207,25 +202,25 @@ async function runE2ETests() {
     }
 
     // Step 3: Pipeline execution
-    const pipeline = createPipeline({
+    let pipeline = createPipeline({
       name: 'Full Chain Pipeline',
       description: 'Pipeline for full chain test',
       stages: [],
     });
 
-    addStage(pipeline, {
+    pipeline = addStage(pipeline, {
       name: 'Research',
       executor: async (input: any) => {
         return { data: 'research data' };
       },
     });
 
-    addStage(pipeline, {
+    pipeline = addStage(pipeline, {
       name: 'Evidence',
       executor: async (input: any) => {
         return { evidence: 'evidence data' };
       },
-      dependsOn: ['research'],
+      dependsOn: ['stage-0'],
     });
 
     const pipelineResult = await executePipeline(pipeline, {
@@ -341,12 +336,7 @@ async function runE2ETests() {
       ],
     };
 
-    const execution = await workflowEngine.execute(workflow, {
-      input: {},
-      outputs: {},
-      state: {},
-      tenantId: 'test-tenant',
-    });
+    const execution = await workflowEngine.execute(workflow, { input: {}, outputs: {}, state: {} }, 'test-tenant');
 
     const stepResult = execution.results.get('step1');
     if (stepResult?.status === 'succeeded' && stepResult?.output === 'step1 result') {

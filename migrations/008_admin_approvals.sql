@@ -1,6 +1,7 @@
 -- Migration: admin_approvals
 -- Phase 2 — Admin approval and self-healing
 -- Per AI_AGENT_SELF_HEALING_APPROVAL_POLICY_2026-07-07.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS admin_approvals (
   request_id TEXT PRIMARY KEY,
@@ -23,3 +24,5 @@ CREATE INDEX IF NOT EXISTS idx_admin_approvals_status ON admin_approvals(status)
 CREATE INDEX IF NOT EXISTS idx_admin_approvals_stage ON admin_approvals(stage);
 CREATE INDEX IF NOT EXISTS idx_admin_approvals_requester ON admin_approvals(requester);
 CREATE INDEX IF NOT EXISTS idx_admin_approvals_requested_at ON admin_approvals(requested_at);
+
+COMMIT;

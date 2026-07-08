@@ -1,6 +1,7 @@
 -- Migration: runbooks
 -- Phase 2 — Admin approval and self-healing
 -- Per AI_AGENT_SELF_HEALING_APPROVAL_POLICY_2026-07-07.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS runbooks (
   runbook_id TEXT PRIMARY KEY,
@@ -20,3 +21,5 @@ CREATE TABLE IF NOT EXISTS runbooks (
 CREATE INDEX IF NOT EXISTS idx_runbooks_component ON runbooks(component);
 CREATE INDEX IF NOT EXISTS idx_runbooks_incident_type ON runbooks(incident_type);
 CREATE INDEX IF NOT EXISTS idx_runbooks_risk_level ON runbooks(risk_level);
+
+COMMIT;

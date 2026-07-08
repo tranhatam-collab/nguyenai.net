@@ -1,6 +1,7 @@
 -- Migration: model_invocations
 -- Phase 3 — Model Gateway and output guard
 -- Per MODEL_GATEWAY_IDENTITY_POLICY.md
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS model_invocations (
   invocation_id TEXT PRIMARY KEY,
@@ -26,3 +27,5 @@ CREATE INDEX IF NOT EXISTS idx_model_invocations_user_id ON model_invocations(us
 CREATE INDEX IF NOT EXISTS idx_model_invocations_tenant_id ON model_invocations(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_model_invocations_provider ON model_invocations(provider);
 CREATE INDEX IF NOT EXISTS idx_model_invocations_created_at ON model_invocations(created_at);
+
+COMMIT;
