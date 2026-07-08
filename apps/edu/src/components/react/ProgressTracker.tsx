@@ -210,6 +210,7 @@ export default function ProgressTracker({
                     ? 'text-academy-muted hover:text-academy-text bg-academy-bg'
                     : 'text-white bg-academy-accent hover:bg-academy-accent/90'
                 }`}
+                aria-label={`Mark lesson ${lesson.slug} as ${lesson.completed ? 'incomplete' : 'complete'}`}
               >
                 {updatingSlug === lesson.slug
                   ? '...'
