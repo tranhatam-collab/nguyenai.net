@@ -29,7 +29,8 @@
     "audit:brand": "bash tools/audit-brand-naming-lock.sh",
     "audit:language": "bash tools/audit-language-boundary.sh",
     "audit:independence": "bash tools/audit-independence.sh",
-    "audit:all": "pnpm run audit:brand && pnpm run audit:accessibility && pnpm run audit:contamination && pnpm run audit:language && pnpm run audit:independence && pnpm run audit:security-p0 && npx tsx tools/audit-email-language.ts && npx tsx tools/audit-hreflang.ts && npx tsx tools/audit-i18n-keys.ts && npx tsx tools/audit-language-switcher.ts && npx tsx tools/audit-public-claims.ts && npx tsx tools/audit-seo-bilingual.ts && npx tsx tools/audit-form-language.ts",
+    "audit:all": "pnpm run audit:brand && pnpm run audit:accessibility && pnpm run audit:contamination && pnpm run audit:language && pnpm run audit:independence && pnpm run audit:security-p0 && npx tsx tools/audit-email-language.ts && npx tsx tools/audit-hreflang.ts && npx tsx tools/audit-i18n-keys.ts && npx tsx tools/audit-language-switcher.ts && npx tsx tools/audit-public-claims.ts && npx tsx tools/audit-seo-bilingual.ts && npx tsx tools/audit-form-language.ts && npx tsx tools/audit-vietnamese-purity-build.ts",
+    "audit:language:pure": "npx tsx tools/audit-vietnamese-purity-build.ts",
     "audit:security-p0": "npx tsx tools/audit-security-p0.ts",
     "db:migrate": "pnpm --filter @nai/migrations migrate:apply",
     "db:status": "pnpm --filter @nai/migrations migrate:status"

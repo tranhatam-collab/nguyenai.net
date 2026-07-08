@@ -1,13 +1,17 @@
 {
   "name": "@nai/i18n",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./vi": "./src/vi.ts",
-    "./en": "./src/en.ts"
-  }
+  "version": "1.0.0",
+  "description": "Vietnamese language purity enforcement for nguyenai.net",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "i18n",
+    "vietnamese",
+    "language-purity"
+  ],
+  "author": "Nguyen AI",
+  "license": "UNLICENSED"
 }
