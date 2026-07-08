@@ -34,11 +34,11 @@ const websiteJsonLd = {
 const productJsonLd = routeKey === 'home' ? {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: 'Nguyen AI Computer',
+  name: locale === 'vi' ? 'Máy Tính AI Nguyễn' : 'Nguyen AI Computer',
   description: site.heroDescription[locale],
   brand: { '@type': 'Brand', name: site.name[locale] },
   url: site.url,
-  category: 'AI Computer',
+  category: locale === 'vi' ? 'Máy Tính AI Nguyễn' : 'AI Computer',
   offers: {
     '@type': 'AggregateOffer',
     priceCurrency: 'VND',

@@ -116,97 +116,97 @@ const vi: Record<RouteKey, PageContent> = {
     title: 'Máy Tính AI Nguyễn | Máy Tính AI cho thế hệ Nguyễn toàn cầu',
     description: 'Máy Tính AI Nguyễn là dòng Máy Tính AI đám mây chuyên biệt cho cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng Nguyễn toàn cầu — 9 mô hình máy + 9 sản phẩm chức năng + 9 tác nhân chuyên biệt + 7 siêu ứng dụng di sản.',
     eyebrow: 'Máy Tính AI Nguyễn',
-    heroTitle: 'AI Computer cho thế hệ Nguyễn toàn cầu.',
-    heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một AI Computer riêng trên đám mây — với đội ngũ 9 AI Agent, bộ nhớ dài hạn, kho dữ liệu, 7 Super App di sản, 12 tool family làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
-    primaryCta: 'Khởi tạo Nguyen AI Computer',
+    heroTitle: 'Máy Tính AI Nguyễn cho thế hệ Nguyễn toàn cầu.',
+    heroText: 'Mỗi cá nhân, gia đình, nhà sáng lập, doanh nghiệp và cộng đồng có một Máy Tính AI Nguyễn riêng trên đám mây — với đội ngũ 9 Tác nhân AI, bộ nhớ dài hạn, kho dữ liệu, 7 Siêu ứng dụng di sản, 12 họ công cụ làm việc và kết nối toàn cầu. Không phải chatbot. Không chỉ gia phả.',
+    primaryCta: 'Khởi tạo Máy Tính AI Nguyễn',
     secondaryCta: 'Khám phá cách hệ thống vận hành',
     sections: [
-      { title: 'Không phải chatbot', body: 'Nguyen AI Computer là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một instance riêng với đội ngũ Agent, bộ nhớ dài hạn, kho dữ liệu, công cụ và workflow — không chỉ trả lời từng câu hỏi một.' },
-      { title: 'Máy Tính AI riêng cho mỗi người', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác. Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' },
+      { title: 'Không phải chatbot', body: 'Nguyễn AI là một hệ thống Máy Tính AI cá nhân trên đám mây. Mỗi người dùng có một máy riêng với đội ngũ Tác nhân, bộ nhớ dài hạn, kho dữ liệu, công cụ và quy trình — không chỉ trả lời từng câu hỏi một.' },
+      { title: 'Máy Tính AI riêng cho mỗi người', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác. Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn mô hình, phân việc cho Tác nhân, gọi công cụ, thực hiện quy trình dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' },
       { title: 'Cội nguồn vững. Trí tuệ mạnh. Vận hành toàn cầu.', body: 'Nguyen Operating Profile được thiết kế cho nhu cầu của cộng đồng Nguyễn: cội nguồn, tri thức, sáng lập, thích nghi, kết nối, minh chứng và trách nhiệm thế hệ.' }
     ],
     trustBar: {
       items: [
-        { label: 'Agent chuyên biệt', value: '9' },
-        { label: 'Super App di sản', value: '7' },
-        { label: 'Tool family AI', value: '12' },
-        { label: 'Model máy', value: '9' },
-        { label: 'Functional Product', value: '9' },
+        { label: 'Tác nhân chuyên biệt', value: '9' },
+        { label: 'Siêu ứng dụng di sản', value: '7' },
+        { label: 'Họ công cụ AI', value: '12' },
+        { label: 'Mô hình máy', value: '9' },
+        { label: 'Sản phẩm chức năng', value: '9' },
         { label: 'Ngôn ngữ', value: 'VI / EN' }
       ]
     },
     comparisonVsChatbot: {
-      title: 'Chatbot vs Nguyen AI Computer',
+      title: 'Chatbot vs Máy Tính AI Nguyễn',
       rows: [
         { label: 'Bản chất', values: ['Trả lời từng câu', 'Hệ thống Máy Tính AI cá nhân'] },
         { label: 'Bộ nhớ', values: ['Không có / session', 'Bộ nhớ dài hạn, project, decision'] },
-        { label: 'Dữ liệu', values: ['Không có vault', 'Data Vault riêng, mã hóa'] },
-        { label: 'Agent', values: ['1 chatbot', '9 Agent chuyên biệt'] },
-        { label: 'Công cụ', values: ['Không', '12 tool family + 7 Super App'] },
-        { label: 'Workflow', values: ['Không', 'Workflow engine dài hạn, multi-step'] },
-        { label: 'Bằng chứng', values: ['Không', 'Evidence, proof record, audit log'] },
-        { label: 'Phê duyệt', values: ['Không', 'Approval Gates cho hành động nhạy cảm'] },
-        { label: 'Kiểm soát chi phí', values: ['Không', 'Cost Governor giới hạn quota'] }
+        { label: 'Dữ liệu', values: ['Không có vault', 'Kho dữ liệu riêng, mã hóa'] },
+        { label: 'Tác nhân', values: ['1 chatbot', '9 Tác nhân chuyên biệt'] },
+        { label: 'Công cụ', values: ['Không', '12 họ công cụ + 7 Siêu ứng dụng'] },
+        { label: 'Quy trình', values: ['Không', 'Bộ máy quy trình dài hạn, multi-step'] },
+        { label: 'Bằng chứng', values: ['Không', 'Bằng chứng, biên nhận, nhật ký kiểm tra'] },
+        { label: 'Phê duyệt', values: ['Không', 'Cổng phê duyệt cho hành động nhạy cảm'] },
+        { label: 'Kiểm soát chi phí', values: ['Không', 'Bộ kiểm soát chi phí giới hạn hạn mức'] }
       ]
     },
     architectureDiagram: {
-      title: 'Kiến trúc Nguyen AI — Backend độc lập',
+      title: 'Kiến trúc Nguyễn AI — Backend độc lập',
       body: 'Nguyễn AI vận hành trên phần nền riêng, tự chủ toàn bộ. Ba lớp vận hành, mỗi lớp có vai trò rõ ràng. Mọi năng lực đều có biên nhận kiểm chứng.',
       layers: [
-        { name: 'Runtime độc lập — Lõi thực thi', role: 'Runtime, Agent, công cụ, bộ nhớ, bằng chứng', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Tool Kernel, Memory Engine, Evidence Engine', 'Workflow Engine, Security Boundary'] },
-        { name: 'Identity & commerce', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['nguyenai.net', 'Identity, Account, Entitlement', 'Billing, Subscription, Plan management', 'Academy Pass, Certification'] },
-        { name: 'Nguyen AI — Thương hiệu & sản phẩm chuyên biệt', role: 'Thương hiệu, sản phẩm chuyên biệt, nội dung và phân phối', items: ['nguyenai.net', 'Nguyen Operating Profile', '9 Model + 9 Functional Products', '7 Super App + 12 tool family + 9 Agent'] }
+        { name: 'Runtime độc lập — Lõi thực thi', role: 'Runtime, Tác nhân, công cụ, bộ nhớ, bằng chứng', items: ['nguyenai.net/apps/api', 'Router, Planner, Executor, Reviewer', 'Lõi công cụ, Bộ nhớ, Bằng chứng', 'Bộ máy quy trình, Ranh giới bảo mật'] },
+        { name: 'Danh tính & thương mại', role: 'Danh tính, tài khoản, gói, quyền sử dụng, thanh toán', items: ['nguyenai.net', 'Danh tính, Tài khoản, Quyền sử dụng', 'Thanh toán, Đăng ký, Quản lý gói', 'Học viện, Chứng chỉ'] },
+        { name: 'Nguyễn AI — Thương hiệu & sản phẩm chuyên biệt', role: 'Thương hiệu, sản phẩm chuyên biệt, nội dung và phân phối', items: ['nguyenai.net', 'Nguyen Operating Profile', '9 Mô hình máy + 9 Sản phẩm chức năng', '7 Siêu ứng dụng + 12 họ công cụ + 9 Tác nhân'] }
       ]
     },
     featureGrid: {
-      title: '9 Agent chuyên biệt',
+      title: '9 Tác nhân chuyên biệt',
       body: 'Chín tác nhân chuyên biệt vận hành trên nền tảng riêng của Nguyễn AI, mỗi tác nhân có vai trò rõ ràng.',
       cards: [
-        { name: 'Nguyen Guide', description: 'Điều phối chính, tiếp nhận lệnh, lập kế hoạch và phân việc.', tag: 'Core' },
-        { name: 'Nguyen Researcher', description: 'Nghiên cứu, tổng hợp nguồn, so sánh tài liệu.', tag: 'Research' },
-        { name: 'Nguyen Archivist', description: 'Quản trị tư liệu, gia phả, kho lưu trữ.', tag: 'Archive' },
-        { name: 'Nguyen Verifier', description: 'Kiểm tra claim, evidence, fact-checking.', tag: 'Trust' },
-        { name: 'Nguyen Family Steward', description: 'Quản trị family memory, oral history, quyền thế hệ.', tag: 'Family' },
-        { name: 'Nguyen Founder', description: 'Chiến lược, pitch deck, gọi vốn, decision log.', tag: 'Founder' },
-        { name: 'Nguyen Business Operator', description: 'Vận hành doanh nghiệp, SOP, CRM, automation.', tag: 'Business' },
-        { name: 'Nguyen Global Connector', description: 'Diaspora, mạng lưới, kết nối cộng đồng toàn cầu.', tag: 'Network' },
-        { name: 'Nguyen Guardian', description: 'Bảo mật, quyền, phê duyệt, audit log.', tag: 'Security' }
+        { name: 'Nguyen Guide', description: 'Điều phối chính, tiếp nhận lệnh, lập kế hoạch và phân việc.', tag: 'Lõi' },
+        { name: 'Nguyen Researcher', description: 'Nghiên cứu, tổng hợp nguồn, so sánh tài liệu.', tag: 'Nghiên cứu' },
+        { name: 'Nguyen Archivist', description: 'Quản trị tư liệu, gia phả, kho lưu trữ.', tag: 'Lưu trữ' },
+        { name: 'Nguyen Verifier', description: 'Kiểm tra claim, bằng chứng, fact-checking.', tag: 'Minh chứng' },
+        { name: 'Nguyen Family Steward', description: 'Quản trị bộ nhớ gia đình, oral history, quyền thế hệ.', tag: 'Gia đình' },
+        { name: 'Nguyen Founder', description: 'Chiến lược, pitch deck, gọi vốn, decision log.', tag: 'Sáng lập' },
+        { name: 'Nguyen Business Operator', description: 'Vận hành doanh nghiệp, SOP, CRM, automation.', tag: 'Doanh nghiệp' },
+        { name: 'Nguyen Global Connector', description: 'Diaspora, mạng lưới, kết nối cộng đồng toàn cầu.', tag: 'Kết nối' },
+        { name: 'Nguyen Guardian', description: 'Bảo mật, quyền, phê duyệt, nhật ký kiểm tra.', tag: 'Bảo mật' }
       ]
     },
     superAppsGeneral: {
-      title: '12 Tool family AI — Siêu Ứng Dụng tổng quát',
+      title: '12 Họ công cụ AI — Siêu Ứng Dụng tổng quát',
       body: 'Công cụ AI chung cho công việc hàng ngày, có trong các gói Personal trở lên.',
       cards: [
-        { name: 'AI Office', description: 'Văn phòng: documents, spreadsheets, reports, minutes.', tag: 'Office' },
-        { name: 'AI Research', description: 'Nghiên cứu: web search, PDF, bibliography, cited reports.', tag: 'Research' },
-        { name: 'AI Browser', description: 'Trình duyệt: controlled web access, page reading, extraction.', tag: 'Browser' },
-        { name: 'AI Content', description: 'Nội dung: articles, SEO, social, newsletter, editorial.', tag: 'Content' },
+        { name: 'AI Office', description: 'Văn phòng: documents, spreadsheets, reports, minutes.', tag: 'Văn phòng' },
+        { name: 'AI Research', description: 'Nghiên cứu: web search, PDF, bibliography, cited reports.', tag: 'Nghiên cứu' },
+        { name: 'AI Browser', description: 'Trình duyệt: controlled web access, page reading, extraction.', tag: 'Trình duyệt' },
+        { name: 'AI Content', description: 'Nội dung: articles, SEO, social, newsletter, editorial.', tag: 'Nội dung' },
         { name: 'AI Media', description: 'Media: images, audio, video, transcript, subtitles.', tag: 'Media' },
         { name: 'AI Code', description: 'Code: repository audit, write, test, fix, deploy.', tag: 'Code' },
-        { name: 'AI Automation', description: 'Tự động hóa: workflow, trigger, scheduled task.', tag: 'Automation' },
-        { name: 'AI Founder OS', description: 'Founder: vision, strategy, roadmap, decision log, pitch.', tag: 'Founder' },
-        { name: 'AI Business OS', description: 'Business: operations, SOP, task, knowledge, customer care.', tag: 'Business' },
-        { name: 'AI Sales', description: 'Bán hàng: CRM, proposal, follow-up, pipeline, scripts.', tag: 'Sales' },
-        { name: 'AI Finance Workspace', description: 'Tài chính: budget, cash flow, voucher, management report.', tag: 'Finance' },
-        { name: 'AI Legal Workspace', description: 'Pháp lý: contract classification, clause, comparison.', tag: 'Legal' }
+        { name: 'AI Automation', description: 'Tự động hóa: quy trình, trigger, scheduled task.', tag: 'Tự động hóa' },
+        { name: 'AI Founder OS', description: 'Founder: vision, strategy, roadmap, decision log, pitch.', tag: 'Sáng lập' },
+        { name: 'AI Business OS', description: 'Business: operations, SOP, task, knowledge, customer care.', tag: 'Doanh nghiệp' },
+        { name: 'AI Sales', description: 'Bán hàng: CRM, proposal, follow-up, pipeline, scripts.', tag: 'Bán hàng' },
+        { name: 'AI Finance Workspace', description: 'Tài chính: budget, cash flow, voucher, management report.', tag: 'Tài chính' },
+        { name: 'AI Legal Workspace', description: 'Pháp lý: contract classification, clause, comparison.', tag: 'Pháp lý' }
       ]
     },
     superAppsSpecialized: {
-      title: '7 Super App — Siêu Ứng Dụng chuyên biệt Nguyễn',
-      body: 'Super App đặc thù cho hệ sinh thái Nguyễn: di sản, tri thức, cộng đồng.',
+      title: '7 Siêu Ứng Dụng — Siêu Ứng Dụng chuyên biệt Nguyễn',
+      body: 'Siêu ứng dụng đặc thù cho hệ sinh thái Nguyễn: di sản, tri thức, cộng đồng.',
       cards: [
-        { name: 'Nguyen Roots', description: 'Cội Nguồn — family graph, cây gia phả, chi họ, timeline.', tag: 'Heritage' },
-        { name: 'Nguyen Memory', description: 'Di Sản — ảnh, tài liệu, nhật ký, oral history, archive.', tag: 'Heritage' },
-        { name: 'Nguyen Knowledge', description: 'Tri Thức — lịch sử, văn hóa, thư viện, Q&A có nguồn.', tag: 'Knowledge' },
-        { name: 'Nguyen Trust', description: 'Minh Chứng — claim, source, evidence, verification, audit.', tag: 'Trust' },
-        { name: 'Nguyen Network', description: 'Kết Nối — cá nhân, chuyên gia, founder, chapter, diaspora.', tag: 'Network' },
-        { name: 'Nguyen Founders', description: 'Sáng Lập — hồ sơ founder, doanh nghiệp, mentorship.', tag: 'Founder' },
-        { name: 'Nguyen Chapter OS', description: 'Chi Họ — thành viên, governance, sự kiện, website riêng.', tag: 'Community' }
+        { name: 'Nguyen Roots', description: 'Cội Nguồn — family graph, cây gia phả, chi họ, timeline.', tag: 'Di sản' },
+        { name: 'Nguyen Memory', description: 'Di Sản — ảnh, tài liệu, nhật ký, oral history, archive.', tag: 'Di sản' },
+        { name: 'Nguyen Knowledge', description: 'Tri Thức — lịch sử, văn hóa, thư viện, Q&A có nguồn.', tag: 'Tri thức' },
+        { name: 'Nguyen Trust', description: 'Minh Chứng — claim, source, evidence, verification, audit.', tag: 'Minh chứng' },
+        { name: 'Nguyen Network', description: 'Kết Nối — cá nhân, chuyên gia, founder, chapter, diaspora.', tag: 'Kết nối' },
+        { name: 'Nguyen Founders', description: 'Sáng Lập — hồ sơ founder, doanh nghiệp, mentorship.', tag: 'Sáng lập' },
+        { name: 'Nguyen Chapter OS', description: 'Chi Họ — thành viên, governance, sự kiện, website riêng.', tag: 'Cộng đồng' }
       ]
     },
     userGroups: {
       title: 'Nhóm người dùng',
-      body: 'Nguyen AI Computer phục vụ 8 nhóm người dùng từ cá nhân đến tổ chức lớn.',
+      body: 'Máy Tính AI Nguyễn phục vụ 8 nhóm người dùng từ cá nhân đến tổ chức lớn.',
       cards: [
         { name: 'Cá nhân', icon: '👤', description: 'Công việc, học tập, sáng tạo, tri thức cá nhân.', plan: 'Personal' },
         { name: 'Gia đình', icon: '👨‍👩‍👧', description: 'Gia phả, di sản, oral history, bộ nhớ gia đình.', plan: 'Family' },
@@ -222,7 +222,7 @@ const vi: Record<RouteKey, PageContent> = {
       title: '8 Demo — Máy vận hành thế nào',
       body: 'Tám tình huống thực tế. Mỗi demo được ghi rõ trạng thái: Live, Interactive, Simulated, Preview hoặc Planned. Không giả lập demo như sản phẩm thật.',
       scenarios: [
-        { title: 'Nghiên cứu thị trường có nguồn', user: 'Nguyễn A — Founder', command: '"Nghiên cứu thị trường Máy Tính AI cá nhân tại Việt Nam, có nguồn và evidence."', steps: ['Nguyen Researcher thu thập nguồn', 'AI Browser truy cập web, trích xuất dữ liệu', 'Nguyen Verifier gắn nhãn: primary, secondary', 'AI Research tổng hợp báo cáo có bibliography', 'Lưu evidence pack vào Data Vault'], result: 'Báo cáo 25 trang + 40 nguồn + evidence labels + bibliography', label: 'Simulated demo' },
+        { title: 'Nghiên cứu thị trường có nguồn', user: 'Nguyễn A — Founder', command: '"Nghiên cứu thị trường Máy Tính AI cá nhân tại Việt Nam, có nguồn và bằng chứng."', steps: ['Nguyen Researcher thu thập nguồn', 'AI Browser truy cập web, trích xuất dữ liệu', 'Nguyen Verifier gắn nhãn: primary, secondary', 'AI Research tổng hợp báo cáo có bibliography', 'Lưu bộ bằng chứng vào Kho dữ liệu riêng'], result: 'Báo cáo 25 trang + 40 nguồn + evidence labels + bibliography', label: 'Simulated demo' },
         { title: 'Xây hồ sơ gọi vốn', user: 'Nguyễn B — Founder', command: '"Chuẩn bị pitch deck, mô hình tài chính 5 năm, data room cho vòng Seed."', steps: ['Nguyen Founder lập outline pitch deck', 'AI Finance Workspace xây mô hình 5 năm', 'AI Legal Workspace chuẩn bị SAFE', 'Nguyen Guardian thiết lập data room', 'Investor Readiness Pack tạo diligence checklist'], result: 'Pitch deck 15 slide + financial model + data room + checklist', label: 'Simulated demo' },
         { title: 'Kế hoạch vận hành doanh nghiệp 90 ngày', user: 'Nguyễn C — Business', command: '"Lập kế hoạch vận hành 90 ngày cho doanh nghiệp 15 nhân viên."', steps: ['Nguyen Business Operator phân tích hiện trạng', 'AI Business OS xây SOP cho 5 phòng ban', 'AI Automation lên lịch task tự động', 'Nguyen Verifier kiểm tra consistency', 'Xuất kế hoạch 90 ngày có KPI'], result: 'Kế hoạch 90 ngày + 5 SOP + KPI dashboard + automation schedule', label: 'Simulated demo' },
         { title: 'Phân tích hợp đồng', user: 'Nguyễn D — Business', command: '"Phân tích hợp đồng thuê văn phòng, phát hiện rủi ro, so sánh phiên bản."', steps: ['AI Legal Workspace trích xuất clause', 'Nguyen Verifier phát hiện rủi ro', 'AI Legal so sánh phiên bản, highlight thay đổi', 'Nguyen Guardian phê duyệt trước export', 'Xuất báo cáo rủi ro + recommendation'], result: 'Báo cáo phân tích + 7 rủi ro + version diff + recommendation', label: 'Simulated demo' },
@@ -238,25 +238,25 @@ const vi: Record<RouteKey, PageContent> = {
       steps: [
         'Người dùng ra lệnh bằng tiếng Việt hoặc tiếng Anh',
         'Command Kernel tiếp nhận và phân tích lệnh',
-        'Planner lập kế hoạch, chia việc cho Agent',
-        'Model Router chọn model theo nhiệm vụ (reasoning, coding, vision...)',
+        'Planner lập kế hoạch, chia việc cho Tác nhân',
+        'Model Router chọn mô hình theo nhiệm vụ (reasoning, coding, vision...)',
         'Tool Execution thực thi: gọi công cụ, API, browser',
         'Reviewer kiểm tra kết quả, phát hiện lỗi',
-        'Evidence Engine lưu proof record, audit trail',
+        'Evidence Engine lưu biên nhận, nhật ký kiểm tra',
         'Human Approval phê duyệt trước hành động nhạy cảm',
-        'Result trả về người dùng + evidence pack'
+        'Result trả về người dùng + bộ bằng chứng'
       ]
     },
     pricingTable: {
-      title: '9 Model máy — Giá định hướng',
+      title: '9 Mô hình máy — Giá định hướng',
       body: 'Giá hiện là giả thuyết pilot, cần xác minh chi phí AI, lưu trữ, hỗ trợ và pháp lý trước khi công bố thương mại.',
       plans: [
-        { name: 'Nguyen Start', code: 'nguyen-start', price: 'Free', target: 'Người mới thử', features: ['2 Agent (Guide, Guardian)', '100MB memory, 500MB vault', '10 commands/ngày', 'Không Super App'], cta: 'Bắt đầu miễn phí' },
-        { name: 'Nguyen Personal', code: 'nguyen-personal', price: '299.000₫', period: '/tháng', target: 'Cá nhân', features: ['4 Agent', '5GB memory, 10GB vault', '100 commands/ngày', '3 Super App cơ bản'], cta: 'Chọn Personal' },
-        { name: 'Nguyen Family', code: 'nguyen-family', price: '599.000₫', period: '/tháng', target: 'Gia đình 2-6 người', features: ['5 Agent (+Family Steward)', '20GB memory, 50GB vault', '300 commands/ngày', '+ Nguyen Roots, Memory'], cta: 'Chọn Family' },
-        { name: 'Nguyen Creator', code: 'nguyen-creator', price: '999.000₫', period: '/tháng', target: 'Người sáng tạo', features: ['5 Agent (+Creator)', '20GB memory, 100GB vault', '500 commands/ngày', '+ AI Media, AI Browser'], cta: 'Chọn Creator' },
-        { name: 'Nguyen Founder', code: 'nguyen-founder', price: '1.999.000₫', period: '/tháng', target: 'Nhà sáng lập', features: ['7 Agent (+Founder, Business)', '50GB memory, 200GB vault', '1.000 commands/ngày', '+ Founder OS, Finance, Legal'], cta: 'Chọn Founder', highlighted: true },
-        { name: 'Nguyen Business', code: 'nguyen-business', price: '4.999.000₫', period: '/tháng', target: 'Doanh nghiệp 5-25 seat', features: ['8 Agent (+Global Connector)', '200GB memory, 1TB vault', '5.000 commands/ngày', '+ Business OS, Sales, Automation'], cta: 'Chọn Business' },
+        { name: 'Nguyen Start', code: 'nguyen-start', price: 'Free', target: 'Người mới thử', features: ['2 Tác nhân (Guide, Guardian)', '100MB bộ nhớ, 500MB kho dữ liệu', '10 commands/ngày', 'Không Siêu ứng dụng'], cta: 'Bắt đầu miễn phí' },
+        { name: 'Nguyen Personal', code: 'nguyen-personal', price: '299.000₫', period: '/tháng', target: 'Cá nhân', features: ['4 Tác nhân', '5GB bộ nhớ, 10GB kho dữ liệu', '100 commands/ngày', '3 Siêu ứng dụng cơ bản'], cta: 'Chọn Personal' },
+        { name: 'Nguyen Family', code: 'nguyen-family', price: '599.000₫', period: '/tháng', target: 'Gia đình 2-6 người', features: ['5 Tác nhân (+Family Steward)', '20GB bộ nhớ, 50GB kho dữ liệu', '300 commands/ngày', '+ Nguyen Roots, Memory'], cta: 'Chọn Family' },
+        { name: 'Nguyen Creator', code: 'nguyen-creator', price: '999.000₫', period: '/tháng', target: 'Người sáng tạo', features: ['5 Tác nhân (+Creator)', '20GB bộ nhớ, 100GB kho dữ liệu', '500 commands/ngày', '+ AI Media, AI Browser'], cta: 'Chọn Creator' },
+        { name: 'Nguyen Founder', code: 'nguyen-founder', price: '1.999.000₫', period: '/tháng', target: 'Nhà sáng lập', features: ['7 Tác nhân (+Founder, Business)', '50GB bộ nhớ, 200GB kho dữ liệu', '1.000 commands/ngày', '+ Founder OS, Finance, Legal'], cta: 'Chọn Founder', highlighted: true },
+        { name: 'Nguyen Business', code: 'nguyen-business', price: '4.999.000₫', period: '/tháng', target: 'Doanh nghiệp 5-25 seat', features: ['8 Tác nhân (+Global Connector)', '200GB bộ nhớ, 1TB kho dữ liệu', '5.000 commands/ngày', '+ Business OS, Sales, Automation'], cta: 'Chọn Business' },
         { name: 'Nguyen Chapter', code: 'nguyen-chapter', price: '7.999.000₫', period: '/tháng', target: 'Chi họ, hội, cộng đồng', features: ['9 Agent (all)', '500GB memory, 5TB vault', '10.000 commands/ngày', '+ Chapter OS, Network, Knowledge'], cta: 'Chọn Chapter' },
         { name: 'Nguyen Enterprise', code: 'nguyen-enterprise', price: 'Báo giá', target: 'Tổ chức lớn 25+ seat', features: ['9 Agent + custom', 'Custom memory, custom vault', 'Custom quota', 'SSO, SLA, compliance, audit export'], cta: 'Liên hệ' },
         { name: 'Nguyen Sovereign', code: 'nguyen-sovereign', price: 'Báo giá', target: 'Dedicated/private, on-premise', features: ['9 Agent + custom', 'Dedicated memory, dedicated vault', 'Unlimited quota', 'Data residency, on-prem, sovereign deploy'], cta: 'Liên hệ' }
