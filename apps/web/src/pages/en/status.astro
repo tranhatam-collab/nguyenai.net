@@ -7,11 +7,11 @@ const description = 'Capability × R-grade matrix. Every capability has a verifi
 ---
 <BaseLayout locale="en" routeKey="status" title={title} description={description}>
   <main class="status-page">
-    <section class="hero">
+    <section class="hero" aria-label="Hero section">
       <h1>Product status</h1>
       <p>Every capability has its R-grade label. R0 = unverified, R1 = internally verified, R2 = independently verified, R3 = live verified.</p>
     </section>
-    <section class="matrix">
+    <section class="matrix" aria-label="Product status matrix">
       <ProductStatusMatrix locale="en" />
     </section>
   </main>

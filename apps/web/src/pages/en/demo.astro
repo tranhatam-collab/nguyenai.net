@@ -7,11 +7,11 @@ const description = 'Live capability demo: call API, see results, check receipts
 ---
 <BaseLayout locale="en" routeKey="demo" title={title} description={description}>
   <main class="demo-page">
-    <section class="hero">
+    <section class="hero" aria-label="Hero section">
       <h1>Capability demo</h1>
       <p>Live capability demo. Call the API, see results, check receipts.</p>
     </section>
-    <section class="demos">
+    <section class="demos" aria-label="List of API demos">
       <div class="demo-card">
         <h3>POST /v1/chat <RGradeBadge grade="R1" locale="en" /></h3>
         <p>Call chat API with own model. Response from direct provider (OpenAI/Anthropic/Google), no Gen1 proxy.</p>

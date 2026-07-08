@@ -7,11 +7,11 @@ const description = 'List of approved public claims with R-grade labels and evid
 ---
 <BaseLayout locale="en" routeKey="claims" title={title} description={description}>
   <main class="claims-page">
-    <section class="hero">
+    <section class="hero" aria-label="Hero section">
       <h1>Public claims</h1>
       <p>List of approved public claims. Any claim outside this list requires Founder approval.</p>
     </section>
-    <section class="claims">
+    <section class="claims" aria-label="List of public claims">
       <PublicClaimBlock claimId="independent-backend" text="Nguyen AI owns its own backend, fully self-sufficient." grade="R1" locale="en" evidenceUrl="/en/receipts/" />
       <PublicClaimBlock claimId="no-gen1-dependency" text="No legacy system dependency in default operation." grade="R1" locale="en" evidenceUrl="/en/receipts/" />
       <PublicClaimBlock claimId="evidence-receipts" text="Every important command has a verification receipt." grade="R1" locale="en" evidenceUrl="/en/receipts/" />

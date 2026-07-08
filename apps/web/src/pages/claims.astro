@@ -7,11 +7,11 @@ const description = 'Danh sách tuyên bố công khai được phép, kèm nhã
 ---
 <BaseLayout locale="vi" routeKey="claims" title={title} description={description}>
   <main class="claims-page">
-    <section class="hero">
+    <section class="hero" aria-label="Phần giới thiệu">
       <h1>Tuyên bố công khai</h1>
       <p>Danh sách tuyên bố công khai được phép. Mọi tuyên bố ngoài danh sách này cần phê duyệt Founder.</p>
     </section>
-    <section class="claims">
+    <section class="claims" aria-label="Danh sách tuyên bố công khai">
       <PublicClaimBlock claimId="independent-backend" text="Nguyễn AI sở hữu phần nền sau riêng, tự chủ toàn bộ." grade="R1" locale="vi" evidenceUrl="/receipts/" />
       <PublicClaimBlock claimId="no-gen1-dependency" text="Không phụ thuộc hệ thống cũ trong vận hành mặc định." grade="R1" locale="vi" evidenceUrl="/receipts/" />
       <PublicClaimBlock claimId="evidence-receipts" text="Mọi lệnh quan trọng có biên nhận kiểm chứng." grade="R1" locale="vi" evidenceUrl="/receipts/" />

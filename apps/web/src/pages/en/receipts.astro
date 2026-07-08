@@ -7,11 +7,11 @@ const description = 'Verification receipts for public claims. Hash, timestamp, s
 ---
 <BaseLayout locale="en" routeKey="receipts" title={title} description={description}>
   <main class="receipts-page">
-    <section class="hero">
+    <section class="hero" aria-label="Hero section">
       <h1>Verification receipts</h1>
       <p>Every important claim has a receipt with hash, timestamp, and signer.</p>
     </section>
-    <section class="receipts">
+    <section class="receipts" aria-label="List of verification receipts">
       <ProofReceiptCard receiptId="RC-2026-07-08-001" hash="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2" timestamp="2026-07-08T01:23:45Z" signer="Tran Ha Tam (Founder)" locale="en" />
       <ProofReceiptCard receiptId="RC-2026-07-08-002" hash="b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3" timestamp="2026-07-08T01:24:00Z" signer="Tran Ha Tam (Founder)" locale="en" />
       <ProofReceiptCard receiptId="RC-2026-07-08-003" hash="c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4" timestamp="2026-07-08T01:24:15Z" signer="Tran Ha Tam (Founder)" locale="en" />

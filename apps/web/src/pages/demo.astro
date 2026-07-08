@@ -7,11 +7,11 @@ const description = 'Bản chứng minh năng lực thực tế: gọi API, xem 
 ---
 <BaseLayout locale="vi" routeKey="demo" title={title} description={description}>
   <main class="demo-page">
-    <section class="hero">
+    <section class="hero" aria-label="Phần giới thiệu">
       <h1>Chứng minh năng lực</h1>
       <p>Bản chứng minh năng lực thực tế. Gọi API, xem kết quả, kiểm tra biên nhận.</p>
     </section>
-    <section class="demos">
+    <section class="demos" aria-label="Danh sách demo API">
       <div class="demo-card">
         <h3>POST /v1/chat <RGradeBadge grade="R1" locale="vi" /></h3>
         <p>Gọi chat API với mô hình riêng. Response từ provider trực tiếp (OpenAI/Anthropic/Google), không qua Gen1.</p>

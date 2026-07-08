@@ -7,11 +7,11 @@ const description = 'Biên nhận kiểm chứng cho các tuyên bố công khai
 ---
 <BaseLayout locale="vi" routeKey="receipts" title={title} description={description}>
   <main class="receipts-page">
-    <section class="hero">
+    <section class="hero" aria-label="Phần giới thiệu">
       <h1>Biên nhận kiểm chứng</h1>
       <p>Mỗi tuyên bố quan trọng có biên nhận với mã băm, thời gian, và người duyệt.</p>
     </section>
-    <section class="receipts">
+    <section class="receipts" aria-label="Danh sách biên nhận kiểm chứng">
       <ProofReceiptCard receiptId="RC-2026-07-08-001" hash="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2" timestamp="2026-07-08T01:23:45Z" signer="Trần Hà Tâm (Founder)" locale="vi" />
       <ProofReceiptCard receiptId="RC-2026-07-08-002" hash="b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3" timestamp="2026-07-08T01:24:00Z" signer="Trần Hà Tâm (Founder)" locale="vi" />
       <ProofReceiptCard receiptId="RC-2026-07-08-003" hash="c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4" timestamp="2026-07-08T01:24:15Z" signer="Trần Hà Tâm (Founder)" locale="vi" />

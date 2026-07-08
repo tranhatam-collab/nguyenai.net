@@ -7,11 +7,11 @@ const description = 'Ma trận năng lực × nhãn tin cậy R0–R3. Mọi nă
 ---
 <BaseLayout locale="vi" routeKey="status" title={title} description={description}>
   <main class="status-page">
-    <section class="hero">
+    <section class="hero" aria-label="Phần giới thiệu">
       <h1>Trạng thái sản phẩm</h1>
       <p>Mọi năng lực có nhãn tin cậy R0–R3. R0 = chưa kiểm chứng, R1 = kiểm chứng nội bộ, R2 = kiểm chứng độc lập, R3 = kiểm chứng sống.</p>
     </section>
-    <section class="matrix">
+    <section class="matrix" aria-label="Ma trận trạng thái sản phẩm">
       <ProductStatusMatrix locale="vi" />
     </section>
   </main>

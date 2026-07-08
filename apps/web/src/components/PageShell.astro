@@ -64,7 +64,7 @@ const statusClass: Record<string, string> = {
 
 <BaseLayout locale={locale} routeKey={page.key} title={page.title} description={page.description} jsonLd={faqJsonLd ? [pageJsonLd, faqJsonLd] : pageJsonLd} ogImage={resolvedOgImage}>
   {/* 1. Hero */}
-  <section class="hero section-wrap">
+  <section class="hero section-wrap" aria-label={locale === 'vi' ? 'Phần giới thiệu chính' : 'Hero section'}>
     <div class="eyebrow">{page.eyebrow}</div>
     <h1>{page.heroTitle}</h1>
     <p class="hero-text">{page.heroText}</p>
@@ -411,7 +411,7 @@ const statusClass: Record<string, string> = {
 
   {/* 20. FAQ */}
   {page.faq && (
-    <section class="section-wrap faq">
+    <section class="section-wrap faq" aria-label={locale === 'vi' ? 'Câu hỏi thường gặp' : 'Frequently asked questions'}>
       <div class="eyebrow">FAQ</div>
       <h2>{locale === 'vi' ? 'Câu hỏi thường gặp' : 'Frequently asked questions'}</h2>
       {page.faq.map((item) => (
