@@ -323,34 +323,34 @@ const vi: Record<RouteKey, PageContent> = {
     ]
   },
   'ai-computer': {
-    key: 'ai-computer', title: 'AI Computer — Nguyen AI Computer', description: 'Kiến trúc AI Computer Instance: 16 thành phần — Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Memory, Workflow, Evidence, Approval Gates, Security, Cost Governor, Audit, Sync, Self-Upgrade.', eyebrow: 'AI Computer', heroTitle: 'Mỗi người có một AI Computer riêng.', heroText: 'Nguyen AI Computer Instance bao gồm 16 thành phần: Identity, Command Center, Model Mesh, Agent Team, Super Apps, Tool Kernel, Data Vault, Long-term Memory, Workflow Engine, Verification, Approval Gates, Security Boundary, Cost Governor, Audit & Replay, Sync Layer, Self-Upgrade Registry.',
+    key: 'ai-computer', title: 'Máy Tính AI Nguyễn — Máy Tính AI Nguyễn', description: 'Kiến trúc Máy Tính AI Nguyễn: 16 thành phần — Danh tính, Trung tâm lệnh, Mạng mô hình trí tuệ, Đội tác nhân, Siêu ứng dụng, Lõi công cụ, Kho dữ liệu riêng, Bộ nhớ dài hạn, Bộ máy quy trình, Kiểm chứng, Cổng phê duyệt, Ranh giới bảo mật, Bộ kiểm soát chi phí, Nhật ký kiểm tra, Lớp đồng bộ, Kho tự nâng cấp.', eyebrow: 'Máy Tính AI Nguyễn', heroTitle: 'Mỗi người có một Máy Tính AI Nguyễn riêng.', heroText: 'Mỗi Máy Tính AI Nguyễn là một không gian vận hành riêng, gồm mười sáu thành phần: danh tính, trung tâm lệnh, mạng mô hình trí tuệ, đội tác nhân, siêu ứng dụng, lõi công cụ, kho dữ liệu, bộ nhớ dài hạn, bộ máy quy trình, kiểm chứng, cổng phê duyệt, ranh giới bảo mật, bộ kiểm soát chi phí, nhật ký kiểm tra, lớp đồng bộ và kho tự nâng cấp.',
     sections: [
       { title: 'Khả năng vận hành', body: 'Máy có thể tiếp nhận lệnh tiếng Việt, tự lập kế hoạch, chọn model, phân việc cho Agent, gọi công cụ, thực hiện workflow dài hạn, lưu bộ nhớ, xin phê duyệt, kiểm tra kết quả và phục hồi khi lỗi.' },
       { title: 'Không chia sẻ', body: 'Mỗi người dùng sở hữu một máy riêng trên đám mây, không chia sẻ bộ nhớ hay dữ liệu với người khác. Dữ liệu nằm trong boundary của người dùng.' }
     ],
     featureGrid: {
-      title: '16 thành phần AI Computer Instance',
+      title: 'Mười sáu thành phần của Máy Tính AI Nguyễn',
       cards: [
-        { name: 'Identity & Ownership', description: 'Danh tính và quyền sở hữu máy, không chia sẻ giữa người dùng.', tag: 'Core' },
-        { name: 'Command Center', description: 'Trung tâm tiếp nhận lệnh, điều phối hoạt động.', tag: 'Core' },
-        { name: 'Model Mesh', description: 'Đa mô hình: reasoning, research, coding, vision, voice.', tag: 'AI' },
-        { name: 'Agent Team', description: '9 Agent chuyên biệt cho hệ sinh thái Nguyễn.', tag: 'Agent' },
-        { name: 'Super Apps', description: '7 Super App di sản + 12 tool family AI.', tag: 'App' },
-        { name: 'Tool & Connector Kernel', description: 'Công cụ và kết nối: API, webhook, integration.', tag: 'Tool' },
-        { name: 'Data Vault', description: 'Kho dữ liệu riêng, mã hóa, quyền theo vai trò.', tag: 'Data' },
-        { name: 'Long-term Memory', description: 'Bộ nhớ dài hạn: session, preference, project, decision.', tag: 'Memory' },
-        { name: 'Workflow Engine', description: 'Motor thực thi workflow dài hạn, multi-step.', tag: 'Engine' },
-        { name: 'Verification & Evidence', description: 'Kiểm tra kết quả, lưu proof record, evidence pack.', tag: 'Trust' },
-        { name: 'Approval Gates', description: 'Phê duyệt trước hành động nhạy cảm.', tag: 'Security' },
-        { name: 'Security Boundary', description: 'Ranh giới bảo mật, data stays within user boundary.', tag: 'Security' },
-        { name: 'Cost Governor', description: 'Giới hạn chi phí AI, cảnh báo khi gần quota.', tag: 'Governor' },
-        { name: 'Audit & Replay', description: 'Ghi audit log mọi hành động, có thể replay.', tag: 'Audit' },
-        { name: 'Sync Layer', description: 'Đồng bộ đa thiết bị, offline-first.', tag: 'Sync' },
-        { name: 'Self-Upgrade Registry', description: 'Tự cập nhật Agent, tool, model khi có phiên bản mới.', tag: 'Upgrade' }
+        { name: 'Danh tính và quyền sở hữu', description: 'Danh tính và quyền sở hữu máy, không chia sẻ giữa người dùng.', tag: 'Lõi' },
+        { name: 'Trung tâm lệnh', description: 'Trung tâm tiếp nhận lệnh, điều phối hoạt động.', tag: 'Lõi' },
+        { name: 'Mạng mô hình trí tuệ', description: 'Đa mô hình: suy luận, nghiên cứu, lập trình, hình ảnh, giọng nói.', tag: 'Trí tuệ' },
+        { name: 'Đội tác nhân', description: '9 Tác nhân chuyên biệt cho hệ sinh thái Nguyễn.', tag: 'Tác nhân' },
+        { name: 'Siêu ứng dụng', description: '7 Siêu ứng dụng di sản + 12 họ công cụ AI.', tag: 'Ứng dụng' },
+        { name: 'Lõi công cụ và kết nối', description: 'Công cụ và kết nối: API, điểm nhận sự kiện, kết nối.', tag: 'Công cụ' },
+        { name: 'Kho dữ liệu riêng', description: 'Kho dữ liệu riêng, mã hóa, quyền theo vai trò.', tag: 'Dữ liệu' },
+        { name: 'Bộ nhớ dài hạn', description: 'Bộ nhớ dài hạn: session, preference, project, decision.', tag: 'Bộ nhớ' },
+        { name: 'Bộ máy quy trình', description: 'Motor thực thi quy trình dài hạn, multi-step.', tag: 'Vận hành' },
+        { name: 'Kiểm chứng và bằng chứng', description: 'Kiểm tra kết quả, lưu biên nhận, bộ bằng chứng.', tag: 'Kiểm chứng' },
+        { name: 'Cổng phê duyệt', description: 'Phê duyệt trước hành động nhạy cảm.', tag: 'Bảo mật' },
+        { name: 'Ranh giới bảo mật', description: 'Ranh giới bảo mật, dữ liệu nằm trong ranh giới người dùng.', tag: 'Bảo mật' },
+        { name: 'Bộ kiểm soát chi phí', description: 'Giới hạn chi phí AI, cảnh báo khi gần hạn mức.', tag: 'Chi phí' },
+        { name: 'Nhật ký kiểm tra và phát lại', description: 'Ghi nhật ký kiểm tra mọi hành động, có thể phát lại.', tag: 'Kiểm tra' },
+        { name: 'Lớp đồng bộ', description: 'Đồng bộ đa thiết bị, ưu tiên dùng khi mất kết nối.', tag: 'Đồng bộ' },
+        { name: 'Kho tự nâng cấp', description: 'Tự cập nhật Tác nhân, công cụ, mô hình khi có phiên bản mới.', tag: 'Nâng cấp' }
       ]
     },
     faq: [
-      { question: 'Instance có phải shared không?', answer: 'Không. Mỗi người dùng có một instance riêng, memory riêng, vault riêng, không chia sẻ với ai.' },
+      { question: 'Máy riêng có dùng chung với người khác không?', answer: 'Không. Mỗi người dùng có một máy riêng, bộ nhớ riêng, kho dữ liệu riêng, không chia sẻ với ai.' },
       { question: 'Tôi có thể export dữ liệu không?', answer: 'Có. Bạn có thể export toàn bộ data vault, memory, audit log bất cứ lúc nào.' }
     ]
   },
