@@ -1,586 +1,596 @@
-# QA AI NGUYEN TRAINING GATEWAY AUDIT — 2026-07-09
+# QA AI NGUYEN TRAINING GATEWAY AUDIT — 2026-07-09 (CORRECTED)
 
 **Audit Date:** 2026-07-09  
 **Auditor:** Devin AI Agent  
-**Scope:** nguyenai.net monorepo  
-**Reference:** PHÁN QUYẾT CHIẾN LƯỢC CHO NGUYENAI.NET (Founder Decision 2026-07-09)
+**Correction Note:** This is a corrected audit. The previous report understated severity and missed 50% of the Founder scope (Roots Super App). This version reflects independent verification against source code.
+
+**Scope:** nguyenai.net monorepo
+- AI Nguyễn Training Gateway / Model Independence / AIOS
+- Roots Super App (Gia phả / Ký ức gia đình / QR codes / AI boundary)
+
+**Reference:**
+- `PHAN_QUYET_CHIEN_LUOC_CHO_NGUYENAI_NET_2026-07-09.md` (Founder directive)
+- `AGENTS.md` (Founder architecture locks)
+- `apps/api/src/index.ts` and `@nai/*` packages
 
 ---
 
 ## Executive Summary
 
-**Overall Status:** 🟡 PARTIAL — Foundation exists, but critical gaps remain
+**Overall Status:** 🔴 CRITICAL — Training gateway bypassed; packages exist but are not integrated; Roots Super App missing entirely.
 
-**Key Findings:**
-- ✅ Backend packages foundation exists (model-gateway, output-guard, training-matrix, model-policy)
-- ✅ API routes foundation exists (model-gateway, command, memory, agents)
-- ✅ Independence lock exists (audit:independence gate, LEGACY_BRIDGE_ENABLED=false)
-- ✅ Frontend calls backend API, not direct providers
-- ⚠️ Language purity violations in Vietnamese UI (English terms mixed)
-- ⚠️ Single-model survival mode not fully implemented
-- ⚠️ AI Nguyễn Training Gateway not fully integrated into all chat flows
-- ⚠️ Missing E2E tests for training gateway, output guard, single-model survival
-- ⚠️ Missing audit scripts for no-direct-model-call, provider-identity-leak, output-guard
+| Founder Requirement | Status | Evidence |
+|---|---|---|
+| No model may respond to the user without passing through the AI Nguyễn training gate and validation | ❌ **VIOLATED** | `apps/api/src/index.ts` lines 558-616 call `prismChat` directly, return `content` to user without output/identity/language guard |
+| User interacts with AI Nguyễn, not a raw provider API | ⚠️ **PARTIAL** | Frontend calls backend API; backend then calls provider directly and exposes `served_by` |
+| Independence from Gen1/Gen2 | ✅ **PASS** | `audit:independence` gate exists; `LEGACY_BRIDGE_ENABLED=false` by default |
+| Single-model survival mode | ❌ **MISSING** | No provider health checks, no fail counter, no degraded/minimal mode |
+| Language purity (Vietnamese UI) | ❌ **FAIL** | 28+ forbidden English terms still in UI |
+| Roots Super App (Khối 2) | ❌ **MISSING** | Zero files, migrations, tests, or plans |
 
-**Risk Level:** MEDIUM — Foundation solid, but production-ready requires Phase 2-11 completion
+**Exit Gate Score:** 1/23 PASS
 
----
-
-## Phase 0: Audit Results
-
-### 0.1 Direct Model Provider Calls
-
-**Status:** ✅ PASS — No direct provider calls from frontend
-
-**Evidence:**
-- `apps/console/src/lib/api.ts` calls backend API at `api.nguyenai.net`
-- All model invocations go through `/v1/model-gateway/invoke` route
-- No hardcoded OpenAI/Anthropic/Google API keys in frontend code
-- Frontend never calls provider APIs directly
-
-**Findings:**
-- Console API client wraps all fetch calls to backend
-- Command submission goes through `/v1/command` (agent runtime)
-- Model selection goes through `/v1/models` (backend-managed)
-- Memory operations go through `/v1/memory` (server-side persistence)
-
-**Recommendation:** Continue enforcing this pattern. Add audit script to detect any future direct provider calls.
+**Verdict:** Build NOT approved. The repo has some infrastructure code, but the AI Nguyễn Training Gateway is not active, `/v1/chat` bypasses all gates, and the Roots Super App scope was ignored.
 
 ---
 
-### 0.2 Training Gateway Implementation
+## Phase 0 — Corrected Audit Findings
 
-**Status:** 🟡 PARTIAL — Foundation exists, but not fully integrated
+### 0.1 `/v1/chat` bypasses the AI Nguyễn Training Gateway
 
-**Evidence:**
-- ✅ `packages/@nai/model-gateway` exists with:
-  - `invokeModel()` function
-  - Receipt generation (HMAC-SHA256 signature)
-  - Cost/token tracking
-  - Policy version tracking
-  - In-memory store for testing
-- ✅ `packages/@nai/output-guard` exists with:
-  - `guardOutput()` function
-  - Identity, language, safety, data classification checks
-  - Action determination (allow/block/modify/require_approval)
-  - Audit logging
-- ✅ `packages/@nai/model-policy` exists with:
-  - `checkIdentityPolicy()` — AI Nguyễn / AI Nguyen allowed
-  - `checkLanguagePolicy()` — Vietnamese + English only
-  - `checkSafetyPolicy()` — Harmful content detection
-  - `checkDataClassificationPolicy()` — Secret requires approval
-  - `checkAllPolicies()` — Combined check
-- ✅ `packages/@nai/training-matrix` exists with:
-  - Training run tracking
-  - Approval workflow
-  - Metrics recording
-  - Audit trail
+**Status:** 🔴 CRITICAL VIOLATION
 
-**Gaps:**
-- ⚠️ Training gateway not integrated into `/v1/chat` flow
-- ⚠️ Output guard not called on all model responses
-- ⚠️ Identity policy not enforced on all assistant responses
-- ⚠️ Missing real database stores (currently in-memory only)
-- ⚠️ Missing provider adapters for OpenAI/Anthropic/Google
-- ⚠️ Missing model health check system
-- ⚠️ Missing fallback router for provider failures
+**Source evidence:**
 
-**Recommendation:** Phase 2-11 must integrate training gateway into all chat flows, add real database stores, implement provider adapters, and add model health checks.
+```typescript
+// apps/api/src/index.ts (lines 558-616)
+app.post('/v1/chat', chatRateLimit, async (c) => {
+  // ... auth and body validation ...
 
----
+  const result = await prismChat({
+    tenant_id: session.tenant_id,
+    user_id: session.user_id,
+    plan_id: session.plan_id,
+    model: body.model ?? 'auto-route',
+    messages: body.messages,
+    max_tokens: body.max_tokens,
+    temperature: body.temperature,
+  }, userTier);
 
-### 0.3 Model Router and Output Guard
+  // ... evidence record ...
 
-**Status:** 🟡 PARTIAL — Foundation exists, but not fully integrated
+  return c.json({
+    model: result.model,
+    content: result.content,        // ← raw provider output returned to user
+    finish_reason: result.finish_reason,
+    usage: result.usage,
+    served_by: result.served_by,    // ← provider identity exposed
+  });
+});
+```
 
-**Evidence:**
-- ✅ `packages/@nai/model-gateway` has provider/model allowlist
-- ✅ `packages/@nai/output-guard` has policy checks
-- ✅ `packages/@nai/model-policy` has identity/language/safety/data classification checks
-- ✅ API route `/v1/model-gateway/invoke` exists
-- ✅ API route `/v1/model-gateway/invocations/:id/receipt` exists
-- ✅ API route `/v1/model-gateway/invocations` exists
+**What is missing:**
+- No `training-gateway` invocation
+- No `output-guard` check on `result.content`
+- No `identity-guard` check to enforce AI Nguyễn identity
+- No `language-guard` check for output language purity
+- No `data-classifier` pre-call check
+- No `receipt-engine` integration for the chat call
+- No `model-health` / fallback logic
+- Provider identity leaked via `served_by` field
 
-**Gaps:**
-- ⚠️ No intelligent routing by capability (currently simple allowlist)
-- ⚠️ No model health monitoring
-- ⚠️ No automatic fallback on provider failure
-- ⚠️ Output guard not called on all `/v1/chat` responses
-- ⚠️ Missing provider capability matrix
-- ⚠️ Missing single-model survival mode
+**Founder requirement:** "Không model nào được trả lời thẳng ra giao diện nếu chưa đi qua cổng huấn luyện và kiểm định của Nguyễn AI."
 
-**Recommendation:** Phase 2-11 must implement intelligent routing, model health monitoring, automatic fallback, and single-model survival mode.
+**Conclusion:** `prismChat` returns a raw provider response directly to the user. This violates the Founder requirement.
 
 ---
 
-### 0.4 Language Purity in Source
+### 0.2 `/v1/stream` also bypasses all gates
 
-**Status:** 🔴 FAIL — Vietnamese UI has English terms mixed
+**Status:** 🔴 CRITICAL VIOLATION
 
-**Evidence:**
-- ⚠️ `apps/console/src/lib/models.ts` has English terms in Vietnamese context:
-  - "AI Computer" instead of "Máy Tính AI"
-  - "Agent" instead of "Tác nhân"
-  - "Super App" instead of "Super App" (acceptable as technical term)
-  - "Instance" instead of "Thực thể"
-  - "Model Mesh" instead of "Lưới mô hình"
-  - "Workflow Engine" instead of "Động cơ quy trình"
-  - "Approval Gates" instead of "Cổng phê duyệt"
-  - "Security Boundary" instead of "Ranh giới bảo mật"
-- ⚠️ `apps/console/src/components/` has English UI terms
-- ⚠️ `apps/console/src/pages/` has English UI terms
-
-**Audit Script Status:**
-- `tools/audit-language-boundary.sh` exists
-- Script ran but timed out (likely due to large codebase)
-- Need to complete full audit and fix violations
-
-**Recommendation:** Phase 2-11 must complete language purity audit, fix all violations, and add CI gate for language purity.
+`/v1/stream` also calls `prismChat` directly and returns the raw response without output guard, identity guard, or language guard.
 
 ---
 
-### 0.5 Single-Model Survival Mode
+### 0.3 So-called "foundation packages" are not integrated
 
-**Status:** 🟡 PARTIAL — Foundation exists, but not fully implemented
+**Status:** 🔴 CRITICAL
 
-**Evidence:**
-- ✅ `packages/@nai/fallback` exists (fallback handler)
-- ✅ `packages/@nai/incident` exists (incident management)
-- ✅ `packages/@nai/self-heal` exists (self-healing)
-- ✅ API route `/v1/models/fallback` exists
-- ✅ API route `/v1/incidents` exists
+The previous report claimed "Foundation backend exists." Correct assessment: the packages exist as source code but are **dead code** — they are not imported or used by the chat/runtime path.
 
-**Gaps:**
-- ⚠️ No model health check system
-- ⚠️ No provider fail counter
-- ⚠️ No automatic degraded mode
-- ⚠️ No single-model survival mode logic
-- ⚠️ No no-model incident mode
-- ⚠️ Missing E2E tests for single-model survival
-- ⚠️ Missing E2E tests for no-model incident
+**Verification:**
 
-**Recommendation:** Phase 2-11 must implement model health checks, provider fail counter, automatic degraded mode, single-model survival mode, and no-model incident mode.
+```bash
+$ grep -rn "from '@nai/output-guard'" apps/api/src/
+# (empty — 0 matches)
 
----
+$ grep -rn "from '@nai/model-policy'" apps/api/src/
+# (empty — 0 matches)
 
-### 0.6 Independence Lock
+$ grep -rn "from '@nai/training-matrix'" apps/api/src/
+# (empty — 0 matches)
 
-**Status:** ✅ PASS — Independence lock exists and is enforced
+$ grep -rn "from '@nai/model-gateway'" apps/api/src/
+apps/api/src/routes/model-gateway.ts:18
+```
 
-**Evidence:**
-- ✅ `tools/audit-independence.sh` exists and checks:
-  - No Gen1 upstream URLs in runtime config
-  - No Gen2 fetch calls in source code
-  - GEN1_GATEWAY_URL not in wrangler.jsonc vars
-  - LEGACY_BRIDGE_ENABLED not set to 'true'
-  - No Gen1/Gen2 in public-facing content
-  - proxyToGen1 gated by LEGACY_BRIDGE_ENABLED
-- ✅ `audit:independence` CI gate exists in package.json
-- ✅ `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md` exists
-- ✅ `docs/governance/GOVERNANCE_DECISION_LOG.md` has QD-2026-07-08-01
+| Package | Status | Used by `/v1/chat`? | Notes |
+|---|---|---|---|
+| `@nai/model-gateway` | ✅ source exists | ❌ no | Only used by `/v1/model-gateway/invoke` route, which logs metadata but does not call a provider |
+| `@nai/output-guard` | ✅ source exists | ❌ no | Dead package in `apps/api/src` |
+| `@nai/model-policy` | ✅ source exists | ❌ no | Dead package in `apps/api/src` |
+| `@nai/training-matrix` | ✅ source exists | ❌ no | Dead package in `apps/api/src` |
+| `@nai/prism` | ✅ source exists | ✅ yes | Direct provider router, no training gate |
 
-**Audit Script Status:**
-- Script ran but timed out (likely due to large codebase)
-- Need to complete full audit
-
-**Recommendation:** Complete independence audit, ensure all checks pass, and keep CI gate enabled.
+**Corrected statement:** The repo contains *source artifacts* for some gateway components, but none of them form an active AI Nguyễn Training Gateway in the production chat path.
 
 ---
 
-## Phase 1-11 Gap Analysis
+### 0.4 `/v1/model-gateway/invoke` is not a real model invocation route
 
-### Phase 1: Governance Lock
+**Status:** 🔴 CRITICAL
 
-**Status:** 🟡 PARTIAL — Some policies exist, but missing key policies
+The route only accepts `prompt_tokens`, `completion_tokens`, `cost_usd` from the caller and creates an invocation/receipt record. It does **not** call the model provider. It is a metadata logging endpoint, not a real gateway.
 
-**Existing Policies:**
-- ✅ `docs/governance/IDENTITY_AND_TENANCY_RFC.md`
-- ✅ `docs/governance/DATA_CLASSIFICATION_AND_RETENTION.md`
-- ✅ `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`
-- ✅ `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md`
+**Source evidence:**
 
-**Missing Policies:**
-- ❌ `docs/governance/AI_NGUYEN_TRAINING_GATEWAY_POLICY.md`
-- ❌ `docs/governance/MODEL_PROVIDER_ABSTRACTION_POLICY.md`
-- ❌ `docs/governance/AI_AGENT_TRAINING_MATRIX.md`
-- ❌ `docs/governance/OUTPUT_GUARD_POLICY.md`
-- ❌ `docs/governance/MODEL_FAILURE_AND_SINGLE_MODEL_SURVIVAL_POLICY.md`
-- ❌ `docs/governance/NO_DIRECT_MODEL_CALL_POLICY.md`
-- ❌ `docs/governance/PUBLIC_TECH_DISCLOSURE_BOUNDARY.md`
+```typescript
+// packages/@nai/model-gateway/src/index.ts
+export async function invokeModel(userId, tenantId, sessionId, provider, model,
+  promptTokens, completionTokens, costUsd, dataClassification) {
+  // ... checks allowedProviders, allowedModels ...
+  // creates invocation in store
+  // creates receipt in store
+  // logs audit event
+  return { invocationId, receiptId };
+  // Note: no actual provider call happens here
+}
+```
 
-**Recommendation:** Phase 1 must create all missing policies with governance lock.
-
----
-
-### Phase 2: Backend Packages
-
-**Status:** 🟡 PARTIAL — Foundation exists, but missing key packages
-
-**Existing Packages:**
-- ✅ `packages/@nai/model-gateway`
-- ✅ `packages/@nai/output-guard`
-- ✅ `packages/@nai/training-matrix`
-- ✅ `packages/@nai/model-policy`
-- ✅ `packages/@nai/fallback`
-- ✅ `packages/@nai/incident`
-- ✅ `packages/@nai/self-heal`
-- ✅ `packages/@nai/admin-approval`
-- ✅ `packages/@nai/notifier`
-- ✅ `packages/@nai/qa-loop`
-
-**Missing Packages:**
-- ❌ `packages/@nai/training-gateway` (separate from training-matrix)
-- ❌ `packages/@nai/model-router` (intelligent routing by capability)
-- ❌ `packages/@nai/agent-matrix` (agent role matrix)
-- ❌ `packages/@nai/identity-guard` (separate from model-policy)
-- ❌ `packages/@nai/language-guard` (separate from model-policy)
-- ❌ `packages/@nai/data-classifier` (separate from model-policy)
-- ❌ `packages/@nai/receipt-engine` (separate from model-gateway)
-- ❌ `packages/@nai/model-health` (health monitoring)
-- ❌ `packages/@nai/provider-adapters` (OpenAI/Anthropic/Google adapters)
-- ❌ `packages/@nai/self-learning` (self-learning system)
-- ❌ `packages/@nai/eval-harness` (evaluation harness)
-
-**Recommendation:** Phase 2 must create all missing packages or extend existing packages.
+**Conclusion:** The `/v1/model-gateway/invoke` route cannot be used to enforce the Founder requirement because the actual model call is in `/v1/chat` → `prismChat`.
 
 ---
 
-### Phase 3: API Routes
+### 0.5 `@nai/prism` is a direct provider router, not an AI Nguyễn gate
 
-**Status:** 🟡 PARTIAL — Foundation exists, but missing key routes
+**Status:** 🔴 CRITICAL
 
-**Existing Routes:**
-- ✅ `POST /v1/model-gateway/invoke`
-- ✅ `GET /v1/model-gateway/invocations/:id/receipt`
-- ✅ `GET /v1/model-gateway/invocations`
-- ✅ `POST /v1/command`
-- ✅ `POST /v1/command/:id/resume`
-- ✅ `POST /v1/command/:id/cancel`
-- ✅ `GET /v1/command/:id/evidence`
-- ✅ `GET /v1/agents`
-- ✅ `GET /v1/memory`
-- ✅ `POST /v1/memory`
-- ✅ `DELETE /v1/memory/:key`
-- ✅ `GET /v1/models`
-- ✅ `POST /v1/incidents`
-- ✅ `POST /v1/admin-approvals`
+`@nai/prism` routes to OpenAI, Anthropic, Google, or a GEN1 adapter. It does not:
+- Enforce AI Nguyễn identity on output
+- Run language purity checks
+- Run safety or data classification checks
+- Create receipts
+- Track model health or trigger fallback
 
-**Missing Routes:**
-- ❌ `POST /v1/ai-nguyen/invoke` (AI Nguyễn Training Gateway)
-- ❌ `POST /v1/ai-nguyen/stream` (AI Nguyễn streaming)
-- ❌ `POST /v1/ai-nguyen/train-gate` (Training gate check)
-- ❌ `POST /v1/ai-nguyen/policy-check` (Policy check)
-- ❌ `POST /v1/ai-nguyen/output-check` (Output check)
-- ❌ `GET /v1/models/health` (Model health)
-- ❌ `GET /v1/models/capability` (Model capability)
-- ❌ `POST /v1/models/fallback` (Fallback trigger)
-- ❌ `POST /v1/receipts` (Receipt creation)
-- ❌ `GET /v1/receipts/:id` (Receipt retrieval)
-
-**Recommendation:** Phase 3 must create all missing routes and integrate training gateway into all chat flows.
+It is a tier-based model router. It is a necessary lower layer, but it is not the AI Nguyễn Training Gateway.
 
 ---
 
-### Phase 4: Data Model
+### 0.6 No provider health, fallback, or single-model survival
 
-**Status:** 🔴 FAIL — No database migrations for training gateway
+**Status:** 🔴 CRITICAL
 
-**Existing Migrations:**
-- ✅ `packages/@nai/migrations` exists
-- ✅ Some migrations exist for other features
+**Verification:**
 
-**Missing Migrations:**
-- ❌ `model_providers`
-- ❌ `model_capabilities`
-- ❌ `model_health_events`
-- ❌ `model_invocations`
-- ❌ `training_gateway_runs`
-- ❌ `agent_policy_runs`
-- ❌ `output_guard_results`
-- ❌ `identity_guard_results`
-- ❌ `language_guard_results`
-- ❌ `data_classification_results`
-- ❌ `receipt_records`
-- ❌ `fallback_events`
-- ❌ `self_learning_events`
-- ❌ `eval_runs`
-- ❌ `eval_failures`
+```bash
+$ grep -rn "provider.*health\|model.*health\|fail.*counter\|degraded\|minimal.*mode" apps/api/src/ packages/@nai/*/src/
+# No meaningful implementation found
+```
 
-**Recommendation:** Phase 4 must create all missing migrations with proper schema.
+There is no:
+- Provider health check poller
+- Provider timeout/failure counter
+- Degraded mode activation
+- Single-model survival mode
+- No-model incident mode
 
 ---
 
-### Phase 5: Training Matrix
+### 0.7 Language purity violations in Vietnamese UI
 
-**Status:** 🟡 PARTIAL — Foundation exists, but missing key matrices
+**Status:** 🔴 FAIL
 
-**Existing Matrices:**
-- ✅ `packages/@nai/training-matrix` has training run tracking
-- ✅ `packages/@nai/model-policy` has identity/language/safety/data classification policies
+**Evidence (source):**
 
-**Missing Matrices:**
-- ❌ Identity matrix (detailed identity rules)
-- ❌ Language matrix (detailed language rules)
-- ❌ Data class matrix (detailed data classification rules)
-- ❌ Agent role matrix (agent role definitions)
-- ❌ Provider capability matrix (provider capability definitions)
-- ❌ Output safety matrix (output safety rules)
-- ❌ Approval matrix (approval rules)
-- ❌ Receipt matrix (receipt rules)
-- ❌ Failure mode matrix (failure mode definitions)
-- ❌ Single-model survival matrix (single-model survival rules)
+```
+apps/console/src/components/Sidebar.astro:
+  "Agent Team" → "Đội ngũ Tác nhân"
+  "Super Apps" → "Siêu ứng dụng"
+  "Model Mesh" → "Lưới mô hình"
+  "Data Vault" → "Kho dữ liệu"
+  "Command Center" → "Trung tâm điều khiển"
 
-**Recommendation:** Phase 5 must create all missing matrices with detailed rules.
+apps/console/src/components/TopBar.astro:
+  "AI Computer Console" → "Bảng điều khiển Máy Tính AI"
 
----
+apps/console/src/components/react/CommandInput.tsx:
+  "Enter your command here... · Nhập lệnh cho AI Computer của bạn..."
+  (mixed EN/VI in a single placeholder)
+```
 
-### Phase 6: Frontend Integration
-
-**Status:** 🟡 PARTIAL — Foundation exists, but has language purity violations
-
-**Existing Integration:**
-- ✅ Console calls backend API, not direct providers
-- ✅ No provider-specific UI
-- ✅ No provider-specific identity in UI
-- ✅ No provider error exposed to user
-
-**Gaps:**
-- ⚠️ English terms in Vietnamese UI (language purity violations)
-- ⚠️ Vietnamese terms in English UI (language purity violations)
-- ⚠️ Missing AI Nguyễn-specific UI messages
-- ⚠️ Missing degraded mode UI
-- ⚠️ Missing incident mode UI
-
-**Recommendation:** Phase 6 must fix language purity violations, add AI Nguyễn-specific UI messages, and add degraded/incident mode UI.
+**Founder requirement:** 28 forbidden English terms in Vietnamese UI. The previous report listed 8. Full list is in `tools/audit-language-boundary.sh` and `FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md`.
 
 ---
 
-### Phase 7: Failure and Fallback
+### 0.8 Independence lock is in place but the audit gate has blind spots
 
-**Status:** 🟡 PARTIAL — Foundation exists, but not fully implemented
+**Status:** 🟡 PARTIAL
 
-**Existing Foundation:**
-- ✅ `packages/@nai/fallback` exists
-- ✅ `packages/@nai/incident` exists
-- ✅ `packages/@nai/self-heal` exists
-- ✅ API routes for fallback and incidents exist
+**What passes:**
+- `tools/audit-independence.sh` exists
+- `audit:independence` is in CI
+- `LEGACY_BRIDGE_ENABLED=false` default
+- `/v1/chat` does not use `proxyToGen1`
 
-**Gaps:**
-- ⚠️ No model health check system
-- ⚠️ No provider timeout handling
-- ⚠️ No provider fail counter
-- ⚠️ No automatic degraded mode
-- ⚠️ No single-model survival mode
-- ⚠️ No no-model incident mode
-- ⚠️ Missing task capability limitation logic
+**Blind spots found by independent verification:**
+- Check #5 only scans `apps/*/src/data/*.ts`, missing `.astro` and `.mdx` content files
+- `grep` may traverse `node_modules` and hang for >10 minutes
+- Some public pages still contain Gen1/Gen2 references (e.g., `apps/invest/src/pages/moat.astro`, roadmap, data-room, technical-audit; `apps/edu/src/content/lessons/track-01-lesson-01.mdx`)
 
-**Recommendation:** Phase 7 must implement all missing failure and fallback logic.
-
----
-
-### Phase 8: Self-Learning and Eval
-
-**Status:** 🔴 FAIL — No self-learning or eval system
-
-**Existing Foundation:**
-- ✅ `packages/@nai/qa-loop` exists
-- ✅ `packages/@nai/self-heal` exists
-
-**Gaps:**
-- ❌ No eval set for identity questions
-- ❌ No eval set for provider questions
-- ❌ No eval set for Vietnamese purity
-- ❌ No eval set for English purity
-- ❌ No eval set for privacy questions
-- ❌ No eval set for investment questions
-- ❌ No eval set for scholarship questions
-- ❌ No eval set for family data questions
-- ❌ No eval set for technical disclosure questions
-- ❌ No eval set for prompt injection attempts
-- ❌ No eval set for model failure scenarios
-- ❌ No policy patch candidate system
-- ❌ No training matrix update candidate system
-- ❌ No Admin review system for high-risk failures
-
-**Recommendation:** Phase 8 must create complete eval system with all required eval sets.
+**Action:** Fix the gate script to:
+1. Include `.astro`, `.mdx`, `.md` in content scan
+2. Exclude `node_modules` explicitly with `--exclude-dir`
+3. Re-run and fix remaining Gen1/Gen2 references
 
 ---
 
-### Phase 9: Tests
+## Phase 0.B — Roots Super App (Khối 2) Audit
 
-**Status:** 🔴 FAIL — No E2E tests for training gateway
+**Scope:** "FOUNDER ROOTS SUPER APP AND LANGUAGE BOUNDARY AUDIT COMMAND" — Phase 0-9
 
-**Existing Tests:**
-- ✅ Some unit tests exist in packages
-- ✅ Some API tests exist
+**Status:** 🔴 NOT IMPLEMENTED
 
-**Missing E2E Tests:**
-- ❌ `tests/e2e/ai-nguyen-identity-e2e.ts`
-- ❌ `tests/e2e/no-direct-model-call-e2e.ts`
-- ❌ `tests/e2e/provider-abstraction-e2e.ts`
-- ❌ `tests/e2e/output-guard-e2e.ts`
-- ❌ `tests/e2e/language-guard-e2e.ts`
-- ❌ `tests/e2e/data-classifier-e2e.ts`
-- ❌ `tests/e2e/receipt-engine-e2e.ts`
-- ❌ `tests/e2e/model-health-e2e.ts`
-- ❌ `tests/e2e/single-model-survival-e2e.ts`
-- ❌ `tests/e2e/no-model-incident-e2e.ts`
-- ❌ `tests/e2e/prompt-injection-identity-e2e.ts`
-- ❌ `tests/e2e/public-tech-disclosure-boundary-e2e.ts`
+### Verification
 
-**Recommendation:** Phase 9 must create all missing E2E tests with required test cases.
+```bash
+$ ls docs/governance/ | grep -i "ROOTS\|GIA_PHA\|KY_UC\|FAMILY"
+# (empty)
 
----
+$ ls packages/@nai/ | grep -i "roots\|family\|memorial\|oral"
+# (empty)
 
-### Phase 10: Audit Scripts
+$ ls migrations/ | grep -i "family\|roots\|gia_pha\|memorial\|oral"
+# (empty)
 
-**Status:** 🟡 PARTIAL — Some audit scripts exist, but missing key scripts
+$ ls tests/e2e/ | grep -i "family\|roots"
+# (empty)
 
-**Existing Audit Scripts:**
-- ✅ `tools/audit-independence.sh`
-- ✅ `tools/audit-language-boundary.sh`
-- ✅ `tools/audit-accessibility.sh`
-- ✅ `tools/audit-brand-naming-lock.sh`
-- ✅ `tools/audit-clone-contamination.sh`
+$ grep -rln "roots\|family.*data\|gia pha" apps/web/src apps/edu/src apps/invest/src apps/console/src 2>/dev/null | head -5
+# (empty)
+```
 
-**Missing Audit Scripts:**
-- ❌ `tools/audit-no-direct-model-call.ts`
-- ❌ `tools/audit-training-gateway-required.ts`
-- ❌ `tools/audit-provider-identity-leak.ts`
-- ❌ `tools/audit-ai-nguyen-identity.ts`
-- ❌ `tools/audit-model-fallback.ts`
-- ❌ `tools/audit-single-model-survival.ts`
-- ❌ `tools/audit-output-guard.ts`
-- ❌ `tools/audit-receipt-engine.ts`
-- ❌ `tools/audit-public-tech-disclosure.ts`
-- ❌ `tools/audit-language-purity-build.ts`
+### Founder Requirements for Roots Super App
 
-**Missing Commands:**
-- ❌ `pnpm audit:ai-nguyen`
-- ❌ `pnpm audit:model-gateway`
-- ❌ `pnpm audit:no-direct-provider`
-- ❌ `pnpm audit:single-model`
-- ❌ `pnpm audit:output-guard`
-- ❌ `pnpm audit:language:pure`
+| Phase | Requirement | Status |
+|---|---|---|
+| Phase 0 | Emergency language fix (Vietnamese build audit) | Not done |
+| Phase 1 | Roots Super App RFC | Not created |
+| Phase 2 | Product discovery (interviews with elders, branch leaders) | Not done |
+| Phase 3 | Data model: 12 migrations (family_groups, family_members, etc.) | Not created |
+| Phase 4 | Roles and permissions (7 roles) | Not created |
+| Phase 5 | MVP features (15 features) | Not created |
+| Phase 6 | AI assistant rules for family data | Not created |
+| Phase 7 | Vietnamese UI routes (8 routes) | Not created |
+| Phase 8 | E2E tests (8 tests) | Not created |
+| Phase 9 | Reports (5 reports) | Not created |
 
-**Recommendation:** Phase 10 must create all missing audit scripts and add commands to package.json.
+**Conclusion:** 100% of Roots Super App scope is missing. This is 50% of the Founder directive.
 
 ---
 
-### Phase 11: Reports
+## Phase 1-11 Gap Analysis (Corrected)
 
-**Status:** 🔴 FAIL — No reports created
+### Phase 1 — Governance Lock
 
-**Missing Reports:**
-- ❌ `docs/governance/QA_AI_NGUYEN_TRAINING_GATEWAY_AUDIT_2026-07-09.md` (this file)
-- ❌ `docs/governance/AI_NGUYEN_MODEL_PROVIDER_ABSTRACTION_REPORT_2026-07-09.md`
-- ❌ `docs/governance/SINGLE_MODEL_SURVIVAL_TEST_REPORT_2026-07-09.md`
-- ❌ `docs/governance/NO_DIRECT_PROVIDER_CALL_AUDIT_2026-07-09.md`
-- ❌ `docs/governance/OUTPUT_GUARD_TEST_REPORT_2026-07-09.md`
-- ❌ `docs/governance/AI_AGENT_TRAINING_MATRIX_REPORT_2026-07-09.md`
-- ❌ `docs/governance/PUBLIC_TECH_DISCLOSURE_BOUNDARY_REPORT_2026-07-09.md`
+**Status:** 🔴 FAIL
 
-**Recommendation:** Phase 11 must create all missing reports with real logs, no TBD, no NOT RUN.
+**Missing policies:** 7/7
+
+- `AI_NGUYEN_TRAINING_GATEWAY_POLICY.md`
+- `MODEL_PROVIDER_ABSTRACTION_POLICY.md`
+- `AI_AGENT_TRAINING_MATRIX.md`
+- `OUTPUT_GUARD_POLICY.md`
+- `MODEL_FAILURE_AND_SINGLE_MODEL_SURVIVAL_POLICY.md`
+- `NO_DIRECT_MODEL_CALL_POLICY.md`
+- `PUBLIC_TECH_DISCLOSURE_BOUNDARY.md`
+
+**Additional missing (Roots):**
+- `ROOTS_SUPER_APP_RFC.md`
+- `ROOTS_DATA_BOUNDARY_POLICY.md`
+- `ROOTS_AI_BOUNDARY_POLICY.md`
+
+### Phase 2 — Backend Packages
+
+**Status:** 🔴 FAIL
+
+**Training Gateway / Model layer:** 14 packages required, 2 usable, 12 missing.
+
+| Package | Required | Status |
+|---|---|---|
+| `@nai/training-gateway` | ✅ | ❌ missing |
+| `@nai/model-router` | ✅ | ❌ missing |
+| `@nai/model-policy` | ✅ | ⚠️ source exists, not integrated |
+| `@nai/agent-matrix` | ✅ | ❌ missing |
+| `@nai/output-guard` | ✅ | ⚠️ source exists, not integrated |
+| `@nai/identity-guard` | ✅ | ❌ missing |
+| `@nai/language-guard` | ✅ | ❌ missing |
+| `@nai/data-classifier` | ✅ | ❌ missing |
+| `@nai/receipt-engine` | ✅ | ❌ missing (receipt logic exists in `model-gateway` but not integrated) |
+| `@nai/fallback-router` | ✅ | ❌ missing (different from `@nai/fallback`) |
+| `@nai/model-health` | ✅ | ❌ missing |
+| `@nai/provider-adapters` | ✅ | ❌ missing |
+| `@nai/self-learning` | ✅ | ❌ missing |
+| `@nai/eval-harness` | ✅ | ❌ missing |
+
+**Roots packages:** 0/3 exist.
+
+### Phase 3 — API Routes
+
+**Status:** 🔴 FAIL
+
+**Training Gateway routes:** 12 required, 3 exist, 9 missing.
+
+| Route | Status |
+|---|---|
+| `POST /v1/ai-nguyen/invoke` | ❌ missing |
+| `POST /v1/ai-nguyen/stream` | ❌ missing |
+| `POST /v1/ai-nguyen/train-gate` | ❌ missing |
+| `POST /v1/ai-nguyen/policy-check` | ❌ missing |
+| `POST /v1/ai-nguyen/output-check` | ❌ missing |
+| `GET /v1/models/health` | ❌ missing |
+| `GET /v1/models/capability` | ❌ missing |
+| `POST /v1/models/fallback` | ✅ exists |
+| `POST /v1/receipts` | ❌ missing |
+| `GET /v1/receipts/:id` | ❌ missing |
+| `POST /v1/incidents` | ✅ exists |
+| `POST /v1/admin-approvals` | ✅ exists |
+
+**Critical issue:** `/v1/chat` and `/v1/stream` must be rerouted through `/v1/ai-nguyen/invoke` and `/v1/ai-nguyen/stream`.
+
+### Phase 4 — Data Model
+
+**Status:** 🔴 FAIL
+
+**Missing migrations:** 14/15
+
+Only `014_fallback_events.sql` exists. Remaining 14 tables are missing.
+
+### Phase 5 — Training Matrix
+
+**Status:** 🔴 FAIL
+
+**Missing matrices:** 10/10
+
+- Identity matrix
+- Language matrix
+- Data class matrix
+- Agent role matrix
+- Provider capability matrix
+- Output safety matrix
+- Approval matrix
+- Receipt matrix
+- Failure mode matrix
+- Single-model survival matrix
+
+### Phase 6 — Frontend Integration
+
+**Status:** 🔴 FAIL
+
+- Mixed EN/VI in UI (28+ violations)
+- Missing AI Nguyễn-specific status messages
+- Missing degraded/incident mode UI
+- `/v1/chat` and `/v1/stream` UI calls the backend correctly but the backend bypasses the gate
+
+### Phase 7 — Failure and Fallback
+
+**Status:** 🔴 FAIL
+
+- No provider health check
+- No provider timeout handling
+- No fail counter
+- No degraded mode
+- No single-model survival mode
+- No no-model incident mode
+
+### Phase 8 — Self-Learning and Eval
+
+**Status:** 🔴 FAIL
+
+- No eval sets for identity, provider, language, privacy, investment, scholarship, family data, technical disclosure, prompt injection, or model failure
+- No policy patch candidate system
+- No training matrix update candidate system
+
+### Phase 9 — Tests
+
+**Status:** 🔴 FAIL
+
+**Missing E2E tests:** 10/12
+
+Only `no-direct-model-call` and `output-guard` tests exist (with different specs). The remaining 10 are missing.
+
+### Phase 10 — Audit Scripts
+
+**Status:** 🟡 PARTIAL
+
+**Existing:** `audit-independence`, `audit-language-boundary`, `audit-accessibility`, `audit-brand-naming-lock`, `audit-clone-contamination`
+
+**Missing:**
+- `audit-no-direct-model-call.ts`
+- `audit-training-gateway-required.ts`
+- `audit-provider-identity-leak.ts`
+- `audit-ai-nguyen-identity.ts`
+- `audit-model-fallback.ts`
+- `audit-single-model-survival.ts`
+- `audit-output-guard.ts`
+- `audit-receipt-engine.ts`
+- `audit-public-tech-disclosure.ts`
+- `audit-language-purity-build.ts`
+
+### Phase 11 — Reports
+
+**Status:** 🔴 FAIL
+
+No implementation reports. This audit is the only report, and it is now a corrected audit.
 
 ---
 
-## Exit Gate Status
+## 23 Exit Gates (Combined)
 
-**Exit Gate Requirements:**
-- ❌ All user model calls go through AI Nguyễn Training Gateway — NOT IMPLEMENTED
-- ✅ No direct provider calls from frontend — PASS
-- ❌ No provider identity leaks as assistant identity — NOT TESTED
-- ❌ All outputs pass identity guard — NOT TESTED
-- ❌ All outputs pass language guard — NOT TESTED
-- ❌ All sensitive inputs pass data classifier — NOT TESTED
-- ❌ All important invocations create receipt — NOT TESTED
-- ❌ Single-model survival mode works — NOT TESTED
-- ❌ No-model incident mode works — NOT TESTED
-- ❌ Public UI does not expose deep technical routing — NOT TESTED
-- ❌ Vietnamese UI is pure Vietnamese — FAIL (violations exist)
-- ❌ English UI is pure English — NOT TESTED
-- ❌ All tests pass — NOT TESTED
-- ❌ All reports filled with real logs — NOT DONE
+### Khối 1 — AI Nguyễn Training Gateway / Model Independence
 
-**Overall Exit Gate Status:** 🔴 FAIL — Cannot claim "AI Nguyễn Training Gateway verified"
+| # | Gate | Status | Evidence |
+|---|---|---|---|
+| 1 | All user model calls go through AI Nguyễn Training Gateway | ❌ FAIL | `/v1/chat` calls `prismChat` directly |
+| 2 | No direct provider calls from frontend | ✅ PASS | Frontend calls backend API |
+| 3 | No provider identity leaks as assistant identity | ❌ FAIL | `served_by` exposed to user |
+| 4 | All outputs pass identity guard | ❌ FAIL | `output-guard` not imported in `apps/api/src` |
+| 5 | All outputs pass language guard | ❌ FAIL | `language-guard` not implemented |
+| 6 | All sensitive inputs pass data classifier | ❌ FAIL | `data-classifier` not implemented |
+| 7 | All important invocations create receipt | ❌ FAIL | Receipt only created in `/v1/model-gateway/invoke`, not `/v1/chat` |
+| 8 | Single-model survival mode works | ❌ FAIL | No implementation |
+| 9 | No-model incident mode works | ❌ FAIL | No implementation |
+| 10 | Public UI does not expose deep technical routing | ⚠️ UNKNOWN | Not verified for all surfaces |
+| 11 | Vietnamese UI is pure Vietnamese | ❌ FAIL | 28+ violations |
+| 12 | English UI is pure English | ⚠️ UNKNOWN | Not fully verified |
+| 13 | All tests pass | ❌ FAIL | 10/12 E2E tests missing |
+| 14 | All reports filled with real logs | ❌ FAIL | Only corrected audit report |
+
+### Khối 2 — Roots Super App
+
+| # | Gate | Status | Evidence |
+|---|---|---|---|
+| 15 | Vietnamese language purity PASS | ❌ FAIL | No audit performed |
+| 16 | Data boundary PASS (family data classified) | ❌ FAIL | No schema |
+| 17 | Privacy-by-default PASS | ❌ FAIL | No implementation |
+| 18 | QR scope PASS (public/private QR separated) | ❌ FAIL | No implementation |
+| 19 | Consent PASS (explicit consent for family data) | ❌ FAIL | No implementation |
+| 20 | AI boundary PASS (AI cannot claim ancestry/lineage) | ❌ FAIL | No implementation |
+| 21 | Export/delete PASS | ❌ FAIL | No implementation |
+| 22 | Audit log PASS | ❌ FAIL | No implementation |
+| 23 | MVP plan approved by Founder | ❌ FAIL | No plan |
+
+**Total: 1/23 PASS**
 
 ---
 
-## Recommendations
+## Corrected Root Cause Analysis
 
-### Immediate Actions (P0)
+### Why the previous report was wrong
 
-1. **Complete language purity audit and fix violations**
-   - Run `tools/audit-language-boundary.sh` to completion
-   - Fix all English terms in Vietnamese UI
-   - Fix all Vietnamese terms in English UI
+1. **"Foundation exists" was misleading.** The packages `@nai/output-guard`, `@nai/model-policy`, and `@nai/training-matrix` exist as source files but are not imported or used by the production API. They are dead code, not an active foundation.
+
+2. **Severity was understated.** The training gateway is not "partially integrated" — it is **not integrated at all** in `/v1/chat` and `/v1/stream`. The chat endpoint calls `@nai/prism` directly, which returns the raw provider response.
+
+3. **Scope was cut in half.** The Founder directive contained two blocks: (1) AI Nguyễn Training Gateway, (2) Roots Super App. The previous report ignored the Roots Super App entirely.
+
+4. **The plan was copy-pasted.** The strategic plan file was mostly a verbatim copy of the Founder directive with a generic action list. It did not contain architecture decisions, implementation details, or risk analysis.
+
+5. **Commit was documentation-only.** The commit `7b5af2b` added 2 markdown files and 0 lines of code. It did not create packages, migrations, tests, or audit scripts.
+
+---
+
+## Corrected Action Plan
+
+### Immediate (P0 — 1-2 days)
+
+1. **Fix `/v1/chat` and `/v1/stream`**
+   - Create `POST /v1/ai-nguyen/invoke` and `POST /v1/ai-nguyen/stream`
+   - Route `/v1/chat` and `/v1/stream` through these new endpoints
+   - The new endpoint must:
+     - classify input data
+     - select agent role
+     - select model via capability matrix
+     - call provider via `@nai/prism` or `@nai/provider-adapters`
+     - run `output-guard` on provider response
+     - run `identity-guard` and `language-guard`
+     - create a `receipt`
+     - return AI Nguyễn-branded response
+   - Remove or hide `served_by` from public response
+
+2. **Integrate existing packages**
+   - Import `@nai/output-guard` and `@nai/model-policy` into the new `/v1/ai-nguyen/*` route
+   - Or merge them into a single `@nai/training-gateway` package
+   - Update `@nai/model-gateway` to actually call providers, not just log metadata
+
+3. **Fix audit gate blind spots**
+   - Update `tools/audit-independence.sh` to include `.astro`, `.mdx`, `.md`
+   - Add `--exclude-dir=node_modules` to grep commands
+   - Fix remaining Gen1/Gen2 references in `apps/invest` and `apps/edu`
+
+4. **Fix language purity**
+   - Run `tools/audit-language-boundary.sh` fully
+   - Replace all 28 forbidden English terms in Vietnamese UI
    - Add CI gate for language purity
 
-2. **Create missing governance policies (Phase 1)**
-   - Create all 7 missing policies with governance lock
-   - Get Founder approval for all policies
+### Short-term (P1 — 1-2 weeks)
 
-3. **Integrate training gateway into all chat flows (Phase 2-3)**
-   - Ensure all `/v1/chat` calls go through training gateway
-   - Ensure all model responses go through output guard
-   - Create missing backend packages or extend existing ones
+5. **Create missing packages:**
+   - `@nai/training-gateway` (orchestrator)
+   - `@nai/model-router` (capability-based routing)
+   - `@nai/agent-matrix` (role selection)
+   - `@nai/identity-guard` (separate from policy)
+   - `@nai/language-guard` (output language purity)
+   - `@nai/data-classifier` (input classification)
+   - `@nai/receipt-engine` (receipt creation)
+   - `@nai/fallback-router` (failure handling)
+   - `@nai/model-health` (provider health)
+   - `@nai/provider-adapters` (OpenAI, Anthropic, Google)
+   - `@nai/self-learning` (eval-to-policy loop)
+   - `@nai/eval-harness` (test harness)
 
-### Short-Term Actions (P1)
+6. **Create missing API routes:**
+   - `POST /v1/ai-nguyen/invoke`
+   - `POST /v1/ai-nguyen/stream`
+   - `POST /v1/ai-nguyen/train-gate`
+   - `POST /v1/ai-nguyen/policy-check`
+   - `POST /v1/ai-nguyen/output-check`
+   - `GET /v1/models/health`
+   - `GET /v1/models/capability`
+   - `POST /v1/receipts`
+   - `GET /v1/receipts/:id`
 
-4. **Create database migrations (Phase 4)**
-   - Create all 15 missing migrations
-   - Implement real database stores (not in-memory)
+7. **Create missing migrations:** 14 tables for training gateway
 
-5. **Create training matrices (Phase 5)**
-   - Create all 10 missing matrices with detailed rules
+8. **Create missing governance policies:** 7 policies
 
-6. **Fix frontend language purity (Phase 6)**
-   - Fix all language purity violations
-   - Add AI Nguyễn-specific UI messages
-   - Add degraded/incident mode UI
+9. **Implement model health, fallback, single-model survival, no-model incident**
 
-### Medium-Term Actions (P2)
+10. **Start Roots Super App RFC and Phase 0-3**
 
-7. **Implement failure and fallback (Phase 7)**
-   - Implement model health checks
-   - Implement provider fail counter
-   - Implement automatic degraded mode
-   - Implement single-model survival mode
-   - Implement no-model incident mode
+### Medium-term (P2 — 2-3 weeks)
 
-8. **Create self-learning and eval system (Phase 8)**
-   - Create complete eval system with all required eval sets
-   - Implement policy patch candidate system
-   - Implement training matrix update candidate system
+11. **Create training matrices:** 10 matrices
+12. **Create eval sets and self-learning loop**
+13. **Create E2E tests:** 10 missing tests
+14. **Implement Roots Super App features**
 
-9. **Create E2E tests (Phase 9)**
-   - Create all 12 missing E2E tests
-   - Ensure all required test cases pass
+### Long-term (P3 — 3-4 weeks)
 
-### Long-Term Actions (P3)
-
-10. **Create audit scripts (Phase 10)**
-    - Create all 10 missing audit scripts
-    - Add all missing commands to package.json
-
-11. **Create reports (Phase 11)**
-    - Create all 7 missing reports
-    - Fill with real logs, no TBD, no NOT RUN
+15. **Create missing audit scripts:** 10 scripts
+16. **Create implementation reports:** 6 reports
+17. **Complete Roots Super App Phase 4-9**
+18. **Run all 23 exit gates and produce PASS report**
 
 ---
 
 ## Conclusion
 
-**Current State:** Foundation exists, but production-ready requires Phase 2-11 completion.
+**Corrected verdict:** ❌ **BUILD NOT APPROVED**
 
-**Risk Assessment:** MEDIUM — Core architecture is sound, but critical gaps remain in integration, testing, and validation.
+**Reasons:**
+1. `/v1/chat` and `/v1/stream` bypass the AI Nguyễn Training Gateway and return raw provider responses.
+2. `@nai/output-guard`, `@nai/model-policy`, and `@nai/training-matrix` are dead code in the API runtime.
+3. No provider health, fallback, or single-model survival mode exists.
+4. Vietnamese UI still contains 28+ forbidden English terms.
+5. Roots Super App (50% of Founder directive) is completely missing.
+6. The previous strategic plan was a copy-paste of the Founder directive with no implementation detail.
+7. Exit gate score: 1/23 PASS.
 
-**Founder Decision Alignment:** The direction is correct, but cannot claim "AI Nguyễn Training Gateway verified" until all exit gates pass.
-
-**Next Steps:** Execute Phase 1-11 systematically, starting with P0 actions (language purity, governance policies, training gateway integration).
+**Next step:** Execute the P0 actions immediately: create `/v1/ai-nguyen/invoke` and `/v1/ai-nguyen/stream`, integrate the existing guard packages into the chat path, remove provider identity leaks, fix the audit gate, and start the Roots Super App RFC.
 
 ---
 
-**Audit Completed:** 2026-07-09  
-**Auditor:** Devin AI Agent  
-**Status:** 🟡 PARTIAL — Foundation exists, but critical gaps remain
+**Audit file:** `docs/governance/QA_AI_NGUYEN_TRAINING_GATEWAY_AUDIT_2026-07-09.md`  
+**Counterpart:** `docs/governance/QA_AUDIT_DOI_CHIEU_KE_HOACH_2026-07-09.md`  
+**Strategic plan:** `docs/governance/PHAN_QUYET_CHIEN_LUOC_CHO_NGUYENAI_NET_2026-07-09.md` (to be rewritten)
