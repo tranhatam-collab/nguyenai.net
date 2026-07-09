@@ -14,17 +14,17 @@ import { getModelById, PROVIDER_LABELS } from '../../lib/models';
 type StatusFilter = 'all' | 'completed' | 'failed' | 'running';
 
 const STATUS_STYLES: Record<CommandRecord['status'], { dot: string; label: string }> = {
-  running: { dot: 'bg-status-idle animate-pulse', label: 'Running · Đang chạy' },
-  completed: { dot: 'bg-status-active', label: 'Completed · Hoàn thành' },
-  failed: { dot: 'bg-status-offline', label: 'Failed · Lỗi' },
-  pending: { dot: 'bg-slate-500', label: 'Pending · Chờ' },
+  running: { dot: 'bg-status-idle animate-pulse', label: 'Đang chạy' },
+  completed: { dot: 'bg-status-active', label: 'Hoàn thành' },
+  failed: { dot: 'bg-status-offline', label: 'Lỗi' },
+  pending: { dot: 'bg-slate-500', label: 'Chờ' },
 };
 
 const FILTERS: { id: StatusFilter; label: string }[] = [
-  { id: 'all', label: 'All · Tất cả' },
-  { id: 'completed', label: 'Completed · Hoàn thành' },
-  { id: 'failed', label: 'Failed · Lỗi' },
-  { id: 'running', label: 'Running · Đang chạy' },
+  { id: 'all', label: 'Tất cả' },
+  { id: 'completed', label: 'Hoàn thành' },
+  { id: 'failed', label: 'Lỗi' },
+  { id: 'running', label: 'Đang chạy' },
 ];
 
 export default function CommandHistory() {
@@ -66,8 +66,7 @@ export default function CommandHistory() {
     <div className="console-card">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="console-section-title">Run History</h2>
-          <p className="console-section-subtitle">Lịch sử chạy lệnh</p>
+          <h2 className="console-section-title">Lịch sử chạy lệnh</h2>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex flex-wrap gap-1 rounded-lg border border-slate-800 bg-bg-card p-1">
@@ -92,9 +91,9 @@ export default function CommandHistory() {
             className="console-btn console-btn-secondary text-xs"
             onClick={handleClear}
             disabled={history.length === 0}
-            aria-label="Clear command history · Xóa lịch sử lệnh"
+            aria-label="Xóa lịch sử lệnh"
           >
-            Clear History
+            Xóa lịch sử
           </button>
         </div>
       </div>
@@ -102,7 +101,6 @@ export default function CommandHistory() {
       {filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-700 p-8 text-center">
           <p className="text-sm text-slate-400">Chưa có lệnh nào.</p>
-          <p className="mt-1 text-xs text-slate-500">No commands yet.</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -139,9 +137,9 @@ export default function CommandHistory() {
                   type="button"
                   className="console-btn console-btn-secondary shrink-0 text-xs"
                   onClick={() => handleReRun(cmd)}
-                  aria-label="Re-run command · Chạy lại lệnh"
+                  aria-label="Chạy lại lệnh"
                 >
-                  Re-run · Chạy lại
+                  Chạy lại
                 </button>
               </li>
             );

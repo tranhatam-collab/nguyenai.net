@@ -42,7 +42,7 @@ GEN2_PATTERNS="maytinhai\.org\|api\.maytinhai\.org"
 SRC_DIRS="apps/api/src apps/auth/src apps/web/src apps/edu/src apps/invest/src apps/console/src apps/admin/src packages/@nai"
 for dir in $SRC_DIRS; do
   if [ -d "$dir" ]; then
-    matches=$(grep -rn --include='*.ts' --include='*.tsx' --include='*.js' --include='*.astro' "$GEN2_PATTERNS" "$dir" 2>/dev/null | grep -v node_modules | grep -v '\.test\.' || true)
+    matches=$(find "$dir" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.astro' \) ! -path '*/node_modules/*' ! -name '*.test.*' -print0 2>/dev/null | xargs -0 grep -n "$GEN2_PATTERNS" 2>/dev/null || true)
     if [ -n "$matches" ]; then
       echo "FAIL: Gen2 reference found in $dir:"
       echo "$matches"
@@ -81,13 +81,13 @@ for f in apps/api/wrangler.jsonc apps/auth/wrangler.jsonc; do
 done
 echo "    Done."
 
-# ── Check 5: No Gen1/Gen2 in public-facing content data ──
+# ── Check 5: No Gen1/Gen2 in public-facing content ──
 echo "    [5/6] Checking public-facing content for Gen1/Gen2 references..."
-PUBLIC_DIRS="apps/web/src/data apps/edu/src/data apps/invest/src/data"
+PUBLIC_DIRS="apps/web/src apps/edu/src apps/invest/src apps/console/src"
 GEN_PATTERNS="Gen1\|Gen 1\|Gen2\|Gen 2\|computer\.iai\.one\|maytinhai\.org"
 for dir in $PUBLIC_DIRS; do
   if [ -d "$dir" ]; then
-    matches=$(grep -rn --include='*.ts' "$GEN_PATTERNS" "$dir" 2>/dev/null || true)
+    matches=$(find "$dir" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.astro' -o -name '*.mdx' -o -name '*.md' \) ! -path '*/node_modules/*' ! -path '*/private/*' -print0 2>/dev/null | xargs -0 grep -n "$GEN_PATTERNS" 2>/dev/null || true)
     if [ -n "$matches" ]; then
       echo "FAIL: Gen1/Gen2 reference found in public content $dir:"
       echo "$matches"

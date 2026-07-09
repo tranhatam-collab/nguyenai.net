@@ -72,9 +72,9 @@ export default function CostEstimator() {
     <div className="console-card">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="console-section-title">Cost Estimator</h2>
+          <h2 className="console-section-title">Ước tính chi phí</h2>
           <p className="console-section-subtitle">
-           Ước tính chi phí hàng tháng · Estimate monthly cost
+           Ước tính chi phí hàng tháng
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export default function CostEstimator() {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 onClick={() => setCurrency(c)}
-                aria-label={`Switch to ${c} currency · Chuyển sang ${c}`}
+                aria-label={`Chuyển sang ${c}`}
               >
                 {c}
               </button>
@@ -103,7 +103,7 @@ export default function CostEstimator() {
         <div className="space-y-5">
           <div>
             <label className="console-label" htmlFor="model-est">
-              Model · Mô hình
+              Mô hình
             </label>
             <select
               id="model-est"
@@ -122,7 +122,7 @@ export default function CostEstimator() {
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <label className="text-sm font-medium text-slate-300" htmlFor="tokens">
-                Tokens / month · Token / tháng
+                Token / tháng
               </label>
               <span className="text-xs text-slate-400">
                 {formatTokens(tokens)} ({formatNumber(tokens)})
@@ -147,7 +147,7 @@ export default function CostEstimator() {
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <label className="text-sm font-medium text-slate-300" htmlFor="ratio">
-                Input / Output ratio · Tỷ lệ vào/ra
+                Tỷ lệ vào/ra
               </label>
               <span className="text-xs text-slate-400">
                 {inputRatio}% / {100 - inputRatio}%
@@ -164,8 +164,8 @@ export default function CostEstimator() {
               className="w-full accent-accent"
             />
             <div className="mt-1 flex justify-between text-xs text-slate-500">
-              <span>0% input</span>
-              <span>100% input</span>
+              <span>0% vào</span>
+              <span>100% vào</span>
             </div>
           </div>
         </div>
@@ -173,11 +173,11 @@ export default function CostEstimator() {
         {/* Breakdown */}
         <div className="rounded-lg border border-slate-800 bg-bg-card/50 p-5">
           <p className="text-xs text-slate-400">
-            Estimated monthly cost · Chi phí ước tính/tháng
+            Chi phí ước tính/tháng
           </p>
           {model && (
             <p className="mt-1 text-xs text-slate-500">
-              {model.name} — In ${model.inputCostPer1M}/1M · Out $
+              {model.name} — Vào ${model.inputCostPer1M}/1M · Ra $
               {model.outputCostPer1M}/1M
             </p>
           )}
@@ -189,7 +189,7 @@ export default function CostEstimator() {
               <dl className="mt-4 space-y-2 text-sm">
                 <div className="flex items-center justify-between">
                   <dt className="text-slate-400">
-                    Input cost · Chi phí đầu vào ({inputRatio}%)
+                    Chi phí đầu vào ({inputRatio}%)
                   </dt>
                   <dd className="text-slate-200">
                     {formatCurrency(breakdown.inputCost, currency)}
@@ -197,7 +197,7 @@ export default function CostEstimator() {
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-slate-400">
-                    Output cost · Chi phí đầu ra ({100 - inputRatio}%)
+                    Chi phí đầu ra ({100 - inputRatio}%)
                   </dt>
                   <dd className="text-slate-200">
                     {formatCurrency(breakdown.outputCost, currency)}
@@ -205,7 +205,7 @@ export default function CostEstimator() {
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-slate-800 pt-3">
                   <dt className="font-medium text-slate-300">
-                    Total · Tổng cộng
+                    Tổng cộng
                   </dt>
                   <dd className="font-semibold text-accent-muted">
                     {formatCurrency(breakdown.total, currency)}
@@ -214,12 +214,12 @@ export default function CostEstimator() {
               </dl>
               {currency === 'VND' && (
                 <p className="mt-3 text-xs text-slate-500">
-                  Tỷ giá · Rate: 1 USD = {USD_TO_VND.toLocaleString('en-US')} ₫
+                  Tỷ giá: 1 USD = {USD_TO_VND.toLocaleString('en-US')} ₫
                 </p>
               )}
             </>
           ) : (
-            <p className="mt-4 text-slate-500">Select a model</p>
+            <p className="mt-4 text-slate-500">Chọn mô hình</p>
           )}
         </div>
       </div>

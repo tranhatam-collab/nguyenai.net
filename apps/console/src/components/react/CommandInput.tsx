@@ -115,7 +115,7 @@ export default function CommandInput() {
       dispatchSubmit(trimmed, modelId, { response: resp });
       setText('');
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : 'Command failed. · Lệnh thất bại.';
+      const msg = err instanceof ApiError ? err.message : 'Lệnh thất bại.';
       setError(msg);
       const updated: Command[] = getItem<Command[]>(HISTORY_KEY, []).map((c) =>
         c.id === entryId ? { ...c, status: 'failed' as const, result: msg } : c,
@@ -158,7 +158,7 @@ export default function CommandInput() {
     <div className="console-card mb-6">
       <div className="mb-1.5 flex items-center justify-between">
         <label className="console-label mb-0" htmlFor="command-text">
-          Command Input · Nhập lệnh
+          Nhập lệnh
         </label>
         <div className="relative">
           <button
@@ -166,15 +166,15 @@ export default function CommandInput() {
             className="console-btn console-btn-secondary text-xs"
             onClick={() => setHistoryOpen((v) => !v)}
             aria-expanded={historyOpen}
-            aria-label="Toggle command history · Mở lịch sử lệnh"
+            aria-label="Mở lịch sử lệnh"
           >
-            History · Lịch sử ({recentHistory.length})
+            Lịch sử ({recentHistory.length})
           </button>
           {historyOpen && (
             <div className="absolute right-0 z-20 mt-2 max-h-72 w-96 overflow-y-auto rounded-lg border border-slate-700 bg-bg-card p-2 shadow-xl">
               {recentHistory.length === 0 ? (
                 <p className="px-2 py-3 text-xs text-slate-500">
-                  Chưa có lệnh nào. / No commands yet.
+                  Chưa có lệnh nào.
                 </p>
               ) : (
                 <ul className="space-y-1">
@@ -184,7 +184,7 @@ export default function CommandInput() {
                         type="button"
                         className="w-full rounded px-2 py-2 text-left text-xs hover:bg-bg-hover"
                         onClick={() => handleHistoryPick(cmd)}
-                        aria-label={`Select command: ${cmd.text}`}
+                        aria-label={`Chọn lệnh: ${cmd.text}`}
                       >
                         <p className="truncate font-mono text-slate-300">
                           {cmd.text}
@@ -206,7 +206,7 @@ export default function CommandInput() {
         id="command-text"
         rows={6}
         className="console-input resize-none font-mono text-sm"
-        placeholder="Enter your command here... · Nhập lệnh cho AI Computer của bạn..."
+        placeholder="Nhập lệnh cho Máy Tính AI của bạn..."
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -216,7 +216,7 @@ export default function CommandInput() {
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-xs text-slate-400" htmlFor="model-select">
-            Model:
+            Mô hình:
           </label>
           <select
             id="model-select"
@@ -233,13 +233,13 @@ export default function CommandInput() {
           </select>
           {costEstimate && (
             <span className="text-xs text-slate-400">
-              Est. cost · Chi phí ước tính:{' '}
+              Chi phí ước tính:{' '}
               <span className="text-slate-300">
                 ${costEstimate.total.toFixed(4)}
               </span>
               <span className="text-slate-500">
                 {' '}
-                (in ${costEstimate.inputCost.toFixed(4)} / out $
+                (vào ${costEstimate.inputCost.toFixed(4)} / ra $
                 {costEstimate.outputCost.toFixed(4)})
               </span>
             </span>
@@ -255,7 +255,7 @@ export default function CommandInput() {
             className="console-btn console-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
             onClick={handleRun}
             disabled={running || !text.trim()}
-            aria-label={running ? "Running command · Đang chạy lệnh" : "Run command · Chạy lệnh"}
+            aria-label={running ? "Đang chạy lệnh" : "Chạy lệnh"}
           >
             {running ? (
               <>
@@ -272,7 +272,7 @@ export default function CommandInput() {
                     d="M4 12a8 8 0 018-8"
                   />
                 </svg>
-                Running... · Đang chạy
+                Đang chạy...
               </>
             ) : (
               <>
@@ -289,7 +289,7 @@ export default function CommandInput() {
                     d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0L21 3M3 12l2.25 2.25m0 0L7.5 18m-2.25-5.25H3"
                   />
                 </svg>
-                Run Command · Chạy lệnh
+                Chạy lệnh
               </>
             )}
           </button>
@@ -299,7 +299,7 @@ export default function CommandInput() {
       {/* Error display */}
       {error && (
         <div className="mt-4 rounded-lg border border-red-800 bg-red-950/40 p-3 text-sm text-red-300">
-          <p className="font-medium">Error · Lỗi:</p>
+          <p className="font-medium">Lỗi:</p>
           <p className="mt-1 font-mono text-xs">{error}</p>
         </div>
       )}
@@ -309,7 +309,7 @@ export default function CommandInput() {
         <div className="mt-4 rounded-lg border border-slate-700 bg-bg-card p-3 text-sm">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
-              State: {lastResponse.state}
+              Trạng thái: {lastResponse.state}
             </span>
             {lastResponse.agent_id && (
               <span className="rounded bg-accent/20 px-2 py-0.5 text-xs text-accent">

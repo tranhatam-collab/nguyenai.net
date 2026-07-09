@@ -81,9 +81,9 @@ export default function RoutingRules() {
     <div className="console-card">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="console-section-title">Routing Rules</h2>
+          <h2 className="console-section-title">Quy tắc định tuyến</h2>
           <p className="console-section-subtitle">
-            Quy tắc định tuyến · Define how commands are routed to models
+            Xác định cách lệnh được định tuyến đến các mô hình
           </p>
         </div>
         {!adding && (
@@ -91,9 +91,9 @@ export default function RoutingRules() {
             type="button"
             className="console-btn console-btn-primary text-xs"
             onClick={() => setAdding(true)}
-            aria-label="Add routing rule · Thêm quy tắc định tuyến"
+            aria-label="Thêm quy tắc định tuyến"
           >
-            Add Rule · Thêm quy tắc
+            Thêm quy tắc
           </button>
         )}
       </div>
@@ -106,12 +106,12 @@ export default function RoutingRules() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto]">
             <div>
               <label className="console-label" htmlFor="rule-condition">
-                Condition · Điều kiện
+                Điều kiện
               </label>
               <input
                 id="rule-condition"
                 className="console-input"
-                placeholder="e.g. Code generation"
+                placeholder="vd: Sinh mã lập trình"
                 value={condition}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setCondition(e.target.value)
@@ -121,7 +121,7 @@ export default function RoutingRules() {
             </div>
             <div>
               <label className="console-label" htmlFor="rule-model">
-                Model · Mô hình
+                Mô hình
               </label>
               <select
                 id="rule-model"
@@ -137,8 +137,8 @@ export default function RoutingRules() {
               </select>
             </div>
             <div className="flex items-end gap-2">
-              <button type="submit" className="console-btn console-btn-primary" aria-label="Save routing rule · Lưu quy tắc định tuyến">
-                Save · Lưu
+              <button type="submit" className="console-btn console-btn-primary" aria-label="Lưu quy tắc định tuyến">
+                Lưu
               </button>
               <button
                 type="button"
@@ -147,7 +147,7 @@ export default function RoutingRules() {
                   setAdding(false);
                   setCondition('');
                 }}
-                aria-label="Cancel · Hủy"
+                aria-label="Hủy"
               >
                 Hủy
               </button>
@@ -158,19 +158,16 @@ export default function RoutingRules() {
 
       {rules.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-700 p-8 text-center">
-          <p className="text-sm text-slate-400">No routing rules configured</p>
-          <p className="mt-1 text-xs text-slate-500">
-            Chưa có quy tắc định tuyến nào
-          </p>
+          <p className="text-sm text-slate-400">Chưa có quy tắc định tuyến nào</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-slate-800 text-xs text-slate-500">
-                <th className="py-2 pr-4 font-medium">Condition · Điều kiện</th>
-                <th className="py-2 pr-4 font-medium">Preferred Model · Mô hình</th>
-                <th className="py-2 text-right font-medium">Action</th>
+                <th className="py-2 pr-4 font-medium">Điều kiện</th>
+                <th className="py-2 pr-4 font-medium">Mô hình ưu tiên</th>
+                <th className="py-2 text-right font-medium">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -190,9 +187,9 @@ export default function RoutingRules() {
                       type="button"
                       className="text-xs text-slate-500 hover:text-red-400"
                       onClick={() => handleDelete(rule.id)}
-                      aria-label={`Delete routing rule ${rule.condition} · Xóa quy tắc ${rule.condition}`}
+                      aria-label={`Xóa quy tắc ${rule.condition}`}
                     >
-                      Delete · Xóa
+                      Xóa
                     </button>
                   </td>
                 </tr>

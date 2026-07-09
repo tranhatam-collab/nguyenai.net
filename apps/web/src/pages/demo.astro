@@ -14,14 +14,14 @@ const description = 'Bản chứng minh năng lực thực tế: gọi API, xem 
     <section class="demos" aria-label="Danh sách demo API">
       <div class="demo-card">
         <h3>POST /v1/chat <RGradeBadge grade="R1" locale="vi" /></h3>
-        <p>Gọi chat API với mô hình riêng. Response từ provider trực tiếp (OpenAI/Anthropic/Google), không qua Gen1.</p>
+        <p>Gọi chat API với mô hình riêng. Response từ AI Nguyễn, được kiểm định qua cổng huấn luyện.</p>
         <pre><code>curl -X POST https://api.nguyenai.net/v1/chat \
   -H "Content-Type: application/json" \
   -d '&#123;"model":"auto-route","messages":[&#123;"role":"user","content":"Xin chào"&#125;]&#125;'</code></pre>
       </div>
       <div class="demo-card">
         <h3>GET /v1/gen1/models <RGradeBadge grade="R0" locale="vi" /></h3>
-        <p>Route Gen1 đã tắt mặc định. Trả 404 khi LEGACY_BRIDGE_ENABLED không set.</p>
+        <p>Route legacy đã tắt mặc định. Trả 404 khi LEGACY_BRIDGE_ENABLED không set.</p>
         <pre><code>curl https://api.nguyenai.net/v1/gen1/models
 # 404 &#123;"error":"legacy_bridge_disabled"&#125;</code></pre>
       </div>

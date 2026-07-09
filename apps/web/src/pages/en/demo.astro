@@ -14,14 +14,14 @@ const description = 'Live capability demo: call API, see results, check receipts
     <section class="demos" aria-label="List of API demos">
       <div class="demo-card">
         <h3>POST /v1/chat <RGradeBadge grade="R1" locale="en" /></h3>
-        <p>Call chat API with own model. Response from direct provider (OpenAI/Anthropic/Google), no Gen1 proxy.</p>
+        <p>Call chat API with own model. Response from AI Nguyen, validated through the training gateway.</p>
         <pre><code>curl -X POST https://api.nguyenai.net/v1/chat \
   -H "Content-Type: application/json" \
   -d '&#123;"model":"auto-route","messages":[&#123;"role":"user","content":"Hello"&#125;]&#125;'</code></pre>
       </div>
       <div class="demo-card">
         <h3>GET /v1/gen1/models <RGradeBadge grade="R0" locale="en" /></h3>
-        <p>Gen1 route disabled by default. Returns 404 when LEGACY_BRIDGE_ENABLED is not set.</p>
+        <p>Legacy route disabled by default. Returns 404 when LEGACY_BRIDGE_ENABLED is not set.</p>
         <pre><code>curl https://api.nguyenai.net/v1/gen1/models
 # 404 &#123;"error":"legacy_bridge_disabled"&#125;</code></pre>
       </div>

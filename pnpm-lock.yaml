@@ -144,6 +144,9 @@ importers:
       '@nai/self-heal':
         specifier: workspace:*
         version: link:../../packages/@nai/self-heal
+      '@nai/training-gateway':
+        specifier: workspace:*
+        version: link:../../packages/@nai/training-gateway
       hono:
         specifier: ^4.6.0
         version: 4.12.27
@@ -1292,6 +1295,34 @@ importers:
         version: 5.9.3
 
   packages/@nai/trace: {}
+
+  packages/@nai/training-gateway:
+    dependencies:
+      '@nai/audit':
+        specifier: workspace:*
+        version: link:../audit
+      '@nai/model-gateway':
+        specifier: workspace:*
+        version: link:../model-gateway
+      '@nai/model-policy':
+        specifier: workspace:*
+        version: link:../model-policy
+      '@nai/output-guard':
+        specifier: workspace:*
+        version: link:../output-guard
+      '@nai/prism':
+        specifier: workspace:*
+        version: link:../prism
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/@nai/training-matrix:
     dependencies:

@@ -7,25 +7,25 @@ import ConsoleLayout from '../layouts/ConsoleLayout.astro';
 import StatusBadge from '../components/StatusBadge.astro';
 
 const stats = [
-  { label: 'Instance Status', labelVi: 'Trạng thái Instance', value: 'Running', status: 'active' as const },
-  { label: 'Active Agents', labelVi: 'Agent hoạt động', value: '—', status: 'idle' as const },
-  { label: 'Monthly Spend', labelVi: 'Chi phí tháng', value: '—', status: 'offline' as const },
-  { label: 'Commands Today', labelVi: 'Lệnh hôm nay', value: '—', status: 'offline' as const },
+  { label: 'Trạng thái phiên bản', value: 'Đang chạy', status: 'active' as const },
+  { label: 'Agent hoạt động', value: '—', status: 'idle' as const },
+  { label: 'Chi phí tháng', value: '—', status: 'offline' as const },
+  { label: 'Lệnh hôm nay', value: '—', status: 'offline' as const },
 ];
 
 const quickActions = [
-  { label: 'New Command', labelVi: 'Lệnh mới', href: '/command-center', icon: 'M12 4v16m8-8H4' },
-  { label: 'Launch Super App', labelVi: 'Khởi động Super App', href: '/super-apps', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
-  { label: 'Manage Agents', labelVi: 'Quản lý Agent', href: '/agents', icon: 'M12 4.354a4 4 0 110 5.292M15 8H3m15.333 4H7.667M19 12a2 2 0 11-4 0 2 2 0 014 0z' },
-  { label: 'Upload to Vault', labelVi: 'Tải lên Vault', href: '/data-vault', icon: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' },
+  { label: 'Lệnh mới', href: '/command-center', icon: 'M12 4v16m8-8H4' },
+  { label: 'Khởi động ứng dụng', href: '/super-apps', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { label: 'Quản lý Agent', href: '/agents', icon: 'M12 4.354a4 4 0 110 5.292M15 8H3m15.333 4H7.667M19 12a2 2 0 11-4 0 2 2 0 014 0z' },
+  { label: 'Tải lên kho', href: '/data-vault', icon: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12' },
 ];
 ---
 
-<ConsoleLayout title="Dashboard · Nguyen AI Console">
+<ConsoleLayout title="Bảng điều khiển · Nguyễn AI">
   <!-- Page header -->
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-100">Dashboard</h1>
-    <p class="text-sm text-slate-400">Bảng điều khiển · AI Computer Instance overview</p>
+    <h1 class="text-2xl font-bold text-slate-100">Bảng điều khiển</h1>
+    <p class="text-sm text-slate-400">Tổng quan phiên bản Máy Tính AI</p>
   </div>
 
   <!-- Stats grid -->
@@ -35,7 +35,6 @@ const quickActions = [
         <div class="flex items-center justify-between">
           <div>
             <p class="text-xs text-slate-400">{stat.label}</p>
-            <p class="mt-1 text-xs text-slate-500">{stat.labelVi}</p>
           </div>
           {stat.status !== 'offline' && <StatusBadge status={stat.status} />}
         </div>
@@ -46,7 +45,7 @@ const quickActions = [
 
   <!-- Quick actions -->
   <div class="mb-6">
-    <h2 class="console-section-title mb-3">Quick Actions · Thao tác nhanh</h2>
+    <h2 class="console-section-title mb-3">Thao tác nhanh</h2>
     <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {quickActions.map((action) => (
         <a href={action.href} class="console-card group flex flex-col items-center gap-2 text-center">
@@ -56,7 +55,6 @@ const quickActions = [
             </svg>
           </div>
           <span class="text-sm font-medium text-slate-200">{action.label}</span>
-          <span class="text-xs text-slate-500">{action.labelVi}</span>
         </a>
       ))}
     </div>
@@ -68,10 +66,9 @@ const quickActions = [
     <div class="console-card">
       <div class="mb-4 flex items-center justify-between">
         <div>
-          <h2 class="console-section-title">Recent Commands</h2>
-          <p class="console-section-subtitle">Lệnh gần đây</p>
+          <h2 class="console-section-title">Lệnh gần đây</h2>
         </div>
-        <a href="/command-center" class="text-sm text-accent hover:text-accent-hover">View all →</a>
+        <a href="/command-center" class="text-sm text-accent hover:text-accent-hover">Xem tất cả →</a>
       </div>
       <div class="space-y-2">
         {[1, 2, 3].map(() => (
@@ -79,7 +76,7 @@ const quickActions = [
             <div class="h-2 w-2 rounded-full bg-slate-600"></div>
             <div class="flex-1">
               <p class="text-sm text-slate-300">—</p>
-              <p class="text-xs text-slate-500">No commands yet · Chưa có lệnh</p>
+              <p class="text-xs text-slate-500">Chưa có lệnh</p>
             </div>
           </div>
         ))}
@@ -90,17 +87,16 @@ const quickActions = [
     <div class="console-card">
       <div class="mb-4 flex items-center justify-between">
         <div>
-          <h2 class="console-section-title">Active Agents</h2>
-          <p class="console-section-subtitle">Agent đang hoạt động</p>
+          <h2 class="console-section-title">Agent đang hoạt động</h2>
         </div>
-        <a href="/agents" class="text-sm text-accent hover:text-accent-hover">View all →</a>
+        <a href="/agents" class="text-sm text-accent hover:text-accent-hover">Xem tất cả →</a>
       </div>
       <div class="space-y-2">
         {[1, 2, 3].map(() => (
           <div class="flex items-center gap-3 rounded-lg border border-slate-800 bg-bg-card/50 p-3">
             <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800 text-sm font-bold text-slate-400">—</div>
             <div class="flex-1">
-              <p class="text-sm text-slate-300">No active agents · Chưa có Agent hoạt động</p>
+              <p class="text-sm text-slate-300">Chưa có Agent hoạt động</p>
             </div>
             <StatusBadge status="offline" />
           </div>

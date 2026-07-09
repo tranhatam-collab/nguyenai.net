@@ -51,15 +51,15 @@ export default function ModelSelector() {
     <div className="mb-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="console-section-title">Available Models · Các mô hình</h2>
+          <h2 className="console-section-title">Các mô hình khả dụng</h2>
           <p className="console-section-subtitle">
-            Chọn mô hình mặc định · Select a model to use
+            Chọn mô hình để sử dụng
           </p>
         </div>
         <div className="flex items-center gap-2">
           {defaultId && (
             <span className="text-xs text-slate-400">
-              Default · Mặc định:{' '}
+              Mặc định:{' '}
               <span className="text-slate-200">
                 {MODELS.find((m) => m.id === defaultId)?.name ?? defaultId}
               </span>
@@ -69,9 +69,9 @@ export default function ModelSelector() {
             type="button"
             className="console-btn console-btn-primary text-xs"
             onClick={handleSetDefault}
-            aria-label={saved ? "Saved · Đã lưu" : "Set as default · Đặt mặc định"}
+            aria-label={saved ? "Đã lưu" : "Đặt mặc định"}
           >
-            {saved ? 'Saved ✓ · Đã lưu' : 'Set as default · Đặt mặc định'}
+            {saved ? 'Đã lưu ✓' : 'Đặt mặc định'}
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function ModelSelector() {
               }`}
               onClick={() => handleSelect(model.id)}
               aria-pressed={isSelected}
-              aria-label={`Select model ${model.name} · Chọn mô hình ${model.name}`}
+              aria-label={`Chọn mô hình ${model.name}`}
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0">
@@ -104,29 +104,29 @@ export default function ModelSelector() {
                 </div>
                 {isDefault && (
                   <span className="shrink-0 rounded-full bg-accent/20 px-2 py-0.5 text-xs text-accent-muted">
-                    Default
+                    Mặc định
                   </span>
                 )}
               </div>
 
               <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
                 <div>
-                  <dt className="text-slate-500">Context</dt>
+                  <dt className="text-slate-500">Ngữ cảnh</dt>
                   <dd className="text-slate-300">
                     {formatContextWindow(model.contextWindow)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-slate-500">In / 1M</dt>
+                  <dt className="text-slate-500">Vào / 1M</dt>
                   <dd className="text-slate-300">${model.inputCostPer1M}</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-500">Out / 1M</dt>
+                  <dt className="text-slate-500">Ra / 1M</dt>
                   <dd className="text-slate-300">${model.outputCostPer1M}</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-500">Status</dt>
-                  <dd className="text-status-active">Available</dd>
+                  <dt className="text-slate-500">Trạng thái</dt>
+                  <dd className="text-status-active">Khả dụng</dd>
                 </div>
               </dl>
 
@@ -149,10 +149,10 @@ export default function ModelSelector() {
 
       {selected && (
         <p className="mt-3 text-xs text-slate-400">
-          Selected · Đã chọn:{' '}
-          <span className="text-slate-200">{selected.name}</span> — In $
-          {selected.inputCostPer1M}/1M · Out ${selected.outputCostPer1M}/1M ·
-          Context {formatContextWindow(selected.contextWindow)}
+          Đã chọn:{' '}
+          <span className="text-slate-200">{selected.name}</span> — Vào $
+          {selected.inputCostPer1M}/1M · Ra ${selected.outputCostPer1M}/1M ·
+          Ngữ cảnh {formatContextWindow(selected.contextWindow)}
         </p>
       )}
     </div>

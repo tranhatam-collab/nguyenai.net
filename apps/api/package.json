@@ -33,7 +33,8 @@
     "@nai/investor-verify": "workspace:*",
     "@nai/admin-approval": "workspace:*",
     "@nai/model-gateway": "workspace:*",
-    "@nai/notifier": "workspace:*"
+    "@nai/notifier": "workspace:*",
+    "@nai/training-gateway": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

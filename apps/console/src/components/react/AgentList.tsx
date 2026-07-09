@@ -21,7 +21,7 @@ export default function AgentList() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Failed to load agents.');
+          setError(err instanceof ApiError ? err.message : 'Tải danh sách Agent thất bại.');
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -31,13 +31,13 @@ export default function AgentList() {
   }, []);
 
   if (loading) {
-    return <p className="text-sm text-slate-400">Loading agents... · Đang tải...</p>;
+    return <p className="text-sm text-slate-400">Đang tải...</p>;
   }
 
   if (error) {
     return (
       <div className="rounded-lg border border-red-800 bg-red-950/40 p-4 text-sm text-red-300">
-        <p className="font-medium">Error · Lỗi:</p>
+        <p className="font-medium">Lỗi:</p>
         <p className="mt-1 font-mono text-xs">{error}</p>
       </div>
     );
@@ -59,7 +59,7 @@ export default function AgentList() {
                   : 'bg-slate-800 text-slate-400'
               }`}
             >
-              {agent.enabled ? 'Enabled' : 'Disabled'}
+              {agent.enabled ? 'Bật' : 'Tắt'}
             </span>
           </div>
           <p className="text-xs text-slate-400">{agent.nameVi}</p>
@@ -72,7 +72,7 @@ export default function AgentList() {
               </span>
             ))}
           </div>
-          <p className="mt-2 text-[10px] text-slate-500">Default tier: {agent.defaultTier}</p>
+          <p className="mt-2 text-[10px] text-slate-500">Cấp mặc định: {agent.defaultTier}</p>
         </div>
       ))}
     </div>

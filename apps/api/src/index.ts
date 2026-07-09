@@ -96,15 +96,16 @@ import {
   configureGen1Adapter,
   configureMockProvider,
   configureDirectProvider,
-  chat as prismChat,
   type ModelDescriptor,
 } from '@nai/prism';
+import { invokeThroughTrainingGateway } from '@nai/training-gateway';
 import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
 import { chatRateLimit, paymentRateLimit } from './rate-limiter';
 
 // WI-1.1: Route modules — mounted for independent operation.
 import modelGatewayRoutes from './routes/model-gateway';
+import aiNguyenRoutes from './routes/ai-nguyen';
 import fallbackRoutes from './routes/fallback';
 import incidentRoutes from './routes/incidents';
 import selfHealRoutes from './routes/self-heal';
@@ -552,9 +553,9 @@ async function proxyToGen1(
   }
 }
 
-// POST /v1/chat — local LLM via prism (direct provider, no Gen1 proxy)
-// WI-1.2: Routed through @nai/prism which uses direct OpenAI/Anthropic/Google
-// providers. Gen1 adapter is only used when LEGACY_BRIDGE_ENABLED=true (failoff).
+// POST /v1/chat — AI Nguyễn Training Gateway entry point
+// All model calls route through @nai/training-gateway, which enforces
+// identity, language, safety, data classification, and output guard policies.
 app.post('/v1/chat', chatRateLimit, async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'unauthorized' }, 401);
@@ -574,15 +575,17 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
   const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
   const userTier = ents.machine.model_tier ?? 'free';
 
-  const result = await prismChat({
+  const result = await invokeThroughTrainingGateway({
     tenant_id: session.tenant_id,
     user_id: session.user_id,
     plan_id: session.plan_id,
+    session_id: session.session_id ?? null,
     model: body.model ?? 'auto-route',
     messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
     max_tokens: body.max_tokens,
     temperature: body.temperature,
-  }, userTier);
+    user_tier: userTier,
+  });
 
   if (!result.tier_allowed) {
     return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
@@ -598,8 +601,9 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
       proof_type: 'execution' as never,
       payload: {
         model: result.model,
-        served_by: result.served_by,
+        receipt_id: result.receipt_id,
         usage: result.usage,
+        guard_action: result.guard_action,
       },
     }, resolveEvidenceSigningKey(c.env));
   } catch {
@@ -611,13 +615,14 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
     content: result.content,
     finish_reason: result.finish_reason,
     usage: result.usage,
-    served_by: result.served_by,
+    receipt_id: result.receipt_id,
+    guard_action: result.guard_action,
   });
 });
 
-// POST /v1/stream — streaming chat via prism (SSE)
-// WI-1.2: Uses prism for the first token, then streams. For now, non-streaming
-// fallback wrapped in SSE format. Full streaming requires provider SDK support.
+// POST /v1/stream — streaming chat via AI Nguyễn Training Gateway (SSE)
+// For now, non-streaming fallback wrapped in SSE format. Full streaming requires
+// provider SDK support and output guard per-chunk.
 app.post('/v1/stream', chatRateLimit, async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'unauthorized' }, 401);
@@ -636,15 +641,17 @@ app.post('/v1/stream', chatRateLimit, async (c) => {
   const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
   const userTier = ents.machine.model_tier ?? 'free';
 
-  const result = await prismChat({
+  const result = await invokeThroughTrainingGateway({
     tenant_id: session.tenant_id,
     user_id: session.user_id,
     plan_id: session.plan_id,
+    session_id: session.session_id ?? null,
     model: body.model ?? 'auto-route',
     messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
     max_tokens: body.max_tokens,
     temperature: body.temperature,
-  }, userTier);
+    user_tier: userTier,
+  });
 
   if (!result.tier_allowed) {
     return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
@@ -656,7 +663,8 @@ app.post('/v1/stream', chatRateLimit, async (c) => {
     content: result.content,
     finish_reason: result.finish_reason,
     usage: result.usage,
-    served_by: result.served_by,
+    receipt_id: result.receipt_id,
+    guard_action: result.guard_action,
   });
   return new Response(`data: ${sseData}\n\ndata: [DONE]\n\n`, {
     status: 200,
@@ -710,16 +718,18 @@ function makeLLMChatFn(session: Session, planId: PlanId): LLMChatFn {
     // Resolve entitlements to get the user's model tier.
     const ent = await resolveEnt(session.user_id, session.tenant_id, planId);
     const userTier = String(ent.machine.model_tier ?? 'free');
-    const result = await prismChat({
+    const result = await invokeThroughTrainingGateway({
       tenant_id: session.tenant_id,
       user_id: session.user_id,
       plan_id: planId,
+      session_id: session.session_id ?? null,
       model: 'auto-route',
       messages: [
         { role: 'system', content: opts.systemPrompt },
         { role: 'user', content: opts.userMessage },
       ],
-    }, userTier);
+      user_tier: userTier,
+    });
     if (result.finish_reason === 'error') {
       throw new Error(result.tier_reason ?? 'LLM error');
     }
@@ -1259,6 +1269,7 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
 // ============================================================
 
 app.route('/', modelGatewayRoutes);
+app.route('/', aiNguyenRoutes);
 app.route('/', fallbackRoutes);
 app.route('/', incidentRoutes);
 app.route('/', selfHealRoutes);

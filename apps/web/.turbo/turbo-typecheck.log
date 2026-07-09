@@ -1,9 +1,0 @@
-[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
-$ astro check
-12:22:16 [types] Generated 141ms
-12:22:16 [check] Getting diagnostics for Astro files in /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/web...
-Result (76 files): 
-- 0 errors
-- 0 warnings
-- 0 hints
-

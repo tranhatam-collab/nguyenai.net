@@ -6,26 +6,26 @@ export const prerender = false;
 import ConsoleLayout from '../layouts/ConsoleLayout.astro';
 
 const sections = [
-  { id: 'profile', label: 'Profile', labelVi: 'Hồ sơ' },
-  { id: 'plan', label: 'Plan', labelVi: 'Gói dịch vụ' },
-  { id: 'billing', label: 'Billing', labelVi: 'Thanh toán' },
-  { id: 'api-keys', label: 'API Keys', labelVi: 'Khóa API' },
-  { id: 'security', label: 'Security', labelVi: 'Bảo mật' },
+  { id: 'profile', label: 'Hồ sơ' },
+  { id: 'plan', label: 'Gói dịch vụ' },
+  { id: 'billing', label: 'Thanh toán' },
+  { id: 'api-keys', label: 'Khóa API' },
+  { id: 'security', label: 'Bảo mật' },
 ];
 ---
 
-<ConsoleLayout title="Settings · Nguyen AI Console">
+<ConsoleLayout title="Cài đặt · Nguyễn AI">
   <!-- Page header -->
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-100">Settings</h1>
-    <p class="text-sm text-slate-400">Cài đặt · Manage your account and preferences</p>
+    <h1 class="text-2xl font-bold text-slate-100">Cài đặt</h1>
+    <p class="text-sm text-slate-400">Quản lý tài khoản và tùy chọn</p>
   </div>
 
   <!-- Section navigation -->
   <div class="mb-6 flex flex-wrap gap-2">
     {sections.map((section) => (
       <a href={`#${section.id}`} class="console-btn console-btn-secondary text-xs">
-        {section.label} · {section.labelVi}
+        {section.label}
       </a>
     ))}
   </div>
@@ -33,26 +33,26 @@ const sections = [
   <div class="space-y-6">
     <!-- Profile -->
     <div class="console-card" id="profile">
-      <h2 class="console-section-title mb-1">Profile · Hồ sơ</h2>
-      <p class="console-section-subtitle mb-4">Your account information</p>
+      <h2 class="console-section-title mb-1">Hồ sơ</h2>
+      <p class="console-section-subtitle mb-4">Thông tin tài khoản</p>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label class="console-label" for="full-name">Full Name · Họ tên</label>
-          <input id="full-name" type="text" class="console-input" placeholder="Your name" />
+          <label class="console-label" for="full-name">Họ tên</label>
+          <input id="full-name" type="text" class="console-input" placeholder="Tên của bạn" />
         </div>
         <div>
-          <label class="console-label" for="email">Email · Email</label>
+          <label class="console-label" for="email">Email</label>
           <input id="email" type="email" class="console-input" placeholder="you@example.com" />
         </div>
         <div>
-          <label class="console-label" for="display-name">Display Name · Tên hiển thị</label>
-          <input id="display-name" type="text" class="console-input" placeholder="Display name" />
+          <label class="console-label" for="display-name">Tên hiển thị</label>
+          <input id="display-name" type="text" class="console-input" placeholder="Tên hiển thị" />
         </div>
         <div>
-          <label class="console-label">Language · Ngôn ngữ</label>
+          <label class="console-label">Ngôn ngữ</label>
           <select class="console-input">
             <option>Tiếng Việt</option>
-            <option>English</option>
+            <option>Tiếng Anh</option>
           </select>
         </div>
       </div>
@@ -60,64 +60,59 @@ const sections = [
 
     <!-- Plan -->
     <div class="console-card" id="plan">
-      <h2 class="console-section-title mb-1">Plan · Gói dịch vụ</h2>
-      <p class="console-section-subtitle mb-4">Your current subscription</p>
+      <h2 class="console-section-title mb-1">Gói dịch vụ</h2>
+      <p class="console-section-subtitle mb-4">Gói đăng ký hiện tại</p>
       <div class="flex items-center justify-between rounded-lg border border-accent/30 bg-accent/10 p-4">
         <div>
-          <p class="font-semibold text-accent">Founder Plan</p>
-          <p class="text-xs text-slate-400">Current plan · Gói hiện tại</p>
+          <p class="font-semibold text-accent">Gói Founder</p>
+          <p class="text-xs text-slate-400">Gói hiện tại</p>
         </div>
-        <button class="console-btn console-btn-primary">Upgrade · Nâng cấp</button>
+        <button class="console-btn console-btn-primary">Nâng cấp</button>
       </div>
     </div>
 
     <!-- Billing -->
     <div class="console-card" id="billing">
-      <h2 class="console-section-title mb-1">Billing · Thanh toán</h2>
-      <p class="console-section-subtitle mb-4">Payment methods and invoices</p>
+      <h2 class="console-section-title mb-1">Thanh toán</h2>
+      <p class="console-section-subtitle mb-4">Phương thức thanh toán và hóa đơn</p>
       <div class="rounded-lg border border-dashed border-slate-700 p-6 text-center">
-        <p class="text-sm text-slate-400">No payment method on file</p>
-        <p class="mt-1 text-xs text-slate-500">Chưa có phương thức thanh toán</p>
-        <button class="console-btn console-btn-primary mt-4">Add Payment Method · Thêm thanh toán</button>
+        <p class="text-sm text-slate-400">Chưa có phương thức thanh toán</p>
+        <button class="console-btn console-btn-primary mt-4">Thêm phương thức thanh toán</button>
       </div>
     </div>
 
     <!-- API Keys -->
     <div class="console-card" id="api-keys">
-      <h2 class="console-section-title mb-1">API Keys · Khóa API</h2>
-      <p class="console-section-subtitle mb-4">Manage your API credentials</p>
+      <h2 class="console-section-title mb-1">Khóa API</h2>
+      <p class="console-section-subtitle mb-4">Quản lý thông tin xác thực API</p>
       <div class="rounded-lg border border-dashed border-slate-700 p-6 text-center">
-        <p class="text-sm text-slate-400">No API keys generated</p>
-        <p class="mt-1 text-xs text-slate-500">Chưa có khóa API nào</p>
-        <button class="console-btn console-btn-primary mt-4">Generate Key · Tạo khóa</button>
+        <p class="text-sm text-slate-400">Chưa có khóa API nào</p>
+        <button class="console-btn console-btn-primary mt-4">Tạo khóa</button>
       </div>
     </div>
 
     <!-- Security -->
     <div class="console-card" id="security">
-      <h2 class="console-section-title mb-1">Security · Bảo mật</h2>
-      <p class="console-section-subtitle mb-4">Account security settings</p>
+      <h2 class="console-section-title mb-1">Bảo mật</h2>
+      <p class="console-section-subtitle mb-4">Cài đặt bảo mật tài khoản</p>
       <div class="space-y-4">
         <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
           <div>
-            <p class="text-sm font-medium text-slate-200">Two-Factor Authentication</p>
-            <p class="text-xs text-slate-500">Xác thực hai yếu tố</p>
+            <p class="text-sm font-medium text-slate-200">Xác thực hai yếu tố</p>
           </div>
-          <button class="console-btn console-btn-secondary text-xs">Enable · Bật</button>
+          <button class="console-btn console-btn-secondary text-xs">Bật</button>
         </div>
         <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
           <div>
-            <p class="text-sm font-medium text-slate-200">Change Password</p>
-            <p class="text-xs text-slate-500">Đổi mật khẩu</p>
+            <p class="text-sm font-medium text-slate-200">Đổi mật khẩu</p>
           </div>
-          <button class="console-btn console-btn-secondary text-xs">Change · Đổi</button>
+          <button class="console-btn console-btn-secondary text-xs">Đổi</button>
         </div>
         <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-bg-card/50 p-4">
           <div>
-            <p class="text-sm font-medium text-slate-200">Active Sessions</p>
-            <p class="text-xs text-slate-500">Phiên đăng nhập hoạt động</p>
+            <p class="text-sm font-medium text-slate-200">Phiên đăng nhập hoạt động</p>
           </div>
-          <button class="console-btn console-btn-secondary text-xs">View · Xem</button>
+          <button class="console-btn console-btn-secondary text-xs">Xem</button>
         </div>
       </div>
     </div>
