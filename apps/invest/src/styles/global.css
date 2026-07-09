@@ -3,42 +3,46 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #0a0e1a;
-  --color-bg-soft: #111726;
-  --color-bg-card: #161d2e;
-  --color-bg-border: #1f2940;
-  --color-gold: #d4af37;
-  --color-gold-light: #e6c757;
-  --color-gold-dark: #b8941f;
-  --color-ink: #e8ecf4;
-  --color-ink-muted: #9aa6c0;
-  --color-ink-dim: #6b7693;
+  --heritage-dark: #7A2212;
+  --heritage-red: #A6260C;
+  --burnt-orange: #E55B09;
+  --sun-orange: #F48B0D;
+  --gold: #FFB810;
+  --light-cream: #FFFACC;
+  --ink: #4A1D14;
+  --white: #FFFFFF;
+  --muted: #8A6B5E;
+  --surface: #FFFAF0;
+  --border: rgba(74, 29, 20, 0.12);
+  --shadow: 0 24px 70px rgba(122, 34, 18, 0.10);
 }
 
 html {
   scroll-behavior: smooth;
+  background: var(--white);
+  color: var(--ink);
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-ink);
-  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--white);
+  color: var(--ink);
+  font-family: "Be Vietnam Pro", Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Gold gradient text for headings */
+/* Gold gradient text for headings — V3.0 gold */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #e6c757 0%, #d4af37 50%, #b8941f 100%);
+  background: linear-gradient(135deg, #FFB810 0%, #F48B0D 50%, #E55B09 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Subtle gold border glow */
+/* Subtle gold border glow — V3.0 gold */
 .border-gold-glow {
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(255, 184, 16, 0.3);
+  box-shadow: 0 0 20px rgba(255, 184, 16, 0.08);
 }
 
 /* Card hover effect */
@@ -47,28 +51,28 @@ body {
 }
 .card-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(212, 175, 55, 0.4);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 184, 16, 0.4);
+  box-shadow: 0 8px 30px rgba(122, 34, 18, 0.15);
 }
 
 /* Disclosure line styling */
 .disclosure-line {
   font-size: 0.75rem;
-  color: var(--color-ink-dim);
+  color: var(--muted);
   font-style: italic;
   line-height: 1.5;
 }
 
-/* Section divider */
+/* Section divider — V3.0 gold */
 .section-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 184, 16, 0.2), transparent);
 }
 
 /* Focus visible styles for accessibility (WCAG 2.4.7) */
 :focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
 }
 
 button:focus-visible,
@@ -76,7 +80,7 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(255, 184, 16, 0.15);
 }

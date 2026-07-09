@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!--
+    Nguyen AI — Arch of Light Logo Mark (icon only, geometric SVG)
+    FOUNDER LOCKED Arch V3.0 — 2026-07-02
+    Full-color version: ONLY on white #FFFFFF background
+  -->
+  <defs>
+    <linearGradient id="archOuter" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#7A2212"/>
+      <stop offset="100%" stop-color="#A6260C"/>
+    </linearGradient>
+    <linearGradient id="archMid" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#A6260C"/>
+      <stop offset="100%" stop-color="#E55B09"/>
+    </linearGradient>
+    <linearGradient id="archInner" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#E55B09"/>
+      <stop offset="100%" stop-color="#F48B0D"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FFB810"/>
+      <stop offset="60%" stop-color="#F48B0D"/>
+      <stop offset="100%" stop-color="#E55B09" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="terrain" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7A2212"/>
+      <stop offset="50%" stop-color="#A6260C"/>
+      <stop offset="100%" stop-color="#7A2212"/>
+    </linearGradient>
+  </defs>
+
+  <!-- White background (mandatory for full-color logo) -->
+  <rect width="200" height="200" fill="#FFFFFF"/>
+
+  <!-- Outer arch (largest, darkest) -->
+  <path d="M 25 175 Q 100 25 175 175" stroke="url(#archOuter)" stroke-width="11" fill="none" stroke-linecap="round"/>
+
+  <!-- Middle arch -->
+  <path d="M 42 175 Q 100 52 158 175" stroke="url(#archMid)" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+  <!-- Inner arch (smallest, brightest) -->
+  <path d="M 59 175 Q 100 79 141 175" stroke="url(#archInner)" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Sun glow (behind sun disc) -->
+  <circle cx="100" cy="100" r="32" fill="url(#sunGlow)" opacity="0.6"/>
+
+  <!-- Sun disc (center, gold) -->
+  <circle cx="100" cy="100" r="16" fill="#FFB810"/>
+
+  <!-- Sun rays (8 short lines radiating) -->
+  <g stroke="#F48B0D" stroke-width="3" stroke-linecap="round" opacity="0.8">
+    <line x1="100" y1="74" x2="100" y2="67"/>
+    <line x1="100" y1="126" x2="100" y2="133"/>
+    <line x1="74" y1="100" x2="67" y2="100"/>
+    <line x1="126" y1="100" x2="133" y2="100"/>
+    <line x1="82" y1="82" x2="77" y2="77"/>
+    <line x1="118" y1="118" x2="123" y2="123"/>
+    <line x1="118" y1="82" x2="123" y2="77"/>
+    <line x1="82" y1="118" x2="77" y2="123"/>
+  </g>
+
+  <!-- Horizon line (open gateway) -->
+  <line x1="20" y1="175" x2="180" y2="175" stroke="#4A1D14" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Terrain base (layered ground) -->
+  <path d="M 20 175 Q 50 165 80 170 Q 110 163 140 169 Q 155 166 180 175 L 180 185 L 20 185 Z" fill="url(#terrain)" opacity="0.85"/>
+
+  <!-- Digital pixels (3 small squares, representing data/cloud) -->
+  <rect x="33" y="155" width="5" height="5" fill="#F48B0D" rx="0.5"/>
+  <rect x="162" y="155" width="5" height="5" fill="#FFB810" rx="0.5"/>
+  <rect x="97" y="138" width="5" height="5" fill="#E55B09" rx="0.5"/>
+</svg>

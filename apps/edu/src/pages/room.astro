@@ -30,7 +30,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
     <!-- Tabs -->
     <div class="border-b mb-6">
       <nav class="flex gap-4">
-        <button class="tab-btn active py-2 px-4 border-b-2 border-blue-600" data-tab="timeline">Timeline</button>
+        <button class="tab-btn active py-2 px-4 border-b-2 border-heritage" data-tab="timeline">Timeline</button>
         <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="messages">Tin nhắn</button>
         <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="documents">Tài liệu</button>
       </nav>
@@ -55,7 +55,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
         <form id="message-form" class="space-y-3">
           <input type="text" id="msg-subject" placeholder="Tiêu đề" class="w-full px-3 py-2 border rounded" />
           <textarea id="msg-body" rows="3" placeholder="Nội dung" class="w-full px-3 py-2 border rounded"></textarea>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Gửi</button>
+          <button type="submit" class="px-4 py-2 text-white rounded" style="background-color:#A6260C">Gửi</button>
         </form>
       </div>
     </div>
@@ -79,7 +79,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
             <option value="other">Khác</option>
           </select>
           <input type="file" id="doc-file" class="w-full px-3 py-2 border rounded" />
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Tải lên</button>
+          <button type="submit" class="px-4 py-2 text-white rounded" style="background-color:#A6260C">Tải lên</button>
         </form>
       </div>
     </div>
@@ -89,7 +89,9 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
     .tab-btn { cursor: pointer; }
     .tab-content.hidden { display: none; }
     .status-badge { font-weight: 600; }
-    .timeline-entry { border-left: 3px solid #2563eb; padding-left: 12px; }
+    .timeline-entry { border-left: 3px solid #A6260C; padding-left: 12px; }
+    .border-heritage { border-color: #A6260C !important; }
+    .status-submitted { background-color: #FFFACC; color: #A6260C; }
   </style>
 
   <script>
@@ -107,10 +109,10 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => {
-          b.classList.remove('active', 'border-blue-600');
+          b.classList.remove('active', 'border-heritage');
           b.classList.add('border-transparent');
         });
-        btn.classList.add('active', 'border-blue-600');
+        btn.classList.add('active', 'border-heritage');
         btn.classList.remove('border-transparent');
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.getElementById(`tab-${btn.dataset.tab}`)?.classList.remove('hidden');
@@ -144,7 +146,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
     function statusColor(status) {
       const colors = {
         draft: 'bg-gray-100 text-gray-700',
-        submitted: 'bg-blue-100 text-blue-700',
+        submitted: 'status-submitted',
         pending_verification: 'bg-yellow-100 text-yellow-700',
         verified: 'bg-green-100 text-green-700',
         eligible: 'bg-green-100 text-green-700',
@@ -190,7 +192,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
           return;
         }
         list.innerHTML = messages.map(m => `
-          <div class="border rounded p-3 ${m.read ? '' : 'bg-blue-50'}">
+          <div class="border rounded p-3" ${m.read ? '' : 'style="background-color:#FFFACC;"'}>
             <div class="font-medium">${esc(m.subject)}</div>
             <div class="text-sm text-gray-600">Từ: ${esc(m.from_role)} — ${new Date(m.created_at).toLocaleString('vi-VN')}</div>
             <div class="mt-2 text-sm">${esc(m.body)}</div>

@@ -47,6 +47,10 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" />
+  <meta name="theme-color" content="#7A2212" />
   <title>{fullTitle} | invest.nguyenai.net</title>
   {description && <meta name="description" content={description} />}
   {noindex ? (
@@ -76,14 +80,14 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
 <body class="min-h-screen flex flex-col">
   <!-- Skip to content link (WCAG 2.4.1) -->
   <a href="#main-content" class="skip-link">{isEn ? 'Skip to content' : 'Bỏ qua đến nội dung'}</a>
-  <!-- Top nav -->
-  <header class="sticky top-0 z-50 bg-bg/90 backdrop-blur-md border-b border-bg-border">
+  <!-- Top nav — V3.0 brand: heritage-dark background, white text, gold accents -->
+  <header class="sticky top-0 z-50 bg-bg/96 border-b border-white/12" style="backdrop-filter: blur(16px);">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo -->
-        <a href={isEn ? '/en' : '/'} class="flex items-center gap-2 shrink-0">
-          <span class="text-2xl font-serif font-bold text-gold-gradient">N</span>
-          <span class="hidden sm:inline text-sm font-semibold text-ink">Nguyen AI <span class="text-gold">Invest</span></span>
+        <!-- Logo — Arch of Light (monochrome white for dark header) -->
+        <a href={isEn ? '/en' : '/'} class="flex items-center gap-2 shrink-0 no-underline">
+          <img src="/logo-mark-mono-white.svg" alt="" width="32" height="32" />
+          <span class="hidden sm:inline text-sm font-semibold text-white">Nguyen AI <span class="text-gold">Invest</span></span>
         </a>
 
         <!-- Desktop nav -->
@@ -91,7 +95,7 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
           {navLinks.map((link) => (
             <a
               href={link.href}
-              class="px-3 py-2 text-sm text-ink-muted hover:text-gold transition-colors rounded-md"
+              class="px-3 py-2 text-sm text-white/82 hover:text-gold transition-colors rounded-md no-underline"
             >
               {link.label}
             </a>
@@ -104,18 +108,18 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
           {(() => {
             const path = Astro.url.pathname;
             const switchHref = isEn ? path.replace('/en', '') || '/' : '/en' + path;
-            return <a href={switchHref} class="px-3 py-1.5 text-sm font-medium text-ink-muted hover:text-gold transition-colors rounded-md no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
+            return <a href={switchHref} class="px-3 py-1.5 text-sm font-medium text-white/82 hover:text-gold transition-colors rounded-md no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
           })()}
           <a
             href="/request-access"
-            class="px-4 py-2 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors"
+            class="px-4 py-2 text-sm font-semibold text-ink bg-gold hover:bg-gold-light rounded-lg transition-colors no-underline"
           >
             Request Access
           </a>
           <!-- Mobile menu toggle -->
           <button
             id="menu-toggle"
-            class="lg:hidden text-ink-muted hover:text-gold p-2"
+            class="lg:hidden text-white/82 hover:text-gold p-2"
             aria-label="Toggle menu"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,10 +135,10 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
           {navLinks.map((link) => (
             <a
               href={link.href}
-              class="px-3 py-2 text-sm text-ink-muted hover:text-gold transition-colors rounded-md"
+              class="px-3 py-2 text-sm text-white/82 hover:text-gold transition-colors rounded-md no-underline"
             >
               {link.label}
-              <span class="block text-xs text-ink-dim" lang="vi">{link.vi}</span>
+              <span class="block text-xs text-white/50" lang="vi">{link.vi}</span>
             </a>
           ))}
         </div>
@@ -147,21 +151,21 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
     <slot />
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-bg-border bg-bg-soft mt-16">
+  <!-- Footer — V3.0 brand: heritage-dark background, white text, gold accents -->
+  <footer class="border-t border-white/12 bg-bg-soft mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <!-- Disclosure line (required on every page) -->
-      <div class="mb-6 p-4 bg-bg border border-bg-border rounded-lg">
+      <div class="mb-6 p-4 bg-bg border border-white/12 rounded-lg">
         <Disclosure />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl font-serif font-bold text-gold-gradient">N</span>
-            <span class="text-sm font-semibold text-ink">Nguyen AI <span class="text-gold">Invest</span></span>
+            <img src="/logo-mark-mono-white.svg" alt="" width="28" height="28" />
+            <span class="text-sm font-semibold text-white">Nguyen AI <span class="text-gold">Invest</span></span>
           </div>
-          <p class="text-sm text-ink-muted">
+          <p class="text-sm text-white/70">
             Investor site for Nguyen AI Computer.
             <span class="block" lang="vi">Trang nhà đầu tư cho Nguyen AI Computer.</span>
           </p>
@@ -169,17 +173,17 @@ const ogImage = isEn ? `${SITE}/og-invest.png` : `${SITE}/og-invest.png`;
         <div>
           <h4 class="text-xs font-semibold text-gold uppercase tracking-wide mb-3">Links / Liên kết</h4>
           <ul class="space-y-2">
-            <li><a href="https://nguyenai.net" class="text-sm text-ink-muted hover:text-gold transition-colors">nguyenai.net — Main site</a></li>
-            <li><a href="https://edu.nguyenai.net" class="text-sm text-ink-muted hover:text-gold transition-colors">edu.nguyenai.net — Academy</a></li>
-            <li><a href="/request-access" class="text-sm text-ink-muted hover:text-gold transition-colors">Request investor access</a></li>
+            <li><a href="https://nguyenai.net" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">nguyenai.net — Main site</a></li>
+            <li><a href="https://edu.nguyenai.net" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">edu.nguyenai.net — Academy</a></li>
+            <li><a href="/request-access" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">Request investor access</a></li>
           </ul>
         </div>
         <div>
           <h4 class="text-xs font-semibold text-gold uppercase tracking-wide mb-3">Legal / Pháp lý</h4>
           <ul class="space-y-2">
-            <li><a href="/risks" class="text-sm text-ink-muted hover:text-gold transition-colors">Sổ rủi ro</a></li>
-            <li><a href="/governance" class="text-sm text-ink-muted hover:text-gold transition-colors">Governance / Quản trị</a></li>
-            <li><a href="/private/" class="text-sm text-ink-muted hover:text-gold transition-colors">Data room (qualified investors)</a></li>
+            <li><a href="/risks" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">Sổ rủi ro</a></li>
+            <li><a href="/governance" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">Governance / Quản trị</a></li>
+            <li><a href="/private/" class="text-sm text-white/78 hover:text-gold transition-colors no-underline">Data room (qualified investors)</a></li>
           </ul>
         </div>
       </div>

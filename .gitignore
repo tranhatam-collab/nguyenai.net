@@ -8,3 +8,6 @@ dist/
 .devin/research-drive/
 .wrangler/
 .turbo/
+
+# Mobile app submodule (separate repo)
+mobile/

@@ -4,27 +4,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Investor theme — dark background with gold accents
+        // V3.0 brand palette — heritage-dark base with gold accents
         bg: {
-          DEFAULT: '#0a0e1a',
-          soft: '#111726',
-          card: '#161d2e',
-          border: '#1f2940',
+          DEFAULT: '#7A2212',
+          soft: '#4A1D14',
+          card: '#FFFAF0',
+          border: 'rgba(74, 29, 20, 0.12)',
         },
         gold: {
-          DEFAULT: '#d4af37',
-          light: '#e6c757',
-          dark: '#b8941f',
+          DEFAULT: '#FFB810',
+          light: '#FFD060',
+          dark: '#E5A300',
         },
         ink: {
-          DEFAULT: '#e8ecf4',
-          muted: '#9aa6c0',
-          dim: '#6b7693',
+          DEFAULT: '#4A1D14',
+          muted: '#8A6B5E',
+          dim: '#A88B7E',
         },
+        'heritage-red': '#A6260C',
+        'burnt-orange': '#E55B09',
+        'sun-orange': '#F48B0D',
+        'light-cream': '#FFFACC',
+        'surface': '#FFFAF0',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Georgia', 'serif'],
+        sans: ['"Be Vietnam Pro"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['"Noto Serif"', 'Georgia', 'serif'],
       },
     },
   },

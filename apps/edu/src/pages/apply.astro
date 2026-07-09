@@ -62,15 +62,15 @@ const programs = SCHOLARSHIP_PROGRAMS;
         <p class="text-sm text-gray-600 mb-4">Bạn cần xác minh email, số điện thoại và danh tính. Hệ thống sẽ gửi mã OTP.</p>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <button type="button" id="verify-email-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh email</button>
+            <button type="button" id="verify-email-btn" class="px-4 py-2 text-white rounded" style="background-color:#A6260C">Xác minh email</button>
             <span id="email-verified-status" class="text-sm">Chưa xác minh</span>
           </div>
           <div class="flex items-center gap-4">
-            <button type="button" id="verify-phone-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh số điện thoại</button>
+            <button type="button" id="verify-phone-btn" class="px-4 py-2 text-white rounded" style="background-color:#A6260C">Xác minh số điện thoại</button>
             <span id="phone-verified-status" class="text-sm">Chưa xác minh</span>
           </div>
           <div class="flex items-center gap-4">
-            <button type="button" id="verify-identity-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Xác minh danh tính</button>
+            <button type="button" id="verify-identity-btn" class="px-4 py-2 text-white rounded" style="background-color:#A6260C">Xác minh danh tính</button>
             <span id="identity-verified-status" class="text-sm">Chưa xác minh</span>
           </div>
         </div>
@@ -214,7 +214,7 @@ const programs = SCHOLARSHIP_PROGRAMS;
       <div class="flex justify-between pt-4 border-t">
         <button type="button" id="prev-btn" class="px-6 py-2 border rounded disabled:opacity-50" disabled>← Trước</button>
         <span id="autosave-status" class="text-sm text-gray-400 self-center"></span>
-        <button type="button" id="next-btn" class="px-6 py-2 bg-blue-600 text-white rounded">Tiếp →</button>
+        <button type="button" id="next-btn" class="px-6 py-2 text-white rounded" style="background-color:#A6260C">Tiếp →</button>
       </div>
 
       <!-- Submit (hidden until part 8) -->
@@ -239,7 +239,7 @@ const programs = SCHOLARSHIP_PROGRAMS;
       font-size: 14px;
       font-weight: 600;
     }
-    .step-dot.active { background: #2563eb; color: white; }
+    .step-dot.active { background: #A6260C; color: white; }
     .step-dot.completed { background: #16a34a; color: white; }
     .step-line {
       display: inline-block;

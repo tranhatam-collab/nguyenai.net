@@ -553,7 +553,7 @@ async function proxyToGen1(
   }
 }
 
-// POST /v1/chat — AI Nguyễn Training Gateway entry point
+// POST /v1/chat — Nguyễn AI Training Gateway entry point
 // All model calls route through @nai/training-gateway, which enforces
 // identity, language, safety, data classification, and output guard policies.
 app.post('/v1/chat', chatRateLimit, async (c) => {
@@ -620,7 +620,7 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
   });
 });
 
-// POST /v1/stream — streaming chat via AI Nguyễn Training Gateway (SSE)
+// POST /v1/stream — streaming chat via Nguyễn AI Training Gateway (SSE)
 // For now, non-streaming fallback wrapped in SSE format. Full streaming requires
 // provider SDK support and output guard per-chunk.
 app.post('/v1/stream', chatRateLimit, async (c) => {

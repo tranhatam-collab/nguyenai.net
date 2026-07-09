@@ -50,6 +50,10 @@ const SITE = 'https://edu.nguyenai.net';
     <meta name="description" content={finalDescription} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" />
+    <meta name="theme-color" content="#7A2212" />
     <link rel="canonical" href={`${SITE}${canonicalPath}`} />
     <!-- EDU-P0-2/3: reciprocal hreflang + x-default points to Vietnamese root -->
     <link rel="alternate" hreflang="vi" href={`${SITE}${viPath}`} />
@@ -76,15 +80,15 @@ const SITE = 'https://edu.nguyenai.net';
   <body>
     <!-- Skip to content link (WCAG 2.4.1) -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-academy-accent focus:text-white focus:rounded">Bỏ qua đến nội dung</a>
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-academy-header border-b border-academy-border">
+    <!-- Header — V3.0 brand: heritage-dark background, white text, gold hover -->
+    <header class="sticky top-0 z-50 bg-academy-header border-b border-white/12" style="backdrop-filter: blur(16px);">
       <div class="academy-container">
         <nav class="flex items-center justify-between h-16" aria-label="Main navigation">
-          <!-- Logo -->
-          <a href="/" class="flex items-center gap-2 no-underline text-academy-text">
-            <img src="/favicon.svg" alt="" width="32" height="32" class="rounded-lg" />
+          <!-- Logo — Arch of Light (monochrome white for dark header) -->
+          <a href="/" class="flex items-center gap-2 no-underline text-white">
+            <img src="/logo-mark-mono-white.svg" alt="" width="32" height="32" />
             <span class="font-bold text-base">
-              Nguyen AI <span class="text-academy-accent">Academy</span>
+              Nguyen AI <span class="text-academy-gold">Academy</span>
             </span>
           </a>
 
@@ -94,8 +98,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'home'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Trang chủ
@@ -104,8 +108,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/tracks"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'tracks'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Tracks
@@ -114,8 +118,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/programs"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'programs'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Programs
@@ -124,8 +128,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/scholarship"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'scholarship'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Học bổng
@@ -134,8 +138,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/certification"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'certification'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Chứng chỉ
@@ -144,8 +148,8 @@ const SITE = 'https://edu.nguyenai.net';
               href="/about"
               class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
                 activeNav === 'about'
-                  ? 'text-academy-accent bg-academy-accent/5'
-                  : 'text-academy-text hover:text-academy-accent'
+                  ? 'text-academy-gold'
+                  : 'text-white/82 hover:text-academy-gold'
               }`}
             >
               Giới thiệu
@@ -155,8 +159,8 @@ const SITE = 'https://edu.nguyenai.net';
           <!-- Right side: progress + login + language switcher -->
           <div class="flex items-center gap-3">
             <!-- Progress indicator (placeholder) -->
-            <div class="hidden sm:flex items-center gap-2 text-xs text-academy-muted">
-              <span class="w-2 h-2 rounded-full bg-academy-accent"></span>
+            <div class="hidden sm:flex items-center gap-2 text-xs text-white/65">
+              <span class="w-2 h-2 rounded-full bg-academy-gold"></span>
               <span>0 / 10 tracks</span>
             </div>
 
@@ -165,7 +169,7 @@ const SITE = 'https://edu.nguyenai.net';
               const path = Astro.url.pathname;
               const isEn = path.startsWith('/en');
               const switchHref = isEn ? path.replace('/en', '') || '/' : '/en' + path;
-              return <a href={switchHref} class="px-3 py-1.5 rounded-md text-sm font-medium text-academy-text hover:text-academy-accent hover:bg-academy-accent/5 no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
+              return <a href={switchHref} class="px-3 py-1.5 rounded-md text-sm font-medium text-white/82 hover:text-academy-gold no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
             })()}
 
             <a href="/login" class="academy-btn academy-btn-primary text-sm">
@@ -175,7 +179,7 @@ const SITE = 'https://edu.nguyenai.net';
             <!-- Mobile menu toggle -->
             <button
               id="menu-toggle"
-              class="md:hidden p-2 rounded-md text-academy-text hover:bg-academy-bg"
+              class="md:hidden p-2 rounded-md text-white hover:bg-white/10"
               aria-label="Toggle menu"
               aria-expanded="false"
             >
@@ -189,13 +193,13 @@ const SITE = 'https://edu.nguyenai.net';
         </nav>
 
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-academy-border">
+        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/12">
           <div class="flex flex-col gap-1 pt-3">
-            <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Trang chủ</a>
-            <a href="/tracks" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Tracks</a>
-            <a href="/certification" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Chứng chỉ</a>
-            <a href="/about" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Giới thiệu</a>
-            <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-academy-text hover:bg-academy-bg no-underline">Xác minh chứng chỉ</a>
+            <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Trang chủ</a>
+            <a href="/tracks" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Tracks</a>
+            <a href="/certification" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Chứng chỉ</a>
+            <a href="/about" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Giới thiệu</a>
+            <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Xác minh chứng chỉ</a>
           </div>
         </div>
       </div>
@@ -206,50 +210,50 @@ const SITE = 'https://edu.nguyenai.net';
       <slot />
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-academy-header border-t border-academy-border mt-16">
+    <!-- Footer — V3.0 brand: heritage-dark background, white text -->
+    <footer class="bg-academy-header border-t border-white/12 mt-16">
       <div class="academy-container py-10">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <!-- Brand -->
           <div class="md:col-span-2">
             <div class="flex items-center gap-2 mb-3">
-              <img src="/favicon.svg" alt="" width="28" height="28" class="rounded-lg" />
-              <span class="font-bold text-academy-text">
-                Nguyen AI <span class="text-academy-accent">Academy</span>
+              <img src="/logo-mark-mono-white.svg" alt="" width="28" height="28" />
+              <span class="font-bold text-white">
+                Nguyen AI <span class="text-academy-gold">Academy</span>
               </span>
             </div>
-            <p class="text-sm text-academy-muted max-w-md">
-              Học AI miễn phí cho mọi người đăng ký Nguyen AI. 10 track học tập, chứng chỉ xác minh và cộng đồng Nguyen toàn cầu.
+            <p class="text-sm text-white/70 max-w-md">
+              Học AI miễn phí cho mọi người đăng ký Nguyễn AI. 10 track học tập, chứng chỉ xác minh và cộng đồng Nguyễn toàn cầu.
             </p>
-            <p class="text-xs text-academy-muted mt-3">
+            <p class="text-xs text-white/55 mt-3">
               Free AI learning for all Nguyen AI subscribers.
             </p>
           </div>
 
           <!-- Links -->
           <div>
-            <h4 class="text-sm font-semibold text-academy-text mb-3">Academy</h4>
+            <h4 class="text-sm font-semibold text-academy-gold mb-3">Academy</h4>
             <ul class="space-y-2 text-sm">
-              <li><a href="/tracks" class="text-academy-muted hover:text-academy-accent no-underline">Tất cả Tracks</a></li>
-              <li><a href="/certification" class="text-academy-muted hover:text-academy-accent no-underline">Chứng chỉ</a></li>
-              <li><a href="/verify" class="text-academy-muted hover:text-academy-accent no-underline">Xác minh</a></li>
-              <li><a href="/about" class="text-academy-muted hover:text-academy-accent no-underline">Giới thiệu</a></li>
+              <li><a href="/tracks" class="text-white/78 hover:text-academy-gold no-underline">Tất cả Tracks</a></li>
+              <li><a href="/certification" class="text-white/78 hover:text-academy-gold no-underline">Chứng chỉ</a></li>
+              <li><a href="/verify" class="text-white/78 hover:text-academy-gold no-underline">Xác minh</a></li>
+              <li><a href="/about" class="text-white/78 hover:text-academy-gold no-underline">Giới thiệu</a></li>
             </ul>
           </div>
 
           <!-- External -->
           <div>
-            <h4 class="text-sm font-semibold text-academy-text mb-3">Nguyen AI</h4>
+            <h4 class="text-sm font-semibold text-academy-gold mb-3">Nguyen AI</h4>
             <ul class="space-y-2 text-sm">
-              <li><a href="https://nguyenai.net" class="text-academy-muted hover:text-academy-accent no-underline">nguyenai.net</a></li>
-              <li><a href="https://app.nguyenai.net" class="text-academy-muted hover:text-academy-accent no-underline">AI Computer Console</a></li>
-              <li><a href="/login" class="text-academy-muted hover:text-academy-accent no-underline">Đăng nhập</a></li>
+              <li><a href="https://nguyenai.net" class="text-white/78 hover:text-academy-gold no-underline">nguyenai.net</a></li>
+              <li><a href="https://app.nguyenai.net" class="text-white/78 hover:text-academy-gold no-underline">AI Computer Console</a></li>
+              <li><a href="/login" class="text-white/78 hover:text-academy-gold no-underline">Đăng nhập</a></li>
             </ul>
           </div>
         </div>
 
-        <div class="border-t border-academy-border mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p class="text-xs text-academy-muted">
+        <div class="border-t border-white/12 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p class="text-xs text-white/55">
             © {new Date().getFullYear()} Nguyen AI. Academy at edu.nguyenai.net.
           </p>
           <p class="text-xs text-academy-muted">
