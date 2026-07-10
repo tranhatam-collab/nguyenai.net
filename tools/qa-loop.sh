@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # tools/qa-loop.sh — Continuous QA Loop
-# Runs: audit:all → typecheck → build → test
+# Runs: typecheck → build → audit:all → audit-seo-build → test
 # Logs results to QA_LOOP_LOG.md
 # Exit code: 0 = all green, 1 = any failure
 
@@ -11,34 +11,26 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 LOOP_NUM=$(grep -c "^## QA Loop" QA_LOOP_LOG.md 2>/dev/null || echo "0")
 LOOP_NUM=$((LOOP_NUM + 1))
 
+AUDIT_COUNT=$(node -e "console.log(require('./package.json').scripts['audit:all'].split('&&').length)")
+
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║  QA Loop #${LOOP_NUM} — ${TIMESTAMP}                       ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
-AUDIT_RESULT="❌ FAIL"
 TYPECHECK_RESULT="❌ FAIL"
 BUILD_RESULT="❌ FAIL"
+AUDIT_RESULT="❌ FAIL"
+SEO_BUILD_RESULT="❌ FAIL"
 TEST_RESULT="❌ FAIL"
-AUDIT_DETAIL=""
 TYPECHECK_DETAIL=""
 BUILD_DETAIL=""
+AUDIT_DETAIL=""
+SEO_BUILD_DETAIL=""
 TEST_DETAIL=""
 
-# Step 1: audit:all
-echo "▶ Step 1/4: audit:all..."
-if pnpm run audit:all > /tmp/qa-audit.log 2>&1; then
-  AUDIT_RESULT="✅ PASS"
-  AUDIT_DETAIL="15/15 audits passed"
-  echo "  ✅ audit:all PASS"
-else
-  AUDIT_DETAIL=$(grep -E "FAIL|violation|ERROR" /tmp/qa-audit.log | head -5 | tr '\n' '; ')
-  echo "  ❌ audit:all FAIL"
-fi
-echo ""
-
-# Step 2: typecheck
-echo "▶ Step 2/4: typecheck..."
+# Step 1: typecheck
+echo "▶ Step 1/5: typecheck..."
 if pnpm run typecheck > /tmp/qa-typecheck.log 2>&1; then
   TYPECHECK_RESULT="✅ PASS"
   TYPECHECK_DETAIL="0 errors"
@@ -49,8 +41,8 @@ else
 fi
 echo ""
 
-# Step 3: build
-echo "▶ Step 3/4: build..."
+# Step 2: build
+echo "▶ Step 2/5: build..."
 if pnpm run build > /tmp/qa-build.log 2>&1; then
   BUILD_RESULT="✅ PASS"
   BUILD_DETAIL=$(grep "Tasks:" /tmp/qa-build.log | tail -1 | tr -d ' ')
@@ -61,8 +53,32 @@ else
 fi
 echo ""
 
-# Step 4: test
-echo "▶ Step 4/4: test..."
+# Step 3: audit:all (includes dist-dependent checks after build)
+echo "▶ Step 3/5: audit:all..."
+if pnpm run audit:all > /tmp/qa-audit.log 2>&1; then
+  AUDIT_RESULT="✅ PASS"
+  AUDIT_DETAIL="${AUDIT_COUNT}/${AUDIT_COUNT} audits passed"
+  echo "  ✅ audit:all PASS"
+else
+  AUDIT_DETAIL=$(grep -E "FAIL|violation|ERROR" /tmp/qa-audit.log | head -5 | tr '\n' '; ')
+  echo "  ❌ audit:all FAIL"
+fi
+echo ""
+
+# Step 4: rendered HTML SEO audit
+echo "▶ Step 4/5: audit-seo-build..."
+if npx tsx tools/audit-seo-build.ts > /tmp/qa-seo-build.log 2>&1; then
+  SEO_BUILD_RESULT="✅ PASS"
+  SEO_BUILD_DETAIL=$(grep -E "files checked|BUILD AUDIT" /tmp/qa-seo-build.log | tail -1 | tr -d ' ')
+  echo "  ✅ audit-seo-build PASS"
+else
+  SEO_BUILD_DETAIL=$(grep -E "FAIL|error" /tmp/qa-seo-build.log | head -5 | tr '\n' '; ')
+  echo "  ❌ audit-seo-build FAIL"
+fi
+echo ""
+
+# Step 5: test
+echo "▶ Step 5/5: test..."
 if pnpm run test > /tmp/qa-test.log 2>&1; then
   TEST_RESULT="✅ PASS"
   TEST_DETAIL=$(grep "Tasks:" /tmp/qa-test.log | tail -1 | tr -d ' ')
@@ -73,56 +89,43 @@ else
 fi
 echo ""
 
-# Summary
 ALL_GREEN="true"
-[ "$AUDIT_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
 [ "$TYPECHECK_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
 [ "$BUILD_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
+[ "$AUDIT_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
+[ "$SEO_BUILD_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
 [ "$TEST_RESULT" = "❌ FAIL" ] && ALL_GREEN="false"
 
 echo "═══════════════════════════════════════════════════════════"
 echo "  SUMMARY:"
-echo "    audit:all:    $AUDIT_RESULT ($AUDIT_DETAIL)"
-echo "    typecheck:    $TYPECHECK_RESULT ($TYPECHECK_DETAIL)"
-echo "    build:        $BUILD_RESULT ($BUILD_DETAIL)"
-echo "    test:         $TEST_RESULT ($TEST_DETAIL)"
+echo "    typecheck:       $TYPECHECK_RESULT ($TYPECHECK_DETAIL)"
+echo "    build:           $BUILD_RESULT ($BUILD_DETAIL)"
+echo "    audit:all:       $AUDIT_RESULT ($AUDIT_DETAIL)"
+echo "    audit-seo-build: $SEO_BUILD_RESULT ($SEO_BUILD_DETAIL)"
+echo "    test:            $TEST_RESULT ($TEST_DETAIL)"
 if [ "$ALL_GREEN" = "true" ]; then
-  echo "    OVERALL:      ✅ ALL GREEN"
+  echo "    OVERALL:         ✅ ALL GREEN"
 else
-  echo "    OVERALL:      ❌ HAS FAILURES"
+  echo "    OVERALL:         ❌ HAS FAILURES"
 fi
 echo "═══════════════════════════════════════════════════════════"
 
-# Append to QA_LOOP_LOG.md
 {
   echo ""
   echo "## QA Loop #${LOOP_NUM} — ${TIMESTAMP}"
   echo ""
   echo "| Step | Result | Detail |"
   echo "|------|--------|--------|"
-  echo "| audit:all | $AUDIT_RESULT | $AUDIT_DETAIL |"
   echo "| typecheck | $TYPECHECK_RESULT | $TYPECHECK_DETAIL |"
   echo "| build | $BUILD_RESULT | $BUILD_DETAIL |"
+  echo "| audit:all | $AUDIT_RESULT | $AUDIT_DETAIL |"
+  echo "| audit-seo-build | $SEO_BUILD_RESULT | $SEO_BUILD_DETAIL |"
   echo "| test | $TEST_RESULT | $TEST_DETAIL |"
   echo ""
   if [ "$ALL_GREEN" = "true" ]; then
     echo "**OVERALL: ✅ ALL GREEN**"
   else
     echo "**OVERALL: ❌ HAS FAILURES**"
-    echo ""
-    echo "### Failures:"
-    if [ "$AUDIT_RESULT" = "❌ FAIL" ]; then
-      echo "- audit:all: $AUDIT_DETAIL"
-    fi
-    if [ "$TYPECHECK_RESULT" = "❌ FAIL" ]; then
-      echo "- typecheck: $TYPECHECK_DETAIL"
-    fi
-    if [ "$BUILD_RESULT" = "❌ FAIL" ]; then
-      echo "- build: $BUILD_DETAIL"
-    fi
-    if [ "$TEST_RESULT" = "❌ FAIL" ]; then
-      echo "- test: $TEST_DETAIL"
-    fi
   fi
   echo ""
   echo "---"

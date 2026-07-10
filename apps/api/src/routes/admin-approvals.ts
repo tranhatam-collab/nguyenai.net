@@ -24,6 +24,7 @@ import {
   type ApprovalStage,
 } from '@nai/admin-approval';
 import type { Role } from '@nai/auth';
+import { getApiSession, requireAdminSession } from '../session-auth';
 
 const approvalRoutes = new Hono();
 
@@ -32,13 +33,8 @@ const approvalRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session') as { user_id: string; role: string } | null;
-  if (!session) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-  if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-    return c.json({ error: 'Forbidden: admin only' }, 403);
-  }
+  const result = requireAdminSession(c);
+  if (result instanceof Response) return result;
   return null;
 }
 
@@ -95,8 +91,8 @@ approvalRoutes.post('/v1/admin-approvals/:id/approve', async (c) => {
     return c.json({ error: 'Reason is required for approval' }, 400);
   }
 
-  const session = (c as Context).get('session') as { user_id: string; role: string } | null;
-  const userRoles = session?.role ? [session.role] as Role[] : [];
+  const session = getApiSession(c as Context);
+  const userRoles = session?.roles ?? [];
 
   await approveRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 
@@ -118,8 +114,8 @@ approvalRoutes.post('/v1/admin-approvals/:id/deny', async (c) => {
     return c.json({ error: 'Reason is required for denial' }, 400);
   }
 
-  const session = (c as Context).get('session') as { user_id: string; role: string } | null;
-  const userRoles = session?.role ? [session.role] as Role[] : [];
+  const session = getApiSession(c as Context);
+  const userRoles = session?.roles ?? [];
 
   await denyRequest(id, session?.user_id ?? 'system', reason.trim(), userRoles);
 

@@ -35,7 +35,7 @@ echo "Scanning: $APPS_DIR"
 echo ""
 
 # Find all .astro and .tsx files in apps/
-find "$APPS_DIR" -type f \( -name "*.astro" -o -name "*.tsx" \) -not -path "*/node_modules/*" -not -path "*/dist/*" | sort | while read -r file; do
+while IFS= read -r file; do
   rel_file="${file#$REPO_ROOT/}"
 
   # 1. <img> without alt attribute (WCAG 1.1.1)
@@ -50,13 +50,12 @@ find "$APPS_DIR" -type f \( -name "*.astro" -o -name "*.tsx" \) -not -path "*/no
     report_violation "$rel_file" "$line_num" "WCAG-3.3.2" "input without id (label association)"
   done < <(grep -n '<input' "$file" | grep -v 'id=' | grep -v 'type="hidden"' | grep -v 'type="submit"' | cut -d: -f1)
 
-  # 3. <button> or <a> without text content (WCAG 4.1.2)
+  # 3. <button> without text or aria-label on the same line (WCAG 4.1.2)
   while IFS= read -r line_num; do
     [ -z "$line_num" ] && continue
     line_content=$(sed -n "${line_num}p" "$file")
-    # Check if button has text or aria-label
-    if ! echo "$line_content" | grep -qE 'aria-label|>.*\S.*<'; then
-      report_violation "$rel_file" "$line_num" "WCAG-4.1.2" "button without discernible text"
+    if ! echo "$line_content" | grep -qE 'aria-label|aria-labelledby|>[^<[:space:]]'; then
+      report_violation "$rel_file" "$line_num" "WCAG-4.1.2" "button without discernible text on same line"
     fi
   done < <(grep -n '<button' "$file" | cut -d: -f1)
 
@@ -78,7 +77,7 @@ find "$APPS_DIR" -type f \( -name "*.astro" -o -name "*.tsx" \) -not -path "*/no
     fi
   done < <(grep -n '<section' "$file" | cut -d: -f1)
 
-done
+done < <(find "$APPS_DIR" -type f \( -name "*.astro" -o -name "*.tsx" \) -not -path "*/node_modules/*" -not -path "*/dist/*" | sort)
 
 # Check layouts for skip-to-content link (WCAG 2.4.1)
 echo ""

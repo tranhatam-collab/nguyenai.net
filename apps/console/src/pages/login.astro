@@ -40,7 +40,7 @@ import '../styles/global.css';
         </p>
 
         <!-- Login form -->
-        <form class="mt-6 space-y-4" method="POST" action="/api/auth/login">
+        <form id="login-form" class="mt-6 space-y-4">
           <div>
             <label class="console-label" for="email">
               Email
@@ -90,7 +90,7 @@ import '../styles/global.css';
         </div>
 
         <!-- Google sign-in -->
-        <button class="console-btn console-btn-secondary w-full" aria-label="Đăng nhập với Google">
+        <button type="button" id="google-login" class="console-btn console-btn-secondary w-full" aria-label="Đăng nhập với Google">
           <svg class="h-5 w-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -106,5 +106,36 @@ import '../styles/global.css';
         Bằng việc đăng nhập, bạn đồng ý với Điều khoản dịch vụ Nguyễn AI.
       </p>
     </div>
+    <script>
+      const AUTH_BASE = 'https://auth.nguyenai.net/v1/auth';
+      const params = new URLSearchParams(window.location.search);
+      const redirectTarget = params.get('redirect') || '/dashboard';
+
+      document.getElementById('login-form')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (!(form instanceof HTMLFormElement)) return;
+        const email = new FormData(form).get('email');
+        const password = new FormData(form).get('password');
+        const response = await fetch(`${AUTH_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
+        });
+        if (response.ok) {
+          window.location.href = redirectTarget;
+          return;
+        }
+        const payload = await response.json().catch(() => ({}));
+        alert(payload.error || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
+      });
+
+      document.getElementById('google-login')?.addEventListener('click', () => {
+        const beginUrl = new URL(`${AUTH_BASE}/oauth/google/begin`);
+        beginUrl.searchParams.set('redirect', `${window.location.origin}${redirectTarget}`);
+        window.location.href = beginUrl.toString();
+      });
+    </script>
   </body>
 </html>

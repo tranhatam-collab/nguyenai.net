@@ -32,6 +32,12 @@ import { defaultRateLimit, formSubmitRateLimit, cleanupBuckets } from './rate-li
 import { EmailService } from '@nai/email';
 import { logAuditEvent } from '@nai/audit';
 import {
+  getApiSession,
+  requireAuthSession,
+  sessionHasScholarshipRole,
+  type ApiSession,
+} from './session-auth';
+import {
   InMemoryScholarshipStore,
   setScholarshipStore,
   createApplication,
@@ -97,9 +103,8 @@ function initScholarshipStore(env: ScholarshipEnv['Bindings']): void {
   scholarshipStoreInitialized = true;
 }
 
-function requireAuth(c: { req: { header: (n: string) => string | undefined }; get: (k: string) => unknown }): { user_id: string; role: string } | null {
-  // Session is set by main app middleware
-  const session = (c as unknown as { get: (k: string) => unknown }).get('session') as { user_id: string; role: string } | null;
+function requireAuth(c: { req: { header: (n: string) => string | undefined }; get: (k: string) => unknown }): ApiSession | null {
+  const session = getApiSession(c as any);
   return session;
 }
 
@@ -355,7 +360,7 @@ scholarshipRoutes.get('/investor/applications', async (c) => {
 
   // Only investors/council can access
   const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Investor access required' }, 403);
   }
 
@@ -373,7 +378,7 @@ scholarshipRoutes.get('/investor/applications/:id', async (c) => {
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
 
   const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Investor access required' }, 403);
   }
 
@@ -473,7 +478,7 @@ scholarshipRoutes.post('/moderation/posts/:id/approve', async (c) => {
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
 
   const allowedRoles = ['moderator', 'admin', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Moderator access required' }, 403);
   }
 
@@ -493,7 +498,7 @@ scholarshipRoutes.post('/moderation/posts/:id/reject', async (c) => {
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
 
   const allowedRoles = ['moderator', 'admin', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Moderator access required' }, 403);
   }
 
@@ -678,7 +683,7 @@ scholarshipRoutes.post('/applications/:id/status', async (c) => {
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
   const allowedRoles = ['admin', 'super_admin', 'council_member', 'moderator'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Admin/council access required' }, 403);
   }
   const body = await c.req.json();
@@ -687,7 +692,7 @@ scholarshipRoutes.post('/applications/:id/status', async (c) => {
     await transitionApplicationStatus(
       c.req.param('id'),
       session.user_id,
-      session.role,
+      session.roles[0] ?? 'USER',
       body.status as ApplicationStatus,
       body.reason,
     );
@@ -733,7 +738,7 @@ scholarshipRoutes.post('/investor/:id/verify', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   try {
@@ -749,7 +754,7 @@ scholarshipRoutes.post('/investor/:id/access', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -773,7 +778,7 @@ scholarshipRoutes.delete('/investor/access/:id', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json().catch(() => ({}));
@@ -791,7 +796,7 @@ scholarshipRoutes.get('/investor/feed', async (c) => {
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
   const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Investor access required' }, 403);
   }
   try {
@@ -808,7 +813,7 @@ scholarshipRoutes.post('/investor/reviews/submit', async (c) => {
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
   const allowedRoles = ['investor', 'council_member', 'council_observer', 'auditor', 'founder_liaison', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Investor access required' }, 403);
   }
   const body = await c.req.json();
@@ -833,7 +838,7 @@ scholarshipRoutes.post('/council/award', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['council_member', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['council_member', 'super_admin'])) {
     return c.json({ error: 'Council member access required' }, 403);
   }
   const body = await c.req.json();
@@ -961,7 +966,7 @@ scholarshipRoutes.get('/moderation/queue', async (c) => {
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
   const allowedRoles = ['moderator', 'admin', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Moderator access required' }, 403);
   }
   try {
@@ -978,7 +983,7 @@ scholarshipRoutes.post('/moderation/reports/:id/review', async (c) => {
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
   const allowedRoles = ['moderator', 'admin', 'super_admin'];
-  if (!allowedRoles.includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, allowedRoles)) {
     return c.json({ error: 'Moderator access required' }, 403);
   }
   const body = await c.req.json();
@@ -1013,7 +1018,7 @@ scholarshipRoutes.post('/council/decide', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['council_member', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['council_member', 'super_admin'])) {
     return c.json({ error: 'Council member access required' }, 403);
   }
   const body = await c.req.json();
@@ -1050,7 +1055,7 @@ scholarshipRoutes.get('/waitlist', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin', 'council_member'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin', 'council_member'])) {
     return c.json({ error: 'Admin/council access required' }, 403);
   }
   const status = c.req.query('status') as 'waiting' | 'offered' | 'expired' | 'withdrawn' | undefined;
@@ -1068,7 +1073,7 @@ scholarshipRoutes.post('/waitlist/:id/offer', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   try {
@@ -1115,7 +1120,7 @@ scholarshipRoutes.post('/entitlements', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -1169,7 +1174,7 @@ scholarshipRoutes.post('/entitlements/:id/suspend', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -1187,7 +1192,7 @@ scholarshipRoutes.post('/entitlements/:id/restore', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json().catch(() => ({}));
@@ -1204,7 +1209,7 @@ scholarshipRoutes.post('/entitlements/:id/revoke', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -1222,7 +1227,7 @@ scholarshipRoutes.post('/entitlements/:id/complete', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   try {
@@ -1238,7 +1243,7 @@ scholarshipRoutes.post('/entitlements/:id/learning-paths', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -1271,7 +1276,7 @@ scholarshipRoutes.post('/cohorts', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json();
@@ -1315,7 +1320,7 @@ scholarshipRoutes.post('/admin/retention-sweep', async (c) => {
   initScholarshipStore(c.env);
   const session = requireAuth(c);
   if (!session) return c.json({ error: 'Unauthorized' }, 401);
-  if (!['admin', 'super_admin'].includes(session.role)) {
+  if (!sessionHasScholarshipRole(session, ['admin', 'super_admin'])) {
     return c.json({ error: 'Admin access required' }, 403);
   }
   const body = await c.req.json().catch(() => ({}));

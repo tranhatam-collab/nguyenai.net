@@ -22,6 +22,7 @@ import {
   type Severity,
   type IncidentStatus,
 } from '@nai/incident';
+import { requireAdminSession } from '../session-auth';
 
 const incidentRoutes = new Hono();
 
@@ -30,13 +31,8 @@ const incidentRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session') as { role?: string } | undefined;
-  if (!session) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-  if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-    return c.json({ error: 'Forbidden: admin only' }, 403);
-  }
+  const result = requireAdminSession(c);
+  if (result instanceof Response) return result;
   return null;
 }
 

@@ -20,6 +20,7 @@ import {
   SlackAdapter,
   type Channel,
 } from '@nai/notifier';
+import { requireAdminSession } from '../session-auth';
 
 const notificationRoutes = new Hono();
 
@@ -28,13 +29,8 @@ const notificationRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session');
-  if (!session) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-  if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-    return c.json({ error: 'Forbidden: admin only' }, 403);
-  }
+  const result = requireAdminSession(c);
+  if (result instanceof Response) return result;
   return null;
 }
 

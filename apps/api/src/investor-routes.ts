@@ -43,10 +43,15 @@ import {
   type RoomScope,
 } from '@nai/investor-verify';
 import { logAuditEvent } from '@nai/audit';
+import {
+  requireAdminSession,
+  requireAuthSession,
+  type ApiSession,
+} from './session-auth';
 
 export interface InvestorEnv {
   Variables: {
-    session: { user_id: string; role: string } | null;
+    session: ApiSession | null;
   };
 }
 
@@ -60,21 +65,12 @@ export const investorRoutes = new Hono<InvestorEnv>();
 // value, so the 401 was never sent and the handler kept running.
 // ============================================================
 
-function requireAuth(c: any): { user_id: string; role: string } | Response {
-  const session = c.get('session');
-  if (!session) {
-    return c.json({ error: 'unauthorized' }, 401);
-  }
-  return session;
+function requireAuth(c: any): ApiSession | Response {
+  return requireAuthSession(c);
 }
 
-function requireAdmin(c: any): { user_id: string; role: string } | Response {
-  const result = requireAuth(c);
-  if (result instanceof Response) return result;
-  if (result.role !== 'admin' && result.role !== 'super_admin') {
-    return c.json({ error: 'forbidden' }, 403);
-  }
-  return result;
+function requireAdmin(c: any): ApiSession | Response {
+  return requireAdminSession(c);
 }
 
 function auditCtx(c: any) {

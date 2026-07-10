@@ -72,6 +72,9 @@ jobs:
       - name: SEO build audit (rendered HTML)
         run: npx tsx tools/audit-seo-build.ts
 
+      - name: Vietnamese purity build audit
+        run: npx tsx tools/audit-vietnamese-purity-build.ts
+
       - name: Test
         run: pnpm test
 

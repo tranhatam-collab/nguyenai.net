@@ -29,6 +29,7 @@ import {
   getSelfHealStore,
   canMutateData,
 } from '@nai/self-heal';
+import { requireAdminSession } from '../session-auth';
 
 const selfHealRoutes = new Hono();
 
@@ -37,13 +38,8 @@ const selfHealRoutes = new Hono();
 // ============================================================
 
 function requireAdmin(c: Context) {
-  const session = c.get('session') as { role?: string } | undefined;
-  if (!session) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-  if (session.role !== 'SUPER_ADMIN' && session.role !== 'ADMIN') {
-    return c.json({ error: 'Forbidden: admin only' }, 403);
-  }
+  const result = requireAdminSession(c);
+  if (result instanceof Response) return result;
   return null;
 }
 

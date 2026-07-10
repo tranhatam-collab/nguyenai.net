@@ -1275,7 +1275,7 @@ app.route('/', incidentRoutes);
 app.route('/', selfHealRoutes);
 app.route('/', notificationRoutes);
 app.route('/', approvalRoutes);
-app.route('/', scholarshipRoutes);
-app.route('/', investorRoutes);
+app.route('/v1/scholarship', scholarshipRoutes);
+app.route('/v1/investor', investorRoutes);
 
 export default app;

@@ -1,6 +1,8 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
 import { SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
+
+const programsJson = JSON.stringify(SCHOLARSHIP_PROGRAMS);
 ---
 
 <AcademyLayout
@@ -15,36 +17,84 @@ import { SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
       a verified email and a short statement of intent.
     </p>
 
-    <form class="space-y-4" action="/api/scholarship/applications" method="POST">
+    <form id="en-apply-form" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium mb-1">Full Name</label>
-        <input type="text" name="full_name" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
+        <label class="block text-sm font-medium mb-1" for="full_name">Full Name</label>
+        <input id="full_name" type="text" name="full_name" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">Email</label>
-        <input type="email" name="email" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
+        <label class="block text-sm font-medium mb-1" for="email">Email</label>
+        <input id="email" type="email" name="email" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">Program</label>
-        <select name="program_code" required class="w-full border border-academy-border rounded-lg px-4 py-2">
+        <label class="block text-sm font-medium mb-1" for="phone">Phone</label>
+        <input id="phone" type="tel" name="phone" required class="w-full border border-academy-border rounded-lg px-4 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1" for="program_code">Program</label>
+        <select id="program_code" name="program_code" required class="w-full border border-academy-border rounded-lg px-4 py-2">
           {SCHOLARSHIP_PROGRAMS.map((p) => (
             <option value={p.code}>{p.code} — {p.name}</option>
           ))}
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">Statement of Intent</label>
-        <textarea name="statement" rows="5" required class="w-full border border-academy-border rounded-lg px-4 py-2" placeholder="Why do you want to join this scholarship program?"></textarea>
+        <label class="block text-sm font-medium mb-1" for="statement">Statement of Intent</label>
+        <textarea id="statement" name="statement" rows="5" required class="w-full border border-academy-border rounded-lg px-4 py-2" placeholder="Why do you want to join this scholarship program?"></textarea>
       </div>
       <button type="submit" class="w-full bg-academy-accent text-white font-medium rounded-lg px-6 py-3 hover:bg-academy-accent/90 transition">
         Submit Application
       </button>
+      <p id="en-apply-status" class="text-sm text-academy-muted" role="status"></p>
     </form>
-
-    <div class="mt-8 border-t border-academy-border pt-6 text-center">
-      <a href="/apply" class="text-academy-accent hover:underline">Tiếng Việt</a>
-      <span class="mx-2 text-academy-muted">·</span>
-      <span class="text-academy-text font-medium">English</span>
-    </div>
   </section>
+
+  <script define:vars={{ programsJson }}>
+    const API_BASE = 'https://api.nguyenai.net/v1/scholarship';
+    const form = document.getElementById('en-apply-form');
+    const status = document.getElementById('en-apply-status');
+    const programs = JSON.parse(programsJson);
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!(form instanceof HTMLFormElement) || !status) return;
+      const data = new FormData(form);
+      const programCode = String(data.get('program_code') || '');
+      const program = programs.find((item) => item.code === programCode);
+      status.textContent = 'Submitting application...';
+
+      try {
+        const createRes = await fetch(`${API_BASE}/applications`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: data.get('full_name'),
+            email: data.get('email'),
+            phone: data.get('phone'),
+            program_code: programCode,
+            program_id: program?.id ?? programCode,
+            statement: data.get('statement'),
+          }),
+        });
+        if (!createRes.ok) {
+          const payload = await createRes.json().catch(() => ({}));
+          throw new Error(payload.error || 'Application could not be created.');
+        }
+        const created = await createRes.json();
+        const submitRes = await fetch(`${API_BASE}/applications/${created.application_id}/submit`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (!submitRes.ok) {
+          const payload = await submitRes.json().catch(() => ({}));
+          throw new Error(payload.error || 'Application could not be submitted.');
+        }
+        status.textContent = 'Application submitted successfully.';
+        form.reset();
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : 'Submission failed.';
+      }
+    });
+  </script>
 </AcademyLayout>
