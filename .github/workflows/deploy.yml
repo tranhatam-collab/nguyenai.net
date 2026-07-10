@@ -189,6 +189,9 @@ jobs:
           command: pages deploy dist --project-name=nai-console
 
   deploy-invest:
+    # DISABLED until legal entity + IP ownership resolved per governance.
+    # See docs/governance/INVESTOR_ACCESS_POLICY.md and QA_AUDIT_GO_LIVE_READINESS_2026-07-10.md
+    if: false
     name: Deploy Invest to Cloudflare Pages
     needs: verify
     runs-on: ubuntu-latest
