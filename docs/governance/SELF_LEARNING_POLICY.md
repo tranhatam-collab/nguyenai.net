@@ -102,9 +102,9 @@ Mọi thay đổi phải được ghi vào `CHANGELOG.md` theo format Keep a Cha
 
 | Check | Tiêu chí |
 |-------|----------|
-| Audits | 15/15 PASS |
+| Audits | 14/14 PASS (`audit:all`) + post-build SEO |
 | Typecheck | 0 errors |
-| Build | 88/88 PASS |
+| Build | turbo `successful === total` (hiện tại 90/90) |
 | Tests | 0 failures |
 | QA Loop | exit 0 |
 | CI | verify job PASS |

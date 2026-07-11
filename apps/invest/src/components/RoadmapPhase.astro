@@ -1,21 +1,33 @@
 ---
 /**
- * RoadmapPhase.astro — Timeline phase card.
- * Props: phase, title, items (string[]), status
+ * RoadmapPhase.astro — Timeline phase card (single-locale).
  */
 interface Props {
   phase: string;
   title: string;
-  titleVi?: string;
   items: string[];
   status: 'done' | 'active' | 'planned';
+  locale?: 'vi' | 'en';
 }
-const { phase, title, titleVi, items, status } = Astro.props;
+const { phase, title, items, status, locale = 'vi' } = Astro.props;
+const isVi = locale === 'vi';
 
 const statusStyles = {
-  done: { label: 'Done / Hoàn thành', color: 'text-green-400', dot: 'bg-green-400' },
-  active: { label: 'Active / Đang thực hiện', color: 'text-gold', dot: 'bg-gold' },
-  planned: { label: 'Planned / Kế hoạch', color: 'text-ink-dim', dot: 'bg-ink-dim' },
+  done: {
+    label: isVi ? 'Hoàn thành' : 'Done',
+    color: 'text-green-400',
+    dot: 'bg-green-400',
+  },
+  active: {
+    label: isVi ? 'Đang thực hiện' : 'Active',
+    color: 'text-gold',
+    dot: 'bg-gold',
+  },
+  planned: {
+    label: isVi ? 'Kế hoạch' : 'Planned',
+    color: 'text-ink-dim',
+    dot: 'bg-ink-dim',
+  },
 };
 const s = statusStyles[status];
 ---
@@ -28,7 +40,6 @@ const s = statusStyles[status];
       <span class={`text-xs font-semibold ${s.color}`}>{s.label}</span>
     </div>
     <h3 class="text-lg font-bold text-ink">{title}</h3>
-    {titleVi && <p class="text-sm text-ink-muted" lang="vi">{titleVi}</p>}
     <ul class="mt-3 space-y-1.5">
       {items.map((item) => (
         <li class="text-sm text-ink-muted flex items-start gap-2">

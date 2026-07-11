@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && cp -r public/* dist/ 2>/dev/null || true",
+    "build": "npx tsx ../../tools/generate-web-sitemaps.ts && astro build && cp -r public/* dist/",
     "preview": "astro preview",
     "typecheck": "astro check",
     "lint": "echo 'TODO: eslint for @nai/web'"

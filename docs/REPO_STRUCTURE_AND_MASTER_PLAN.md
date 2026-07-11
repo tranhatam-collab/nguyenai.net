@@ -1,6 +1,6 @@
 # Nguyen AI Monorepo — Repo Structure & Master Plan
 
-**Cập nhật:** 2026-07-03
+**Cập nhật:** 2026-07-10
 **Repo:** `nguyenai.net` (single monorepo, pnpm workspace + turbo)
 **Trạng thái:** Phase 1 code complete, 7 apps gộp xong
 
@@ -80,7 +80,16 @@ Chi tiết: `docs/architecture/GEN1_GATEWAY_ADAPTER.md`
 
 ## 3. Phase 1 — Go-live readiness
 
-### Đã hoàn thành
+> **10/10 framework:** `docs/governance/GO_LIVE_10_POINT_FRAMEWORK_2026-07-10.md`
+
+### Phase 0 — Repo build (automated)
+
+```bash
+pnpm build:go-live      # ordered: sitemap → typecheck → build → audits → test
+pnpm go-live:check      # ALL GREEN gate
+```
+
+### Đã hoàn thành (repo)
 
 - ✅ Public website (54 trang VI/EN) — Astro static
 - ✅ App console (11 trang) — Astro + React
@@ -89,12 +98,12 @@ Chi tiết: `docs/architecture/GEN1_GATEWAY_ADAPTER.md`
 - ✅ Auth worker (email + Google OAuth)
 - ✅ API worker (payment, models, entitlement, Gen1 adapter)
 - ✅ Legal pages (Terms, Privacy VI+EN)
+- ✅ QA loop 14/14 audits + seo-build + accessibility 0 violations
+- ✅ Session-auth regression + API route mounts (`/v1/scholarship`, `/v1/investor`)
+- ✅ Web sitemap generator (32 bilingual route pairs)
 - ✅ CI/CD pipeline (GitHub Actions)
-- ✅ P0/P1 security issues đã fix
-- ✅ Package tests pass (billing 30/30, runtime-sdk 10/10)
-- ✅ Gen1 gateway adapter (8 routes proxy)
 
-### Còn lại (Founder làm thủ công)
+### Còn lại (Founder + engineering)
 
 1. Provision Neon PostgreSQL
 2. Set Cloudflare secrets (OAuth, Stripe, VNPay, DB, Gen1 admin key)

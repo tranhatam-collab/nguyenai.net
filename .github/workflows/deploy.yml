@@ -166,7 +166,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/edu
-          command: pages deploy dist --project-name=nai-edu
+          command: pages deploy dist --project-name=nguyenai-edu
 
   deploy-console:
     name: Deploy Console to Cloudflare Pages
@@ -189,7 +189,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/console
-          command: pages deploy dist --project-name=nai-console
+          command: pages deploy dist --project-name=nguyenai-console
 
   deploy-invest:
     # DISABLED until legal entity + IP ownership resolved per governance.
@@ -289,18 +289,6 @@ jobs:
           secrets: |
             GOOGLE_CLIENT_ID
             GOOGLE_CLIENT_SECRET
-        env:
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/auth
-          command: deploy
-          secrets: |
-            GOOGLE_CLIENT_ID
-            GOOGLE_CLIENT_SECRET
-        env:
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}

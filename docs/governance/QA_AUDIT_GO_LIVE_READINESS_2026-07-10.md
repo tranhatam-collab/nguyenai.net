@@ -15,7 +15,7 @@
 | Build | ✅ PASS | 90/90 tasks |
 | Typecheck | ✅ PASS | 150/150 tasks |
 | Tests | ✅ PASS | 150/150 tasks |
-| Audits | ✅ PASS | 15/15 audits |
+| Audits | ✅ PASS | 14/14 audits |
 | Brand sync V3.0 | ✅ PASS | EDU + INVEST aligned |
 | External services | ❌ BLOCKER | Founder setup required |
 | Deployment | ❌ BLOCKER | Founder deploy required |
@@ -38,7 +38,7 @@
 
 ### 2.2 QA Audits — `pnpm run audit:all`
 
-All 15 audit categories passed:
+All 14 audit categories passed:
 
 1. ✅ Brand naming lock — 0 violations
 2. ✅ Accessibility — 0 critical violations

@@ -11,9 +11,10 @@
  */
 
 export type { EmailClient, EmailMessage, EmailSendResult, EmailAddress, EmailTemplate, EmailTemplateId, TemplateContext } from './types';
-export { ResendClient, MockEmailClient } from './client';
+export { MailIaiOneClient, ResendClient, MockEmailClient } from './client';
 export { TEMPLATES, getTemplate, listTemplates, renderTemplate } from './templates';
 export { EmailService, createEmailService } from './service';
+export type { EmailProvider } from './service';
 
 // Audit event → email template mapping
 export const AUDIT_EVENT_TO_TEMPLATE: Record<string, import('./types').EmailTemplateId> = {

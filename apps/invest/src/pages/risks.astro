@@ -7,84 +7,74 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Risk Register"
   titleVi="Sổ rủi ro"
-  description="Nguyen AI Computer risk register: 8 risks from the technical and business audit, each with likelihood, impact, and mitigation."
+  description="Sổ rủi ro Máy Tính AI Nguyễn: tám rủi ro từ kiểm toán kỹ thuật và kinh doanh, kèm khả năng, tác động và giảm thiểu."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Risk register overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Risk Register</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Sổ rủi ro</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan sổ rủi ro">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Sổ rủi ro</h1>
 
     <p class="mt-6 text-lg text-ink-muted max-w-3xl">
-      Eight risks identified in the technical and business audit, with likelihood, impact, and mitigation for each.
-      <span class="block mt-2" lang="vi">Tám rủi ro được xác định trong kiểm toán kỹ thuật và kinh doanh.</span>
+      Tám rủi ro được xác định trong kiểm toán kỹ thuật và kinh doanh, kèm khả năng xảy ra, tác động và biện pháp giảm thiểu.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
       <RiskCard
-        risk="Stale brand surfaces"
-        riskVi="Thương hiệu cũ còn sót"
+        locale="vi"
+        risk="Thương hiệu cũ còn sót"
         likelihood="Medium"
         impact="Medium"
-        mitigation="Phase 0 brand audit and cleanup. Clone contamination audit for stale legacy terms. Remove all stale surfaces before public launch."
-        mitigationVi="Kiểm toán thương hiệu Giai đoạn 0. Xóa bỏ mọi bề mặt cũ trước khi ra mắt."
+        mitigation="Kiểm toán thương hiệu Giai đoạn 0. Xóa mọi bề mặt cũ trước khi ra mắt công khai."
       />
       <RiskCard
-        risk="IP not transferred to entity"
-        riskVi="IP chưa chuyển nhượng"
+        locale="vi"
+        risk="IP chưa chuyển nhượng"
         likelihood="High"
         impact="High"
-        mitigation="Phase 1: establish legal entity (HoldCo model) and formally transfer all IP. Document chain of title. This is a precondition for investment close."
-        mitigationVi="Giai đoạn 1: thành lập thực thể và chuyển nhượng IP chính thức. Điều kiện tiên quyết để chốt đầu tư."
+        mitigation="Giai đoạn 1: thành lập thực thể (HoldCo) và chuyển nhượng IP chính thức. Điều kiện tiên quyết để chốt đầu tư."
       />
       <RiskCard
-        risk="No legal entity formed"
-        riskVi="Chưa có thực thể pháp lý"
+        locale="vi"
+        risk="Chưa có thực thể pháp lý"
         likelihood="High"
         impact="High"
-        mitigation="Phase 1: incorporate entity with legal counsel. Define jurisdiction, structure, and tax implications. Cap table formalized post-incorporation."
-        mitigationVi="Giai đoạn 1: thành lập công ty với tư vấn pháp lý. Định nghĩa cấu trúc và thuế."
+        mitigation="Giai đoạn 1: thành lập công ty với tư vấn pháp lý. Định nghĩa cấu trúc, thuế và bảng cổ phần."
       />
       <RiskCard
-        risk="Product gaps"
-        riskVi="Khoảng trống sản phẩm"
+        locale="vi"
+        risk="Khoảng trống sản phẩm"
         likelihood="Medium"
         impact="High"
-        mitigation="Phase 2: scaffold AI Computer Console with authentication, data vault, Agent team, and Model Mesh. Independent backend. Prioritize MVP scope."
-        mitigationVi="Giai đoạn 2: khung Console với xác thực, kho dữ liệu, Agent, Model Mesh."
+        mitigation="Giai đoạn 2: khung Console với xác thực, kho dữ liệu, đội Agent và Model Mesh. Ưu tiên phạm vi MVP."
       />
       <RiskCard
-        risk="No beta users"
-        riskVi="Chưa có người dùng beta"
+        locale="vi"
+        risk="Chưa có người dùng beta"
         likelihood="High"
         impact="Medium"
-        mitigation="Phase 5: closed beta with Nguyen community members. Establish feedback loops. Iterate before public launch. Recruit from Nguyen Chapters."
-        mitigationVi="Giai đoạn 5: beta kín với thành viên cộng đồng Nguyễn."
+        mitigation="Giai đoạn 5: beta kín với thành viên cộng đồng Nguyễn. Thu thập phản hồi trước khi ra mắt."
       />
       <RiskCard
-        risk="Pricing discrepancy"
-        riskVi="Sai lệch giá"
+        locale="vi"
+        risk="Sai lệch giá"
         likelihood="Medium"
         impact="Medium"
-        mitigation="V2 pricing locked: 8 plans from Start (free) to Enterprise (custom). Audit pricing across all surfaces for consistency. Currency conversion documented."
-        mitigationVi="Giá V2 đã khóa: 8 gói. Kiểm tra tính nhất quán trên mọi bề mặt."
+        mitigation="Giá V2 đã khóa: 8 gói từ Start (miễn phí) đến Enterprise. Kiểm tra nhất quán trên mọi bề mặt."
       />
       <RiskCard
-        risk="JSON-LD structured data errors"
-        riskVi="Lỗi JSON-LD"
+        locale="vi"
+        risk="Lỗi JSON-LD"
         likelihood="Medium"
         impact="Low"
-        mitigation="Bilingual SEO audit before production release. Validate all structured data with Schema.org validator. Reciprocal hreflang, self-referencing hreflang, x-default."
-        mitigationVi="Kiểm toán SEO song ngữ trước khi ra mắt."
+        mitigation="Kiểm toán SEO song ngữ trước khi ra mắt. Xác thực structured data và hreflang."
       />
       <RiskCard
-        risk="Sitemap / indexing issues"
-        riskVi="Vấn đề sitemap / lập chỉ mục"
+        locale="vi"
+        risk="Vấn đề sitemap / lập chỉ mục"
         likelihood="Medium"
         impact="Low"
-        mitigation="Generate sitemap excluding /private/ routes. Verify robots.txt disallows /private/. Ensure private pages have noindex, nofollow, noarchive. Test with Google Search Console."
-        mitigationVi="Tạo sitemap loại trừ /private/. Xác minh robots.txt và noindex."
+        mitigation="Sitemap loại trừ /private/. robots.txt và noindex cho trang riêng tư. Kiểm tra Search Console."
       />
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

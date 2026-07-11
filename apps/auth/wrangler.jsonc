@@ -1,11 +1,11 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "nai-auth",
+  "name": "nguyenai-auth",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "ENVIRONMENT": "development",
+    "ENVIRONMENT": "production",
     "AUTH_ISSUER": "auth.nguyenai.net",
     "DEFAULT_AUDIENCE": "app.nguyenai.net",
     "SESSION_MAX_AGE": "3600",
@@ -14,12 +14,12 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "nai-identity",
-      "database_id": "5d0f4d21-ecfd-444b-8196-590bcab642bf",
-      "migrations_dir": "../../migrations"
+      "database_name": "nguyenai-identity",
+      "database_id": "704f85cb-0fa2-4d56-8659-cda65cc4d4e4",
+      "migrations_dir": "../../migrations/d1"
     }
   ],
-  "triggers": {
-    "crons": ["0 */6 * * *"]
-  }
+  "routes": [
+    { "pattern": "auth.nguyenai.net", "custom_domain": true }
+  ]
 }

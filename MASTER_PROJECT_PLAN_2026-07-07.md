@@ -1,4 +1,6 @@
-# Master Project Plan — 2026-07-07 (UPDATED 2026-07-08)
+# Master Project Plan — 2026-07-07 (UPDATED 2026-07-10)
+
+> **Go-Live 10/10 Framework (BINDING):** `docs/governance/GO_LIVE_10_POINT_FRAMEWORK_2026-07-10.md`
 
 > **⚠️ FOUNDER LOCK 2026-07-08:** nguyenai.net là dự án PUBLIC độc lập hoàn toàn.
 > KHÔNG đụng tới Gen 1 (computer.iai.one) và Gen 2 (maytinhai.org).
@@ -16,19 +18,33 @@ This document provides a comprehensive project plan for both Nguyen AI (nguyenai
 
 ## Part 1: Nguyen AI (nguyenai.net)
 
-### Current Status
+### Current Status (verified 2026-07-10)
 
-**Completion:** 95% (code + audits + automation + independence lock done, external services + deploy pending)
+**Repo readiness:** ALL GREEN (`pnpm go-live:check`)  
+**Production 10/10:** NOT APPROVED — Founder secrets + deploy + persistence + sign-off pending
+
+| # | Go-Live 10/10 criterion | Status |
+|---|-------------------------|--------|
+| 1 | Repo QA gate | ✅ |
+| 2 | Security P0 | ✅ |
+| 3 | Independence | ✅ (code) |
+| 4 | Product surfaces | ✅ ~9/10 |
+| 5 | SEO & brand | ✅ ~9/10 |
+| 6 | Accessibility | ✅ |
+| 7 | Production runtime | ❌ prod drift |
+| 8 | Persistence | ❌ InMemory MVP |
+| 9 | Founder external | ❌ manual |
+| 10 | Governance release | ❌ OPEN |
 
 | Metric | Status |
 |--------|--------|
-| Code quality | ✅ 100% (typecheck 139/139, build 64 pages, lint) |
-| QA audits | ✅ 100% (12/12 critical categories passing, including independence) |
-| Automation | ✅ 100% (CI/CD, scripts, status checker) |
-| **Independence lock** | ✅ **100% (Phase 0 COMPLETE 2026-07-08)** |
-| External services | ⚠️ 0% (Founder manual setup) |
-| Deployment | ⚠️ 0% (Founder manual deploy) |
-| Governance | ⚠️ 0% (Sprint 0 lock OPEN) |
+| Code quality | ✅ typecheck 0 errors, build 90/90, test 150/150 |
+| QA audits | ✅ 14/14 `audit:all` + seo-build |
+| Automation | ✅ `pnpm build:go-live`, `pnpm go-live:check` |
+| **Independence lock** | ✅ Phase 0 COMPLETE 2026-07-08 |
+| External services | ⚠️ Founder manual |
+| Deployment | ⚠️ Founder manual (account Anhhatam) |
+| Governance | ⚠️ Sprint 0 lock OPEN |
 
 ### Phase 0 — Independence Lock (✅ COMPLETED 2026-07-08)
 
@@ -66,7 +82,14 @@ This document provides a comprehensive project plan for both Nguyen AI (nguyenai
 - ✅ SEO bilingual: 54/54 pages
 - ✅ Form language: 0 violations
 
-**Note:** ~150 non-critical accessibility violations (button text, input id, section aria-label) deferred to Phase 2.
+**Note:** Accessibility violations fixed 2026-07-10 (0/0). Deferred Phase 2 items: full ESLint, InMemory → D1 persistence.
+
+#### Ordered repo build (Phase 0)
+
+```bash
+pnpm build:go-live    # sitemap → typecheck → build → audit:all → seo-build → test → regression
+pnpm go-live:check    # qa-loop + session-auth regression
+```
 
 #### 3. Automation
 - ✅ CI/CD pipeline updated with all audits

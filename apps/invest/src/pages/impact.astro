@@ -6,82 +6,71 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Impact"
   titleVi="Tác động"
-  description="Nguyen AI Computer impact: community empowerment, bilingual education, heritage preservation, economic opportunity, and privacy-first values."
+  description="Tác động Máy Tính AI Nguyễn: trao quyền cộng đồng, giáo dục song ngữ, bảo tồn di sản, cơ hội kinh tế, và riêng tư mặc định."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Impact overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Impact</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Tác động</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan tác động">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Tác động</h1>
 
     <p class="mt-6 text-lg text-ink-muted max-w-3xl">
-      Nguyen AI Computer is built to empower one of the world's largest surname communities with AI-native, privacy-first, bilingual tools.
-      <span class="block mt-2" lang="vi">Nguyen AI Computer xây dựng để trao quyền cho một trong những cộng đồng họ lớn nhất thế giới.</span>
+      Máy Tính AI Nguyễn được xây dựng để trao quyền cho một trong những cộng đồng họ lớn nhất thế giới bằng công cụ AI-native, riêng tư, song ngữ.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
       {[
-        { icon: '🤝', title: 'Community Empowerment', vi: 'Trao quyền cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders, and Nguyen Network give the community tools to organize, connect, and collaborate — not just consume technology.' },
-        { icon: '📚', title: 'Bilingual Education', vi: 'Giáo dục song ngữ', desc: 'edu.nguyenai.net provides free AI learning in Vietnamese and English. Certification programs build skills and credibility for the community.' },
-        { icon: '🌳', title: 'Heritage Preservation', vi: 'Bảo tồn di sản', desc: 'Nguyen Roots, Nguyen Memory, and Nguyen Knowledge preserve family histories, documents, and oral traditions with evidence-based methodology — no bloodline claims.' },
-        { icon: '💼', title: 'Economic Opportunity', vi: 'Cơ hội kinh tế', desc: 'AI Founder OS, AI Business OS, and AI Sales tools give Nguyen founders and businesses access to enterprise-grade AI at accessible price points.' },
-        { icon: '🔒', title: 'Privacy-First', vi: 'Riêng tư là trên hết', desc: 'Living-person data is private by default. Family trees are private by default. Each user owns their data vault. PDPD 91/2025 compliance is a feature, not a burden.' },
+        { icon: '🤝', title: 'Trao quyền cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders và Nguyen Network giúp cộng đồng tổ chức, kết nối và hợp tác — không chỉ tiêu dùng công nghệ.' },
+        { icon: '📚', title: 'Giáo dục song ngữ', desc: 'edu.nguyenai.net cung cấp học AI miễn phí bằng tiếng Việt và tiếng Anh. Chương trình chứng nhận xây kỹ năng và uy tín.' },
+        { icon: '🌳', title: 'Bảo tồn di sản', desc: 'Nguyen Roots, Nguyen Memory và Nguyen Knowledge bảo tồn lịch sử gia đình, tài liệu và truyền miệng theo phương pháp dựa trên bằng chứng — không tuyên bố huyết thống.' },
+        { icon: '💼', title: 'Cơ hội kinh tế', desc: 'AI Founder OS, AI Business OS và AI Sales giúp nhà sáng lập và doanh nghiệp Nguyễn tiếp cận AI cấp doanh nghiệp với mức giá tiếp cận được.' },
+        { icon: '🔒', title: 'Riêng tư là trên hết', desc: 'Dữ liệu người đang sống và cây gia đình mặc định riêng tư. Mỗi người dùng sở hữu kho dữ liệu. Tuân thủ Nghị định 91/2025 là tính năng, không phải gánh nặng.' },
       ].map((item) => (
         <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
           <div class="text-3xl mb-3">{item.icon}</div>
           <h3 class="text-lg font-bold text-ink">{item.title}</h3>
-          <p class="text-sm text-gold" lang="vi">{item.vi}</p>
           <p class="text-sm text-ink-muted mt-3">{item.desc}</p>
         </div>
       ))}
     </div>
 
-    <!-- Ethics note -->
     <div class="mt-12 bg-bg-card border border-gold/20 rounded-xl p-6">
-      <h2 class="text-lg font-serif font-bold text-gold mb-2">Ethics & Historical Boundaries</h2>
-      <p class="text-sm text-ink-muted" lang="vi">Đạo đức & ranh giới lịch sử</p>
+      <h2 class="text-lg font-serif font-bold text-gold mb-4">Đạo đức &amp; ranh giới lịch sử</h2>
       <ul class="mt-4 space-y-2 text-sm text-ink-muted">
-        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Never imply all Nguyen people share one bloodline, descend from Nguyễn Bặc, or belong to the Nguyễn Phúc imperial lineage.</li>
-        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Never claim AI can confirm ancestry, royal lineage, or bloodline. Use evidence labels and uncertainty language.</li>
-        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> "Nguyen Operating Profile" refers to an operating profile and value system — NOT bloodline, genetics, or superiority.</li>
-        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Required evidence labels: verified, primary source, secondary source, according to branch genealogy, oral history, insufficient evidence, disputed, cannot conclude.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Không ngụ ý mọi người họ Nguyễn cùng một huyết thống, đều từ Nguyễn Bặc, hoặc thuộc dòng Nguyễn Phúc.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Không tuyên bố AI xác nhận tổ tiên, dòng dõi hoàng tộc hay huyết thống. Dùng nhãn bằng chứng và ngôn ngữ không chắc chắn.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> “Nguyen Operating Profile” là hồ sơ vận hành và hệ giá trị — không phải huyết thống, di truyền hay ưu việt.</li>
+        <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Nhãn bằng chứng bắt buộc: đã xác minh, nguồn sơ cấp, nguồn thứ cấp, theo gia phả chi, truyền miệng, bằng chứng không đủ, tranh chấp, không kết luận được.</li>
       </ul>
     </div>
 
-    <!-- Impact metrics (hypothesis) -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Impact Metrics (Hypothesis) / Chỉ số tác động (giả thuyết)</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Chỉ số tác động (giả thuyết)</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { value: '4M+', label: 'Nguyen people globally', vi: 'Người họ Nguyễn toàn cầu' },
-          { value: '10', label: 'Edu tracks free', vi: 'Track học miễn phí' },
-          { value: '9', label: 'Specialized Agents', vi: 'Agent chuyên biệt' },
-          { value: '100%', label: 'Privacy-by-default', vi: 'Riêng tư mặc định' },
+          { value: '4M+', label: 'Người họ Nguyễn toàn cầu' },
+          { value: '10', label: 'Track học miễn phí' },
+          { value: '9', label: 'Agent chuyên biệt' },
+          { value: '100%', label: 'Riêng tư mặc định' },
         ].map((m) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-5 text-center">
             <div class="text-3xl font-serif font-bold text-gold">{m.value}</div>
             <div class="text-xs text-ink-muted mt-1">{m.label}</div>
-            <div class="text-xs text-ink-dim" lang="vi">{m.vi}</div>
           </div>
         ))}
       </div>
-      <p class="mt-3 text-xs text-ink-dim italic">All metrics are hypotheses based on public demographic data. Not a forecast. <span lang="vi">Tất cả là giả thuyết, không phải dự báo.</span></p>
+      <p class="mt-3 text-xs text-ink-dim italic">Tất cả là giả thuyết dựa trên dữ liệu nhân khẩu công khai. Không phải dự báo.</p>
     </div>
 
-    <!-- SDG alignment -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">UN SDG Alignment / Phù hợp SDG Liên Hợp Quốc</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Phù hợp SDG Liên Hợp Quốc</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { num: '4', title: 'Quality Education', vi: 'Giáo dục chất lượng', desc: 'Free bilingual AI education at edu.nguyenai.net — 10 tracks, certification, accessible to all subscribers.' },
-          { num: '8', title: 'Decent Work & Economic Growth', vi: 'Việc làm & tăng trưởng', desc: 'AI Founder OS and AI Business OS give Nguyen founders and businesses enterprise-grade tools at accessible prices.' },
-          { num: '9', title: 'Industry, Innovation & Infrastructure', vi: 'Đổi mới & hạ tầng', desc: 'Four-layer AI Computer architecture — a new category of cloud computing specialized for a community.' },
+          { num: '4', title: 'Giáo dục chất lượng', desc: 'Học AI song ngữ miễn phí tại edu.nguyenai.net — 10 track, chứng nhận, tiếp cận được.' },
+          { num: '8', title: 'Việc làm &amp; tăng trưởng', desc: 'AI Founder OS và AI Business OS trao công cụ cấp doanh nghiệp với mức giá tiếp cận được.' },
+          { num: '9', title: 'Đổi mới &amp; hạ tầng', desc: 'Kiến trúc Máy Tính AI bốn lớp — danh mục điện toán đám mây chuyên biệt cho cộng đồng.' },
         ].map((sdg) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-5">
             <div class="flex items-center gap-3 mb-3">
               <span class="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center font-bold text-sm">{sdg.num}</span>
-              <div>
-                <h3 class="font-semibold text-ink text-sm">{sdg.title}</h3>
-                <p class="text-xs text-gold" lang="vi">{sdg.vi}</p>
-              </div>
+              <h3 class="font-semibold text-ink text-sm">{sdg.title}</h3>
             </div>
             <p class="text-sm text-ink-muted">{sdg.desc}</p>
           </div>
@@ -89,14 +78,13 @@ import Disclosure from '../components/Disclosure.astro';
       </div>
     </div>
 
-    <!-- Community quote -->
     <div class="mt-12 bg-bg-card border border-gold/20 rounded-xl p-8 text-center">
       <blockquote class="text-xl font-serif text-ink-muted italic max-w-3xl mx-auto">
-        "We build not for bloodline, but for a community that shares a name, a history, and a future. Nguyen AI Computer is a tool for that future — private by default, bilingual by design, evidence-based by principle."
+        “Chúng tôi không xây vì huyết thống, mà vì một cộng đồng chia sẻ tên, lịch sử và tương lai. Máy Tính AI Nguyễn là công cụ cho tương lai đó — riêng tư mặc định, song ngữ theo thiết kế, dựa trên bằng chứng theo nguyên tắc.”
       </blockquote>
-      <p class="mt-4 text-sm text-gold">— Nguyen AI Founder Statement</p>
+      <p class="mt-4 text-sm text-gold">— Tuyên bố Nhà sáng lập Nguyễn AI</p>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

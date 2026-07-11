@@ -6,32 +6,29 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Competitive Moat"
   titleVi="Lợi thế cạnh tranh"
-  description="Nguyen AI Computer's competitive moat: four-layer architecture, Nguyen Operating Profile, bilingual, community, data vault, and evidence methodology."
+  description="Lợi thế cạnh tranh Máy Tính AI Nguyễn: kiến trúc bốn lớp, hồ sơ vận hành Nguyễn, song ngữ, cộng đồng, kho dữ liệu, phương pháp bằng chứng."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Competitive moat overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Competitive Moat</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Lợi thế cạnh tranh</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan lợi thế cạnh tranh">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Lợi thế cạnh tranh</h1>
 
     <p class="mt-6 text-lg text-ink-muted max-w-3xl">
-      Six interlocking advantages create a defensible position that is difficult for incumbents or new entrants to replicate.
-      <span class="block mt-2" lang="vi">Sáu lợi thế liên kết tạo vị thế phòng thủ khó sao chép.</span>
+      Sáu lợi thế liên kết tạo vị thế phòng thủ khó sao chép bởi đối thủ hiện hữu hay người mới.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
       {[
-        { num: '01', title: 'Four-Layer Architecture', vi: 'Kiến trúc bốn lớp', desc: 'Reference core engine → Reference product system → Nguyen AI Computer → Academy. Each layer compounds value and creates switching costs. Competitors must build all four layers from scratch.' },
-        { num: '02', title: 'Nguyen Operating Profile', vi: 'Hồ sơ vận hành Nguyễn', desc: 'A purpose-built operating profile, value system, dataset, toolset, Agent team, and workflow for the Nguyen community. Not a generic AI tool — a specialized system.' },
-        { num: '03', title: 'Bilingual VI/EN', vi: 'Song ngữ VI/EN', desc: 'Native Vietnamese and English support with reciprocal hreflang SEO. No global AI or genealogy platform offers this for the Vietnamese diaspora.' },
-        { num: '04', title: 'Community Network', vi: 'Mạng lưới cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders, Nguyen Network — community-embedded distribution that creates organic growth and retention.' },
-        { num: '05', title: 'Private Data Vault', vi: 'Kho dữ liệu riêng tư', desc: 'Each user owns their data vault. Privacy-by-default for living persons and family trees. PDPD 91/2025 compliance creates a regulatory moat.' },
-        { num: '06', title: 'Evidence Methodology', vi: 'Phương pháp bằng chứng', desc: 'Required evidence labels (verified, primary source, secondary source, oral history, insufficient evidence, disputed, cannot conclude). No claims of bloodline or royal descent. Trust through rigor.' },
+        { num: '01', title: 'Kiến trúc bốn lớp', desc: 'Nền tảng độc lập → Academy. Mỗi lớp cộng hưởng giá trị và tạo chi phí chuyển đổi. Đối thủ phải xây từ đầu.' },
+        { num: '02', title: 'Hồ sơ vận hành Nguyễn', desc: 'Hồ sơ vận hành, hệ giá trị, dữ liệu, công cụ, đội Agent và quy trình chuyên biệt cho cộng đồng Nguyễn — không phải công cụ AI chung.' },
+        { num: '03', title: 'Song ngữ VI/EN', desc: 'Hỗ trợ tiếng Việt và tiếng Anh gốc với SEO hreflang. Chưa có nền tảng AI/gia phả toàn cầu làm điều này cho kiều bào Việt.' },
+        { num: '04', title: 'Mạng lưới cộng đồng', desc: 'Nguyen Chapters, Nguyen Founders, Nguyen Network — phân phối gắn cộng đồng, tăng trưởng và giữ chân tự nhiên.' },
+        { num: '05', title: 'Kho dữ liệu riêng tư', desc: 'Mỗi người dùng sở hữu kho dữ liệu. Riêng tư mặc định cho người đang sống và cây gia đình. Tuân thủ 91/2025 tạo lợi thế quy định.' },
+        { num: '06', title: 'Phương pháp bằng chứng', desc: 'Nhãn bằng chứng bắt buộc. Không tuyên bố huyết thống hay dòng dõi hoàng tộc. Niềm tin nhờ sự nghiêm ngặt.' },
       ].map((m) => (
         <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
           <div class="flex items-start gap-4">
             <span class="text-3xl font-serif font-bold text-gold shrink-0">{m.num}</span>
             <div>
               <h3 class="text-lg font-bold text-ink">{m.title}</h3>
-              <p class="text-sm text-gold" lang="vi">{m.vi}</p>
               <p class="text-sm text-ink-muted mt-3">{m.desc}</p>
             </div>
           </div>
@@ -39,6 +36,6 @@ import Disclosure from '../components/Disclosure.astro';
       ))}
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

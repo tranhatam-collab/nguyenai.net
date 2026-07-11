@@ -4,72 +4,70 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout title="Legal Documents" titleVi="Tài liệu pháp lý" noindex={true}>
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Legal documents information">
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tài liệu pháp lý">
     <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Riêng tư</span>
     </div>
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Legal Documents</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Tài liệu pháp lý</p>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Tài liệu pháp lý</h1>
 
     <div class="mt-6 p-4 bg-gold/10 border border-gold/30 rounded-lg">
       <p class="text-sm text-gold">
-        ⚠ All documents are placeholders. No real term sheet, SAFE, or subscription agreement has been executed.
-        <span class="block" lang="vi">Mọi tài liệu là mẫu. Chưa có văn bản nào được ký kết.</span>
+        ⚠ Mọi tài liệu là mẫu. Chưa có term sheet, SAFE hay thỏa thuận đăng ký nào được ký kết.
       </p>
     </div>
 
     <div class="mt-10 space-y-4">
       {[
-        { name: 'Term Sheet', vi: 'Bản điều khoản', desc: 'Key terms: valuation, raise, dilution, board, liquidation preferences', status: 'Placeholder', terms: [
-          { k: 'Pre-money valuation', v: '$4.5M USD' },
-          { k: 'Raise amount', v: '$750K USD' },
-          { k: 'Instrument', v: 'SAFE or equity (negotiable)' },
-          { k: 'Discount', v: '20% (SAFE) — negotiable' },
-          { k: 'Valuation cap', v: '$4.5M (SAFE) — negotiable' },
-          { k: 'MFN provision', v: 'Yes — standard' },
-          { k: 'Pro-rata rights', v: 'Yes — for investors > $50K' },
-          { k: 'Board', v: 'Founder-controlled, 1 observer seat for lead investor' },
-          { k: 'Liquidation preference', v: '1x non-participating (equity round)' },
-          { k: 'Anti-dilution', v: 'Broad-based weighted average' },
-          { k: 'Closing conditions', v: 'Entity formation + IP transfer + KYC/AML' },
+        { name: 'Term Sheet', desc: 'Điều khoản chính: định giá, vốn gọi, pha loãng, hội đồng, ưu tiên thanh lý', status: 'Placeholder', terms: [
+          { k: 'Định giá pre-money', v: '$4.5M USD' },
+          { k: 'Số vốn gọi', v: '$750K USD' },
+          { k: 'Công cụ', v: 'SAFE hoặc equity (thương lượng)' },
+          { k: 'Chiết khấu', v: '20% (SAFE) — thương lượng' },
+          { k: 'Valuation cap', v: '$4.5M (SAFE) — thương lượng' },
+          { k: 'Điều khoản MFN', v: 'Có — chuẩn' },
+          { k: 'Quyền pro-rata', v: 'Có — cho nhà đầu tư > $50K' },
+          { k: 'Hội đồng', v: 'Founder kiểm soát, 1 ghế quan sát cho lead investor' },
+          { k: 'Ưu tiên thanh lý', v: '1x non-participating (vòng equity)' },
+          { k: 'Chống pha loãng', v: 'Broad-based weighted average' },
+          { k: 'Điều kiện đóng', v: 'Thành lập thực thể + chuyển IP + KYC/AML' },
         ] },
-        { name: 'SAFE Agreement', vi: 'Thỏa thuận SAFE', desc: 'Simple Agreement for Future Equity — standard YC SAFE template (post-money)', status: 'Placeholder', terms: [
-          { k: 'Template', v: 'Y Combinator Post-Money SAFE (standard)' },
+        { name: 'SAFE Agreement', desc: 'Simple Agreement for Future Equity — mẫu YC SAFE chuẩn (post-money)', status: 'Placeholder', terms: [
+          { k: 'Mẫu', v: 'Y Combinator Post-Money SAFE (chuẩn)' },
           { k: 'Cap', v: '$4.5M post-money' },
-          { k: 'Discount', v: '20%' },
-          { k: 'MFN', v: 'Yes — standard provision' },
-          { k: 'Pro-rata', v: 'Side letter for > $50K investors' },
-          { k: 'Governing law', v: 'Singapore or Vietnam (TBD with counsel)' },
-          { k: 'Currency', v: 'USD' },
-          { k: 'Minimum investment', v: '$25K' },
+          { k: 'Chiết khấu', v: '20%' },
+          { k: 'MFN', v: 'Có — điều khoản chuẩn' },
+          { k: 'Pro-rata', v: 'Side letter cho nhà đầu tư > $50K' },
+          { k: 'Luật áp dụng', v: 'Singapore hoặc Việt Nam (TBD với tư vấn)' },
+          { k: 'Tiền tệ', v: 'USD' },
+          { k: 'Đầu tư tối thiểu', v: '$25K' },
         ] },
-        { name: 'Subscription Agreement', vi: 'Thỏa thuận đăng ký', desc: 'Share subscription terms, conditions, representations and warranties', status: 'Placeholder', terms: [
-          { k: 'Share type', v: 'Ordinary shares (equity round)' },
-          { k: 'Price per share', v: 'Based on post-money / total shares' },
-          { k: 'Lock-up', v: '12 months post-closing' },
-          { k: 'Transfer restrictions', v: 'Right of first refusal + co-sale' },
-          { k: 'Information rights', v: 'Quarterly + annual reports for > $50K' },
-          { k: 'Representations', v: 'Standard investor reps + company reps' },
-          { k: 'Conditions', v: 'Entity formation + IP transfer + bank account' },
-          { k: 'Closing', v: 'Within 30 days of term sheet signing' },
+        { name: 'Subscription Agreement', desc: 'Điều khoản đăng ký cổ phần, điều kiện, tuyên bố và bảo đảm', status: 'Placeholder', terms: [
+          { k: 'Loại cổ phần', v: 'Ordinary shares (vòng equity)' },
+          { k: 'Giá mỗi cổ phần', v: 'Dựa trên post-money / tổng cổ phần' },
+          { k: 'Lock-up', v: '12 tháng sau đóng' },
+          { k: 'Hạn chế chuyển nhượng', v: 'Right of first refusal + co-sale' },
+          { k: 'Quyền thông tin', v: 'Báo cáo quý + năm cho > $50K' },
+          { k: 'Tuyên bố', v: 'Reps chuẩn của nhà đầu tư + công ty' },
+          { k: 'Điều kiện', v: 'Thành lập thực thể + chuyển IP + tài khoản ngân hàng' },
+          { k: 'Đóng', v: 'Trong 30 ngày sau ký term sheet' },
         ] },
-        { name: 'IP Assignment Agreement', vi: 'Thỏa thuận chuyển nhượng IP', desc: 'Transfer of all IP from founder to HoldCo — precondition for investment close', status: 'Placeholder', terms: [
-          { k: 'From', v: 'Founder(s) — personal capacity' },
-          { k: 'To', v: 'HoldCo (IP holding entity)' },
-          { k: 'Scope', v: 'All code, brand, trademarks, docs, datasets, Agent designs' },
-          { k: 'Consideration', v: 'Founders shares in HoldCo' },
-          { k: 'Effective date', v: 'Closing date' },
-          { k: 'Warranty', v: 'Founder owns all IP, no third-party claims' },
-          { k: 'Status', v: '⚠ PENDING — precondition for close' },
+        { name: 'IP Assignment Agreement', desc: 'Chuyển toàn bộ IP từ founder sang HoldCo — điều kiện tiên quyết để chốt đầu tư', status: 'Placeholder', terms: [
+          { k: 'Từ', v: 'Founder(s) — tư cách cá nhân' },
+          { k: 'Đến', v: 'HoldCo (thực thể nắm IP)' },
+          { k: 'Phạm vi', v: 'Toàn bộ code, brand, trademarks, docs, datasets, thiết kế Agent' },
+          { k: 'Đối giá', v: 'Cổ phần Founders trong HoldCo' },
+          { k: 'Ngày hiệu lực', v: 'Ngày đóng' },
+          { k: 'Bảo đảm', v: 'Founder sở hữu toàn bộ IP, không có khiếu nại bên thứ ba' },
+          { k: 'Trạng thái', v: '⚠ ĐANG CHỜ — điều kiện tiên quyết để đóng' },
         ] },
-        { name: 'Data Processing Agreement', vi: 'Thỏa thuận xử lý dữ liệu', desc: 'PDPD 91/2025 compliant DPA for user data processing', status: 'Placeholder', terms: [
-          { k: 'Controller', v: 'User (data owner)' },
+        { name: 'Data Processing Agreement', desc: 'DPA tuân thủ PDPD 91/2025 cho xử lý dữ liệu người dùng', status: 'Placeholder', terms: [
+          { k: 'Controller', v: 'Người dùng (chủ dữ liệu)' },
           { k: 'Processor', v: 'Nguyen AI OpCo' },
-          { k: 'Law', v: 'Vietnam PDPD 91/2025 + GDPR (EU users)' },
-          { k: 'Sub-processors', v: 'Cloudflare, Neon, Stripe — listed in DPA schedule' },
-          { k: 'Data location', v: 'Cloudflare edge + Singapore (Neon primary)' },
-          { k: 'Retention', v: 'Per data classification policy' },
-          { k: 'Breach notification', v: '72 hours' },
+          { k: 'Luật', v: 'Vietnam PDPD 91/2025 + GDPR (người dùng EU)' },
+          { k: 'Sub-processors', v: 'Cloudflare, Neon, Stripe — liệt kê trong phụ lục DPA' },
+          { k: 'Vị trí dữ liệu', v: 'Cloudflare edge + Singapore (Neon primary)' },
+          { k: 'Lưu trữ', v: 'Theo chính sách phân loại dữ liệu' },
+          { k: 'Thông báo vi phạm', v: '72 giờ' },
         ] },
       ].map((doc) => (
         <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
@@ -79,7 +77,6 @@ import Disclosure from '../../components/Disclosure.astro';
                 <h3 class="text-lg font-bold text-ink">{doc.name}</h3>
                 <span class="text-xs px-2 py-0.5 text-ink-dim bg-bg-soft rounded border border-bg-border">{doc.status}</span>
               </div>
-              <p class="text-sm text-gold" lang="vi">{doc.vi}</p>
               <p class="text-sm text-ink-muted mt-2">{doc.desc}</p>
             </div>
             <span class="text-ink-dim text-2xl">📄</span>
@@ -98,32 +95,27 @@ import Disclosure from '../../components/Disclosure.astro';
           </div>
           <div class="mt-4 p-3 bg-bg-soft rounded-lg border border-bg-border">
             <p class="text-xs text-ink-dim italic">
-              Document to be prepared with legal counsel upon entity formation. No bank account or executed documents exist yet.
-              <span class="block" lang="vi">Tài liệu sẽ được soạn với tư vấn pháp lý. Chưa có tài khoản ngân hàng hay văn bản ký kết.</span>
+              Tài liệu sẽ được soạn với tư vấn pháp lý khi thành lập thực thể. Chưa có tài khoản ngân hàng hay văn bản ký kết.
             </p>
           </div>
         </div>
       ))}
     </div>
 
-    <!-- Legal prerequisites -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Legal Prerequisites / Điều kiện tiên quyết pháp lý</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Điều kiện tiên quyết pháp lý</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <ul class="space-y-3 text-sm">
           {[
-            { item: 'Entity formation (HoldCo + OpCo)', vi: 'Thành lập thực thể', status: 'Pending' },
-            { item: 'IP assignment to HoldCo', vi: 'Chuyển nhượng IP', status: 'Pending — precondition' },
-            { item: 'Bank account (USD + VND)', vi: 'Tài khoản ngân hàng', status: 'Pending' },
-            { item: 'KYC/AML for investors', vi: 'KYC/AML cho nhà đầu tư', status: 'Per investor' },
-            { item: 'Legal counsel engagement', vi: 'Thuê tư vấn pháp lý', status: 'Pending' },
-            { item: 'Governing law determination (SG vs VN)', vi: 'Quyết định luật áp dụng', status: 'Pending' },
+            { item: 'Thành lập thực thể (HoldCo + OpCo)', status: 'Đang chờ' },
+            { item: 'Chuyển nhượng IP sang HoldCo', status: 'Đang chờ — điều kiện tiên quyết' },
+            { item: 'Tài khoản ngân hàng (USD + VND)', status: 'Đang chờ' },
+            { item: 'KYC/AML cho nhà đầu tư', status: 'Theo từng nhà đầu tư' },
+            { item: 'Thuê tư vấn pháp lý', status: 'Đang chờ' },
+            { item: 'Quyết định luật áp dụng (SG vs VN)', status: 'Đang chờ' },
           ].map((p) => (
             <li class="flex items-center justify-between p-3 bg-bg-soft rounded-lg border border-bg-border">
-              <div>
-                <span class="text-ink">{p.item}</span>
-                <span class="block text-xs text-gold" lang="vi">{p.vi}</span>
-              </div>
+              <span class="text-ink">{p.item}</span>
               <span class="text-xs px-2 py-1 text-red-400 bg-red-400/10 rounded border border-red-400/30">{p.status}</span>
             </li>
           ))}
@@ -131,6 +123,6 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

@@ -4,21 +4,19 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout title="Investor Qualification" titleVi="Xác nhận nhà đầu tư" noindex={true}>
-  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Investor qualification form">
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Form xác nhận nhà đầu tư">
     <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Riêng tư</span>
     </div>
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Investor Qualification</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Xác nhận nhà đầu tư</p>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Xác nhận nhà đầu tư</h1>
 
     <p class="mt-6 text-ink-muted">
-      Complete this form to request access to the private data room. All fields are required.
-      <span class="block mt-2" lang="vi">Hoàn thành form để yêu cầu truy cập data room riêng tư.</span>
+      Hoàn thành form để yêu cầu truy cập data room riêng tư. Tất cả các trường đều bắt buộc.
     </p>
 
     <form id="qual-form" class="mt-10 space-y-6 bg-bg-card border border-bg-border rounded-xl p-8">
       <div>
-        <label for="q-name" class="block text-sm font-semibold text-ink mb-1">Full name / Họ tên <span class="text-gold">*</span></label>
+        <label for="q-name" class="block text-sm font-semibold text-ink mb-1">Họ tên <span class="text-gold">*</span></label>
         <input type="text" id="q-name" name="name" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" />
       </div>
       <div>
@@ -26,29 +24,29 @@ import Disclosure from '../../components/Disclosure.astro';
         <input type="email" id="q-email" name="email" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" />
       </div>
       <div>
-        <label for="q-entity" class="block text-sm font-semibold text-ink mb-1">Entity type / Loại thực thể <span class="text-gold">*</span></label>
+        <label for="q-entity" class="block text-sm font-semibold text-ink mb-1">Loại thực thể <span class="text-gold">*</span></label>
         <select id="q-entity" name="entity" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink focus:border-gold focus:outline-none transition-colors">
-          <option value="">— Select / Chọn —</option>
-          <option value="individual">Individual / Cá nhân</option>
-          <option value="angel">Angel investor / Thiên thần</option>
-          <option value="vc">Venture capital / Quỹ</option>
+          <option value="">— Chọn —</option>
+          <option value="individual">Cá nhân</option>
+          <option value="angel">Thiên thần (angel)</option>
+          <option value="vc">Quỹ venture capital</option>
           <option value="family-office">Family office</option>
-          <option value="strategic">Strategic / Chiến lược</option>
-          <option value="other">Other / Khác</option>
+          <option value="strategic">Chiến lược</option>
+          <option value="other">Khác</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-semibold text-ink mb-2">Accredited investor status / Tình trạng <span class="text-gold">*</span></label>
+        <label class="block text-sm font-semibold text-ink mb-2">Tình trạng nhà đầu tư được công nhận <span class="text-gold">*</span></label>
         <div class="space-y-2">
-          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="yes" required class="text-gold" /><span class="text-sm text-ink-muted">Yes / Có</span></label>
-          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="no" class="text-gold" /><span class="text-sm text-ink-muted">No / Không</span></label>
-          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="unsure" class="text-gold" /><span class="text-sm text-ink-muted">Not sure / Không chắc</span></label>
+          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="yes" required class="text-gold" /><span class="text-sm text-ink-muted">Có</span></label>
+          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="no" class="text-gold" /><span class="text-sm text-ink-muted">Không</span></label>
+          <label class="flex items-center gap-3"><input type="radio" name="accredited" value="unsure" class="text-gold" /><span class="text-sm text-ink-muted">Không chắc</span></label>
         </div>
       </div>
       <div>
-        <label for="q-range" class="block text-sm font-semibold text-ink mb-1">Investment range / Phạm vi <span class="text-gold">*</span></label>
+        <label for="q-range" class="block text-sm font-semibold text-ink mb-1">Phạm vi đầu tư <span class="text-gold">*</span></label>
         <select id="q-range" name="range" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink focus:border-gold focus:outline-none transition-colors">
-          <option value="">— Select / Chọn —</option>
+          <option value="">— Chọn —</option>
           <option value="25-50">$25K – $50K</option>
           <option value="50-100">$50K – $100K</option>
           <option value="100-250">$100K – $250K</option>
@@ -67,7 +65,7 @@ import Disclosure from '../../components/Disclosure.astro';
       <a href="/private/data-room" class="inline-block mt-6 text-gold hover:text-gold-light text-sm">→ Tiếp tục vào data room</a>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 
   <script>

@@ -4,60 +4,54 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout title="IP Ownership" titleVi="Sở hữu IP" noindex={true}>
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="IP ownership information">
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Sở hữu IP">
     <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Riêng tư</span>
     </div>
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">IP Ownership</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Sở hữu trí tuệ</p>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Sở hữu IP</h1>
 
-    <!-- HoldCo model -->
     <div class="mt-10 bg-bg-card border border-bg-border rounded-xl p-6">
-      <h2 class="text-xl font-serif font-bold text-ink mb-2">HoldCo Model / Mô hình HoldCo</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-2">Mô hình HoldCo</h2>
       <p class="text-sm text-ink-muted">
-        Intellectual property is held by a Holding Company (HoldCo), which licenses IP to operating entities. This separates IP ownership from operational risk.
-        <span class="block mt-2" lang="vi">IP được nắm bởi HoldCo, cấp phép cho thực thể vận hành. Tách sở hữu IP khỏi rủi ro vận hành.</span>
+        Sở hữu trí tuệ được nắm bởi Holding Company (HoldCo), cấp phép IP cho thực thể vận hành. Tách sở hữu IP khỏi rủi ro vận hành.
       </p>
 
       <div class="mt-6 space-y-3">
         <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
           <span class="text-gold font-mono text-xs">HoldCo</span>
           <span class="text-ink-dim">→</span>
-          <span class="text-sm text-ink-muted">Owns all IP (code, brand, trademarks, datasets, documentation)</span>
+          <span class="text-sm text-ink-muted">Sở hữu toàn bộ IP (code, brand, trademarks, datasets, documentation)</span>
         </div>
         <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
           <span class="text-gold font-mono text-xs">OpCo</span>
           <span class="text-ink-dim">→</span>
-          <span class="text-sm text-ink-muted">Operating entity — licenses IP from HoldCo</span>
+          <span class="text-sm text-ink-muted">Thực thể vận hành — cấp phép IP từ HoldCo</span>
         </div>
         <div class="flex items-center gap-3 p-3 bg-bg-soft rounded-lg border border-bg-border">
           <span class="text-gold font-mono text-xs">License terms</span>
           <span class="text-ink-dim">→</span>
-          <span class="text-sm text-ink-muted">Exclusive, perpetual, revocable upon breach</span>
+          <span class="text-sm text-ink-muted">Độc quyền, vĩnh viễn, có thể thu hồi khi vi phạm</span>
         </div>
       </div>
     </div>
 
-    <!-- IP inventory -->
     <div class="mt-8">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">IP Inventory / Kiểm kê IP</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Kiểm kê IP</h2>
       <div class="bg-bg-card border border-bg-border rounded-lg p-5">
         <ul class="space-y-2 text-sm">
-          {['Source code (Nguyen AI independent backend)', 'Brand assets (Nguyen AI, nguyenai.net)', 'Documentation (positioning, brand, product, architecture)', 'Agent team designs and prompts', 'Nguyen Operating Profile', 'Academy curriculum'].map((ip) => (
+          {['Source code (backend độc lập Nguyen AI)', 'Brand assets (Nguyen AI, nguyenai.net)', 'Documentation (positioning, brand, product, architecture)', 'Thiết kế và prompt đội Agent', 'Nguyen Operating Profile', 'Giáo trình Academy'].map((ip) => (
             <li class="flex items-start gap-2 text-ink-muted"><span class="text-gold">▸</span> {ip}</li>
           ))}
         </ul>
       </div>
     </div>
 
-    <!-- Status warning -->
     <div class="mt-8 p-4 bg-red-400/10 border border-red-400/30 rounded-lg">
       <p class="text-sm text-red-400">
-        ⚠ IP transfer is PENDING. No IP has been formally transferred to any entity yet. This is a precondition for investment close.
-        <span class="block mt-1" lang="vi">Chuyển nhượng IP ĐANG HOÀN THIỆN. Chưa có IP nào được chuyển chính thức. Điều kiện tiên quyết để chốt đầu tư.</span>
+        ⚠ Chuyển nhượng IP ĐANG HOÀN THIỆN. Chưa có IP nào được chuyển chính thức sang bất kỳ thực thể nào. Đây là điều kiện tiên quyết để chốt đầu tư.
       </p>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

@@ -14,6 +14,8 @@ import {
   buildTotpUri,
   buildCookieHeader,
   buildClearCookieHeader,
+  signSessionCookieValue,
+  parseSessionCookieValue,
   getPermissionsForRoles,
   hasPermission,
   hasRole,
@@ -37,7 +39,7 @@ function assert(condition: boolean, msg: string) {
 async function testPasswordHashing() {
   console.log('Test: password hashing');
   const hash = await hashPassword('testPassword123');
-  assert(hash.startsWith('pbkdf2:600000:'), 'hash format correct with 600K iterations');
+  assert(hash.startsWith('pbkdf2:100000:'), 'hash format correct with 100K iterations (Workers cap)');
   const valid = await verifyPassword('testPassword123', hash);
   assert(valid === true, 'correct password verifies');
   const invalid = await verifyPassword('wrongPassword', hash);
@@ -87,6 +89,20 @@ function testCookieBuilding() {
 
   const clearCookie = buildClearCookieHeader(SESSION_COOKIE_NAME);
   assert(clearCookie.includes('Max-Age=0'), 'clear cookie has Max-Age=0');
+}
+
+async function testSessionCookieSigning() {
+  console.log('Test: session cookie signing (AUTH_SECRET)');
+  const secret = 'test-auth-secret-not-for-production-use-32b';
+  const sid = generateSessionId();
+  const signed = await signSessionCookieValue(sid, secret);
+  assert(signed.startsWith(`${sid}.`), 'signed value starts with session id');
+  const parsed = await parseSessionCookieValue(signed, secret);
+  assert(parsed === sid, 'parse recovers session id');
+  const bad = await parseSessionCookieValue(`${sid}.deadbeef`, secret);
+  assert(bad === null, 'tampered signature rejected');
+  const legacy = await parseSessionCookieValue(sid, secret);
+  assert(legacy === sid, 'legacy unsigned UUID accepted during migration');
 }
 
 function testRolePermissions() {
@@ -145,6 +161,7 @@ async function main() {
   testTokenGeneration();
   await testApiKeyHashing();
   testCookieBuilding();
+  await testSessionCookieSigning();
   testRolePermissions();
   testSessionChecks();
   console.log(`\n${passed} passed, ${failed} failed`);

@@ -4,28 +4,26 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout title="Document Index" titleVi="Mục lục tài liệu" noindex={true}>
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Document index information">
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Mục lục tài liệu">
     <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Private / Riêng tư</span>
+      <span class="px-3 py-1 text-xs font-semibold text-red-400 border border-red-400/30 rounded-full">Riêng tư</span>
     </div>
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Document Index</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Mục lục tài liệu</p>
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Mục lục tài liệu</h1>
 
     <div class="mt-10 space-y-3">
       {[
-        { href: '/private/product-demo', label: 'Product Demo', vi: 'Demo sản phẩm', desc: 'Video walkthrough and screenshot gallery' },
-        { href: '/private/financial-model', label: 'Financial Model', vi: 'Mô hình tài chính', desc: 'Revenue hypotheses, sensitivity analysis' },
-        { href: '/private/cap-table', label: 'Cap Table', vi: 'Bảng cổ phần', desc: 'Pre-money, raise, post-money, dilution' },
-        { href: '/private/technical-audit', label: 'Technical Audit', vi: 'Kiểm toán kỹ thuật', desc: 'Platform status, security, privacy audits' },
-        { href: '/private/ip', label: 'IP Ownership', vi: 'Sở hữu IP', desc: 'HoldCo model, license terms' },
-        { href: '/private/security', label: 'Security Overview', vi: 'Tổng quan bảo mật', desc: 'PDPD 91/2025, data flow, encryption' },
-        { href: '/private/contracts', label: 'Legal Documents', vi: 'Tài liệu pháp lý', desc: 'Term sheet, SAFE, subscription agreement' },
+        { href: '/private/product-demo', label: 'Demo sản phẩm', desc: 'Video hướng dẫn và thư viện ảnh chụp' },
+        { href: '/private/financial-model', label: 'Mô hình tài chính', desc: 'Giả thuyết doanh thu, phân tích độ nhạy' },
+        { href: '/private/cap-table', label: 'Bảng cổ phần', desc: 'Pre-money, vòng gọi vốn, post-money, pha loãng' },
+        { href: '/private/technical-audit', label: 'Kiểm toán kỹ thuật', desc: 'Trạng thái nền tảng, bảo mật, quyền riêng tư' },
+        { href: '/private/ip', label: 'Sở hữu IP', desc: 'Mô hình HoldCo, điều khoản cấp phép' },
+        { href: '/private/security', label: 'Tổng quan bảo mật', desc: 'PDPD 91/2025, luồng dữ liệu, mã hóa' },
+        { href: '/private/contracts', label: 'Tài liệu pháp lý', desc: 'Term sheet, SAFE, thỏa thuận đăng ký' },
       ].map((doc) => (
         <a href={doc.href} class="block bg-bg-card border border-bg-border rounded-lg p-5 card-hover">
           <div class="flex items-center justify-between">
             <div>
               <h3 class="font-semibold text-ink">{doc.label}</h3>
-              <p class="text-xs text-ink-dim" lang="vi">{doc.vi}</p>
               <p class="text-sm text-ink-muted mt-1">{doc.desc}</p>
             </div>
             <span class="text-gold text-xl">→</span>
@@ -34,42 +32,40 @@ import Disclosure from '../../components/Disclosure.astro';
       ))}
     </div>
 
-    <!-- Access policy -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Access Policy / Chính sách truy cập</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Chính sách truy cập</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <ul class="space-y-3 text-sm text-ink-muted">
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Qualification required:</strong> All visitors must complete investor qualification before accessing documents.</li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Audit log:</strong> Every document access is logged with timestamp, IP, and user identity.</li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Expiring access:</strong> Access grants expire after 90 days unless renewed.</li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Revocable:</strong> Founder can revoke access at any time, for any reason.</li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">No download:</strong> Documents are view-only. No printing, downloading, or screenshotting permitted.</li>
-          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">NDA:</strong> Access implies acceptance of confidentiality terms.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Yêu cầu xác nhận:</strong> Mọi khách phải hoàn thành xác nhận nhà đầu tư trước khi xem tài liệu.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Nhật ký kiểm toán:</strong> Mọi truy cập tài liệu được ghi với thời gian, IP và danh tính.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Truy cập có thời hạn:</strong> Quyền truy cập hết hạn sau 90 ngày trừ khi gia hạn.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Có thể thu hồi:</strong> Founder có thể thu hồi quyền truy cập bất cứ lúc nào, vì bất kỳ lý do nào.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">Không tải xuống:</strong> Tài liệu chỉ xem. Không in, tải xuống hay chụp màn hình.</li>
+          <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> <strong class="text-ink">NDA:</strong> Truy cập đồng nghĩa chấp nhận điều khoản bảo mật.</li>
         </ul>
       </div>
     </div>
 
-    <!-- Access log (placeholder) -->
     <div class="mt-8">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Recent Access Log / Nhật ký truy cập gần đây</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Nhật ký truy cập gần đây</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-5">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-bg-border">
-              <th class="text-left py-2 text-ink-muted uppercase text-xs">Timestamp</th>
-              <th class="text-left py-2 text-ink-muted uppercase text-xs">Visitor</th>
-              <th class="text-left py-2 text-ink-muted uppercase text-xs">Document</th>
-              <th class="text-right py-2 text-ink-muted uppercase text-xs">Status</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Thời gian</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Khách</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Tài liệu</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Trạng thái</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-bg-border">
-            <tr><td class="py-2 text-ink-dim">—</td><td class="py-2 text-ink-dim">No access yet</td><td class="py-2 text-ink-dim">—</td><td class="py-2 text-right text-ink-dim">—</td></tr>
+            <tr><td class="py-2 text-ink-dim">—</td><td class="py-2 text-ink-dim">Chưa có truy cập</td><td class="py-2 text-ink-dim">—</td><td class="py-2 text-right text-ink-dim">—</td></tr>
           </tbody>
         </table>
-        <p class="mt-3 text-xs text-ink-dim italic">Access log is populated when real investors visit. <span lang="vi">Nhật ký sẽ có khi nhà đầu tư thật truy cập.</span></p>
+        <p class="mt-3 text-xs text-ink-dim italic">Nhật ký sẽ có khi nhà đầu tư thật truy cập.</p>
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

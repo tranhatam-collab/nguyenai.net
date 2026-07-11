@@ -7,102 +7,100 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Roadmap"
   titleVi="Lộ trình"
-  description="Nguyen AI Computer roadmap: Phase 0 through Phase 6 — from fixing brand and positioning to scaling the platform."
+  description="Lộ trình Máy Tính AI Nguyễn: Giai đoạn 0 đến 6 — từ căn chỉnh thương hiệu đến mở rộng nền tảng."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Roadmap overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Roadmap</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Lộ trình</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan lộ trình">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Lộ trình</h1>
 
     <p class="mt-6 text-lg text-ink-muted max-w-3xl">
-      Seven phases from foundation to scale. The current focus is Phase 0–1: fixing brand, legal entity, and IP ownership.
-      <span class="block mt-2" lang="vi">Bảy giai đoạn từ nền tảng đến mở rộng. Trọng tâm hiện tại là Giai đoạn 0–1.</span>
+      Bảy giai đoạn từ nền tảng đến mở rộng. Trọng tâm hiện tại là Giai đoạn 0–1: thương hiệu, thực thể pháp lý và sở hữu IP.
     </p>
 
     <div class="mt-12 max-w-3xl">
       <RoadmapPhase
-        phase="Phase 0"
-        title="Fix & Align"
-        titleVi="Sửa chữa & căn chỉnh"
+        locale="vi"
+        phase="Giai đoạn 0"
+        title="Sửa chữa &amp; căn chỉnh"
         status="active"
         items={[
-          'Brand audit and clone contamination cleanup',
-          'Stale brand surfaces removed',
-          'Positioning locked (Master Positioning)',
-          'AGENTS.md rules established',
+          'Kiểm toán thương hiệu và làm sạch nhiễm clone',
+          'Gỡ bề mặt thương hiệu cũ',
+          'Khóa định vị (Master Positioning)',
+          'Thiết lập quy tắc AGENTS.md',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 1"
-        title="Legal Entity & IP Ownership"
-        titleVi="Thực thể pháp lý & sở hữu IP"
+        locale="vi"
+        phase="Giai đoạn 1"
+        title="Thực thể pháp lý &amp; sở hữu IP"
         status="planned"
         items={[
-          'Establish legal entity (HoldCo model)',
-          'Transfer IP to entity',
-          'Cap table formalized',
-          'Term sheet and investment documents',
+          'Thành lập thực thể (mô hình HoldCo)',
+          'Chuyển nhượng IP sang thực thể',
+          'Chính thức hóa bảng cổ phần',
+          'Term sheet và tài liệu đầu tư',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 2"
-        title="App Scaffold"
-        titleVi="Khung ứng dụng"
+        locale="vi"
+        phase="Giai đoạn 2"
+        title="Khung ứng dụng"
         status="planned"
         items={[
-          'AI Computer Console (app.nguyenai.net)',
-          'Authentication and data vault',
-          'Agent team integration',
-          'Model Mesh routing',
+          'Console Máy Tính AI (app.nguyenai.net)',
+          'Xác thực và kho dữ liệu',
+          'Tích hợp đội Agent',
+          'Định tuyến Model Mesh',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 3"
-        title="Academy Launch"
-        titleVi="Khởi động Academy"
+        locale="vi"
+        phase="Giai đoạn 3"
+        title="Khởi động Academy"
         status="planned"
         items={[
-          'edu.nguyenai.net — free AI learning',
-          'Certification programs',
-          'Bilingual curriculum (VI/EN)',
+          'edu.nguyenai.net — học AI miễn phí',
+          'Chương trình chứng nhận',
+          'Giáo trình song ngữ (VI/EN)',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 4"
-        title="Invest & Fundraise"
-        titleVi="Đầu tư & gọi vốn"
+        locale="vi"
+        phase="Giai đoạn 4"
+        title="Đầu tư &amp; gọi vốn"
         status="planned"
         items={[
-          'Investor site live (invest.nguyenai.net)',
-          'Data room access for qualified investors',
-          'Close 750K USD seed round',
+          'Site nhà đầu tư live (invest.nguyenai.net)',
+          'Data room cho nhà đầu tư đủ điều kiện',
+          'Đóng vòng seed 750K USD',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 5"
-        title="Beta Program"
-        titleVi="Chương trình beta"
+        locale="vi"
+        phase="Giai đoạn 5"
+        title="Chương trình beta"
         status="planned"
         items={[
-          'Closed beta with Nguyen community members',
-          'Feedback loops and iteration',
-          'Security and privacy audits',
-          'PDPD 91/2025 compliance verification',
+          'Beta kín với thành viên cộng đồng Nguyễn',
+          'Vòng phản hồi và lặp lại',
+          'Kiểm toán bảo mật và quyền riêng tư',
+          'Xác minh tuân thủ Nghị định 91/2025',
         ]}
       />
       <RoadmapPhase
-        phase="Phase 6"
-        title="Scale"
-        titleVi="Mở rộng"
+        locale="vi"
+        phase="Giai đoạn 6"
+        title="Mở rộng"
         status="planned"
         items={[
-          'Public launch',
-          'Chapter program rollout',
-          'Enterprise sales motion',
-          'International diaspora expansion',
+          'Ra mắt công khai',
+          'Triển khai chương trình Chapter',
+          'Bán hàng doanh nghiệp',
+          'Mở rộng kiều bào quốc tế',
         ]}
       />
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

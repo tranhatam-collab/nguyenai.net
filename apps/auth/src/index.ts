@@ -10,10 +10,11 @@
  *   P0-3: MFA — real TOTP verification via otpauth, no dev bypass
  *   P0-4: CSRF — token verified on all state-changing requests
  *   P1-5: Email verification required before login
- *   P1-6: PBKDF2 600K iterations (OWASP 2026)
+ *   P1-6: PBKDF2 100K iterations (Workers WebCrypto cap; OWASP 600K not available on CF)
  *
  * Routes:
  *   GET  /health — health check
+ *   GET  /auth — HTML login UI (?redirect=https://*.nguyenai.net/...)
  *   POST /v1/auth/register — create new user + default org
  *   POST /v1/auth/login — email/password login, returns session cookie
  *   POST /v1/auth/logout — revoke session, clear cookie
@@ -45,6 +46,8 @@ import {
   buildTotpUri,
   buildCookieHeader,
   buildClearCookieHeader,
+  signSessionCookieValue,
+  parseSessionCookieValue,
   getPermissionsForRoles,
   SESSION_COOKIE_NAME,
   type Role,
@@ -52,6 +55,7 @@ import {
 } from '@nai/auth';
 
 import { setAuditStore, logAuditEvent, logLoginSuccess, logLoginFailure, logLogout, logAccessDenied } from '@nai/audit';
+import { renderLoginPage, sanitizeRedirect } from './login-page';
 
 // R10 fix: Structured error logger — no console.error in production.
 function logError(scope: string, err: unknown): void {
@@ -110,9 +114,15 @@ interface AuthEnv {
     AUTH_ISSUER: string;
     DEFAULT_AUDIENCE: string;
     SESSION_MAX_AGE: string;
+    /** HMAC secret for signing session cookies (wrangler secret). Not JWT. */
+    AUTH_SECRET?: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_REDIRECT_URI: string;
+    /** Primary email key — mail.iai.one (Founder directive: sole email provider) */
+    MAIL_IAI_ONE_API_KEY?: string;
+    /** @deprecated Use MAIL_IAI_ONE_API_KEY */
+    RESEND_API_KEY?: string;
   };
   Variables: {
     session: Session | null;
@@ -244,10 +254,24 @@ async function isRateLimited(c: Context<AuthEnv>, email: string): Promise<boolea
 // Session resolution middleware
 // ============================================================
 
+async function cookieSessionId(c: Context<AuthEnv>): Promise<string | null> {
+  const raw = getSessionCookie(c);
+  if (!raw) return null;
+  return parseSessionCookieValue(raw, c.env.AUTH_SECRET);
+}
+
+async function setSignedSessionCookie(c: Context<AuthEnv>, sessionId: string, maxAge: number): Promise<void> {
+  const secret = c.env.AUTH_SECRET;
+  const value = secret
+    ? await signSessionCookieValue(sessionId, secret)
+    : sessionId;
+  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, value, { maxAge }));
+}
+
 async function resolveSession(c: Context<AuthEnv>): Promise<Session | null> {
-  const cookie = getSessionCookie(c);
-  if (!cookie) return null;
-  const d1Session = await findSessionById(c.env.DB, cookie);
+  const sessionId = await cookieSessionId(c);
+  if (!sessionId) return null;
+  const d1Session = await findSessionById(c.env.DB, sessionId);
   if (!d1Session) return null;
   if (d1Session.revoked_at) return null;
   if (new Date(d1Session.expires_at) < new Date()) return null;
@@ -284,12 +308,38 @@ app.get('/health', (c) => {
   return c.json({
     status: 'ok',
     service: 'nai-auth',
-    version: '0.2.0',
+    version: '0.2.1',
     timestamp: new Date().toISOString(),
     environment: c.env.ENVIRONMENT,
     issuer: c.env.AUTH_ISSUER,
+    auth_secret_configured: Boolean(c.env.AUTH_SECRET),
+    session_model: 'd1_opaque_cookie_hmac',
   });
 });
+
+// ============================================================
+// Login UI — GET /auth?redirect=https://invest.nguyenai.net/private/
+// Invest middleware and other gates send users here. Without this
+// route the Worker returned JSON 404 {"error":"not found"}.
+// ============================================================
+
+app.get('/auth', async (c) => {
+  const rawRedirect = c.req.query('redirect');
+  const redirect = sanitizeRedirect(rawRedirect) ?? 'https://app.nguyenai.net/dashboard';
+
+  // Already signed in → bounce to safe redirect
+  const existing = await resolveSession(c);
+  if (existing) {
+    return c.redirect(redirect, 302);
+  }
+
+  return c.html(renderLoginPage({ redirect }), 200, {
+    'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive',
+  });
+});
+
+app.get('/', (c) => c.redirect('/auth', 302));
 
 // ============================================================
 // Register — POST /v1/auth/register
@@ -376,7 +426,7 @@ app.post('/v1/auth/register', async (c) => {
 
   try {
     const { createEmailService } = await import('@nai/email');
-    const emailService = createEmailService(c.env as { RESEND_API_KEY?: string; ENVIRONMENT?: string });
+    const emailService = createEmailService(c.env as { MAIL_IAI_ONE_API_KEY?: string; RESEND_API_KEY?: string; ENVIRONMENT?: string });
     await emailService.sendTemplate('welcome', {
       locale: userLocale as 'vi' | 'en',
       user_email: email,
@@ -422,16 +472,20 @@ app.post('/v1/auth/verify-email', async (c) => {
 
   await markEmailVerified(c.env.DB, user.user_id);
 
-  await logAuditEvent({
-    user_id: user.user_id,
-    session_id: null,
-    event_type: 'email_verified',
-    actor_ip: getClientIp(c),
-    user_agent: getUserAgent(c),
-    target: user.user_id,
-    result: 'success',
-    metadata: { email: user.email },
-  });
+  try {
+    await logAuditEvent({
+      user_id: user.user_id,
+      session_id: null,
+      event_type: 'email_verified',
+      actor_ip: getClientIp(c),
+      user_agent: getUserAgent(c),
+      target: user.user_id,
+      result: 'success',
+      metadata: { email: user.email },
+    });
+  } catch (err) {
+    logError('email_verified_audit', err);
+  }
 
   return c.json({ verified: true, email: user.email });
 });
@@ -510,7 +564,7 @@ app.post('/v1/auth/login', async (c) => {
 
   await logLoginSuccess(user.user_id, sessionId, getClientIp(c), getUserAgent(c));
 
-  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+  await setSignedSessionCookie(c, sessionId, maxAge);
 
   return c.json({
     session_id: sessionId,
@@ -851,7 +905,7 @@ app.post('/v1/auth/magic-link/verify', async (c) => {
   if (!user) return c.json({ error: 'user not found' }, 404);
   await createSession(c.env.DB, { session_id: sessionId, user_id: user.user_id, tenant_id: '', audience: 'web', issuer: 'auth.nguyenai.net', roles: [], permissions: [], device: c.req.header('User-Agent') ?? null, ip_address: c.req.header('CF-Connecting-IP') ?? null, user_agent: c.req.header('User-Agent') ?? null, csrf_token: crypto.randomUUID(), expires_at: new Date(Date.now()+3600000).toISOString() });
   await logLoginSuccess(user.user_id, '', c.req.header('CF-Connecting-IP') ?? 'unknown', c.req.header('User-Agent') ?? null);
-  c.header('Set-Cookie', `${SESSION_COOKIE_NAME}=${sessionId}; Domain=.nguyenai.net; HttpOnly; Secure; SameSite=Lax; Max-Age=3600; Path=/`);
+  await setSignedSessionCookie(c, sessionId, 3600);
   return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
 });
 
@@ -1214,7 +1268,7 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
 
   await logLoginSuccess(userId, sessionId, ip, userAgent);
 
-  c.header('Set-Cookie', buildCookieHeader(SESSION_COOKIE_NAME, sessionId, { maxAge }));
+  await setSignedSessionCookie(c, sessionId, maxAge);
 
   return c.json({
     session_id: sessionId,

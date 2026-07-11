@@ -6,75 +6,72 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Request Access"
   titleVi="Yêu cầu truy cập"
-  description="Request investor access to the Nguyen AI Computer private data room. Qualified investors receive access within 48 hours."
+  description="Yêu cầu truy cập data room riêng tư Máy Tính AI Nguyễn. Nhà đầu tư đủ điều kiện nhận quyền trong vòng 48 giờ."
 >
-  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Request access form">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Request Access</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Yêu cầu truy cập</p>
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Form yêu cầu truy cập">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Yêu cầu truy cập</h1>
 
     <p class="mt-6 text-ink-muted">
-      Complete the investor qualification form below. Qualified investors receive access to the private data room within 48 hours.
-      <span class="block mt-2" lang="vi">Hoàn thành form xác nhận nhà đầu tư. Nhà đầu tư đủ điều kiện nhận quyền truy cập data room trong vòng 48 giờ.</span>
+      Hoàn thành form xác nhận nhà đầu tư. Nhà đầu tư đủ điều kiện nhận quyền truy cập data room trong vòng 48 giờ.
     </p>
 
-    <!-- Form -->
     <form id="access-form" class="mt-10 space-y-6 bg-bg-card border border-bg-border rounded-xl p-8">
       <div>
-        <label for="name" class="block text-sm font-semibold text-ink mb-1">Full name / Họ tên <span class="text-gold">*</span></label>
-        <input type="text" id="name" name="name" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="Nguyen Van A" />
+        <label for="name" class="block text-sm font-semibold text-ink mb-1">Họ tên <span class="text-gold">*</span></label>
+        <input type="text" id="name" name="name" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="Nguyễn Văn A" />
       </div>
 
       <div>
         <label for="email" class="block text-sm font-semibold text-ink mb-1">Email <span class="text-gold">*</span></label>
-        <input type="email" id="email" name="email" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="you@example.com" />
+        <input type="email" id="email" name="email" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="ban@example.com" />
       </div>
 
       <div>
-        <label for="entity" class="block text-sm font-semibold text-ink mb-1">Entity type / Loại thực thể <span class="text-gold">*</span></label>
+        <label for="entity" class="block text-sm font-semibold text-ink mb-1">Loại thực thể <span class="text-gold">*</span></label>
         <select id="entity" name="entity" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink focus:border-gold focus:outline-none transition-colors">
-          <option value="">— Select / Chọn —</option>
-          <option value="individual">Individual / Cá nhân</option>
-          <option value="angel">Angel investor / Nhà đầu tư thiên thần</option>
-          <option value="vc">Venture capital / Quỹ đầu tư</option>
-          <option value="family-office">Family office / Văn phòng gia đình</option>
-          <option value="strategic">Strategic / Chiến lược</option>
-          <option value="other">Other / Khác</option>
+          <option value="">— Chọn —</option>
+          <option value="individual">Cá nhân</option>
+          <option value="angel">Nhà đầu tư thiên thần</option>
+          <option value="vc">Quỹ đầu tư</option>
+          <option value="family-office">Văn phòng gia đình</option>
+          <option value="strategic">Chiến lược</option>
+          <option value="other">Khác</option>
         </select>
       </div>
 
       <div>
-        <label class="block text-sm font-semibold text-ink mb-2">Accredited investor status / Tình trạng nhà đầu tư đủ điều kiện <span class="text-gold">*</span></label>
+        <label class="block text-sm font-semibold text-ink mb-2">Tình trạng nhà đầu tư đủ điều kiện <span class="text-gold">*</span></label>
         <div class="space-y-2">
           <label class="flex items-center gap-3 cursor-pointer">
             <input type="radio" name="accredited" value="yes" required class="text-gold focus:ring-gold" />
-            <span class="text-sm text-ink-muted">Yes, I am an accredited investor / Có, tôi là nhà đầu tư đủ điều kiện</span>
+            <span class="text-sm text-ink-muted">Có, tôi là nhà đầu tư đủ điều kiện</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer">
             <input type="radio" name="accredited" value="no" class="text-gold focus:ring-gold" />
-            <span class="text-sm text-ink-muted">No / Không</span>
+            <span class="text-sm text-ink-muted">Không</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer">
             <input type="radio" name="accredited" value="unsure" class="text-gold focus:ring-gold" />
-            <span class="text-sm text-ink-muted">Not sure / Không chắc</span>
+            <span class="text-sm text-ink-muted">Không chắc</span>
           </label>
         </div>
       </div>
 
       <div>
-        <label for="range" class="block text-sm font-semibold text-ink mb-1">Investment range / Phạm vi đầu tư <span class="text-gold">*</span></label>
+        <label for="range" class="block text-sm font-semibold text-ink mb-1">Phạm vi đầu tư <span class="text-gold">*</span></label>
         <select id="range" name="range" required class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink focus:border-gold focus:outline-none transition-colors">
-          <option value="">— Select / Chọn —</option>
+          <option value="">— Chọn —</option>
           <option value="25-50">$25K – $50K</option>
           <option value="50-100">$50K – $100K</option>
           <option value="100-250">$100K – $250K</option>
           <option value="250+">$250K+</option>
-          <option value="exploring">Just exploring / Đang tìm hiểu</option>
+          <option value="exploring">Đang tìm hiểu</option>
         </select>
       </div>
 
       <div>
-        <label for="notes" class="block text-sm font-semibold text-ink mb-1">Notes (optional) / Ghi chú (tùy chọn)</label>
-        <textarea id="notes" name="notes" rows="3" class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="Any questions or context..."></textarea>
+        <label for="notes" class="block text-sm font-semibold text-ink mb-1">Ghi chú (tùy chọn)</label>
+        <textarea id="notes" name="notes" rows="3" class="w-full bg-bg border border-bg-border rounded-lg px-4 py-2.5 text-ink placeholder-ink-dim focus:border-gold focus:outline-none transition-colors" placeholder="Câu hỏi hoặc ngữ cảnh..."></textarea>
       </div>
 
       <button type="submit" class="w-full py-3 text-base font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
@@ -82,7 +79,6 @@ import Disclosure from '../components/Disclosure.astro';
       </button>
     </form>
 
-    <!-- Thank you message (hidden by default) -->
     <div id="thank-you" class="hidden mt-10 bg-bg-card border border-gold/30 rounded-xl p-8 text-center border-gold-glow">
       <div class="text-4xl mb-4">✓</div>
       <h2 class="text-2xl font-serif font-bold text-ink">Cảm ơn bạn</h2>
@@ -92,7 +88,7 @@ import Disclosure from '../components/Disclosure.astro';
       <a href="/" class="inline-block mt-6 text-gold hover:text-gold-light text-sm">← Về trang chủ</a>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 
   <script>

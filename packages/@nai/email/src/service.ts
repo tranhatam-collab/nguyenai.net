@@ -5,8 +5,10 @@
  */
 
 import type { EmailClient, EmailAddress, EmailTemplateId, TemplateContext, EmailMessage, EmailSendResult } from './types';
-import { ResendClient, MockEmailClient } from './client';
+import { MailIaiOneClient, ResendClient, MockEmailClient } from './client';
 import { renderTemplate } from './templates';
+
+export type EmailProvider = 'mail_iai_one' | 'resend';
 
 export interface EmailServiceOptions {
   apiKey?: string;
@@ -15,6 +17,13 @@ export interface EmailServiceOptions {
   client?: EmailClient;
   /** If true, use MockEmailClient (no real sends) */
   mock?: boolean;
+  /** mail.iai.one API URL override (for testing) */
+  mailApiUrl?: string;
+  /**
+   * Which real provider to use when apiKey is set.
+   * Default: mail_iai_one. Use `resend` only as temporary fallback.
+   */
+  provider?: EmailProvider;
 }
 
 export class EmailService {
@@ -30,11 +39,18 @@ export class EmailService {
       this.client = opts.client;
     } else if (opts.mock || !opts.apiKey) {
       this.client = new MockEmailClient();
-    } else {
+    } else if (opts.provider === 'resend') {
       this.client = new ResendClient({
         apiKey: opts.apiKey,
         defaultFrom: opts.from,
         defaultReplyTo: opts.replyTo,
+      });
+    } else {
+      this.client = new MailIaiOneClient({
+        apiKey: opts.apiKey,
+        defaultFrom: opts.from,
+        defaultReplyTo: opts.replyTo,
+        apiUrl: opts.mailApiUrl,
       });
     }
   }
@@ -87,10 +103,15 @@ export class EmailService {
 /**
  * Factory: create EmailService from environment (Workers or Node.js).
  *
- * In Workers: pass env.RESEND_API_KEY
- * In dev/test: omit apiKey → MockEmailClient is used.
+ * Primary: MAIL_IAI_ONE_API_KEY → mail.iai.one
+ * Temporary fallback: RESEND_API_KEY → ResendClient (only when MAIL key absent)
+ * Dev: omit both → MockEmailClient
  */
-export function createEmailService(env: { RESEND_API_KEY?: string; ENVIRONMENT?: string }): EmailService {
+export function createEmailService(env: {
+  MAIL_IAI_ONE_API_KEY?: string;
+  RESEND_API_KEY?: string;
+  ENVIRONMENT?: string;
+}): EmailService {
   const from: EmailAddress = {
     email: 'hello@nguyenai.net',
     name: 'Nguyen AI',
@@ -100,10 +121,17 @@ export function createEmailService(env: { RESEND_API_KEY?: string; ENVIRONMENT?:
     name: 'Nguyen AI Support',
   };
 
+  const mailKey = env.MAIL_IAI_ONE_API_KEY;
+  const resendKey = env.RESEND_API_KEY;
+  const useMail = Boolean(mailKey);
+  const apiKey = mailKey ?? resendKey;
+  const provider: EmailProvider = useMail ? 'mail_iai_one' : 'resend';
+
   return new EmailService({
-    apiKey: env.RESEND_API_KEY,
+    apiKey,
     from,
     replyTo,
-    mock: !env.RESEND_API_KEY || env.ENVIRONMENT === 'development',
+    provider,
+    mock: !apiKey || env.ENVIRONMENT === 'development',
   });
 }

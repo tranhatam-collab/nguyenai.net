@@ -26,6 +26,7 @@ import { cors } from 'hono/cors';
 import {
   SESSION_COOKIE_NAME,
   buildClearCookieHeader,
+  parseSessionCookieValue,
   type Session,
   type Role,
 } from '@nai/auth';
@@ -39,6 +40,8 @@ import {
   setAuditStore,
 } from '@nai/audit';
 import { D1AuditStore } from './d1-audit-store';
+import { D1EntitlementStore } from './d1-entitlement-store';
+import { D1ApprovalStore } from './d1-approval-store';
 
 import {
   resolveEntitlements,
@@ -159,6 +162,8 @@ interface AppEnv {
     // Never committed. In production (ENVIRONMENT !== 'development') the
     // evidence signing helper throws if this is missing.
     EVIDENCE_SIGNING_KEY?: string;
+    /** Same AUTH_SECRET as auth worker — verify signed session cookies. */
+    AUTH_SECRET?: string;
     // Phase 3 — LLM provider mode: 'gen1' | 'mock'
     LLM_PROVIDER_MODE?: string;
     // P1-4: KV namespace for durable rate limiting across Worker instances.
@@ -213,22 +218,21 @@ app.use('*', async (c, next) => {
 
 // ============================================================
 // Initialize stores
-// Audit: D1-backed (persistent) — R2 fix
-// Entitlement: InMemory for custom records (plan-based comes from static catalog)
-// Approval: InMemory (will move to D1 in next sprint)
+// Audit / Entitlement / Approval: D1 when DB bound, else InMemory
 // ============================================================
 
 let storesInitialized = false;
 function initStores(env: AppEnv['Bindings']): void {
   if (storesInitialized) return;
-  // Use D1 audit store for persistence (R2 fix)
   if (env.DB) {
     setAuditStore(new D1AuditStore(env.DB));
+    setEntitlementStore(new D1EntitlementStore(env.DB));
+    setApprovalStore(new D1ApprovalStore(env.DB));
   } else {
     setAuditStore(new InMemoryAuditStore());
+    setEntitlementStore(new InMemoryEntitlementStore());
+    setApprovalStore(new InMemoryApprovalStore());
   }
-  setEntitlementStore(new InMemoryEntitlementStore());
-  setApprovalStore(new InMemoryApprovalStore());
 
   // Phase 3 — initialize LLM platform (prism)
   // Load model registry from product-catalog models.json (bundled at build time)
@@ -247,7 +251,7 @@ function initStores(env: AppEnv['Bindings']): void {
       googleApiKey: env.GOOGLE_AI_API_KEY,
     });
     if (!hasDirect) {
-      // No direct keys — try Gen1 adapter only if legacy bridge is enabled
+      // No keys at all — try Gen1 adapter only if legacy bridge is enabled
       const legacyEnabled = env.LEGACY_BRIDGE_ENABLED === 'true';
       if (legacyEnabled && env.GEN1_GATEWAY_URL) {
         configureGen1Adapter({
@@ -272,7 +276,10 @@ app.use('/v1/*', async (c, next) => {
   initStores(c.env);
   const cookie = c.req.header('Cookie') ?? '';
   const sessionCookie = parseCookie(cookie, SESSION_COOKIE_NAME);
-  c.set('session', sessionCookie ? await resolveSessionFromCookie(sessionCookie, c.env) : null);
+  const sessionId = sessionCookie
+    ? await parseSessionCookieValue(sessionCookie, c.env.AUTH_SECRET)
+    : null;
+  c.set('session', sessionId ? await resolveSessionFromCookie(sessionId, c.env) : null);
   await next();
 });
 

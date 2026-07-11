@@ -1,103 +1,68 @@
 #!/usr/bin/env bash
-# Go-live status checker
-# Checks which items from FOUNDER_GO_LIVE_CHECKLIST.md are completed
+# Go-live status checker — uses qa-loop as source of truth for automated gates
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-62d57eaa548617aeecac766e5a1cb98e}"
 
 echo "=== Nguyen AI Go-Live Status Check ==="
 echo "Date: $(date -u +%Y-%m-%d)"
 echo ""
 
-# 1. Code quality checks
-echo "1. Code Quality Checks"
-echo "   Typecheck..."
-if pnpm typecheck > /dev/null 2>&1; then
-  echo "   ✅ Typecheck PASS"
+echo "1. Automated QA Loop (typecheck → build → audit:all → seo-build → test)"
+if bash tools/qa-loop.sh > /tmp/go-live-qa-loop.log 2>&1; then
+  echo "   ✅ QA Loop ALL GREEN"
+  rg "SUMMARY:" -A 8 /tmp/go-live-qa-loop.log | sed 's/^/   /'
 else
-  echo "   ❌ Typecheck FAIL"
-fi
-
-echo "   Build..."
-if pnpm build > /dev/null 2>&1; then
-  echo "   ✅ Build PASS"
-else
-  echo "   ❌ Build FAIL"
-fi
-
-echo "   Tests..."
-if pnpm test > /dev/null 2>&1; then
-  echo "   ✅ Tests PASS"
-else
-  echo "   ❌ Tests FAIL"
+  echo "   ❌ QA Loop HAS FAILURES"
+  rg "SUMMARY:" -A 8 /tmp/go-live-qa-loop.log | sed 's/^/   /' || tail -20 /tmp/go-live-qa-loop.log | sed 's/^/   /'
+  exit 1
 fi
 
 echo ""
-
-# 2. Audit checks
-echo "2. Audit Checks"
-echo "   Brand naming lock..."
-if bash tools/audit-brand-naming-lock.sh > /dev/null 2>&1; then
-  echo "   ✅ Brand naming lock PASS"
+echo "2. Session auth regression"
+if npx tsx tools/session-auth-regression.ts > /dev/null 2>&1; then
+  echo "   ✅ session-auth regression PASS"
 else
-  echo "   ❌ Brand naming lock FAIL"
-fi
-
-echo "   Accessibility..."
-if bash tools/audit-accessibility.sh > /dev/null 2>&1; then
-  echo "   ✅ Accessibility PASS"
-else
-  echo "   ❌ Accessibility FAIL"
-fi
-
-echo "   Clone contamination..."
-if bash tools/audit-clone-contamination.sh > /dev/null 2>&1; then
-  echo "   ✅ Clone contamination PASS"
-else
-  echo "   ❌ Clone contamination FAIL"
+  echo "   ❌ session-auth regression FAIL"
+  exit 1
 fi
 
 echo ""
+echo "3. Production smoke (HTTP)"
+if bash tools/production-smoke.sh > /tmp/go-live-smoke.log 2>&1; then
+  echo "   ✅ Production smoke PASS"
+else
+  echo "   ⚠️  Production smoke partial/fail"
+fi
+sed 's/^/   /' /tmp/go-live-smoke.log | head -12
 
-# 3. External services (manual check)
-echo "3. External Services (Manual Check Required)"
-echo "   ⚠️  Neon PostgreSQL — Founder must provision"
-echo "   ⚠️  Google OAuth — Founder must setup"
-echo "   ⚠️  Stripe — Founder must setup"
-echo "   ⚠️  Resend — Founder must setup"
-echo "   ⚠️  Cloudflare secrets — Founder must set"
+echo ""
+echo "4. Wrangler secrets (Founder — set via tools/set-wrangler-secrets.sh + OAuth/Stripe/Resend)"
+if command -v wrangler >/dev/null 2>&1; then
+  API_SECRETS=$(cd apps/api && wrangler secret list 2>/dev/null | rg -c '"name"' || echo "0")
+  AUTH_SECRETS=$(cd apps/auth && wrangler secret list 2>/dev/null | rg -c '"name"' || echo "0")
+  echo "   API worker secrets count: $API_SECRETS"
+  echo "   Auth worker secrets count: $AUTH_SECRETS"
+else
+  echo "   ⚠️  wrangler not available"
+fi
+
+echo ""
+echo "5. Deployment (account 62d57eaa548617aeecac766e5a1cb98e)"
+echo "   pnpm deploy:all — web, edu, console, invest, api, auth"
 echo ""
 
-# 4. Deployment status
-echo "4. Deployment Status"
-echo "   ⚠️  Web (nguyenai.net) — Deploy via CI/CD or manual"
-echo "   ⚠️  Edu (edu.nguyenai.net) — Deploy via CI/CD or manual"
-echo "   ⚠️  Console (app.nguyenai.net) — Deploy via CI/CD or manual"
-echo "   ⚠️  Invest (invest.nguyenai.net) — DO NOT DEPLOY (legal entity + IP ownership pending)"
-echo "   ⚠️  API (api.nguyenai.net) — Deploy via CI/CD or manual"
-echo "   ⚠️  Auth (auth.nguyenai.net) — Deploy via CI/CD or manual"
-echo ""
-
-# 5. Governance status
-echo "5. Governance Status"
-echo "   ⚠️  Sprint 0 governance lock — OPEN (needs Founder lock)"
+echo "6. Governance"
+echo "   ⚠️  Sprint 0 governance lock — OPEN"
+echo "   ⚠️  Production release — NOT APPROVED until Founder sign-off"
 echo ""
 
 echo "=== Summary ==="
-echo "Code quality: ✅ Automated checks passing"
-echo "Audits: ✅ All audits passing"
-echo "External services: ⚠️  Founder manual setup required"
-echo "Deployment: ⚠️  Founder manual deploy or CI/CD trigger"
-echo "Governance: ⚠️  Sprint 0 lock OPEN"
-echo ""
-echo "Next steps:"
-echo "1. Founder provisions external services (Neon, Google OAuth, Stripe, Resend)"
-echo "2. Founder sets Cloudflare secrets"
-echo "3. Founder locks Sprint 0 governance"
-echo "4. Run: pnpm db:migrate (after DATABASE_URL set)"
-echo "5. Deploy via CI/CD (push to main) or manual wrangler deploy"
-echo "6. Verify end-to-end on production"
+echo "Repo automated gates: see qa-loop above"
+echo "Production: run pnpm audit:production-smoke"
 echo ""
 echo "See: docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md"
+echo "Evidence: docs/governance/QA_AUDIT_EVIDENCE_2026-07-10.md"

@@ -4,35 +4,32 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout
-  title="Scholarship Sponsors"
+  title="Nhà tài trợ học bổng"
   titleVi="Nhà tài trợ học bổng"
   description="Danh sách nhà tài trợ quỹ học bổng Nguyen AI Academy."
 >
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Scholarship sponsors information">
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Thông tin nhà tài trợ học bổng">
     <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Nhà tài trợ</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Scholarship Sponsors</p>
 
     <div class="mt-10 bg-bg-card border border-gold/20 rounded-xl p-8 text-center">
       <div class="text-5xl mb-4">🤝</div>
       <h2 class="text-xl font-serif font-bold text-ink mb-2">Chưa có nhà tài trợ</h2>
       <p class="text-ink-muted text-sm">
         Danh sách nhà tài trợ sẽ được công bố khi quỹ học bổng chính thức ra mắt.
-        <span class="block mt-1" lang="vi">Sponsor list will be published when the scholarship fund officially launches.</span>
       </p>
       <a href="/scholarship/fund" class="inline-block mt-6 px-6 py-2.5 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
         Trở thành nhà tài trợ đầu tiên →
       </a>
     </div>
 
-    <!-- Sponsorship packages -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gói tài trợ / Sponsorship Packages</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gói tài trợ</h2>
       <div class="space-y-3">
         {[
           { tier: '1 học viên', vnd: '8.000.000₫', desc: '1 suất học bổng toàn phần' },
-          { tier: '1 nhóm 11 người', vnd: '88.000.000₫', desc: '1 nhóm trong 1 program' },
+          { tier: '1 nhóm 11 người', vnd: '88.000.000₫', desc: '1 nhóm trong 1 chương trình' },
           { tier: '1 cohort 30 người', vnd: '240.000.000₫', desc: '1 cohort hoàn chỉnh' },
-          { tier: '1 chương trình/năm', vnd: '720.000.000₫', desc: '1 program trọn năm (90 suất)' },
+          { tier: '1 chương trình/năm', vnd: '720.000.000₫', desc: '1 chương trình trọn năm (90 suất)' },
           { tier: 'Đối tác 1.000 học bổng', vnd: 'Theo thỏa thuận', desc: 'Đối tác chiến lược toàn hệ sinh thái' },
         ].map((t) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-4 flex items-center justify-between">
@@ -46,6 +43,6 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

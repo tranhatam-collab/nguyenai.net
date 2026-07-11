@@ -31,7 +31,7 @@ const policy = id ? policyMap[id] : null;
   description={policy?.title || 'Policy not found'}
   activeNav="scholarship"
 >
-  <section class="academy-container py-8 max-w-3xl">
+  <section class="academy-container py-8 max-w-3xl" aria-label="Scholarship policy">
     {policy ? (
       <>
         <a href="/scholarship/policies" class="text-blue-600 text-sm mb-4 inline-block">← Tất cả chính sách</a>

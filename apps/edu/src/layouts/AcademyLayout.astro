@@ -17,26 +17,56 @@ const {
   ogImage = '/og-default.png',
 } = Astro.props;
 
-// EDU-P0-1: derive locale from URL path so EN pages get lang="en".
 const pathname = Astro.url.pathname;
 const isEn = locale ? locale === 'en' : pathname.startsWith('/en');
 
-// EDU-P0-2: compute VI and EN paths without double-prefixing /en.
-// viPath strips the /en prefix; enPath prepends /en to the VI path.
 const viPath = isEn ? pathname.replace(/^\/en\/?/, '/') : pathname;
 const enPath = isEn ? pathname : `/en${pathname === '/' ? '/' : pathname}`;
 const canonicalPath = isEn ? pathname : viPath;
 
-// EDU-P0-4: locale-aware defaults. VI pages get Vietnamese title/description,
-// EN pages get English. Pages can still override via props.
-const siteName = 'Nguyen AI Academy';
-const defaultTitle = isEn ? 'Nguyen AI Academy' : 'Nguyễn AI Academy';
+const siteName = isEn ? 'Nguyen AI Academy' : 'Nguyễn AI Academy';
+const defaultTitle = siteName;
 const defaultDescription = isEn
   ? 'Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more.'
   : 'Học AI miễn phí cho người đăng ký Nguyễn AI — 10 track học tập, chứng chỉ xác minh và hơn thế nữa.';
 const finalTitle = title ?? defaultTitle;
 const finalDescription = description ?? defaultDescription;
-const fullTitle = finalTitle === siteName ? finalTitle : `${finalTitle} — ${siteName}`;
+// Avoid duplicating site name when title already is the site name or contains it
+const fullTitle =
+  finalTitle === siteName || finalTitle.includes(siteName) || finalTitle.includes('Nguyen AI Academy') || finalTitle.includes('Nguyễn AI Academy')
+    ? finalTitle
+    : `${finalTitle} — ${siteName}`;
+
+const prefix = isEn ? '/en' : '';
+const t = {
+  skip: isEn ? 'Skip to content' : 'Bỏ qua đến nội dung',
+  home: isEn ? 'Home' : 'Trang chủ',
+  tracks: isEn ? 'Tracks' : 'Lộ trình',
+  programs: isEn ? 'Programs' : 'Chương trình',
+  scholarship: isEn ? 'Scholarship' : 'Học bổng',
+  certification: isEn ? 'Certification' : 'Chứng chỉ',
+  about: isEn ? 'About' : 'Giới thiệu',
+  verify: isEn ? 'Verify certificate' : 'Xác minh chứng chỉ',
+  login: isEn ? 'Sign in' : 'Đăng nhập',
+  progress: isEn ? '0 / 10 tracks' : '0 / 10 lộ trình',
+  // avoid English "tracks" token on VI chrome
+  tracksWord: isEn ? 'tracks' : 'lộ trình',
+  menu: isEn ? 'Toggle menu' : 'Mở menu',
+  switchLabel: isEn ? 'Tiếng Việt' : 'English',
+  footerBlurb: isEn
+    ? 'Free AI learning for all Nguyen AI subscribers. 10 learning tracks, verified certificates, and the global Nguyen community.'
+    : 'Học AI miễn phí cho mọi người đăng ký Nguyễn AI. 10 lộ trình học tập, chứng chỉ xác minh và cộng đồng Nguyễn toàn cầu.',
+  footerAcademy: isEn ? 'Academy' : 'Academy',
+  allTracks: isEn ? 'All tracks' : 'Tất cả lộ trình',
+  verifyShort: isEn ? 'Verify' : 'Xác minh',
+  console: isEn ? 'AI Computer Console' : 'Bảng điều khiển Máy Tính AI',
+  privacyNote: isEn
+    ? 'Living-person data is private by default.'
+    : 'Dữ liệu người đang sống luôn riêng tư theo mặc định.',
+  copyright: isEn
+    ? `© ${new Date().getFullYear()} Nguyen AI. Academy at edu.nguyenai.net.`
+    : `© ${new Date().getFullYear()} Nguyễn AI. Academy tại edu.nguyenai.net.`,
+};
 
 const SITE = 'https://edu.nguyenai.net';
 ---
@@ -55,13 +85,11 @@ const SITE = 'https://edu.nguyenai.net';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" />
     <meta name="theme-color" content="#7A2212" />
     <link rel="canonical" href={`${SITE}${canonicalPath}`} />
-    <!-- EDU-P0-2/3: reciprocal hreflang + x-default points to Vietnamese root -->
     <link rel="alternate" hreflang="vi" href={`${SITE}${viPath}`} />
     <link rel="alternate" hreflang="en" href={`${SITE}${enPath}`} />
     <link rel="alternate" hreflang="x-default" href={`${SITE}${viPath}`} />
     <link rel="sitemap" href="/sitemap.xml" />
 
-    <!-- Open Graph (EDU fix: use content= not href=, add og:image + og:locale) -->
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={finalDescription} />
     <meta property="og:site_name" content={siteName} />
@@ -78,109 +106,42 @@ const SITE = 'https://edu.nguyenai.net';
     <title>{fullTitle}</title>
   </head>
   <body>
-    <!-- Skip to content link (WCAG 2.4.1) -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-academy-accent focus:text-white focus:rounded">Bỏ qua đến nội dung</a>
-    <!-- Header — V3.0 brand: heritage-dark background, white text, gold hover -->
-    <header class="sticky top-0 z-50 bg-academy-header border-b border-white/12" style="backdrop-filter: blur(16px);">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-academy-accent focus:text-white focus:rounded">{t.skip}</a>
+    <header class="sticky top-0 z-50 bg-academy-header border-b border-white/20" style="backdrop-filter: blur(16px);">
       <div class="academy-container">
-        <nav class="flex items-center justify-between h-16" aria-label="Main navigation">
-          <!-- Logo — Arch of Light (monochrome white for dark header) -->
-          <a href="/" class="flex items-center gap-2 no-underline text-white">
+        <nav class="flex items-center justify-between h-16" aria-label={isEn ? 'Main navigation' : 'Điều hướng chính'}>
+          <a href={isEn ? '/en/' : '/'} class="flex items-center gap-2 no-underline text-white">
             <img src="/logo-mark-mono-white.svg" alt="" width="32" height="32" />
             <span class="font-bold text-base">
-              Nguyen AI <span class="text-academy-gold">Academy</span>
+              {isEn ? 'Nguyen AI' : 'Nguyễn AI'} <span class="text-academy-gold">Academy</span>
             </span>
           </a>
 
-          <!-- Desktop nav -->
           <div class="hidden md:flex items-center gap-1">
-            <a
-              href="/"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'home'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Trang chủ
-            </a>
-            <a
-              href="/tracks"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'tracks'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Tracks
-            </a>
-            <a
-              href="/programs"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'programs'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Programs
-            </a>
-            <a
-              href="/scholarship"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'scholarship'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Học bổng
-            </a>
-            <a
-              href="/certification"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'certification'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Chứng chỉ
-            </a>
-            <a
-              href="/about"
-              class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${
-                activeNav === 'about'
-                  ? 'text-academy-gold'
-                  : 'text-white/82 hover:text-academy-gold'
-              }`}
-            >
-              Giới thiệu
-            </a>
+            <a href={isEn ? '/en/' : '/'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'home' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.home}</a>
+            <a href={`${prefix}/tracks`} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'tracks' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.tracks}</a>
+            <a href="/programs" class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'programs' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.programs}</a>
+            <a href={isEn ? '/en/scholarship' : '/scholarship'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'scholarship' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.scholarship}</a>
+            <a href={isEn ? '/en/certification' : '/certification'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'certification' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.certification}</a>
+            <a href={isEn ? '/en/about' : '/about'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'about' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.about}</a>
           </div>
 
-          <!-- Right side: progress + login + language switcher -->
           <div class="flex items-center gap-3">
-            <!-- Progress indicator (placeholder) -->
-            <div class="hidden sm:flex items-center gap-2 text-xs text-white/65">
+            <div class="hidden sm:flex items-center gap-2 text-xs text-white/70">
               <span class="w-2 h-2 rounded-full bg-academy-gold"></span>
-              <span>0 / 10 tracks</span>
+              <span>{t.progress}</span>
             </div>
 
-            <!-- Language switcher -->
-            {(() => {
-              const path = Astro.url.pathname;
-              const isEn = path.startsWith('/en');
-              const switchHref = isEn ? path.replace('/en', '') || '/' : '/en' + path;
-              return <a href={switchHref} class="px-3 py-1.5 rounded-md text-sm font-medium text-white/82 hover:text-academy-gold no-underline">{isEn ? 'Tiếng Việt' : 'English'}</a>;
-            })()}
+            <a href={isEn ? (viPath || '/') : enPath} class="px-3 py-1.5 rounded-md text-sm font-medium text-white hover:text-academy-gold no-underline">{t.switchLabel}</a>
 
-            <a href="/login" class="academy-btn academy-btn-primary text-sm">
-              Đăng nhập
-            </a>
+            <a href="/login" class="academy-btn academy-btn-primary text-sm">{t.login}</a>
 
-            <!-- Mobile menu toggle -->
             <button
+              type="button"
               id="menu-toggle"
-              class="md:hidden p-2 rounded-md text-white hover:bg-white/10"
-              aria-label="Toggle menu"
+              class="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 p-2 rounded-md text-academy-gold border border-academy-gold/50 bg-academy-gold/10 hover:bg-academy-gold/20"
+              aria-label={t.menu}
+              aria-controls="mobile-menu"
               aria-expanded="false"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -192,73 +153,59 @@ const SITE = 'https://edu.nguyenai.net';
           </div>
         </nav>
 
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/12">
+        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/20">
           <div class="flex flex-col gap-1 pt-3">
-            <a href="/" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Trang chủ</a>
-            <a href="/tracks" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Tracks</a>
-            <a href="/certification" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Chứng chỉ</a>
-            <a href="/about" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Giới thiệu</a>
-            <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-white/82 hover:bg-white/10 no-underline">Xác minh chứng chỉ</a>
+            <a href={isEn ? '/en/' : '/'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.home}</a>
+            <a href={`${prefix}/tracks`} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.tracks}</a>
+            <a href={isEn ? '/en/scholarship' : '/scholarship'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.scholarship}</a>
+            <a href={isEn ? '/en/certification' : '/certification'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.certification}</a>
+            <a href={isEn ? '/en/about' : '/about'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.about}</a>
+            <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.verify}</a>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Main content -->
     <main id="main-content" class="min-h-[calc(100vh-8rem)]">
       <slot />
     </main>
 
-    <!-- Footer — V3.0 brand: heritage-dark background, white text -->
-    <footer class="bg-academy-header border-t border-white/12 mt-16">
+    <footer class="bg-academy-header border-t border-white/20 mt-16">
       <div class="academy-container py-10">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <!-- Brand -->
           <div class="md:col-span-2">
             <div class="flex items-center gap-2 mb-3">
               <img src="/logo-mark-mono-white.svg" alt="" width="28" height="28" />
               <span class="font-bold text-white">
-                Nguyen AI <span class="text-academy-gold">Academy</span>
+                {isEn ? 'Nguyen AI' : 'Nguyễn AI'} <span class="text-academy-gold">Academy</span>
               </span>
             </div>
-            <p class="text-sm text-white/70 max-w-md">
-              Học AI miễn phí cho mọi người đăng ký Nguyễn AI. 10 track học tập, chứng chỉ xác minh và cộng đồng Nguyễn toàn cầu.
-            </p>
-            <p class="text-xs text-white/55 mt-3">
-              Free AI learning for all Nguyen AI subscribers.
-            </p>
+            <p class="text-sm text-white/70 max-w-md">{t.footerBlurb}</p>
           </div>
 
-          <!-- Links -->
           <div>
-            <h4 class="text-sm font-semibold text-academy-gold mb-3">Academy</h4>
+            <h4 class="text-sm font-semibold text-academy-gold mb-3">{t.footerAcademy}</h4>
             <ul class="space-y-2 text-sm">
-              <li><a href="/tracks" class="text-white/78 hover:text-academy-gold no-underline">Tất cả Tracks</a></li>
-              <li><a href="/certification" class="text-white/78 hover:text-academy-gold no-underline">Chứng chỉ</a></li>
-              <li><a href="/verify" class="text-white/78 hover:text-academy-gold no-underline">Xác minh</a></li>
-              <li><a href="/about" class="text-white/78 hover:text-academy-gold no-underline">Giới thiệu</a></li>
+              <li><a href={`${prefix}/tracks`} class="text-white/80 hover:text-academy-gold no-underline">{t.allTracks}</a></li>
+              <li><a href={isEn ? '/en/certification' : '/certification'} class="text-white/80 hover:text-academy-gold no-underline">{t.certification}</a></li>
+              <li><a href="/verify" class="text-white/80 hover:text-academy-gold no-underline">{t.verifyShort}</a></li>
+              <li><a href={isEn ? '/en/about' : '/about'} class="text-white/80 hover:text-academy-gold no-underline">{t.about}</a></li>
             </ul>
           </div>
 
-          <!-- External -->
           <div>
-            <h4 class="text-sm font-semibold text-academy-gold mb-3">Nguyen AI</h4>
+            <h4 class="text-sm font-semibold text-academy-gold mb-3">{isEn ? 'Nguyen AI' : 'Nguyễn AI'}</h4>
             <ul class="space-y-2 text-sm">
-              <li><a href="https://nguyenai.net" class="text-white/78 hover:text-academy-gold no-underline">nguyenai.net</a></li>
-              <li><a href="https://app.nguyenai.net" class="text-white/78 hover:text-academy-gold no-underline">AI Computer Console</a></li>
-              <li><a href="/login" class="text-white/78 hover:text-academy-gold no-underline">Đăng nhập</a></li>
+              <li><a href="https://nguyenai.net" class="text-white/80 hover:text-academy-gold no-underline">nguyenai.net</a></li>
+              <li><a href="https://app.nguyenai.net" class="text-white/80 hover:text-academy-gold no-underline">{t.console}</a></li>
+              <li><a href="/login" class="text-white/80 hover:text-academy-gold no-underline">{t.login}</a></li>
             </ul>
           </div>
         </div>
 
-        <div class="border-t border-white/12 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p class="text-xs text-white/55">
-            © {new Date().getFullYear()} Nguyen AI. Academy at edu.nguyenai.net.
-          </p>
-          <p class="text-xs text-academy-muted">
-            Dữ liệu người đang sống luôn riêng tư theo mặc định.
-          </p>
+        <div class="border-t border-white/20 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p class="text-xs text-white/60">{t.copyright}</p>
+          <p class="text-xs text-academy-muted">{t.privacyNote}</p>
         </div>
       </div>
     </footer>
@@ -273,9 +220,5 @@ const SITE = 'https://edu.nguyenai.net';
         });
       }
     </script>
-  </body>
-</html>
-  </body>
-</html>
   </body>
 </html>

@@ -7,7 +7,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
   description="Xem trạng thái đơn đăng ký học bổng, tin nhắn, tài liệu và timeline quyết định."
   activeNav="scholarship"
 >
-  <section class="academy-container py-8 max-w-4xl">
+  <section class="academy-container py-8 max-w-4xl" aria-label="Scholarship room">
     <h1 class="text-3xl font-bold mb-2">Scholarship Room</h1>
     <p class="text-gray-600 mb-8">Trạng thái đơn, tin nhắn, tài liệu bổ sung và timeline quyết định.</p>
 
@@ -29,7 +29,7 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 
     <!-- Tabs -->
     <div class="border-b mb-6">
-      <nav class="flex gap-4">
+      <nav class="flex gap-4" aria-label="Scholarship room tabs">
         <button class="tab-btn active py-2 px-4 border-b-2 border-heritage" data-tab="timeline">Timeline</button>
         <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="messages">Tin nhắn</button>
         <button class="tab-btn py-2 px-4 border-b-2 border-transparent" data-tab="documents">Tài liệu</button>

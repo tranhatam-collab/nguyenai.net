@@ -39,6 +39,7 @@ import {
 } from './session-auth';
 import {
   InMemoryScholarshipStore,
+  D1ScholarshipStore,
   setScholarshipStore,
   createApplication,
   updateApplication,
@@ -79,6 +80,9 @@ import {
 export interface ScholarshipEnv {
   Bindings: {
     DB?: D1Database;
+    /** Primary — mail.iai.one (Founder directive: sole email provider) */
+    MAIL_IAI_ONE_API_KEY?: string;
+    /** @deprecated */
     RESEND_API_KEY?: string;
   };
   Variables: {
@@ -90,14 +94,22 @@ let scholarshipStoreInitialized = false;
 
 function initScholarshipStore(env: ScholarshipEnv['Bindings']): void {
   if (scholarshipStoreInitialized) return;
-  setScholarshipStore(new InMemoryScholarshipStore());
-  // Initialize email service (mock in dev, real when RESEND_API_KEY is set)
+  if (env.DB) {
+    setScholarshipStore(new D1ScholarshipStore(env.DB as never));
+  } else {
+    setScholarshipStore(new InMemoryScholarshipStore());
+  }
+  // Initialize email service (mock in dev; mail.iai.one primary, Resend temporary fallback)
   if (!getEmailService()) {
+    const mailKey = env.MAIL_IAI_ONE_API_KEY;
+    const resendKey = env.RESEND_API_KEY;
+    const apiKey = mailKey ?? resendKey;
     setEmailService(new EmailService({
-      apiKey: env.RESEND_API_KEY,
+      apiKey,
       from: { email: 'scholarship@nguyenai.net', name: 'Nguyen AI Scholarship' },
       replyTo: { email: 'hello@nguyenai.net', name: 'Nguyen AI' },
-      mock: !env.RESEND_API_KEY,
+      provider: mailKey ? 'mail_iai_one' : 'resend',
+      mock: !apiKey,
     }) as unknown as Parameters<typeof setEmailService>[0]);
   }
   scholarshipStoreInitialized = true;

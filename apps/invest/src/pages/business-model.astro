@@ -7,86 +7,76 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Business Model"
   titleVi="Mô hình kinh doanh"
-  description="Nguyen AI Computer business model: 8 subscription plans from free to enterprise, with multiple revenue streams and strong unit economics."
+  description="Mô hình kinh doanh Máy Tính AI Nguyễn: 8 gói đăng ký từ miễn phí đến doanh nghiệp, nhiều dòng doanh thu và kinh tế đơn vị giả thuyết."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Business model overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Business Model</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Mô hình kinh doanh</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan mô hình kinh doanh">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Mô hình kinh doanh</h1>
 
     <p class="mt-6 text-lg text-ink-muted max-w-3xl">
-      Subscription-based SaaS with eight tiers — from free entry to enterprise custom contracts. Multiple revenue streams create diversification.
-      <span class="block mt-2" lang="vi">SaaS đăng ký với tám gói — từ miễn phí đến doanh nghiệp tùy chỉnh. Nhiều dòng doanh thu tạo đa dạng hóa.</span>
+      SaaS đăng ký với tám gói — từ miễn phí đến doanh nghiệp tùy chỉnh. Nhiều dòng doanh thu tạo đa dạng hóa.
     </p>
 
-    <!-- Pricing table -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">8 Plans (V2 Pricing)</h2>
-      <p class="text-gold mb-6" lang="vi">8 gói (giá V2)</p>
-      <PricingTable />
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">8 gói (giá V2)</h2>
+      <PricingTable locale="vi" />
     </div>
 
-    <!-- Revenue streams -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Revenue Streams</h2>
-      <p class="text-gold mb-6" lang="vi">Dòng doanh thu</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Dòng doanh thu</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { name: 'Subscriptions', vi: 'Đăng ký', desc: '8-tier monthly recurring revenue' },
-          { name: 'Enterprise contracts', vi: 'Hợp đồng doanh nghiệp', desc: 'Custom pricing, annual, SLA' },
-          { name: 'Academy certification', vi: 'Chứng nhận Academy', desc: 'Paid certification programs' },
-          { name: 'Chapter licensing', vi: 'Cấp phép hội đồng', desc: 'Nguyen Chapter OS licensing' },
-          { name: 'API & platform fees', vi: 'Phí API & nền tảng', desc: 'Developer access, integrations' },
-          { name: 'Premium data vault', vi: 'Kho dữ liệu cao cấp', desc: 'Additional storage and compute' },
+          { name: 'Đăng ký', desc: 'Doanh thu định kỳ hàng tháng 8 bậc' },
+          { name: 'Hợp đồng doanh nghiệp', desc: 'Giá tùy chỉnh, theo năm, SLA' },
+          { name: 'Chứng nhận Academy', desc: 'Chương trình chứng nhận trả phí' },
+          { name: 'Cấp phép hội đồng', desc: 'Cấp phép Nguyen Chapter OS' },
+          { name: 'Phí API &amp; nền tảng', desc: 'Truy cập developer, tích hợp' },
+          { name: 'Kho dữ liệu cao cấp', desc: 'Lưu trữ và tính toán bổ sung' },
         ].map((stream) => (
           <div class="bg-bg-card border border-bg-border rounded-lg p-5 card-hover">
             <h3 class="font-semibold text-ink">{stream.name}</h3>
-            <p class="text-xs text-ink-dim" lang="vi">{stream.vi}</p>
             <p class="text-sm text-ink-muted mt-2">{stream.desc}</p>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- Unit economics -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Unit Economics (Hypothesis)</h2>
-      <p class="text-gold mb-6" lang="vi">Kinh tế đơn vị (giả thuyết)</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Kinh tế đơn vị (giả thuyết)</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <table class="w-full text-sm">
           <tbody class="divide-y divide-bg-border">
             <tr>
-              <td class="py-3 text-ink-muted">Starting price (Personal)</td>
-              <td class="py-3 text-right font-semibold text-gold">299K VND/mo (~$12/mo)</td>
+              <td class="py-3 text-ink-muted">Giá khởi điểm (Personal)</td>
+              <td class="py-3 text-right font-semibold text-gold">299K VND/tháng (~$12/tháng)</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink-muted">Mid-tier (Founder)</td>
-              <td class="py-3 text-right font-semibold text-gold">1.999M VND/mo (~$80/mo)</td>
+              <td class="py-3 text-ink-muted">Bậc giữa (Founder)</td>
+              <td class="py-3 text-right font-semibold text-gold">1.999M VND/tháng (~$80/tháng)</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink-muted">Top-tier (Chapter)</td>
-              <td class="py-3 text-right font-semibold text-gold">7.999M VND/mo (~$320/mo)</td>
+              <td class="py-3 text-ink-muted">Bậc cao (Chapter)</td>
+              <td class="py-3 text-right font-semibold text-gold">7.999M VND/tháng (~$320/tháng)</td>
             </tr>
             <tr>
               <td class="py-3 text-ink-muted">Enterprise</td>
-              <td class="py-3 text-right font-semibold text-gold">Custom (annual contract)</td>
+              <td class="py-3 text-right font-semibold text-gold">Tùy chỉnh (hợp đồng năm)</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink-muted">Primary market</td>
-              <td class="py-3 text-right text-ink">Vietnam + global Vietnamese diaspora</td>
+              <td class="py-3 text-ink-muted">Thị trường chính</td>
+              <td class="py-3 text-right text-ink">Việt Nam + kiều bào Việt toàn cầu</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink-muted">Gross margin (target)</td>
-              <td class="py-3 text-right font-semibold text-gold">70%+ (SaaS, cloud infrastructure)</td>
+              <td class="py-3 text-ink-muted">Biên gộp (mục tiêu)</td>
+              <td class="py-3 text-right font-semibold text-gold">70%+ (SaaS, hạ tầng đám mây)</td>
             </tr>
           </tbody>
         </table>
         <p class="mt-4 text-xs text-ink-dim italic">
-          Note: Unit economics are hypotheses based on comparable SaaS benchmarks, not verified financials.
-          <span class="block" lang="vi">Lưu ý: Kinh tế đơn vị là giả thuyết dựa trên chuẩn SaaS, không phải số liệu đã xác minh.</span>
+          Lưu ý: Kinh tế đơn vị là giả thuyết dựa trên chuẩn SaaS, không phải số liệu đã xác minh.
         </p>
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

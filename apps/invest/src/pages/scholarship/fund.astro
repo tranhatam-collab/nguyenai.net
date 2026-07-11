@@ -4,21 +4,19 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout
-  title="Scholarship Fund — Tài trợ"
+  title="Quỹ học bổng — Tài trợ"
   titleVi="Quỹ học bổng — Tài trợ"
-  description="Tài trợ quỹ học bổng Nguyễn AI — 99 suất đầu, mục tiêu 1.000/năm. Gói: 1 học viên, 1 nhóm 11, 1 cohort 30, 1 program/năm, đối tác 1.000."
+  description="Tài trợ quỹ học bổng Nguyễn AI — 99 suất đầu, mục tiêu 1.000/năm. Gói: 1 học viên, 1 nhóm 11, 1 cohort 30, 1 chương trình/năm, đối tác 1.000."
 >
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Scholarship fund sponsorship information">
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Thông tin tài trợ quỹ học bổng">
     <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Scholarship Fund</span>
+      <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Quỹ học bổng</span>
     </div>
     <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Tài trợ Quỹ học bổng</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Sponsor the Scholarship Fund</p>
     <p class="mt-2 text-sm text-ink-dim italic">
-      Quỹ Học bổng Kỹ năng Tương lai Nguyễn AI / Nguyen AI Future Skills Scholarship Fund
+      Quỹ Học bổng Kỹ năng Tương lai Nguyễn AI
     </p>
 
-    <!-- Legal disclaimer -->
     <div class="mt-6 bg-bg-soft border border-bg-border rounded-xl p-4">
       <p class="text-xs text-ink-dim">
         Chương trình tài trợ học bổng do hệ sinh thái Nguyễn AI vận hành. Chưa phải quỹ xã hội hoặc quỹ từ thiện được cấp phép độc lập.
@@ -26,49 +24,42 @@ import Disclosure from '../../components/Disclosure.astro';
       </p>
     </div>
 
-    <!-- Fund overview -->
     <div class="mt-10 bg-bg-card border border-gold/20 rounded-xl p-8">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Tổng quan quỹ / Fund Overview</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Tổng quan quỹ</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div class="text-center">
           <div class="text-2xl font-serif font-bold text-gold">99</div>
           <div class="text-sm text-ink-muted">Suất khởi động</div>
-          <div class="text-xs text-ink-dim">Launch batch</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-serif font-bold text-gold">1.000</div>
           <div class="text-sm text-ink-muted">Mục tiêu/năm</div>
-          <div class="text-xs text-ink-dim">Target/year</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-serif font-bold text-gold">8tr₫</div>
           <div class="text-sm text-ink-muted">Giá trị/học bổng</div>
-          <div class="text-xs text-ink-dim">Per scholarship</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-serif font-bold text-gold">9</div>
-          <div class="text-sm text-ink-muted">Programs</div>
-          <div class="text-xs text-ink-dim">Certification tracks</div>
+          <div class="text-sm text-ink-muted">Chương trình chứng nhận</div>
         </div>
       </div>
     </div>
 
-    <!-- How it works -->
     <div class="mt-8">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Cách thức hoạt động / How It Works</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Cách thức hoạt động</h2>
       <div class="space-y-4">
         {[
-          { step: '1', title: 'Cam kết tài trợ', vi: 'Sponsor commits', desc: 'Sponsor chọn gói và cam kết số tiền. Ký thỏa thuận tài trợ.' },
-          { step: '2', title: 'Quỹ ring-fenced', vi: 'Quỹ riêng biệt', desc: 'Tiền tách riêng vào quỹ học bổng — không trộn lẫn vốn vận hành.' },
-          { step: '3', title: 'Phát học bổng', vi: 'Grant scholarships', desc: 'Học bổng được phát qua edu.nguyenai.net. Ưu tiên họ Nguyễn VN, tuổi 20–49.' },
-          { step: '4', title: 'Báo cáo tác động', vi: 'Impact report', desc: 'Báo cáo hàng năm: số học bổng, tỷ lệ hoàn thành, sản phẩm, stories.' },
-          { step: '5', title: 'Audit', vi: 'Kiểm toán', desc: 'Quỹ được audit độc lập. Sponsor nhận báo cáo tài chính chi tiết.' },
+          { step: '1', title: 'Cam kết tài trợ', desc: 'Nhà tài trợ chọn gói và cam kết số tiền. Ký thỏa thuận tài trợ.' },
+          { step: '2', title: 'Quỹ riêng biệt', desc: 'Tiền tách riêng vào quỹ học bổng — không trộn lẫn vốn vận hành.' },
+          { step: '3', title: 'Phát học bổng', desc: 'Học bổng được phát qua edu.nguyenai.net. Ưu tiên họ Nguyễn VN, tuổi 20–49.' },
+          { step: '4', title: 'Báo cáo tác động', desc: 'Báo cáo hàng năm: số học bổng, tỷ lệ hoàn thành, sản phẩm, câu chuyện.' },
+          { step: '5', title: 'Kiểm toán', desc: 'Quỹ được kiểm toán độc lập. Nhà tài trợ nhận báo cáo tài chính chi tiết.' },
         ].map((s) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-5 flex items-start gap-4">
             <div class="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center font-bold shrink-0">{s.step}</div>
             <div>
               <h3 class="font-semibold text-ink">{s.title}</h3>
-              <p class="text-xs text-gold" lang="vi">{s.vi}</p>
               <p class="text-sm text-ink-muted mt-1">{s.desc}</p>
             </div>
           </div>
@@ -76,16 +67,15 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <!-- Sponsor tiers -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gói tài trợ / Sponsorship Packages</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Gói tài trợ</h2>
       <div class="space-y-3">
         {[
           { tier: '1 học viên', vnd: '8.000.000₫', usd: '~$320', benefits: 'Tài trợ 1 suất học bổng toàn phần. Tên trong danh sách nhà tài trợ. Báo cáo tác động.', color: 'border-bg-border bg-bg-card' },
-          { tier: '1 nhóm 11 người', vnd: '88.000.000₫', usd: '~$3,520', benefits: 'Tài trợ 1 nhóm trong 1 program. Logo trên trang sponsors. Báo cáo riêng. Tham dự Demo Day.', color: 'border-gold/30 bg-gold/5' },
+          { tier: '1 nhóm 11 người', vnd: '88.000.000₫', usd: '~$3,520', benefits: 'Tài trợ 1 nhóm trong 1 chương trình. Logo trên trang nhà tài trợ. Báo cáo riêng. Tham dự Demo Day.', color: 'border-gold/30 bg-gold/5' },
           { tier: '1 cohort 30 người', vnd: '240.000.000₫', usd: '~$9,600', benefits: 'Tài trợ 1 cohort hoàn chỉnh. Logo nổi bật. Báo cáo riêng. Mentor đồng hành. Ưu tiên tuyển dụng.', color: 'border-purple-400/30 bg-purple-400/5' },
-          { tier: '1 chương trình/năm', vnd: '720.000.000₫', usd: '~$28,800', benefits: 'Tài trợ 1 program trọn năm (90 suất). Naming rights. Logo premium. Báo cáo chiến lược. Kết nối học viên.', color: 'border-cyan-400/30 bg-cyan-400/5' },
-          { tier: 'Đối tác 1.000 học bổng', vnd: 'Theo thỏa thuận', usd: 'Custom', benefits: 'Đối tác chiến lược toàn hệ sinh thái. Naming rights toàn quỹ. Seat trong hội đồng cố vấn.', color: 'border-amber-600/30 bg-amber-600/5' },
+          { tier: '1 chương trình/năm', vnd: '720.000.000₫', usd: '~$28,800', benefits: 'Tài trợ 1 chương trình trọn năm (90 suất). Naming rights. Logo premium. Báo cáo chiến lược. Kết nối học viên.', color: 'border-cyan-400/30 bg-cyan-400/5' },
+          { tier: 'Đối tác 1.000 học bổng', vnd: 'Theo thỏa thuận', usd: 'Tùy chỉnh', benefits: 'Đối tác chiến lược toàn hệ sinh thái. Naming rights toàn quỹ. Ghế trong hội đồng cố vấn.', color: 'border-amber-600/30 bg-amber-600/5' },
         ].map((t) => (
           <div class={`border rounded-xl p-5 ${t.color}`}>
             <div class="flex items-center justify-between">
@@ -103,7 +93,6 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <!-- Sponsor rights + restrictions -->
     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-bg-card border border-green-500/20 rounded-xl p-6">
         <h3 class="font-bold text-green-400 mb-3">Quyền lợi nhà tài trợ</h3>
@@ -130,39 +119,37 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <!-- Why sponsor -->
     <div class="mt-12 bg-bg-card border border-bg-border rounded-xl p-8">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Vì sao tài trợ? / Why Sponsor?</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Vì sao tài trợ?</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h3 class="font-semibold text-gold mb-2">Đầu tư nhân lực</h3>
           <ul class="space-y-2 text-sm text-ink-muted">
             <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Trao quyền AI cho người trưởng thành 20–49</li>
             <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Ưu tiên cộng đồng họ Nguyễn tại Việt Nam</li>
-            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Certificate verify được</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Chứng chỉ có thể xác minh</li>
             <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Sản phẩm thật, bằng chứng thật</li>
           </ul>
         </div>
         <div>
-          <h3 class="font-semibold text-gold mb-2">Brand & Talent</h3>
+          <h3 class="font-semibold text-gold mb-2">Thương hiệu &amp; nhân tài</h3>
           <ul class="space-y-2 text-sm text-ink-muted">
             <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Logo trên invest.nguyenai.net</li>
-            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Naming rights (program/năm)</li>
-            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> PR campaign 12 tháng</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Naming rights (chương trình/năm)</li>
+            <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Chiến dịch PR 12 tháng</li>
             <li class="flex items-start gap-2"><span class="text-gold mt-0.5">▸</span> Ưu tiên tuyển dụng học viên tốt nghiệp</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- CTA -->
     <div class="mt-12 text-center">
       <a href="/request-access" class="inline-block px-8 py-3 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
         Liên hệ tài trợ →
       </a>
-      <p class="mt-3 text-xs text-ink-dim">Sponsor agreement cần ký. Chi tiết liên hệ qua investor access.</p>
+      <p class="mt-3 text-xs text-ink-dim">Cần ký thỏa thuận tài trợ. Chi tiết qua yêu cầu truy cập nhà đầu tư.</p>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

@@ -4,45 +4,40 @@ import Disclosure from '../../components/Disclosure.astro';
 ---
 
 <InvestLayout
-  title="Scholarship Impact Report"
+  title="Báo cáo tác động học bổng"
   titleVi="Báo cáo tác động học bổng"
   description="Báo cáo tác động hàng năm của quỹ học bổng Nguyen AI Academy — 1.000 học bổng/năm."
 >
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Scholarship impact report information">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Impact Report</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Báo cáo tác động học bổng</p>
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Thông tin báo cáo tác động học bổng">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Báo cáo tác động</h1>
 
-    <!-- Placeholder -->
     <div class="mt-10 bg-bg-card border border-gold/20 rounded-xl p-12 text-center">
       <div class="text-5xl mb-4">📊</div>
-      <h2 class="text-xl font-serif font-bold text-ink mb-2">Báo cáo đầu tiên: Dec 2026</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-2">Báo cáo đầu tiên: tháng 12/2026</h2>
       <p class="text-ink-muted text-sm max-w-2xl mx-auto">
         Báo cáo tác động hàng năm đầu tiên sẽ được công bố vào tháng 12 năm 2026,
         sau khi hoàn thành 3 đợt phát học bổng (Tết, Hè, Cuối năm).
-        <span class="block mt-2" lang="vi">The first annual impact report will be published in December 2026, after completing all 3 scholarship batches.</span>
       </p>
     </div>
 
-    <!-- What will be reported -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Nội dung báo cáo / Report Contents</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Nội dung báo cáo</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { icon: '🎓', title: 'Scholarships granted', vi: 'Học bổng trao', desc: 'Tổng số, phân bổ theo nhóm, đợt, program' },
-          { icon: '✅', title: 'Completion rate', vi: 'Tỷ lệ hoàn thành', desc: 'Tỷ lệ hoàn thành 9 programs trong 12 tháng' },
-          { icon: '📜', title: 'Certificates issued', vi: 'Chứng chỉ cấp', desc: 'Số certificate verify được' },
-          { icon: '👥', title: 'Study groups', vi: 'Nhóm học', desc: 'Số nhóm 11 người hoạt động' },
-          { icon: '🤝', title: 'Mentors', vi: 'Mentor', desc: 'Số mentor tham gia' },
-          { icon: '💰', title: 'Fund utilization', vi: 'Sử dụng quỹ', desc: 'Chi tiết tài chính, audit' },
-          { icon: '📰', title: 'Media reach', vi: 'Tiếp cận truyền thông', desc: 'Impressions, press coverage' },
-          { icon: '💬', title: 'Scholar stories', vi: 'Câu chuyện học viên', desc: 'Testimonials, case studies' },
+          { icon: '🎓', title: 'Học bổng trao', desc: 'Tổng số, phân bổ theo nhóm, đợt, chương trình' },
+          { icon: '✅', title: 'Tỷ lệ hoàn thành', desc: 'Tỷ lệ hoàn thành 9 chương trình trong 12 tháng' },
+          { icon: '📜', title: 'Chứng chỉ cấp', desc: 'Số chứng chỉ có thể xác minh' },
+          { icon: '👥', title: 'Nhóm học', desc: 'Số nhóm 11 người hoạt động' },
+          { icon: '🤝', title: 'Mentor', desc: 'Số mentor tham gia' },
+          { icon: '💰', title: 'Sử dụng quỹ', desc: 'Chi tiết tài chính, kiểm toán' },
+          { icon: '📰', title: 'Tiếp cận truyền thông', desc: 'Lượt tiếp cận, báo chí' },
+          { icon: '💬', title: 'Câu chuyện học viên', desc: 'Lời chứng thực, case study' },
         ].map((r) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-5">
             <div class="flex items-start gap-3">
               <span class="text-2xl">{r.icon}</span>
               <div>
                 <h3 class="font-semibold text-ink text-sm">{r.title}</h3>
-                <p class="text-xs text-gold" lang="vi">{r.vi}</p>
                 <p class="text-sm text-ink-muted mt-1">{r.desc}</p>
               </div>
             </div>
@@ -51,27 +46,26 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <!-- Y1 targets -->
     <div class="mt-12">
-      <h2 class="text-xl font-serif font-bold text-ink mb-4">Mục tiêu Y1 / Year 1 Targets</h2>
+      <h2 class="text-xl font-serif font-bold text-ink mb-4">Mục tiêu năm 1</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-bg-border">
-              <th class="text-left py-2 text-ink-muted uppercase text-xs">Metric</th>
-              <th class="text-right py-2 text-ink-muted uppercase text-xs">Target</th>
-              <th class="text-right py-2 text-ink-muted uppercase text-xs">Actual</th>
+              <th class="text-left py-2 text-ink-muted uppercase text-xs">Chỉ số</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Mục tiêu</th>
+              <th class="text-right py-2 text-ink-muted uppercase text-xs">Thực tế</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-bg-border">
             {[
               { metric: 'Học bổng trao', target: '1.000', actual: '—' },
               { metric: 'Tỷ lệ hoàn thành', target: '>70%', actual: '—' },
-              { metric: 'Certificate verify', target: '>500', actual: '—' },
+              { metric: 'Chứng chỉ xác minh', target: '>500', actual: '—' },
               { metric: 'Mentor', target: '50', actual: '—' },
-              { metric: 'Sponsor', target: '10+', actual: '—' },
+              { metric: 'Nhà tài trợ', target: '10+', actual: '—' },
               { metric: 'Quỹ', target: '$400K', actual: '—' },
-              { metric: 'Media reach', target: '1M+', actual: '—' },
+              { metric: 'Tiếp cận truyền thông', target: '1M+', actual: '—' },
             ].map((m) => (
               <tr>
                 <td class="py-2 text-ink">{m.metric}</td>
@@ -84,6 +78,6 @@ import Disclosure from '../../components/Disclosure.astro';
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

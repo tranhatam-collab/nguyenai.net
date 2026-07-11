@@ -12,8 +12,8 @@ const SELECTED_KEY = 'nguyenai:selected-model';
 const DEFAULT_KEY = 'nguyenai:default-model';
 
 const CAPABILITY_COLORS: Record<string, string> = {
-  reasoning: 'bg-blue-500/15 text-blue-300',
-  vision: 'bg-purple-500/15 text-purple-300',
+  reasoning: 'bg-blue-500/20 text-blue-300',
+  vision: 'bg-purple-500/20 text-purple-300',
   code: 'bg-emerald-500/15 text-emerald-300',
   fast: 'bg-amber-500/15 text-amber-300',
   'long-context': 'bg-cyan-500/15 text-cyan-300',

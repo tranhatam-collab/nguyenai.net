@@ -6,107 +6,93 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Governance"
   titleVi="Quản trị"
-  description="Nguyen AI Computer governance: cap table placeholder, board structure, IP ownership (HoldCo model), and decision rights."
+  description="Quản trị Máy Tính AI Nguyễn: bảng cổ phần mẫu, cấu trúc hội đồng, sở hữu IP (HoldCo), và quyền quyết định."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Governance overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Governance</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Quản trị</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan quản trị">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Quản trị</h1>
 
-    <!-- Cap table placeholder -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Cap Table</h2>
-      <p class="text-gold mb-6" lang="vi">Bảng cơ cấu cổ phần</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Bảng cơ cấu cổ phần</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <div class="flex items-center gap-3 mb-4">
-          <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Placeholder</span>
-          <span class="text-xs text-ink-dim" lang="vi">Dữ liệu mẫu — chưa công bố</span>
+          <span class="px-3 py-1 text-xs font-semibold text-gold border border-gold/30 rounded-full">Dữ liệu mẫu</span>
+          <span class="text-xs text-ink-dim">Chưa công bố</span>
         </div>
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-bg-border">
-              <th class="text-left py-3 text-ink-muted uppercase text-xs">Stakeholder / Cổ đông</th>
-              <th class="text-right py-3 text-ink-muted uppercase text-xs">Pre-money</th>
-              <th class="text-right py-3 text-ink-muted uppercase text-xs">Post-money</th>
+              <th class="text-left py-3 text-ink-muted uppercase text-xs">Cổ đông</th>
+              <th class="text-right py-3 text-ink-muted uppercase text-xs">Trước vòng</th>
+              <th class="text-right py-3 text-ink-muted uppercase text-xs">Sau vòng</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-bg-border">
             <tr>
-              <td class="py-3 text-ink">Founder(s) / Nhà sáng lập</td>
+              <td class="py-3 text-ink">Nhà sáng lập</td>
               <td class="py-3 text-right text-gold">100%</td>
-              <td class="py-3 text-right text-gold">85.71%</td>
+              <td class="py-3 text-right text-gold">85,71%</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink">Seed investors / Nhà đầu tư</td>
+              <td class="py-3 text-ink">Nhà đầu tư seed</td>
               <td class="py-3 text-right text-ink-muted">0%</td>
-              <td class="py-3 text-right text-gold">14.29%</td>
+              <td class="py-3 text-right text-gold">14,29%</td>
             </tr>
             <tr>
-              <td class="py-3 text-ink">Option pool / Cổ phần dự phòng</td>
+              <td class="py-3 text-ink">Cổ phần dự phòng (option pool)</td>
               <td class="py-3 text-right text-ink-muted">TBD</td>
               <td class="py-3 text-right text-ink-muted">TBD</td>
             </tr>
           </tbody>
         </table>
         <p class="mt-4 text-xs text-ink-dim italic">
-          Detailed cap table available in the private data room for qualified investors. No real cap table data in public HTML.
-          <span class="block" lang="vi">Bảng cơ cấu chi tiết có trong data room riêng tư. Không có dữ liệu thật trong HTML công khai.</span>
+          Bảng cơ cấu chi tiết có trong data room riêng tư. Không có dữ liệu thật trong HTML công khai.
         </p>
       </div>
     </div>
 
-    <!-- Board structure -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Board Structure</h2>
-      <p class="text-gold mb-6" lang="vi">Cấu trúc hội đồng</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Cấu trúc hội đồng</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { role: 'Founder seat', vi: 'Ghế nhà sáng lập', desc: 'CEO/Founder' },
-          { role: 'Investor seat(s)', vi: 'Ghế nhà đầu tư', desc: 'To be determined with seed round' },
-          { role: 'Independent seat', vi: 'Ghế độc lập', desc: 'To be appointed' },
+          { role: 'Ghế nhà sáng lập', desc: 'CEO / Nhà sáng lập' },
+          { role: 'Ghế nhà đầu tư', desc: 'Sẽ xác định theo vòng seed' },
+          { role: 'Ghế độc lập', desc: 'Sẽ bổ nhiệm' },
         ].map((b) => (
           <div class="bg-bg-card border border-bg-border rounded-lg p-5 card-hover">
             <h3 class="font-semibold text-ink">{b.role}</h3>
-            <p class="text-xs text-ink-dim" lang="vi">{b.vi}</p>
             <p class="text-sm text-ink-muted mt-2">{b.desc}</p>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- IP ownership (HoldCo) -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">IP Ownership — HoldCo Model</h2>
-      <p class="text-gold mb-6" lang="vi">Sở hữu IP — mô hình HoldCo</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Sở hữu IP — mô hình HoldCo</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <p class="text-sm text-ink-muted">
-          Intellectual property is held by a Holding Company (HoldCo), which licenses IP to operating entities. This structure separates IP ownership from operational risk and enables flexible entity structuring across jurisdictions.
-          <span class="block mt-2" lang="vi">Sở hữu trí tuệ được nắm bởi công ty holding (HoldCo), cấp phép IP cho các thực thể vận hành. Cấu trúc này tách sở hữu IP khỏi rủi ro vận hành.</span>
+          Sở hữu trí tuệ được nắm bởi công ty holding (HoldCo), cấp phép IP cho các thực thể vận hành. Cấu trúc này tách sở hữu IP khỏi rủi ro vận hành.
         </p>
         <div class="mt-4 p-4 bg-bg-soft rounded-lg border border-bg-border">
           <p class="text-xs text-ink-dim italic">
-            IP ownership transfer is pending. No IP has been formally transferred to any entity yet. This is a known risk (see Risk Register).
-            <span class="block mt-1" lang="vi">Việc chuyển nhượng IP đang hoàn thiện. Chưa có IP nào được chuyển nhượng chính thức. Đây là rủi ro đã biết.</span>
+            Việc chuyển nhượng IP đang hoàn thiện. Chưa có IP nào được chuyển nhượng chính thức. Đây là rủi ro đã biết (xem Sổ rủi ro).
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Decision rights -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Decision Rights</h2>
-      <p class="text-gold mb-6" lang="vi">Quyền quyết định</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Quyền quyết định</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <ul class="space-y-3">
           {[
-            { level: 'Founder/CEO', vi: 'Nhà sáng lập/CEO', rights: 'Day-to-day operations, product, hiring, strategy' },
-            { level: 'Board', vi: 'Hội đồng', rights: 'Major financing, IP transfer, entity formation, key hires' },
-            { level: 'Investors', vi: 'Nhà đầu tư', rights: 'Information rights, protective provisions per term sheet' },
+            { level: 'Nhà sáng lập / CEO', rights: 'Vận hành hàng ngày, sản phẩm, tuyển dụng, chiến lược' },
+            { level: 'Hội đồng', rights: 'Tài chính lớn, chuyển nhượng IP, thành lập thực thể, tuyển dụng then chốt' },
+            { level: 'Nhà đầu tư', rights: 'Quyền thông tin, điều khoản bảo vệ theo term sheet' },
           ].map((d) => (
             <li class="flex items-start gap-3">
               <span class="text-gold mt-1">▸</span>
               <div>
                 <span class="font-semibold text-ink">{d.level}</span>
-                <span class="text-ink-dim text-xs ml-2" lang="vi">{d.vi}</span>
                 <p class="text-sm text-ink-muted">{d.rights}</p>
               </div>
             </li>
@@ -115,6 +101,6 @@ import Disclosure from '../components/Disclosure.astro';
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

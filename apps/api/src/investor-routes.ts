@@ -44,8 +44,8 @@ import {
 } from '@nai/investor-verify';
 import { logAuditEvent } from '@nai/audit';
 import {
+  getApiSession,
   requireAdminSession,
-  requireAuthSession,
   type ApiSession,
 } from './session-auth';
 
@@ -66,7 +66,11 @@ export const investorRoutes = new Hono<InvestorEnv>();
 // ============================================================
 
 function requireAuth(c: any): ApiSession | Response {
-  return requireAuthSession(c);
+  const session = getApiSession(c);
+  if (!session) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+  return session;
 }
 
 function requireAdmin(c: any): ApiSession | Response {

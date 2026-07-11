@@ -1,11 +1,11 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "nai-api",
+  "name": "nguyenai-api-gateway",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    "ENVIRONMENT": "development",
+    "ENVIRONMENT": "production",
     "AUTH_ISSUER": "auth.nguyenai.net",
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
@@ -20,18 +20,18 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "nai-identity",
-      "database_id": "5d0f4d21-ecfd-444b-8196-590bcab642bf",
-      "migrations_dir": "../../migrations"
+      "database_name": "nguyenai-identity",
+      "database_id": "704f85cb-0fa2-4d56-8659-cda65cc4d4e4",
+      "migrations_dir": "../../migrations/d1"
     }
   ],
   "r2_buckets": [
     { "binding": "AUDIT_ARCHIVE", "bucket_name": "nai-audit-archive" }
   ],
   "kv_namespaces": [
-    { "binding": "RATE_LIMIT", "id": "ea7823e56b0a44b9b41a6bb2c49dc95f" }
-  ],
-  "no_bundle": true
-  // RESEND_API_KEY is set via `wrangler secret put RESEND_API_KEY` (not in vars for security)
-  // Email sending uses Resend API directly via @nai/email package
+    // RATE_LIMIT on Anhhatam production (62d57) — NOT the f3f9 namespace
+    { "binding": "RATE_LIMIT", "id": "2e76b2d12593426ca912aabde39311b9" }
+  ]
+  // MAIL_IAI_ONE_API_KEY via `wrangler secret put MAIL_IAI_ONE_API_KEY` (primary)
+  // RESEND_API_KEY deprecated fallback only
 }

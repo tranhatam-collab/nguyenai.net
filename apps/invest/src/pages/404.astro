@@ -4,25 +4,23 @@ import Disclosure from '../components/Disclosure.astro';
 ---
 
 <InvestLayout title="404 — Not Found" titleVi="404 — Không tìm thấy" noindex={true}>
-  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center" aria-label="Không tìm thấy trang">
     <div class="text-8xl font-serif font-bold text-gold-gradient">404</div>
-    <h1 class="mt-6 text-2xl font-serif font-bold text-ink">Page not found</h1>
-    <p class="mt-2 text-lg text-ink-muted" lang="vi">Không tìm thấy trang</p>
+    <h1 class="mt-6 text-2xl font-serif font-bold text-ink">Không tìm thấy trang</h1>
 
     <p class="mt-6 text-ink-muted">
-      The page you're looking for doesn't exist or has been moved.
-      <span class="block mt-1" lang="vi">Trang bạn tìm không tồn tại hoặc đã được chuyển.</span>
+      Trang bạn tìm không tồn tại hoặc đã được chuyển.
     </p>
 
     <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
       <a href="/" class="px-6 py-3 text-sm font-semibold text-bg bg-gold hover:bg-gold-light rounded-lg transition-colors">
-        ← Back to home / Về trang chủ
+        ← Về trang chủ
       </a>
       <a href="/request-access" class="px-6 py-3 text-sm font-semibold text-gold border border-gold/30 rounded-lg hover:bg-gold/10 transition-colors">
-        Request investor access / Yêu cầu truy cập
+        Yêu cầu truy cập nhà đầu tư
       </a>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>

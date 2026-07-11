@@ -4,9 +4,12 @@
  */
 
 import { writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { routes, site } from '../apps/web/src/data/site.ts';
 
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+const publicDir = join(repoRoot, 'apps/web/public');
 const base = site.url;
 
 function urlEntry(viPath: string, enPath: string): string {
@@ -27,7 +30,6 @@ const enEntries = routes
 const header = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`;
 const footer = '\n</urlset>\n';
 
-const publicDir = join(process.cwd(), 'apps/web/public');
 writeFileSync(join(publicDir, 'sitemap-vi.xml'), `${header}${viEntries}${footer}`);
 writeFileSync(join(publicDir, 'sitemap-en.xml'), `${header}${enEntries}${footer}`);
 writeFileSync(

@@ -1,17 +1,86 @@
 ---
 /**
- * PricingTable.astro — 8-plan pricing table (V2 pricing).
- * Plans: Start, Personal, Family, Creator, Founder, Business, Chapter, Enterprise
+ * PricingTable.astro — 8-plan pricing table (V2). Single-locale.
  */
+interface Props {
+  locale?: 'vi' | 'en';
+}
+const { locale = 'vi' } = Astro.props;
+const isVi = locale === 'vi';
+
 const plans = [
-  { name: 'Nguyen Start', vi: 'Nguyễn Start', price: 'Free', priceVi: 'Miễn phí', period: '', target: 'New users', targetVi: 'Người dùng mới', features: ['Core AI Computer', '1 Agent', 'Community access'] },
-  { name: 'Nguyen Personal', vi: 'Nguyễn Personal', price: '299K', priceVi: '299K', period: '/mo', target: 'Individuals', targetVi: 'Cá nhân', features: ['5 Agents', 'AI Office', 'Memory vault'] },
-  { name: 'Nguyen Family', vi: 'Nguyễn Family', price: '599K', priceVi: '599K', period: '/mo', target: 'Families', targetVi: 'Gia đình', features: ['Family tree', 'Shared vault', 'Nguyen Roots'] },
-  { name: 'Nguyen Creator', vi: 'Nguyễn Creator', price: '999K', priceVi: '999K', period: '/mo', target: 'Content creators', targetVi: 'Nhà sáng tạo', features: ['AI Content', 'AI Media', 'Publishing tools'] },
-  { name: 'Nguyen Founder', vi: 'Nguyễn Founder', price: '1.999M', priceVi: '1.999M', period: '/mo', target: 'Founders', targetVi: 'Nhà sáng lập', features: ['Founder OS', 'AI Finance', 'AI Legal'] },
-  { name: 'Nguyen Business', vi: 'Nguyễn Business', price: '4.999M', priceVi: '4.999M', period: '/mo', target: 'SMBs', targetVi: 'Doanh nghiệp nhỏ', features: ['Business OS', 'AI Sales', 'Team seats'] },
-  { name: 'Nguyen Chapter', vi: 'Nguyễn Chapter', price: '7.999M', priceVi: '7.999M', period: '/mo', target: 'Nguyen chapters', targetVi: 'Hội đồng Nguyễn', features: ['Chapter OS', 'Network tools', 'Events'] },
-  { name: 'Nguyen Enterprise', vi: 'Nguyễn Enterprise', price: 'Custom', priceVi: 'Tùy chỉnh', period: '', target: 'Large orgs', targetVi: 'Tổ chức lớn', features: ['Dedicated instance', 'Custom Agents', 'SLA'] },
+  {
+    name: 'Nguyen Start',
+    price: isVi ? 'Miễn phí' : 'Free',
+    period: '',
+    target: isVi ? 'Người dùng mới' : 'New users',
+    features: isVi
+      ? ['Máy Tính AI cốt lõi', '1 Agent', 'Truy cập cộng đồng']
+      : ['Core AI Computer', '1 Agent', 'Community access'],
+  },
+  {
+    name: 'Nguyen Personal',
+    price: '299K',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Cá nhân' : 'Individuals',
+    features: isVi
+      ? ['5 Agent', 'AI Office', 'Kho nhớ']
+      : ['5 Agents', 'AI Office', 'Memory vault'],
+  },
+  {
+    name: 'Nguyen Family',
+    price: '599K',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Gia đình' : 'Families',
+    features: isVi
+      ? ['Cây gia đình', 'Kho dùng chung', 'Nguyen Roots']
+      : ['Family tree', 'Shared vault', 'Nguyen Roots'],
+  },
+  {
+    name: 'Nguyen Creator',
+    price: '999K',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Nhà sáng tạo' : 'Content creators',
+    features: isVi
+      ? ['AI Content', 'AI Media', 'Công cụ xuất bản']
+      : ['AI Content', 'AI Media', 'Publishing tools'],
+  },
+  {
+    name: 'Nguyen Founder',
+    price: '1.999M',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Nhà sáng lập' : 'Founders',
+    features: isVi
+      ? ['Founder OS', 'AI Finance', 'AI Legal']
+      : ['Founder OS', 'AI Finance', 'AI Legal'],
+  },
+  {
+    name: 'Nguyen Business',
+    price: '4.999M',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Doanh nghiệp nhỏ' : 'SMBs',
+    features: isVi
+      ? ['Business OS', 'AI Sales', 'Ghế đội ngũ']
+      : ['Business OS', 'AI Sales', 'Team seats'],
+  },
+  {
+    name: 'Nguyen Chapter',
+    price: '7.999M',
+    period: isVi ? '/tháng' : '/mo',
+    target: isVi ? 'Hội đồng Nguyễn' : 'Nguyen chapters',
+    features: isVi
+      ? ['Chapter OS', 'Công cụ mạng lưới', 'Sự kiện']
+      : ['Chapter OS', 'Network tools', 'Events'],
+  },
+  {
+    name: 'Nguyen Enterprise',
+    price: isVi ? 'Tùy chỉnh' : 'Custom',
+    period: '',
+    target: isVi ? 'Tổ chức lớn' : 'Large orgs',
+    features: isVi
+      ? ['Instance riêng', 'Agent tùy chỉnh', 'SLA']
+      : ['Dedicated instance', 'Custom Agents', 'SLA'],
+  },
 ];
 ---
 
@@ -19,10 +88,18 @@ const plans = [
   <table class="w-full text-sm border-collapse">
     <thead>
       <tr class="border-b border-bg-border">
-        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">Plan / Gói</th>
-        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">Price / Giá</th>
-        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">Target / Đối tượng</th>
-        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">Key features / Tính năng</th>
+        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">
+          {isVi ? 'Gói' : 'Plan'}
+        </th>
+        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">
+          {isVi ? 'Giá' : 'Price'}
+        </th>
+        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">
+          {isVi ? 'Đối tượng' : 'Target'}
+        </th>
+        <th class="text-left py-3 px-4 text-ink-muted font-semibold uppercase text-xs tracking-wide">
+          {isVi ? 'Tính năng chính' : 'Key features'}
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -30,17 +107,12 @@ const plans = [
         <tr class="border-b border-bg-border/50 hover:bg-bg-soft/50 transition-colors">
           <td class="py-4 px-4">
             <div class="font-semibold text-ink">{plan.name}</div>
-            <div class="text-xs text-ink-dim" lang="vi">{plan.vi}</div>
           </td>
           <td class="py-4 px-4">
             <span class="text-gold font-bold text-base">{plan.price}</span>
             {plan.period && <span class="text-ink-muted text-xs">{plan.period}</span>}
-            <div class="text-xs text-ink-dim" lang="vi">{plan.priceVi}{plan.period}</div>
           </td>
-          <td class="py-4 px-4 text-ink-muted">
-            {plan.target}
-            <div class="text-xs text-ink-dim" lang="vi">{plan.targetVi}</div>
-          </td>
+          <td class="py-4 px-4 text-ink-muted">{plan.target}</td>
           <td class="py-4 px-4">
             <ul class="space-y-1">
               {plan.features.map((f) => (

@@ -99,7 +99,11 @@ export interface ApiKey {
 // Password hashing — PBKDF2 via Web Crypto API (Workers-compatible)
 // ============================================================
 
-const PBKDF2_ITERATIONS = 600_000; // OWASP 2026: ≥600K for PBKDF2-SHA256
+// Cloudflare Workers WebCrypto hard-caps PBKDF2 at 100_000 iterations.
+// OWASP 2026 prefers ≥600K for PBKDF2-SHA256 — not attainable on Workers today.
+// Format is self-describing (`pbkdf2:iters:salt:hash`) so verifyPassword still
+// accepts legacy hashes if the platform limit is raised later.
+const PBKDF2_ITERATIONS = 100_000;
 const SALT_LENGTH = 16;
 const KEY_LENGTH = 32;
 
@@ -226,6 +230,60 @@ export function buildClearCookieHeader(name: string, opts: Partial<CookieOptions
     'Max-Age=0',
   ];
   return parts.join('; ');
+}
+
+// ============================================================
+// Session cookie signing — AUTH_SECRET (HMAC-SHA256)
+// Cookie value: <session_id>.<base64url(hmac)>
+// Legacy unsigned UUID still accepted when secret is set (migration).
+// ============================================================
+
+async function hmacSha256(secret: string, message: string): Promise<Uint8Array> {
+  const key = await getCrypto().subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await getCrypto().subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return new Uint8Array(sig);
+}
+
+/** Sign opaque session_id for Set-Cookie. Requires AUTH_SECRET. */
+export async function signSessionCookieValue(sessionId: string, secret: string): Promise<string> {
+  if (!secret) throw new Error('AUTH_SECRET is required to sign session cookies');
+  const sig = await hmacSha256(secret, sessionId);
+  return `${sessionId}.${toBase64Url(sig)}`;
+}
+
+/**
+ * Extract session_id from cookie value.
+ * - Signed: verifies HMAC with AUTH_SECRET
+ * - Legacy unsigned UUID: accepted (migration window)
+ */
+export async function parseSessionCookieValue(
+  value: string,
+  secret: string | undefined,
+): Promise<string | null> {
+  if (!value) return null;
+  const dot = value.indexOf('.');
+  if (dot === -1) {
+    // Legacy opaque session id (UUID)
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) {
+      return value;
+    }
+    return null;
+  }
+  if (!secret) return null;
+  const sessionId = value.slice(0, dot);
+  const provided = value.slice(dot + 1);
+  if (!sessionId || !provided) return null;
+  const expected = toBase64Url(await hmacSha256(secret, sessionId));
+  const a = new TextEncoder().encode(provided);
+  const b = new TextEncoder().encode(expected);
+  if (!constantTimeEqual(a, b)) return null;
+  return sessionId;
 }
 
 // ============================================================

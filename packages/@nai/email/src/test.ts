@@ -10,7 +10,7 @@
  * - Text version contains key info
  */
 
-import { TEMPLATES, renderTemplate, listTemplates, MockEmailClient, EmailService, AUDIT_EVENT_TO_TEMPLATE } from './index';
+import { TEMPLATES, renderTemplate, listTemplates, MockEmailClient, EmailService, AUDIT_EVENT_TO_TEMPLATE, createEmailService, ResendClient, MailIaiOneClient } from './index';
 import type { EmailTemplateId, TemplateContext } from './types';
 
 function assert(cond: boolean, msg: string): void {
@@ -135,7 +135,6 @@ assert(categories.has('security'), 'should have security category');
 console.log(`✓ Test 6: All 8 categories present`);
 
 // Test 7: createEmailService without API key uses MockEmailClient
-import { createEmailService } from './service';
 const devService = createEmailService({ ENVIRONMENT: 'development' });
 assert(devService.getClient() instanceof MockEmailClient, 'dev service should use MockEmailClient');
 console.log(`✓ Test 7: Dev service uses MockEmailClient`);
@@ -182,6 +181,19 @@ assert(html.includes('Nguyen AI'), 'html should contain brand name');
 assert(html.includes('nguyenai.net'), 'html should contain domain');
 assert(html.includes('Do not reply') || html.includes('automated'), 'html should mention automated');
 console.log(`✓ Test 10: HTML email has proper structure`);
+
+// Test 11: Resend temporary fallback selects ResendClient (not MailIaiOne)
+const resendFallback = createEmailService({ RESEND_API_KEY: 're_test_only', ENVIRONMENT: 'production' });
+assert(resendFallback.getClient() instanceof ResendClient, 'RESEND-only should use ResendClient');
+const mailPrimary = createEmailService({
+  MAIL_IAI_ONE_API_KEY: 'mail_test',
+  RESEND_API_KEY: 're_ignored',
+  ENVIRONMENT: 'production',
+});
+assert(mailPrimary.getClient() instanceof MailIaiOneClient, 'MAIL key should prefer MailIaiOneClient');
+const neither = createEmailService({ ENVIRONMENT: 'production' });
+assert(neither.getClient() instanceof MockEmailClient, 'no keys → MockEmailClient');
+console.log(`✓ Test 11: Resend temporary fallback + mail primary selection`);
 
 console.log(`\n=== ALL EMAIL TESTS PASSED ===`);
 console.log(`Templates: ${TEMPLATE_IDS.length}`);

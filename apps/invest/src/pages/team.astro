@@ -6,81 +6,72 @@ import Disclosure from '../components/Disclosure.astro';
 <InvestLayout
   title="Team"
   titleVi="Đội ngũ"
-  description="Nguyen AI Computer team: founder bio, advisor placeholders, and hiring plan."
+  description="Đội ngũ Máy Tính AI Nguyễn: nhà sáng lập, cố vấn (chưa công bố), và kế hoạch tuyển dụng."
 >
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Team overview">
-    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Team</h1>
-    <p class="mt-2 text-xl text-ink-muted" lang="vi">Đội ngũ</p>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" aria-label="Tổng quan đội ngũ">
+    <h1 class="text-3xl md:text-5xl font-serif font-bold text-gold-gradient">Đội ngũ</h1>
 
-    <!-- Founder -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Founder</h2>
-      <p class="text-gold mb-6" lang="vi">Nhà sáng lập</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Nhà sáng lập</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-8 card-hover">
         <div class="flex items-start gap-6">
           <div class="w-20 h-20 rounded-full bg-bg-soft border-2 border-gold/40 flex items-center justify-center shrink-0">
             <span class="text-3xl font-serif font-bold text-gold">N</span>
           </div>
           <div>
-            <h3 class="text-xl font-bold text-ink">Founder & CEO</h3>
-            <p class="text-sm text-gold" lang="vi">Nhà sáng lập & CEO</p>
+            <h3 class="text-xl font-bold text-ink">Nhà sáng lập &amp; CEO</h3>
             <p class="text-sm text-ink-muted mt-3">
-              <em>Detailed founder bio to be added upon legal entity formation and disclosure review.</em>
-              <span class="block mt-1" lang="vi"><em>Tiểu sử chi tiết sẽ được thêm sau khi thành lập thực thể pháp lý và xem xét công bố.</em></span>
+              <em>Tiểu sử chi tiết sẽ được thêm sau khi thành lập thực thể pháp lý và xem xét công bố.</em>
             </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Advisors -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Advisors</h2>
-      <p class="text-gold mb-6" lang="vi">Cố vấn</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Cố vấn</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {['Technical Advisor', 'Legal & IP Advisor', 'Go-to-Market Advisor'].map((role) => (
+        {[
+          'Cố vấn kỹ thuật',
+          'Cố vấn pháp lý & IP',
+          'Cố vấn go-to-market',
+        ].map((role) => (
           <div class="bg-bg-card border border-bg-border rounded-xl p-6 card-hover">
             <div class="w-16 h-16 rounded-full bg-bg-soft border border-bg-border flex items-center justify-center mb-4">
               <span class="text-ink-dim text-xl">?</span>
             </div>
             <h3 class="font-semibold text-ink">{role}</h3>
-            <p class="text-xs text-ink-dim mt-1" lang="vi">Chưa công bố</p>
-            <p class="text-sm text-ink-muted mt-2"><em>To be announced.</em></p>
+            <p class="text-sm text-ink-muted mt-2"><em>Chưa công bố.</em></p>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- Hiring plan -->
     <div class="mt-12">
-      <h2 class="text-2xl font-serif font-bold text-ink mb-2">Hiring Plan</h2>
-      <p class="text-gold mb-6" lang="vi">Kế hoạch tuyển dụng</p>
+      <h2 class="text-2xl font-serif font-bold text-ink mb-6">Kế hoạch tuyển dụng</h2>
       <div class="bg-bg-card border border-bg-border rounded-xl p-6">
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-bg-border">
-              <th class="text-left py-3 text-ink-muted uppercase text-xs">Role / Vai trò</th>
-              <th class="text-left py-3 text-ink-muted uppercase text-xs">Phase / Giai đoạn</th>
-              <th class="text-left py-3 text-ink-muted uppercase text-xs">Priority / Ưu tiên</th>
+              <th class="text-left py-3 text-ink-muted uppercase text-xs">Vai trò</th>
+              <th class="text-left py-3 text-ink-muted uppercase text-xs">Giai đoạn</th>
+              <th class="text-left py-3 text-ink-muted uppercase text-xs">Ưu tiên</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-bg-border">
             {[
-              { role: 'Full-stack engineer', vi: 'Kỹ sư full-stack', phase: 'Phase 2', priority: 'High' },
-              { role: 'AI/ML engineer', vi: 'Kỹ sư AI/ML', phase: 'Phase 2', priority: 'High' },
-              { role: 'Security engineer', vi: 'Kỹ sư bảo mật', phase: 'Phase 2–3', priority: 'High' },
-              { role: 'Product designer', vi: 'Thiết kế sản phẩm', phase: 'Phase 2', priority: 'Medium' },
-              { role: 'Community manager', vi: 'Quản lý cộng đồng', phase: 'Phase 3–5', priority: 'Medium' },
-              { role: 'Enterprise sales', vi: 'Bán hàng doanh nghiệp', phase: 'Phase 6', priority: 'Medium' },
+              { role: 'Kỹ sư full-stack', phase: 'Giai đoạn 2', priority: 'Cao' },
+              { role: 'Kỹ sư AI/ML', phase: 'Giai đoạn 2', priority: 'Cao' },
+              { role: 'Kỹ sư bảo mật', phase: 'Giai đoạn 2–3', priority: 'Cao' },
+              { role: 'Thiết kế sản phẩm', phase: 'Giai đoạn 2', priority: 'Trung bình' },
+              { role: 'Quản lý cộng đồng', phase: 'Giai đoạn 3–5', priority: 'Trung bình' },
+              { role: 'Bán hàng doanh nghiệp', phase: 'Giai đoạn 6', priority: 'Trung bình' },
             ].map((h) => (
               <tr>
-                <td class="py-3 text-ink">
-                  {h.role}
-                  <span class="block text-xs text-ink-dim" lang="vi">{h.vi}</span>
-                </td>
+                <td class="py-3 text-ink">{h.role}</td>
                 <td class="py-3 text-ink-muted">{h.phase}</td>
                 <td class="py-3">
-                  <span class={`text-xs px-2 py-1 rounded ${h.priority === 'High' ? 'text-gold bg-gold/10' : 'text-ink-muted bg-bg-soft'}`}>{h.priority}</span>
+                  <span class={`text-xs px-2 py-1 rounded ${h.priority === 'Cao' ? 'text-gold bg-gold/10' : 'text-ink-muted bg-bg-soft'}`}>{h.priority}</span>
                 </td>
               </tr>
             ))}
@@ -89,6 +80,6 @@ import Disclosure from '../components/Disclosure.astro';
       </div>
     </div>
 
-    <div class="mt-12"><Disclosure /></div>
+    <div class="mt-12"><Disclosure locale="vi" /></div>
   </section>
 </InvestLayout>
