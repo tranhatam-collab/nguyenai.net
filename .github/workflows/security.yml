@@ -53,7 +53,7 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
-          scan-target: .
+          scan-ref: .
           format: json
           output: trivy-fs-results.json
           exit-code: 0
@@ -103,9 +103,19 @@ jobs:
         uses: anchore/scan-action@v4
         with:
           path: .
-          fail-match: "severity=Critical"
+          fail-build: true
+          severity-cutoff: high
           output-format: json
-          output-file: grype-results.json
+        env:
+          GRYPE_DB_UPDATE: "true"
+
+      - name: Save grype results
+        if: always()
+        run: |
+          # scan-action writes results to a temp file; copy to known name
+          find /tmp -name "*.json" -path "*grype*" -newer /tmp 2>/dev/null | head -1 | xargs -I{} cp {} grype-results.json 2>/dev/null || true
+          # If scan-action left results in current dir, use that
+          [ -f results.json ] && cp results.json grype-results.json || true
 
       - name: Upload grype results
         if: always()
@@ -114,6 +124,7 @@ jobs:
           name: grype-results
           path: grype-results.json
           retention-days: 30
+          if-no-files-found: ignore
 
   # ============================================================
   # P1-E.4 — Secret scan (gitleaks) — fail on secret leak
@@ -131,8 +142,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_COMMENTS: true
-        with:
-          config-path: .gitleaks.toml
+          GITLEAKS_CONFIG: .gitleaks.toml
 
   # ============================================================
   # P1-E.5 — Artifact signing (cosign) — sign build artifacts
@@ -186,7 +196,11 @@ jobs:
 
       - name: Verify signature
         run: |
+          # Keyless cosign requires --certificate-identity to match the OIDC issuer
+          # GitHub Actions OIDC issuer: https://token.actions.githubusercontent.com
           cosign verify-blob \
+            --certificate-identity-regexp "https://token.actions.githubusercontent.com/.+" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             --certificate artifacts/nai-build.tar.gz.crt \
             --signature artifacts/nai-build.tar.gz.sig \
             artifacts/nai-build.tar.gz
