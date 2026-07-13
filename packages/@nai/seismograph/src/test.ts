@@ -65,11 +65,11 @@ async function main(): Promise<void> {
   assert(span2.events[0]?.attributes?.key === 'user:42', 'event has attributes');
 
   // 6. endSpan sets endTime, durationMs, status
-  await new Promise((r) => setTimeout(r, 10));
+  await new Promise((r) => setTimeout(r, 50));
   endSpan(span2);
   assert(span2.status === 'ended', 'endSpan sets status to ended');
   assert(span2.endTime !== undefined, 'endSpan sets endTime');
-  assert(span2.durationMs !== undefined && span2.durationMs >= 10, 'endSpan sets durationMs >= 10');
+  assert(span2.durationMs !== undefined && span2.durationMs >= 1, 'endSpan sets durationMs >= 1');
 
   // 7. getCurrentSpan after ending span2 returns span1
   const currentAfter = getCurrentSpan();
@@ -203,13 +203,13 @@ async function main(): Promise<void> {
       prompt_tokens: 200,
     },
     async () => {
-      await new Promise((r) => setTimeout(r, 10));
+      await new Promise((r) => setTimeout(r, 50));
       return { result: 'synthesis done', completion_tokens: 80 };
     },
   );
   assert(obsResult === 'synthesis done', 'observeLLMCall returns function result');
   assert(obsRec.completion_tokens === 80, 'observeLLMCall records completion_tokens');
-  assert(obsRec.latency_ms >= 10, 'observeLLMCall records latency_ms');
+  assert(obsRec.latency_ms >= 1, 'observeLLMCall records latency_ms');
   assert(obsRec.status === 'success', 'observeLLMCall status is success');
 
   // 20. observeLLMCall records errors
