@@ -82,6 +82,8 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/DEV_WORK_ITEMS_P0_P1.md` — 62 P0+P1 work items with estimates (BINDING)
 - `docs/governance/RELEASE_EVIDENCE_PACK_2026-07-02.md` — Pre-deploy verification pass (50 routes, SEO, accessibility)
 - `docs/governance/FOUNDER_BRAND_NAMING_LOCK_2026-07-04.md` — FOUNDER LOCKED brand naming standard (BINDING, overrides all prior brand docs)
+- `docs/governance/BRAND_UI_TOKENS_LOCK_2026-07-09.md` — bộ màu giao diện thống nhất web/edu/invest (1 bảng màu, quy tắc cặp màu tối/sáng, hero chuẩn, menu 3 gạch chuẩn)
+- `docs/governance/BRAND_SYNC_COMMIT_STANDARD_2026-07-09.md` — BINDING: chuẩn commit đồng bộ thương hiệu; cưỡng chế 3 tầng (pre-commit lefthook + CI + audit:all qua `tools/audit-ui-tokens.ts`). MỌI commit chạm giao diện phải qua gate này — muốn khác chuẩn phải sửa LOCK trước (Founder duyệt), không sửa giao diện trước
 - `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md` — FOUNDER LOCKED independence plan (BINDING, overrides Cross-Project Integration)
 - `docs/governance/GOVERNANCE_DECISION_LOG.md` — Founder decision log (QD-2026-07-08-01: independence lock)
 

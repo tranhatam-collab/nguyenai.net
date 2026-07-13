@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-preview",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.nvm/versions/node/v22.22.3/bin:$PATH\"; cd /Users/tranhatam/Documents/Devnewproject/nguyenai.net/apps/web && npx astro preview --port 4321"],
+      "port": 4321
+    },
+    {
+      "name": "edu-preview",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.nvm/versions/node/v22.22.3/bin:$PATH\"; cd /Users/tranhatam/Documents/Devnewproject/nguyenai.net && npx wrangler pages dev apps/edu/dist --compatibility-date=2026-06-23 --port 4322"],
+      "port": 4322
+    },
+    {
+      "name": "invest-preview",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.nvm/versions/node/v22.22.3/bin:$PATH\"; cd /Users/tranhatam/Documents/Devnewproject/nguyenai.net && npx wrangler pages dev apps/invest/dist --compatibility-date=2026-06-23 --port 4323"],
+      "port": 4323
+    }
+  ]
+}

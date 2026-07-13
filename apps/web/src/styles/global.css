@@ -142,6 +142,33 @@ a:hover {
   color: var(--gold);
 }
 
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* BRAND UI TOKENS LOCK — nút menu 3 gạch chuẩn hệ thống (đồng nhất web/edu/invest):
+   3 gạch 24px, màu vàng, viền vàng 55%, nền vàng 12%, bo góc 0.5rem, vùng chạm ≥44px */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 184, 16, 0.55);
+  border-radius: 0.5rem;
+  background: rgba(255, 184, 16, 0.12);
+  color: var(--gold);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-toggle:hover {
+  background: rgba(255, 184, 16, 0.22);
+}
+
 .section-wrap {
   width: min(1120px, calc(100% - 2rem));
   margin-inline: auto;
@@ -352,9 +379,45 @@ summary:hover {
     grid-template-columns: 1fr auto;
   }
 
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .brand {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .header-actions {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  /* Menu 3 gạch: nav ẩn mặc định, mở thành cột trên nền đỏ sẫm — đồng nhất edu/invest */
   .main-nav {
+    display: none;
+    grid-row: 2;
     grid-column: 1 / -1;
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    padding: 0.75rem 0 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 0.5rem;
+  }
+
+  .main-nav.open {
+    display: flex;
+  }
+
+  .main-nav a {
+    padding: 0.7rem 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  .main-nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .content-grid {
@@ -377,12 +440,6 @@ summary:hover {
 
   .brand small {
     display: none;
-  }
-
-  .main-nav {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 0.25rem;
   }
 }
 

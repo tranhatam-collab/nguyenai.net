@@ -32,6 +32,7 @@
     "audit:production-smoke": "bash tools/production-smoke.sh",
     "qa:evidence": "bash tools/qa-evidence-update.sh",
     "secrets:wrangler": "bash tools/set-wrangler-secrets.sh",
+    "audit:ui-tokens": "npx tsx tools/audit-ui-tokens.ts",
     "audit:seo-build": "npx tsx tools/audit-seo-build.ts",
     "audit:generate-sitemaps": "npx tsx tools/generate-web-sitemaps.ts",
     "audit:contamination": "bash tools/audit-clone-contamination.sh",
@@ -39,14 +40,16 @@
     "audit:brand": "bash tools/audit-brand-naming-lock.sh",
     "audit:language": "bash tools/audit-language-boundary.sh",
     "audit:independence": "bash tools/audit-independence.sh",
-    "audit:all": "pnpm run audit:brand && pnpm run audit:accessibility && pnpm run audit:contamination && pnpm run audit:language && pnpm run audit:independence && pnpm run audit:security-p0 && npx tsx tools/audit-email-language.ts && npx tsx tools/audit-hreflang.ts && npx tsx tools/audit-i18n-keys.ts && npx tsx tools/audit-language-switcher.ts && npx tsx tools/audit-public-claims.ts && npx tsx tools/audit-seo-bilingual.ts && npx tsx tools/audit-form-language.ts && npx tsx tools/audit-vietnamese-purity-build.ts",
-    "audit:language:pure": "npx tsx tools/audit-vietnamese-purity-build.ts",
+    "audit:all": "pnpm run audit:brand && pnpm run audit:accessibility && pnpm run audit:contamination && pnpm run audit:language && pnpm run audit:independence && pnpm run audit:security-p0 && npx tsx tools/audit-email-language.ts && npx tsx tools/audit-hreflang.ts && npx tsx tools/audit-i18n-keys.ts && npx tsx tools/audit-language-switcher.ts && npx tsx tools/audit-public-claims.ts && npx tsx tools/audit-seo-bilingual.ts && npx tsx tools/audit-form-language.ts && npx tsx tools/audit-vietnamese-purity-build.ts && npx tsx tools/audit-ui-tokens.ts",
+    "audit:language:pure": "npx tsx tools/audit-vietnamese-purity-build.ts && npx tsx tools/audit-ui-tokens.ts",
     "audit:language:live": "bash tools/audit-language-live.sh",
     "audit:security-p0": "npx tsx tools/audit-security-p0.ts",
     "db:migrate": "pnpm --filter @nai/migrations migrate:apply",
-    "db:status": "pnpm --filter @nai/migrations migrate:status"
+    "db:status": "pnpm --filter @nai/migrations migrate:status",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
+    "lefthook": "^2.1.10",
     "turbo": "^2.0.0",
     "typescript": "^5.5.0",
     "tsx": "^4.19.0"

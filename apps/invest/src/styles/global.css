@@ -80,6 +80,16 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* BRAND UI TOKENS LOCK — hero chuẩn hệ thống (đồng nhất với trang chủ nguyenai.net):
+   nền gradient đỏ sẫm → chữ trắng, điểm nhấn vàng. Không dùng chữ tối trên nền này. */
+.nai-hero {
+  background:
+    radial-gradient(circle at 82% 16%, rgba(255, 184, 16, 0.18), transparent 28rem),
+    radial-gradient(circle at 12% 82%, rgba(229, 91, 9, 0.22), transparent 22rem),
+    linear-gradient(135deg, var(--heritage-dark), var(--ink) 78%);
+  color: var(--white);
+}
+
 /* Gold gradient text for headings — V3.0 gold */
 .text-gold-gradient {
   background: linear-gradient(135deg, #FFB810 0%, #F48B0D 50%, #E55B09 100%);

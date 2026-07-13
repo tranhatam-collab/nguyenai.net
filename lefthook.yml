@@ -11,3 +11,15 @@ pre-commit:
     - name: web-build
       glob: "apps/web/**/*.{astro,ts,tsx,js,css}"
       run: pnpm --filter @nai/web build
+
+    # BRAND SYNC COMMIT STANDARD (docs/governance/BRAND_SYNC_COMMIT_STANDARD_2026-07-09.md)
+    # Chặn commit nếu giao diện vi phạm bộ màu thương hiệu thống nhất
+    # (chữ tối trên nền tối, hero sai chuẩn, menu 3 gạch thiếu aria)
+    - name: brand-ui-tokens
+      glob: "apps/{web,edu,invest}/src/**/*.{astro,tsx,jsx,css}"
+      run: npx tsx tools/audit-ui-tokens.ts
+
+    # Chặn commit nếu vi phạm tên thương hiệu bị cấm (FOUNDER_BRAND_NAMING_LOCK)
+    - name: brand-naming
+      glob: "apps/**/*.{astro,ts,tsx,md,mdx,json}"
+      run: bash tools/audit-brand-naming-lock.sh

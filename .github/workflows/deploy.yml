@@ -27,6 +27,9 @@ jobs:
       - name: Brand naming lock audit
         run: ./tools/audit-brand-naming-lock.sh
 
+      - name: Brand UI tokens audit (BRAND_SYNC_COMMIT_STANDARD)
+        run: npx tsx tools/audit-ui-tokens.ts
+
       - name: Accessibility audit
         run: ./tools/audit-accessibility.sh
 

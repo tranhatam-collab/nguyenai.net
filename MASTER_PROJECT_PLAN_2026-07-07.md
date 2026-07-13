@@ -84,6 +84,19 @@ This document provides a comprehensive project plan for both Nguyen AI (nguyenai
 
 **Note:** Accessibility violations fixed 2026-07-10 (0/0). Deferred Phase 2 items: full ESLint, InMemory → D1 persistence.
 
+#### 2b. BRAND SYNC COMMIT STANDARD (BINDING — áp dụng từ 2026-07-09)
+
+Mọi người/AI build vào repo này PHẢI biết:
+- **Bộ màu giao diện thống nhất** khóa tại `docs/governance/BRAND_UI_TOKENS_LOCK_2026-07-09.md`:
+  1 bảng màu heritage cho web/edu/invest; nền TỐI chỉ đi với chữ trắng + nhấn vàng;
+  nền SÁNG chỉ đi với chữ ink + nhấn đỏ; 1 kiểu hero gradient; 1 kiểu menu 3 gạch.
+- **Chuẩn commit** khóa tại `docs/governance/BRAND_SYNC_COMMIT_STANDARD_2026-07-09.md`.
+- **Cưỡng chế tự động 3 tầng** — không thể bỏ qua:
+  pre-commit (`lefthook.yml` → `tools/audit-ui-tokens.ts` + brand naming) →
+  CI (`deploy.yml` bước "Brand UI tokens audit") → `pnpm audit:all` trước go-live.
+- Dev mới: `npx lefthook install` là bước onboarding BẮT BUỘC.
+- Muốn đổi màu/hero/menu: sửa LOCK trước (Founder duyệt, tag `[founder-approval]`), sửa code sau.
+
 #### Ordered repo build (Phase 0)
 
 ```bash

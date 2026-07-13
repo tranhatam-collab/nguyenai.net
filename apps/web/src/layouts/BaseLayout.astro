@@ -97,11 +97,39 @@ const graph = [
           <small>{locale === 'vi' ? 'Máy Tính AI Nguyễn' : 'Nguyen AI Computer'}</small>
         </span>
       </a>
-      <nav class="main-nav" aria-label={locale === 'vi' ? 'Điều hướng chính' : 'Main navigation'}>
+      <nav class="main-nav" id="site-nav" aria-label={locale === 'vi' ? 'Điều hướng chính' : 'Main navigation'}>
         {navItems.map((item) => <a href={item[locale]}>{locale === 'vi' ? item.labelVi : item.labelEn}</a>)}
       </nav>
-      <a class="language-switch" href={routeFor(routeKey, alternateLocale)}>{langLabel}</a>
+      <div class="header-actions">
+        <a class="language-switch" href={routeFor(routeKey, alternateLocale)}>{langLabel}</a>
+        <button
+          type="button"
+          id="menu-toggle"
+          class="nav-toggle"
+          aria-label={locale === 'vi' ? 'Mở menu' : 'Toggle menu'}
+          aria-controls="site-nav"
+          aria-expanded="false"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </header>
+    <script is:inline>
+      (function () {
+        const toggle = document.getElementById('menu-toggle');
+        const nav = document.getElementById('site-nav');
+        if (toggle && nav) {
+          toggle.addEventListener('click', function () {
+            const open = nav.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          });
+        }
+      })();
+    </script>
     <main id="main">
       <slot />
     </main>
