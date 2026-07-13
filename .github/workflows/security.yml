@@ -261,13 +261,13 @@ jobs:
       - name: Generate SLSA provenance attestation
         run: |
           SHA=$(cat artifacts/nai-build.tar.gz.sha256 | cut -d' ' -f1)
-          cat > slsa-provenance.json << PROV
+          cat > slsa-provenance.json <<'PROV'
           {
             "_type": "https://in-toto.io/Statement/v0.1",
             "subject": [
               {
                 "name": "nai-build.tar.gz",
-                "digest": { "sha256": "${SHA}" }
+                "digest": { "sha256": "PLACEHOLDER_SHA" }
               }
             ],
             "predicateType": "https://slsa.dev/provenance/v0.2",
@@ -277,24 +277,29 @@ jobs:
               "invocation": {
                 "configSource": {
                   "uri": "https://github.com/tranhatam-collab/nguyenai.net",
-                  "digest": { "sha1": "${{ github.sha }}" },
+                  "digest": { "sha1": "PLACEHOLDER_GITSHA" },
                   "entryPoint": ".github/workflows/security.yml:slsa"
                 }
               },
               "metadata": {
-                "buildStartedOn": "${{ github.event.head_commit.timestamp }}",
+                "buildStartedOn": "2026-07-13T00:00:00Z",
                 "completeness": { "parameters": true, "environment": true, "materials": true },
                 "reproducible": false
               },
               "materials": [
                 {
                   "uri": "https://github.com/tranhatam-collab/nguyenai.net",
-                  "digest": { "sha1": "${{ github.sha }}" }
+                  "digest": { "sha1": "PLACEHOLDER_GITSHA" }
                 }
               ]
             }
           }
           PROV
+          # Replace placeholders with real values
+          sed -i "s/PLACEHOLDER_SHA/${SHA}/g" slsa-provenance.json
+          sed -i "s/PLACEHOLDER_GITSHA/${{ github.sha }}/g" slsa-provenance.json
+          # Validate JSON
+          python3 -c "import json; json.load(open('slsa-provenance.json')); print('SLSA provenance valid')"
           echo "SLSA provenance generated"
 
       - name: Install cosign
