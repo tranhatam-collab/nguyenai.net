@@ -1,8 +1,8 @@
 ---
 /**
- * /verify — client redirect for legacy email CTAs
- * Email verify tokens are ONE-TIME SECRETS (not public certificate IDs).
- * Strip token from URL ASAP; do not put token in title/OG/analytics.
+ * /verify — chuyển hướng client cho CTA email cũ
+ * Token xác minh email là bí mật dùng một lần (không phải ID chứng chỉ công khai).
+ * Xóa token khỏi URL ngay; không đặt token vào tiêu đề/OG/thống kê.
  */
 ---
 <!doctype html>
@@ -16,7 +16,7 @@
       (function () {
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
-        // Remove secret from address bar before navigation when possible
+        // Xóa bí mật khỏi thanh địa chỉ trước khi chuyển hướng
         try {
           params.delete('token');
           const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
