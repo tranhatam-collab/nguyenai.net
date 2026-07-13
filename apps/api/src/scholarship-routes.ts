@@ -80,8 +80,8 @@ import {
 export interface ScholarshipEnv {
   Bindings: {
     DB?: D1Database;
-    /** Primary — mail.iai.one (Founder directive: sole email provider) */
-    MAIL_IAI_ONE_API_KEY?: string;
+    /** Primary — mail gateway (Founder directive: sole email provider) */
+    MAIL_GATEWAY_API_KEY?: string;
     /** @deprecated */
     RESEND_API_KEY?: string;
   };
@@ -99,16 +99,16 @@ function initScholarshipStore(env: ScholarshipEnv['Bindings']): void {
   } else {
     setScholarshipStore(new InMemoryScholarshipStore());
   }
-  // Initialize email service (mock in dev; mail.iai.one primary, Resend temporary fallback)
+  // Initialize email service (mock in dev; mail gateway primary, Resend temporary fallback)
   if (!getEmailService()) {
-    const mailKey = env.MAIL_IAI_ONE_API_KEY;
+    const mailKey = env.MAIL_GATEWAY_API_KEY;
     const resendKey = env.RESEND_API_KEY;
     const apiKey = mailKey ?? resendKey;
     setEmailService(new EmailService({
       apiKey,
       from: { email: 'scholarship@nguyenai.net', name: 'Nguyen AI Scholarship' },
       replyTo: { email: 'hello@nguyenai.net', name: 'Nguyen AI' },
-      provider: mailKey ? 'mail_iai_one' : 'resend',
+      provider: mailKey ? 'mail_gateway' : 'resend',
       mock: !apiKey,
     }) as unknown as Parameters<typeof setEmailService>[0]);
   }
