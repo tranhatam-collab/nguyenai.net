@@ -1,15 +1,15 @@
 /**
  * @nai/email — Email clients (fetch-based, Workers-compatible)
  *
- * Primary: MailIaiOneClient → mail.iai.one (sole email provider per Founder directive)
+ * Primary: MailGatewayClient → mail gateway (sole email provider per Founder directive)
  * Legacy: ResendClient kept for reference only — do NOT use in production.
  */
 
 import type { EmailClient, EmailMessage, EmailSendResult, EmailAddress } from './types';
 
-const MAIL_IAI_ONE_API_URL = 'https://mail.iai.one/_mail/v1/send';
+const MAIL_GATEWAY_API_URL = 'https://mail-gateway.nguyenai.net/_mail/v1/send';
 
-export interface MailIaiOneClientOptions {
+export interface MailGatewayClientOptions {
   apiKey: string;
   defaultFrom?: EmailAddress;
   defaultReplyTo?: EmailAddress;
@@ -17,19 +17,19 @@ export interface MailIaiOneClientOptions {
   apiUrl?: string;
 }
 
-/** Primary email client — routes all sends through mail.iai.one */
-export class MailIaiOneClient implements EmailClient {
+/** Primary email client — routes all sends through the mail gateway */
+export class MailGatewayClient implements EmailClient {
   private apiKey: string;
   private defaultFrom: EmailAddress | undefined;
   private defaultReplyTo: EmailAddress | undefined;
   private apiUrl: string;
 
-  constructor(opts: MailIaiOneClientOptions) {
-    if (!opts.apiKey) throw new Error('MailIaiOneClient: apiKey is required');
+  constructor(opts: MailGatewayClientOptions) {
+    if (!opts.apiKey) throw new Error('MailGatewayClient: apiKey is required');
     this.apiKey = opts.apiKey;
     this.defaultFrom = opts.defaultFrom;
     this.defaultReplyTo = opts.defaultReplyTo;
-    this.apiUrl = opts.apiUrl ?? MAIL_IAI_ONE_API_URL;
+    this.apiUrl = opts.apiUrl ?? MAIL_GATEWAY_API_URL;
   }
 
   async send(message: EmailMessage): Promise<EmailSendResult> {
@@ -69,7 +69,7 @@ export class MailIaiOneClient implements EmailClient {
         id: '',
         to,
         status: 'bounced',
-        error: `mail.iai.one ${response.status}: ${errorText}`,
+        error: `mail gateway ${response.status}: ${errorText}`,
       };
     }
 

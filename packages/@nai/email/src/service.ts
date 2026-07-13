@@ -5,10 +5,10 @@
  */
 
 import type { EmailClient, EmailAddress, EmailTemplateId, TemplateContext, EmailMessage, EmailSendResult } from './types';
-import { MailIaiOneClient, ResendClient, MockEmailClient } from './client';
+import { MailGatewayClient, ResendClient, MockEmailClient } from './client';
 import { renderTemplate } from './templates';
 
-export type EmailProvider = 'mail_iai_one' | 'resend';
+export type EmailProvider = 'mail_gateway' | 'resend';
 
 export interface EmailServiceOptions {
   apiKey?: string;
@@ -17,11 +17,11 @@ export interface EmailServiceOptions {
   client?: EmailClient;
   /** If true, use MockEmailClient (no real sends) */
   mock?: boolean;
-  /** mail.iai.one API URL override (for testing) */
+  /** Mail gateway API URL override (for testing) */
   mailApiUrl?: string;
   /**
    * Which real provider to use when apiKey is set.
-   * Default: mail_iai_one. Use `resend` only as temporary fallback.
+   * Default: mail_gateway. Use `resend` only as temporary fallback.
    */
   provider?: EmailProvider;
 }
@@ -46,7 +46,7 @@ export class EmailService {
         defaultReplyTo: opts.replyTo,
       });
     } else {
-      this.client = new MailIaiOneClient({
+      this.client = new MailGatewayClient({
         apiKey: opts.apiKey,
         defaultFrom: opts.from,
         defaultReplyTo: opts.replyTo,
@@ -103,12 +103,12 @@ export class EmailService {
 /**
  * Factory: create EmailService from environment (Workers or Node.js).
  *
- * Primary: MAIL_IAI_ONE_API_KEY → mail.iai.one
+ * Primary: MAIL_GATEWAY_API_KEY → mail gateway
  * Temporary fallback: RESEND_API_KEY → ResendClient (only when MAIL key absent)
  * Dev: omit both → MockEmailClient
  */
 export function createEmailService(env: {
-  MAIL_IAI_ONE_API_KEY?: string;
+  MAIL_GATEWAY_API_KEY?: string;
   RESEND_API_KEY?: string;
   ENVIRONMENT?: string;
 }): EmailService {
@@ -121,11 +121,11 @@ export function createEmailService(env: {
     name: 'Nguyen AI Support',
   };
 
-  const mailKey = env.MAIL_IAI_ONE_API_KEY;
+  const mailKey = env.MAIL_GATEWAY_API_KEY;
   const resendKey = env.RESEND_API_KEY;
   const useMail = Boolean(mailKey);
   const apiKey = mailKey ?? resendKey;
-  const provider: EmailProvider = useMail ? 'mail_iai_one' : 'resend';
+  const provider: EmailProvider = useMail ? 'mail_gateway' : 'resend';
 
   return new EmailService({
     apiKey,

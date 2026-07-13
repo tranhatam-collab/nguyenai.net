@@ -10,7 +10,7 @@
  * - Text version contains key info
  */
 
-import { TEMPLATES, renderTemplate, listTemplates, MockEmailClient, EmailService, AUDIT_EVENT_TO_TEMPLATE, createEmailService, ResendClient, MailIaiOneClient } from './index';
+import { TEMPLATES, renderTemplate, listTemplates, MockEmailClient, EmailService, AUDIT_EVENT_TO_TEMPLATE, createEmailService, ResendClient, MailGatewayClient } from './index';
 import type { EmailTemplateId, TemplateContext } from './types';
 
 function assert(cond: boolean, msg: string): void {
@@ -182,15 +182,15 @@ assert(html.includes('nguyenai.net'), 'html should contain domain');
 assert(html.includes('Do not reply') || html.includes('automated'), 'html should mention automated');
 console.log(`✓ Test 10: HTML email has proper structure`);
 
-// Test 11: Resend temporary fallback selects ResendClient (not MailIaiOne)
+// Test 11: Resend temporary fallback selects ResendClient (not MailGateway)
 const resendFallback = createEmailService({ RESEND_API_KEY: 're_test_only', ENVIRONMENT: 'production' });
 assert(resendFallback.getClient() instanceof ResendClient, 'RESEND-only should use ResendClient');
 const mailPrimary = createEmailService({
-  MAIL_IAI_ONE_API_KEY: 'mail_test',
+  MAIL_GATEWAY_API_KEY: 'mail_test',
   RESEND_API_KEY: 're_ignored',
   ENVIRONMENT: 'production',
 });
-assert(mailPrimary.getClient() instanceof MailIaiOneClient, 'MAIL key should prefer MailIaiOneClient');
+assert(mailPrimary.getClient() instanceof MailGatewayClient, 'MAIL key should prefer MailGatewayClient');
 const neither = createEmailService({ ENVIRONMENT: 'production' });
 assert(neither.getClient() instanceof MockEmailClient, 'no keys → MockEmailClient');
 console.log(`✓ Test 11: Resend temporary fallback + mail primary selection`);

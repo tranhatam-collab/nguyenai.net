@@ -11,7 +11,7 @@
  */
 
 export type { EmailClient, EmailMessage, EmailSendResult, EmailAddress, EmailTemplate, EmailTemplateId, TemplateContext } from './types';
-export { MailIaiOneClient, ResendClient, MockEmailClient } from './client';
+export { MailGatewayClient, ResendClient, MockEmailClient } from './client';
 export { TEMPLATES, getTemplate, listTemplates, renderTemplate } from './templates';
 export { EmailService, createEmailService } from './service';
 export type { EmailProvider } from './service';
