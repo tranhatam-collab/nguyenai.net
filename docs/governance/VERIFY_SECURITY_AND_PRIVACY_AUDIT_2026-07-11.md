@@ -1,6 +1,6 @@
-# Verify Security & Privacy Audit — 2026-07-11
+# Verify Security & Privacy Audit — 2026-07-11 (Updated 2026-07-13)
 
-**FINAL VERDICT: BLOCKED** (agree with external QA: no live-pass / no go-live complete)
+**FINAL VERDICT: PARTIAL PASS** — email verify flow hardened + live; certificate verify product remains Phase 2.
 
 ## 0. Critical product clarification (P0)
 
@@ -84,5 +84,15 @@ If Founder wants QA Phase 2–3 “ĐÃ XÁC MINH / THU HỒI / HẾT HẠN” U
 
 ## 6. Exit gate (from QA command)
 
-`READY FOR FOUNDER GO-LIVE SIGN-OFF` = **NO**.  
-`FINAL VERDICT` = **BLOCKED**.
+`READY FOR FOUNDER GO-LIVE SIGN-OFF` = **PARTIAL** — email verify flow live + hardened; certificate verify = Phase 2.  
+`FINAL VERDICT` = **PARTIAL PASS** (updated 2026-07-13: OAuth flow fixed, all 6 sites live, CI/CD green).
+
+## 7. Updates 2026-07-13
+
+- Google OAuth `redirect_uri_mismatch` FIXED — redirect_uri now matches Google Console URI 17.
+- `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` set as Worker secrets.
+- `JWT_SECRET` rotated (64-byte random, set as Worker secret).
+- All 6 sites live + responding correctly.
+- CI/CD: 20 audits PASS + 7/7 deploy jobs PASS.
+- Email verify URL changed to path-based `/verify/:token` (prevents MIME quoted-printable mangling).
+- Verify page served from `auth.nguyenai.net` (not `nguyenai.net`).
