@@ -261,45 +261,38 @@ jobs:
       - name: Generate SLSA provenance attestation
         run: |
           SHA=$(cat artifacts/nai-build.tar.gz.sha256 | cut -d' ' -f1)
+          # cosign attest-blob --type slsaprovenance expects the PREDICATE only
+          # (not the full in-toto Statement). The predicate must contain builder,
+          # buildType, invocation, metadata, materials per SLSA v0.2 spec.
           cat > slsa-provenance.json <<'PROV'
           {
-            "_type": "https://in-toto.io/Statement/v0.1",
-            "subject": [
-              {
-                "name": "nai-build.tar.gz",
-                "digest": { "sha256": "PLACEHOLDER_SHA" }
+            "builder": { "id": "github-actions" },
+            "buildType": "https://github.com/tranhatam-collab/nguyenai.net/.github/workflows/security.yml",
+            "invocation": {
+              "configSource": {
+                "uri": "https://github.com/tranhatam-collab/nguyenai.net",
+                "digest": { "sha1": "PLACEHOLDER_GITSHA" },
+                "entryPoint": ".github/workflows/security.yml:slsa"
               }
-            ],
-            "predicateType": "https://slsa.dev/provenance/v0.2",
-            "predicate": {
-              "builder": { "id": "github-actions" },
-              "buildType": "https://github.com/tranhatam-collab/nguyenai.net/.github/workflows/security.yml",
-              "invocation": {
-                "configSource": {
-                  "uri": "https://github.com/tranhatam-collab/nguyenai.net",
-                  "digest": { "sha1": "PLACEHOLDER_GITSHA" },
-                  "entryPoint": ".github/workflows/security.yml:slsa"
-                }
-              },
-              "metadata": {
-                "buildStartedOn": "2026-07-13T00:00:00Z",
-                "completeness": { "parameters": true, "environment": true, "materials": true },
-                "reproducible": false
-              },
-              "materials": [
-                {
-                  "uri": "https://github.com/tranhatam-collab/nguyenai.net",
-                  "digest": { "sha1": "PLACEHOLDER_GITSHA" }
-                }
-              ]
-            }
+            },
+            "metadata": {
+              "buildStartedOn": "2026-07-13T00:00:00Z",
+              "completeness": { "parameters": true, "environment": true, "materials": true },
+              "reproducible": false
+            },
+            "materials": [
+              {
+                "uri": "https://github.com/tranhatam-collab/nguyenai.net",
+                "digest": { "sha1": "PLACEHOLDER_GITSHA" }
+              }
+            ]
           }
           PROV
-          # Replace placeholders with real values
-          sed -i "s/PLACEHOLDER_SHA/${SHA}/g" slsa-provenance.json
+          # Remove leading indentation from heredoc (cosign needs compact JSON)
+          sed -i 's/^          //' slsa-provenance.json
           sed -i "s/PLACEHOLDER_GITSHA/${{ github.sha }}/g" slsa-provenance.json
-          # Validate JSON
-          python3 -c "import json; json.load(open('slsa-provenance.json')); print('SLSA provenance valid')"
+          # Validate JSON + check builder field
+          python3 -c "import json; d=json.load(open('slsa-provenance.json')); assert 'builder' in d, 'builder missing'; print('SLSA predicate valid, builder:', d['builder'])"
           echo "SLSA provenance generated"
 
       - name: Install cosign
