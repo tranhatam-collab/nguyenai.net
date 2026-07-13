@@ -565,6 +565,9 @@ importers:
         specifier: workspace:*
         version: link:../scout
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
       bun-types:
         specifier: latest
         version: 1.3.14
