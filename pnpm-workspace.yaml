@@ -6,6 +6,12 @@ packages:
   - "tests/e2e"
   - "workers/*"
   - "tools/*"
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd
+  - "@biomejs/biome"
+  - lefthook
 allowBuilds:
   sharp: true
   workerd: true
@@ -120,7 +126,7 @@ allowBuilds:
   csv-parse: 6.2.1
   dotenv: 17.2.3
   electron: ^41.7.2
-  esbuild: ^0.28.1
+  esbuild: true
   eslint: 9.29.0
   eslint-plugin-oxlint: ^1.61.0
   eslint-plugin-n8n-nodes-base: ^1.16.7
@@ -208,8 +214,8 @@ allowBuilds:
   eslint-plugin-markdown-preferences: ^0.0.0
   eslint-plugin-no-barrel-files: ^0.0.0
   vite-plus: ^0.0.0
-  '@biomejs/biome': set this to true or false
-  lefthook: set this to true or false
+  '@biomejs/biome': true
+  lefthook: true
 catalogs:
   default:
     '@types/qs': 6.9.15
