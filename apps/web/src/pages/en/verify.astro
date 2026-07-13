@@ -1,0 +1,39 @@
+---
+/**
+ * /en/verify — client redirect for legacy email CTAs (English version)
+ * Email verify tokens are ONE-TIME SECRETS (not public certificate IDs).
+ * Strip token from address bar ASAP; do not put token into title/OG/analytics.
+ */
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <link rel="alternate" hreflang="vi" href="https://nguyenai.net/verify" />
+    <link rel="alternate" hreflang="en" href="https://nguyenai.net/en/verify" />
+    <link rel="alternate" hreflang="x-default" href="https://nguyenai.net/verify" />
+    <title>Redirecting to verification…</title>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        // Strip secret from address bar before redirect
+        try {
+          params.delete('token');
+          const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          window.history.replaceState({}, '', clean);
+        } catch (_) {}
+        const dest = token
+          ? 'https://auth.nguyenai.net/verify?token=' + encodeURIComponent(token)
+          : 'https://auth.nguyenai.net/auth';
+        window.location.replace(dest);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to email verification…</p>
+    <p><a href="https://auth.nguyenai.net/auth">Continue</a></p>
+  </body>
+</html>
