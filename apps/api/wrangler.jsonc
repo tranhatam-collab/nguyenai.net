@@ -9,6 +9,13 @@
     "AUTH_ISSUER": "auth.nguyenai.net",
     "VNPAY_PAY_URL": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
     "VNPAY_RETURN_URL": "https://api.nguyenai.net/v1/payment/vnpay/return",
+    // pay-gateway.nguyenai.net — VietQR canonical gateway (VND, merchant of record: KASAN JSC).
+    // Secrets (set via `wrangler secret put`): PAY_GATEWAY_API_KEY, PAY_NAI_HMAC.
+    "PAY_GATEWAY_BASE_URL": "https://pay-gateway.nguyenai.net",
+    "PAY_GATEWAY_TENANT_CODE": "nguyenai",
+    "PAY_GATEWAY_SITE_CODE": "nguyenai",
+    "PAY_GATEWAY_PROVIDER": "payos",
+    "PAY_GATEWAY_CALLBACK_BASE": "https://api.nguyenai.net",
     // WI-1.3/WI-2.3: GEN1_GATEWAY_URL removed from vars — Gen1 proxy disabled by default.
     // To enable failoff: `wrangler secret put GEN1_GATEWAY_URL` + `wrangler secret put LEGACY_BRIDGE_ENABLED` (value: true)
     // SEC-P0-3: EVIDENCE_SIGNING_KEY removed from vars (old value leaked via git).
@@ -32,6 +39,6 @@
     // RATE_LIMIT on Anhhatam production (62d57) — NOT the f3f9 namespace
     { "binding": "RATE_LIMIT", "id": "2e76b2d12593426ca912aabde39311b9" }
   ]
-  // MAIL_IAI_ONE_API_KEY via `wrangler secret put MAIL_IAI_ONE_API_KEY` (primary)
+  // MAIL_GATEWAY_API_KEY via `wrangler secret put MAIL_GATEWAY_API_KEY` (primary)
   // RESEND_API_KEY deprecated fallback only
 }

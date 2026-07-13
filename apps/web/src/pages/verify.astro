@@ -1,0 +1,36 @@
+---
+/**
+ * /verify — client redirect for legacy email CTAs
+ * Email verify tokens are ONE-TIME SECRETS (not public certificate IDs).
+ * Strip token from URL ASAP; do not put token in title/OG/analytics.
+ */
+---
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Đang chuyển hướng xác minh…</title>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        // Remove secret from address bar before navigation when possible
+        try {
+          params.delete('token');
+          const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          window.history.replaceState({}, '', clean);
+        } catch (_) {}
+        const dest = token
+          ? 'https://auth.nguyenai.net/verify?token=' + encodeURIComponent(token)
+          : 'https://auth.nguyenai.net/auth';
+        window.location.replace(dest);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Đang chuyển đến trang xác minh email…</p>
+    <p><a href="https://auth.nguyenai.net/auth">Tiếp tục</a></p>
+  </body>
+</html>

@@ -66,10 +66,13 @@ import { resolveEntitlements as resolveEntitlementsAsync } from '@nai/entitlemen
 import {
   createStripeCheckout,
   createVnPayCheckout,
+  createPayOsCheckout,
   verifyStripeWebhook,
   verifyVnPayReturn,
+  verifyPayOsWebhook,
   parseStripeEvent,
   parseVnPayReturn,
+  parsePayOsWebhook,
   generateInvoice,
   computeVat,
   type Gateway,
@@ -145,7 +148,15 @@ interface AppEnv {
     VNPAY_HASH_SECRET: string;
     VNPAY_PAY_URL: string;
     VNPAY_RETURN_URL: string;
-    // Gen1 upstream gateway (aiagent.iai.one — FROZEN reference, adapter only)
+    // pay-gateway.nguyenai.net — VietQR canonical gateway (VND, merchant of record: KASAN JSC)
+    PAY_GATEWAY_BASE_URL?: string;
+    PAY_GATEWAY_API_KEY?: string;
+    PAY_GATEWAY_TENANT_CODE?: string;
+    PAY_GATEWAY_SITE_CODE?: string;
+    PAY_GATEWAY_PROVIDER?: string;
+    PAY_GATEWAY_CALLBACK_BASE?: string;
+    PAY_NAI_HMAC?: string;
+    // Gen1 upstream gateway (aiagent-upstream — FROZEN reference, adapter only)
     // WI-1.3: GEN1_GATEWAY_URL is now optional — only used when LEGACY_BRIDGE_ENABLED=true.
     GEN1_GATEWAY_URL?: string;
     GEN1_ADMIN_KEY?: string;
@@ -466,7 +477,7 @@ app.get('/v1/audit', async (c) => {
 });
 
 // ============================================================
-// Gen1 Gateway Adapter — proxy to aiagent.iai.one (FROZEN reference)
+// Gen1 Gateway Adapter — proxy to aiagent-upstream (FROZEN reference)
 // Per Founder Architecture Amendment: adapter owned by Nguyen AI,
 // Gen1 stays frozen. We proxy chat/stream/models/workflows.
 // Source of truth remains Nguyen AI (entitlement, billing, audit).
@@ -550,7 +561,7 @@ async function proxyToGen1(
       status: upstream.status,
       headers: {
         'Content-Type': upstream.headers.get('Content-Type') ?? 'application/json',
-        'X-Gen1-Upstream': 'aiagent.iai.one',
+        'X-Gen1-Upstream': 'aiagent-upstream',
         'X-Gen1-Session': gen1SessionId,
       },
     });
@@ -582,17 +593,29 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
   const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
   const userTier = ents.machine.model_tier ?? 'free';
 
-  const result = await invokeThroughTrainingGateway({
-    tenant_id: session.tenant_id,
-    user_id: session.user_id,
-    plan_id: session.plan_id,
-    session_id: session.session_id ?? null,
-    model: body.model ?? 'auto-route',
-    messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
-    max_tokens: body.max_tokens,
-    temperature: body.temperature,
-    user_tier: userTier,
-  });
+  let result: Awaited<ReturnType<typeof invokeThroughTrainingGateway>>;
+  try {
+    result = await invokeThroughTrainingGateway({
+      tenant_id: session.tenant_id,
+      user_id: session.user_id,
+      plan_id: session.plan_id,
+      session_id: session.session_id ?? null,
+      model: body.model ?? 'auto-route',
+      messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
+      max_tokens: body.max_tokens,
+      temperature: body.temperature,
+      user_tier: userTier,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/provider\s+mock\s+is\s+not\s+allowed/i.test(msg) || /is not allowed/i.test(msg)) {
+      return c.json({
+        error: 'llm_providers_not_configured',
+        message: 'OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_AI_API_KEY chưa set trên nguyenai-api-gateway.',
+      }, 503);
+    }
+    throw err;
+  }
 
   if (!result.tier_allowed) {
     return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
@@ -648,17 +671,29 @@ app.post('/v1/stream', chatRateLimit, async (c) => {
   const ents = await resolveEntitlements(session.user_id, session.tenant_id, session.plan_id as PlanId);
   const userTier = ents.machine.model_tier ?? 'free';
 
-  const result = await invokeThroughTrainingGateway({
-    tenant_id: session.tenant_id,
-    user_id: session.user_id,
-    plan_id: session.plan_id,
-    session_id: session.session_id ?? null,
-    model: body.model ?? 'auto-route',
-    messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
-    max_tokens: body.max_tokens,
-    temperature: body.temperature,
-    user_tier: userTier,
-  });
+  let result: Awaited<ReturnType<typeof invokeThroughTrainingGateway>>;
+  try {
+    result = await invokeThroughTrainingGateway({
+      tenant_id: session.tenant_id,
+      user_id: session.user_id,
+      plan_id: session.plan_id,
+      session_id: session.session_id ?? null,
+      model: body.model ?? 'auto-route',
+      messages: body.messages as Array<{ role: 'system' | 'user' | 'assistant' | 'tool'; content: string; name?: string; tool_call_id?: string }>,
+      max_tokens: body.max_tokens,
+      temperature: body.temperature,
+      user_tier: userTier,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/provider\s+mock\s+is\s+not\s+allowed/i.test(msg) || /is not allowed/i.test(msg)) {
+      return c.json({
+        error: 'llm_providers_not_configured',
+        message: 'OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_AI_API_KEY chưa set trên nguyenai-api-gateway.',
+      }, 503);
+    }
+    throw err;
+  }
 
   if (!result.tier_allowed) {
     return c.json({ error: 'tier_not_allowed', reason: result.tier_reason }, 403);
@@ -1119,11 +1154,11 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
   if (!price_id || !gateway || !currency) {
     return c.json({ error: 'price_id, gateway, currency are required' }, 400);
   }
-  if (gateway !== 'stripe' && gateway !== 'vnpay') {
-    return c.json({ error: 'gateway must be stripe or vnpay' }, 400);
+  if (gateway !== 'stripe' && gateway !== 'vnpay' && gateway !== 'payos') {
+    return c.json({ error: 'gateway must be stripe, vnpay, or payos' }, 400);
   }
-  if (gateway === 'vnpay' && currency !== 'VND') {
-    return c.json({ error: 'VNPay only supports VND' }, 400);
+  if ((gateway === 'vnpay' || gateway === 'payos') && currency !== 'VND') {
+    return c.json({ error: `${gateway} only supports VND` }, 400);
   }
 
   const price = (pricesData as Array<{ id: string }>).find((p) => p.id === price_id);
@@ -1159,7 +1194,7 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         metadata: { gateway: 'stripe', amount: session_url.amount, currency },
       });
       return c.json(session_url);
-    } else {
+    } else if (gateway === 'vnpay') {
       const session_url = await createVnPayCheckout(
         {
           VNPAY_TMN_CODE: c.env.VNPAY_TMN_CODE,
@@ -1180,6 +1215,23 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         result: 'success',
         metadata: { gateway: 'vnpay', amount: session_url.amount, currency: 'VND' },
       });
+      return c.json(session_url);
+    } else {
+      // payos — VietQR via pay-gateway.nguyenai.net (merchant of record: KASAN JSC).
+      // No payment_received audit here: the money has NOT arrived yet. The
+      // settlement webhook (POST /v1/payment/webhook) emits payment_received.
+      const session_url = await createPayOsCheckout(
+        {
+          PAY_GATEWAY_BASE_URL: c.env.PAY_GATEWAY_BASE_URL,
+          PAY_GATEWAY_API_KEY: c.env.PAY_GATEWAY_API_KEY ?? '',
+          PAY_GATEWAY_TENANT_CODE: c.env.PAY_GATEWAY_TENANT_CODE,
+          PAY_GATEWAY_SITE_CODE: c.env.PAY_GATEWAY_SITE_CODE,
+          PAY_GATEWAY_PROVIDER: c.env.PAY_GATEWAY_PROVIDER,
+          PAY_GATEWAY_CALLBACK_BASE: c.env.PAY_GATEWAY_CALLBACK_BASE,
+        },
+        req,
+        price as any,
+      );
       return c.json(session_url);
     }
   } catch (err) {
@@ -1264,6 +1316,60 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
     target: result.gateway_payment_id,
     result: 'success',
     metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id },
+  });
+
+  return c.json({ received: true, processed: true, payment: result, invoice });
+});
+
+// ============================================================
+// pay-gateway.nguyenai.net webhook — POST /v1/payment/webhook
+// VietQR settlement callback (merchant of record: KASAN JSC).
+// HMAC-SHA256 hex over raw body; header x-iai-signature (fallback
+// x-webhook-signature). Paid gate: event_type payment.completed | order.paid.
+// ============================================================
+
+app.post('/v1/payment/webhook', async (c) => {
+  const payload = await c.req.text();
+  const signature =
+    c.req.header('x-iai-signature') ?? c.req.header('x-webhook-signature') ?? '';
+
+  const valid = await verifyPayOsWebhook(
+    { PAY_NAI_HMAC: c.env.PAY_NAI_HMAC ?? '' },
+    payload,
+    signature,
+  );
+  if (!valid) return c.json({ error: 'invalid signature' }, 400);
+
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(payload) as Record<string, unknown>;
+  } catch {
+    return c.json({ error: 'invalid json' }, 400);
+  }
+
+  const result = parsePayOsWebhook(body);
+  if (!result) {
+    // Non-terminal / non-paid event — acknowledge without processing.
+    return c.json({ received: true, processed: false });
+  }
+
+  const invoice = generateInvoice(result, true); // VietQR = VN customer → KASAN JSC VAT 10%
+
+  await logAuditEvent({
+    user_id: result.user_id || 'unknown',
+    session_id: null,
+    event_type: 'payment_received',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+    user_agent: c.req.header('User-Agent') ?? 'unknown',
+    target: result.gateway_payment_id,
+    result: 'success',
+    metadata: {
+      gateway: 'payos',
+      amount: result.amount,
+      invoice_id: invoice.invoice_id,
+      event_id: String(body.event_id ?? ''),
+      merchant: 'KASAN_JSC',
+    },
   });
 
   return c.json({ received: true, processed: true, payment: result, invoice });

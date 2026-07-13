@@ -343,6 +343,17 @@ export async function countFailedLoginsByIp(db: D1Database, ip: string, sinceISO
   return result?.cnt ?? 0;
 }
 
+/** Count verify-email attempts by IP (uses access_denied + target=verify-email). */
+export async function countVerifyAttemptsByIp(db: D1Database, ip: string, sinceISO: string): Promise<number> {
+  const sqliteSince = sinceISO.replace('T', ' ').replace(/\.\d+Z$/, '');
+  const stmt = db.prepare(
+    `SELECT COUNT(*) as cnt FROM audit_log
+     WHERE event_type = 'access_denied' AND target = 'verify-email' AND actor_ip = ?1 AND timestamp >= ?2`
+  );
+  const result = await stmt.bind(ip, sqliteSince).first<{ cnt: number }>();
+  return result?.cnt ?? 0;
+}
+
 // ============================================================
 // Audit log queries — append-only (triggers prevent UPDATE/DELETE)
 // ============================================================
@@ -398,7 +409,14 @@ export async function queryAuditLogD1(
 
 // ============================================================
 // Email verification queries — per IDENTITY_AND_TENANCY_RFC §3.2
+// Tokens in email URLs are ONE-TIME SECRETS (not public verification_ids).
+// Store only SHA-256 hex; accept legacy plaintext rows during migration.
 // ============================================================
+
+export async function hashVerificationToken(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 export async function saveVerificationToken(
   db: D1Database,
@@ -406,19 +424,26 @@ export async function saveVerificationToken(
   token: string,
   expiresAt: string,
 ): Promise<void> {
+  const tokenHash = await hashVerificationToken(token);
   await db.prepare(
     'UPDATE users SET verification_token = ?1, verification_expires_at = ?2 WHERE user_id = ?3'
-  ).bind(token, expiresAt, userId).run();
+  ).bind(tokenHash, expiresAt, userId).run();
 }
 
 export async function findUserByVerificationToken(
   db: D1Database,
   token: string,
 ): Promise<D1User | null> {
-  const result = await db.prepare(
+  const tokenHash = await hashVerificationToken(token);
+  const byHash = await db.prepare(
+    'SELECT * FROM users WHERE verification_token = ?1 AND deleted_at IS NULL'
+  ).bind(tokenHash).first<D1User>();
+  if (byHash) return byHash;
+  // Legacy plaintext tokens (pre-hash migration) — one-time accept then cleared on verify
+  const byPlain = await db.prepare(
     'SELECT * FROM users WHERE verification_token = ?1 AND deleted_at IS NULL'
   ).bind(token).first<D1User>();
-  return result ?? null;
+  return byPlain ?? null;
 }
 
 export async function markEmailVerified(

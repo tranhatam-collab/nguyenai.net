@@ -20,7 +20,7 @@
 // Types
 // ============================================================
 
-export type Gateway = 'stripe' | 'vnpay';
+export type Gateway = 'stripe' | 'vnpay' | 'payos';
 export type Currency = 'VND' | 'USD';
 export type PaymentPeriod = 'month' | 'year' | 'per-attempt' | 'one-time';
 
@@ -387,6 +387,156 @@ export function parseVnPayReturn(params: Record<string, string>): PaymentResult 
     status: status as PaymentResult['status'],
     paid_at: new Date().toISOString(),
     raw: params,
+  };
+}
+
+// ============================================================
+// pay-gateway.nguyenai.net checkout (VietQR / PayOS — VND, merchant of record: KASAN JSC)
+// ============================================================
+//
+// Canonical payment gateway. Every VN VietQR payment routes through pay-gateway.nguyenai.net
+// (F10 lock — no direct provider bypass). Settlement lands in KASAN JSC's bank
+// account via a dedicated provider_accounts row for tenant=nguyenai
+// (dedicated_prov=1). Without that row pay-gateway.nguyenai.net falls back to the global
+// PayOS merchant (V1 Thành Tâm Phát) — WRONG entity — so the row is mandatory
+// for legal correctness. See docs/architecture/NGUYEN_AI_PAYMENT_KASAN_VIETQR_BUILD_SPEC.
+
+export interface PayOsEnv {
+  PAY_GATEWAY_BASE_URL?: string;     // default https://pay-gateway.nguyenai.net
+  PAY_GATEWAY_API_KEY: string;       // minted by pay-gateway.nguyenai.net for tenant=nguyenai
+  PAY_GATEWAY_TENANT_CODE?: string;  // default "nguyenai"
+  PAY_GATEWAY_SITE_CODE?: string;    // default "nguyenai"
+  PAY_GATEWAY_PROVIDER?: string;     // default "payos"
+  PAY_GATEWAY_CALLBACK_BASE?: string; // default https://api.nguyenai.net
+}
+
+/**
+ * Create a VietQR checkout via pay-gateway.nguyenai.net /internal/checkout-session.
+ * Auth: x-api-key header (NOT Bearer). Idempotency: x-idempotency-key.
+ * Returns a pay.payos.vn hosted VietQR page URL.
+ */
+export async function createPayOsCheckout(
+  env: PayOsEnv,
+  req: CheckoutRequest,
+  price: PriceItem,
+): Promise<CheckoutSession> {
+  const amount = price.price_vnd; // integer VND, no subunit
+  const sessionId = crypto.randomUUID();
+  const internalOrderId = `nai-${(req.tenant_id || 'anon')}-${sessionId.replace(/-/g, '').slice(0, 16)}`;
+  const base = String(env.PAY_GATEWAY_BASE_URL || 'https://pay-gateway.nguyenai.net').replace(/\/+$/, '');
+  const callbackBase = String(env.PAY_GATEWAY_CALLBACK_BASE || 'https://api.nguyenai.net').replace(/\/+$/, '');
+
+  const resp = await fetch(`${base}/internal/checkout-session`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': String(env.PAY_GATEWAY_API_KEY),
+      'x-idempotency-key': internalOrderId,
+    },
+    body: JSON.stringify({
+      tenant_code: String(env.PAY_GATEWAY_TENANT_CODE || 'nguyenai'),
+      site_code: String(env.PAY_GATEWAY_SITE_CODE || 'nguyenai'),
+      provider: String(env.PAY_GATEWAY_PROVIDER || 'payos'),
+      internal_order_id: internalOrderId,
+      amount,
+      currency: 'VND',
+      billing_cycle: 'one_time',
+      description: (req.locale === 'vi' ? price.name_vi : price.name_en).slice(0, 200),
+      email: req.email || null,
+      full_name: null,
+      callback_url: `${callbackBase}/v1/payment/webhook`,
+      success_url: req.success_url,
+      cancel_url: req.cancel_url,
+      metadata: {
+        user_id: req.user_id,
+        tenant_id: req.tenant_id,
+        price_id: price.id,
+        session_id: sessionId,
+        source: 'nai-billing',
+      },
+    }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`pay-gateway.nguyenai.net checkout creation failed (${resp.status}): ${errText}`);
+  }
+
+  const data = (await resp.json()) as {
+    checkout_url?: string;
+    payment_link?: string;
+    provider_order_id?: string;
+    payment_session_id?: string;
+  };
+  const url = data.checkout_url || data.payment_link || null;
+  if (!url) {
+    throw new Error('pay-gateway.nguyenai.net returned no checkout_url');
+  }
+
+  return {
+    session_id: sessionId,
+    gateway: 'payos',
+    authorize_url: url,
+    amount,
+    currency: 'VND',
+    price_id: price.id,
+    user_id: req.user_id,
+    expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+  };
+}
+
+export interface PayOsWebhookEnv {
+  PAY_NAI_HMAC: string; // shared secret; same value registered at pay-gateway.nguyenai.net as webhook_secret
+}
+
+/**
+ * Verify a pay-gateway.nguyenai.net webhook: HMAC-SHA256 hex over the raw request body.
+ * Header: x-iai-signature (fallback x-webhook-signature). Constant-time compare.
+ */
+export async function verifyPayOsWebhook(
+  env: PayOsWebhookEnv,
+  rawBody: string,
+  signatureHex: string,
+): Promise<boolean> {
+  if (!signatureHex || !env.PAY_NAI_HMAC) return false;
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(env.PAY_NAI_HMAC),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sigBuf = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(rawBody));
+  const expected = Array.from(new Uint8Array(sigBuf), (b) => b.toString(16).padStart(2, '0')).join('');
+  if (expected.length !== signatureHex.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) {
+    diff |= expected.charCodeAt(i) ^ signatureHex.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+/**
+ * Parse a pay-gateway.nguyenai.net webhook body into a PaymentResult.
+ * Paid gate: event_type ∈ { payment.completed, order.paid }.
+ * Returns null for non-terminal / non-paid events.
+ */
+export function parsePayOsWebhook(body: Record<string, unknown>): PaymentResult | null {
+  const eventType = String(body.event_type ?? '');
+  if (eventType !== 'payment.completed' && eventType !== 'order.paid') return null;
+  const md = (body.metadata as Record<string, string>) ?? {};
+  return {
+    payment_id: crypto.randomUUID(),
+    gateway: 'payos',
+    gateway_payment_id: String(body.order_id ?? body.provider_order_id ?? ''),
+    amount: Number(body.amount) || 0,
+    currency: 'VND',
+    price_id: md.price_id ?? '',
+    user_id: md.user_id ?? '',
+    tenant_id: md.tenant_id ?? '',
+    status: 'paid',
+    paid_at: new Date().toISOString(),
+    raw: body,
   };
 }
 

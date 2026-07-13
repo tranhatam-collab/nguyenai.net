@@ -56,6 +56,7 @@ import {
 
 import { setAuditStore, logAuditEvent, logLoginSuccess, logLoginFailure, logLogout, logAccessDenied } from '@nai/audit';
 import { renderLoginPage, sanitizeRedirect } from './login-page';
+import { renderVerifyPage } from './verify-page';
 
 // R10 fix: Structured error logger — no console.error in production.
 function logError(scope: string, err: unknown): void {
@@ -119,9 +120,9 @@ interface AuthEnv {
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_REDIRECT_URI: string;
-    /** Primary email key — mail.iai.one (Founder directive: sole email provider) */
-    MAIL_IAI_ONE_API_KEY?: string;
-    /** @deprecated Use MAIL_IAI_ONE_API_KEY */
+    /** Primary email key — mail gateway (Founder directive: sole email provider) */
+    MAIL_GATEWAY_API_KEY?: string;
+    /** @deprecated Use MAIL_GATEWAY_API_KEY */
     RESEND_API_KEY?: string;
   };
   Variables: {
@@ -339,6 +340,27 @@ app.get('/auth', async (c) => {
   });
 });
 
+/** Email CTA target — welcome / email_verification templates link here */
+const VERIFY_PAGE_HEADERS = {
+  'Cache-Control': 'no-store, private',
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-Robots-Tag': 'noindex, nofollow, noarchive',
+} as const;
+
+app.get('/verify', (c) => {
+  const token = c.req.query('token') ?? null;
+  return c.html(renderVerifyPage({ token }), 200, { ...VERIFY_PAGE_HEADERS });
+});
+
+// Path form — emails link here. `?token=<hex…>` breaks when a MIME pipeline declares
+// quoted-printable without encoding the body (raw `=` + hex pair gets decoded in transit).
+app.get('/verify/:token', (c) => {
+  const token = c.req.param('token') || null;
+  return c.html(renderVerifyPage({ token }), 200, { ...VERIFY_PAGE_HEADERS });
+});
+
 app.get('/', (c) => c.redirect('/auth', 302));
 
 // ============================================================
@@ -426,7 +448,7 @@ app.post('/v1/auth/register', async (c) => {
 
   try {
     const { createEmailService } = await import('@nai/email');
-    const emailService = createEmailService(c.env as { MAIL_IAI_ONE_API_KEY?: string; RESEND_API_KEY?: string; ENVIRONMENT?: string });
+    const emailService = createEmailService(c.env as { MAIL_GATEWAY_API_KEY?: string; RESEND_API_KEY?: string; ENVIRONMENT?: string });
     await emailService.sendTemplate('welcome', {
       locale: userLocale as 'vi' | 'en',
       user_email: email,
@@ -481,7 +503,8 @@ app.post('/v1/auth/verify-email', async (c) => {
       user_agent: getUserAgent(c),
       target: user.user_id,
       result: 'success',
-      metadata: { email: user.email },
+      // Do not log raw email or verification token
+      metadata: { flow: 'email_verify' },
     });
   } catch (err) {
     logError('email_verified_audit', err);
@@ -1093,8 +1116,16 @@ function generateStateToken(): string {
 }
 
 app.get('/v1/auth/oauth/google/begin', async (c) => {
+  if (!c.env.GOOGLE_CLIENT_ID || !c.env.GOOGLE_CLIENT_SECRET) {
+    return c.json({
+      error: 'google_oauth_not_configured',
+      message: 'GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET chưa set trên nguyenai-auth.',
+    }, 503);
+  }
+
   const state = generateStateToken();
   const redirectUri = c.env.GOOGLE_REDIRECT_URI || `https://${c.env.AUTH_ISSUER}/v1/auth/oauth/google/callback`;
+  const postLogin = sanitizeRedirect(c.req.query('redirect')) ?? 'https://app.nguyenai.net/dashboard';
   const params = new URLSearchParams({
     client_id: c.env.GOOGLE_CLIENT_ID,
     redirect_uri: redirectUri,
@@ -1105,16 +1136,32 @@ app.get('/v1/auth/oauth/google/begin', async (c) => {
     prompt: 'select_account',
   });
   const url = `${GOOGLE_AUTH_URL}?${params.toString()}`;
-  // P0 fix: store state in HttpOnly cookie so callback can verify it (CSRF protection)
-  c.header('Set-Cookie', `oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`);
-  return c.json({ authorize_url: url, state });
+  c.header(
+    'Set-Cookie',
+    `oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`,
+  );
+  c.header(
+    'Set-Cookie',
+    `oauth_redirect=${encodeURIComponent(postLogin)}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/`,
+    { append: true },
+  );
+  const accept = c.req.header('Accept') ?? '';
+  if (accept.includes('text/html') && !accept.includes('application/json')) {
+    return c.redirect(url, 302);
+  }
+  return c.json({ authorize_url: url, state, redirect: postLogin });
 });
 
 // ============================================================
 // Google OAuth — GET /v1/auth/oauth/google/callback
 // ============================================================
 
-app.get('/v1/auth/oauth/google/callback', async (c) => {
+// Alias: the Google Console client registers https://auth.nguyenai.net/oauth/google/callback
+// (URI 17). Serving both paths lets GOOGLE_REDIRECT_URI point at whichever is registered.
+app.get('/oauth/google/callback', (c) => googleOauthCallback(c));
+app.get('/v1/auth/oauth/google/callback', (c) => googleOauthCallback(c));
+
+async function googleOauthCallback(c: Context<AuthEnv>) {
   const code = c.req.query('code');
   const state = c.req.query('state');
   const error = c.req.query('error');
@@ -1257,8 +1304,8 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
     tenant_id: tenantId,
     audience: c.env.DEFAULT_AUDIENCE,
     issuer: c.env.AUTH_ISSUER,
-    roles: ['user'],
-    permissions: getPermissionsForRoles(['user' as Role]),
+    roles: ['USER'],
+    permissions: getPermissionsForRoles(['USER' as Role]),
     device: JSON.stringify({ ua: userAgent }),
     ip_address: ip,
     user_agent: userAgent,
@@ -1270,14 +1317,25 @@ app.get('/v1/auth/oauth/google/callback', async (c) => {
 
   await setSignedSessionCookie(c, sessionId, maxAge);
 
+  // Clear OAuth CSRF cookies; redirect browser to safe post-login URL when present
+  const postLogin = sanitizeRedirect(getCookie(c, 'oauth_redirect')) ?? 'https://app.nguyenai.net/dashboard';
+  c.header('Set-Cookie', 'oauth_state=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
+  c.header('Set-Cookie', 'oauth_redirect=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
+
+  const accept = c.req.header('Accept') ?? '';
+  if (accept.includes('text/html') || c.req.query('format') === 'redirect') {
+    return c.redirect(postLogin, 302);
+  }
+
   return c.json({
     session_id: sessionId,
     user_id: userId,
     csrf_token: csrfToken,
     is_new_user: isNewUser,
     expires_at: getExpiresAt(maxAge),
+    redirect: postLogin,
   });
-});
+}
 
 // ============================================================
 // 404 + error handlers

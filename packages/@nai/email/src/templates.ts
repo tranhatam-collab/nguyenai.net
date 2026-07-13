@@ -40,6 +40,10 @@ import type { EmailTemplate, EmailTemplateId, TemplateContext } from './types';
 
 const BRAND_NAME = 'Nguyen AI';
 const BRAND_DOMAIN = 'nguyenai.net';
+const AUTH_DOMAIN = 'auth.nguyenai.net';
+// Path-based (no `=` in URL): some MIME pipelines declare quoted-printable without
+// encoding the body, so any raw `=` + hex pair (e.g. `?token=61…`) gets mangled in transit.
+const VERIFY_URL = (token: unknown) => `https://${AUTH_DOMAIN}/verify/${String(token ?? '')}`;
 const SUPPORT_EMAIL = 'hello@nguyenai.net';
 
 function baseHtml(opts: {
@@ -53,7 +57,7 @@ function baseHtml(opts: {
 <html lang="${opts.locale === 'vi' ? 'vi' : 'en'}" dir="${dir}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width&#61;device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>${escapeHtml(opts.title)}</title>
   <style>
@@ -137,13 +141,13 @@ export const TEMPLATES: Record<EmailTemplateId, EmailTemplate> = {
           ? 'Tài khoản Nguyen AI Computer của bạn đã được tạo thành công. Bạn sở hữu một AI Computer riêng trên đám mây với đội ngũ 9 Agent, bộ nhớ dài hạn, kho dữ liệu và 7 Super App di sản.'
           : 'Your Nguyen AI Computer account has been created. You now own a private AI Computer on the cloud with a team of 9 Agents, long-term memory, data vault, and 7 heritage Super Apps.'}</p>
         ${infoBox(ctx.locale === 'vi' ? 'Bước tiếp theo: xác minh email của bạn để kích hoạt tài khoản.' : 'Next step: verify your email to activate your account.')}
-        ${ctaButton(`https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}`, ctx.locale === 'vi' ? 'Xác minh email' : 'Verify email')}
+        ${ctaButton(VERIFY_URL(ctx.verification_token ?? ''), ctx.locale === 'vi' ? 'Xác minh email' : 'Verify email')}
         ${metaRow(ctx.locale === 'vi' ? 'Email' : 'Email', ctx.user_email)}
       `,
     }),
     text: (ctx) => ctx.locale === 'vi'
-      ? `Chào mừng ${ctx.user_name ?? ctx.user_email}!\n\nTài khoản Nguyen AI Computer đã được tạo. Xác minh email tại: https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}\n\n— ${BRAND_NAME}`
-      : `Welcome ${ctx.user_name ?? ctx.user_email}!\n\nYour Nguyen AI Computer account is ready. Verify your email at: https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}\n\n— ${BRAND_NAME}`,
+      ? `Chào mừng ${ctx.user_name ?? ctx.user_email}!\n\nTài khoản Nguyen AI Computer đã được tạo. Xác minh email tại: ${VERIFY_URL(ctx.verification_token ?? '')}\n\n— ${BRAND_NAME}`
+      : `Welcome ${ctx.user_name ?? ctx.user_email}!\n\nYour Nguyen AI Computer account is ready. Verify your email at: ${VERIFY_URL(ctx.verification_token ?? '')}\n\n— ${BRAND_NAME}`,
   },
 
   email_verification: {
@@ -157,14 +161,14 @@ export const TEMPLATES: Record<EmailTemplateId, EmailTemplate> = {
       bodyHtml: `
         <h1>${ctx.locale === 'vi' ? 'Xác minh email' : 'Verify your email'}</h1>
         <p>${ctx.locale === 'vi' ? 'Nhấn nút bên dưới để xác minh email và kích hoạt tài khoản.' : 'Click the button below to verify your email and activate your account.'}</p>
-        ${ctaButton(`https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}`, ctx.locale === 'vi' ? 'Xác minh ngay' : 'Verify now')}
+        ${ctaButton(VERIFY_URL(ctx.verification_token ?? ''), ctx.locale === 'vi' ? 'Xác minh ngay' : 'Verify now')}
         ${infoBox(ctx.locale === 'vi' ? 'Link hết hạn sau 24 giờ. Nếu không phải bạn yêu cầu, bỏ qua email này.' : 'Link expires in 24 hours. If you did not request this, ignore this email.')}
         ${metaRow(ctx.locale === 'vi' ? 'Email' : 'Email', ctx.user_email)}
       `,
     }),
     text: (ctx) => ctx.locale === 'vi'
-      ? `Xác minh email\n\nNhấn link: https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}\n\nLink hết hạn sau 24 giờ.\n\n— ${BRAND_NAME}`
-      : `Verify your email\n\nClick: https://${BRAND_DOMAIN}/verify?token=${ctx.verification_token ?? ''}\n\nLink expires in 24 hours.\n\n— ${BRAND_NAME}`,
+      ? `Xác minh email\n\nNhấn link: ${VERIFY_URL(ctx.verification_token ?? '')}\n\nLink hết hạn sau 24 giờ.\n\n— ${BRAND_NAME}`
+      : `Verify your email\n\nClick: ${VERIFY_URL(ctx.verification_token ?? '')}\n\nLink expires in 24 hours.\n\n— ${BRAND_NAME}`,
   },
 
   login_alert: {

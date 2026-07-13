@@ -4,7 +4,7 @@
  * Per INVESTOR_ACCESS_POLICY §3 (LOCKED) — 6-step verification flow:
  *   1. Google Login — @nai/auth (not here)
  *   2. POST /v1/investor/identity — declare identity (P2-B.3)
- *   3. POST /v1/investor/identity/verify/start — start verify.iai.one (P2-B.4)
+ *   3. POST /v1/investor/identity/verify/start — start verify-gateway.nguyenai.net (P2-B.4)
  *      POST /v1/investor/identity/verify/complete — poll result
  *   4. POST /v1/investor/payment — initiate payment (P2-B.5/B.6)
  *      GET  /v1/investor/payment/qr — get VN QR checkout payload
@@ -175,7 +175,7 @@ investorRoutes.get('/identity', async (c) => {
 });
 
 // ============================================================
-// Step 3 — Identity verification via verify.iai.one (P2-B.4)
+// Step 3 — Identity verification via verify-gateway.nguyenai.net (P2-B.4)
 // ============================================================
 
 // POST /v1/investor/identity/verify/start
