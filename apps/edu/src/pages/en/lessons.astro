@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import LessonPlayer from '../../components/LessonPlayer.astro';
 
 const title = 'Lessons';
 const description = 'Every lesson has 8 components: lecture, reading, quiz, task, product, rubric, review, receipt.';
@@ -12,8 +13,6 @@ const locale = 'en';
       <h1>Lessons</h1>
       <p>Every lesson has 8 components: lecture, reading, quiz, task, product, rubric, review, receipt.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <LessonPlayer lessonTitle="Sample lesson — Intro to Nguyen AI Computer" lessonLevel="0" />
   </main>
 </AcademyLayout>

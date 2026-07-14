@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import DashboardPanel from '../../components/DashboardPanel.astro';
 
 const title = 'Start';
 const description = 'Register and take the entry assessment — start your 90-day journey.';
@@ -9,11 +10,18 @@ const locale = 'en';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="start">
   <main class="edu-page">
     <section class="hero">
-      <h1>Start</h1>
-      <p>Register and take the entry assessment — start your 90-day journey.</p>
+      <h1>Start your 90-day journey</h1>
+      <p>Register, take the entry assessment, get your 90-day map and start learning real, working real.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
+    <section class="start-steps">
+      <ol class="steps-list">
+        <li><strong>Register an account</strong> — free, email + password or Google.</li>
+        <li><strong>Take the entry assessment</strong> — 10 questions, 5 minutes. <a href="/en/assessment" class="edu-link">Start assessment →</a></li>
+        <li><strong>Get your 90-day map</strong> — goals, 30/60/90 milestones, roadmap. <a href="/en/90-day-map" class="edu-link">View map →</a></li>
+        <li><strong>Choose a learning path</strong> — 5 levels from Kickoff to Expert. <a href="/en/learning-paths" class="edu-link">Choose path →</a></li>
+        <li><strong>Start your first lesson</strong> — 8 components: lecture, reading, quiz, task, product, rubric, review, receipt.</li>
+      </ol>
     </section>
+    <DashboardPanel />
   </main>
 </AcademyLayout>

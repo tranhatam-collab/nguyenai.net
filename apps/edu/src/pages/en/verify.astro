@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import ReceiptLookup from '../../components/ReceiptLookup.astro';
 
 const title = 'Verify';
 const description = 'Verify competence receipts — public lookup.';
@@ -9,11 +10,9 @@ const locale = 'en';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="verify">
   <main class="edu-page">
     <section class="hero">
-      <h1>Verify</h1>
+      <h1>Verify Receipt</h1>
       <p>Verify competence receipts — public lookup.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <ReceiptLookup />
   </main>
 </AcademyLayout>

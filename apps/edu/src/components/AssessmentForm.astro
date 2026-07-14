@@ -1,0 +1,117 @@
+---
+/**
+ * AssessmentForm — form đánh giá đầu vào (10 câu)
+ * Gọi POST /v1/edu/assessment/start → POST /v1/edu/assessment/:id/submit
+ */
+---
+
+<section class="edu-assessment" data-edu-assessment>
+  <div class="assessment-intro" data-intro>
+    <h2>Đánh giá đầu vào</h2>
+    <p>10 câu hỏi để hiểu bạn — mất khoảng 5 phút. Kết quả sẽ tạo bản đồ 90 ngày.</p>
+    <button type="button" class="edu-btn edu-btn-primary" data-start-btn>Bắt đầu đánh giá</button>
+  </div>
+
+  <div class="assessment-form hidden" data-form>
+    <form data-assessment-form>
+      <div class="assessment-questions" data-questions></div>
+      <button type="submit" class="edu-btn edu-btn-primary">Nộp đánh giá</button>
+    </form>
+  </div>
+
+  <div class="assessment-result hidden" data-result>
+    <h2>Kết quả đánh giá</h2>
+    <div data-result-content></div>
+    <a href="/ban-do-90-ngay" class="edu-btn edu-btn-secondary">Tạo bản đồ 90 ngày</a>
+  </div>
+
+  <div class="assessment-error hidden" data-error>
+    <p>Bạn cần đăng nhập để làm đánh giá. <a href="https://auth.nguyenai.net/auth?redirect=https://edu.nguyenai.net/danh-gia" class="edu-link">Đăng nhập</a></p>
+  </div>
+</section>
+
+<script is:inline define:vars={{ apiBase: 'https://api.nguyenai.net' }}>
+  (function() {
+    const intro = document.querySelector('[data-intro]');
+    const form = document.querySelector('[data-form]');
+    const result = document.querySelector('[data-result]');
+    const error = document.querySelector('[data-error]');
+    const questionsEl = document.querySelector('[data-questions]');
+    const startBtn = document.querySelector('[data-start-btn]');
+    const formEl = document.querySelector('[data-assessment-form]') as HTMLFormElement | null;
+    const resultContent = document.querySelector('[data-result-content]');
+    let assessmentId: string | null = null;
+
+    startBtn?.addEventListener('click', async () => {
+      try {
+        const res = await fetch(`${apiBase}/v1/edu/assessment/start`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'entry' }),
+        });
+        if (res.status === 401) {
+          intro?.classList.add('hidden');
+          error?.classList.remove('hidden');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        assessmentId = data.assessment_id;
+
+        // Render questions
+        if (questionsEl) {
+          questionsEl.innerHTML = data.questions.map((q: any) => {
+            if (q.type === 'scale_1_5') {
+              return `<div class="question"><label>${q.id}. ${q.question}</label><div class="scale-options">${[1,2,3,4,5].map(n => `<label class="scale-opt"><input type="radio" name="q${q.id}" value="${n}"> ${n}</label>`).join('')}</div></div>`;
+            } else if (q.type === 'multi') {
+              return `<div class="question"><label>${q.id}. ${q.question}</label><textarea name="q${q.id}" rows="2" placeholder="Liệt kê cách nhau bởi dấu phẩy"></textarea></div>`;
+            } else if (q.type === 'choice') {
+              return `<div class="question"><label>${q.id}. ${q.question}</label><select name="q${q.id}"><option value="">Chọn...</option><option value="5">5 giờ/tuần</option><option value="10">10 giờ/tuần</option><option value="20">20 giờ/tuần</option><option value="40">40 giờ/tuần (toàn thời)</option></select></div>`;
+            }
+            return `<div class="question"><label>${q.id}. ${q.question}</label><textarea name="q${q.id}" rows="3"></textarea></div>`;
+          }).join('');
+        }
+
+        intro?.classList.add('hidden');
+        form?.classList.remove('hidden');
+      } catch (e) {
+        console.error('Assessment start failed:', e);
+        error?.classList.remove('hidden');
+      }
+    });
+
+    formEl?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!assessmentId) return;
+      const formData = new FormData(formEl);
+      const answers: any[] = [];
+      for (const q of [1,2,3,4,5,6,7,8,9,10]) {
+        const val = formData.get(`q${q}`);
+        if (val) {
+          answers.push({ question_id: q, value: typeof val === 'string' && /^\d+$/.test(val) ? parseInt(val) : val });
+        }
+      }
+      try {
+        const res = await fetch(`${apiBase}/v1/edu/assessment/${assessmentId}/submit`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        form?.classList.add('hidden');
+        if (resultContent) {
+          resultContent.innerHTML = `
+            <p>Đã trả lời <strong>${data.score}/${data.max_score}</strong> câu hỏi.</p>
+            <p>Mức độ tự tin: <strong>${data.result.confidence}</strong></p>
+            <p>Có hướng nghề: <strong>${data.result.has_career_direction ? 'Có' : 'Chưa rõ'}</strong></p>`;
+        }
+        result?.classList.remove('hidden');
+      } catch (e) {
+        console.error('Assessment submit failed:', e);
+      }
+    });
+  })();
+</script>

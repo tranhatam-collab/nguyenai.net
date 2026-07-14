@@ -1,0 +1,168 @@
+---
+/**
+ * DashboardPanel — hiển thị tổng quan cho người học
+ * Gọi /v1/edu/dashboard khi có session, fallback login prompt
+ */
+import ProgressBar from './ProgressBar.astro';
+---
+
+<section class="edu-dashboard" data-edu-dashboard>
+  <div class="dashboard-loading" data-loading>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+  <div class="dashboard-error hidden" data-error>
+    <p>Bạn cần đăng nhập để xem dashboard. <a href="https://auth.nguyenai.net/auth?redirect=https://edu.nguyenai.net/bat-dau" class="edu-link">Đăng nhập</a></p>
+  </div>
+  <div class="dashboard-content hidden" data-content>
+    <!-- Profile -->
+    <div class="dashboard-card" data-section="profile">
+      <h2>Hồ sơ người học</h2>
+      <div data-profile-fields></div>
+    </div>
+
+    <!-- Career Map -->
+    <div class="dashboard-card" data-section="career-map">
+      <h2>Bản đồ 90 ngày</h2>
+      <div data-career-map></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="dashboard-card" data-section="progress">
+      <h2>Tiến độ</h2>
+      <div data-progress></div>
+    </div>
+
+    <!-- Submissions -->
+    <div class="dashboard-card" data-section="submissions">
+      <h2>Bài nộp gần đây</h2>
+      <div data-submissions></div>
+    </div>
+
+    <!-- Products -->
+    <div class="dashboard-card" data-section="products">
+      <h2>Sản phẩm</h2>
+      <div data-products></div>
+    </div>
+
+    <!-- Certificates -->
+    <div class="dashboard-card" data-section="certificates">
+      <h2>Chứng nhận</h2>
+      <div data-certificates></div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ apiBase: 'https://api.nguyenai.net' }}>
+  (async function() {
+    const loading = document.querySelector('[data-loading]');
+    const error = document.querySelector('[data-error]');
+    const content = document.querySelector('[data-content]');
+
+    try {
+      const res = await fetch(`${apiBase}/v1/edu/dashboard`, { credentials: 'include' });
+      if (res.status === 401) {
+        loading?.classList.add('hidden');
+        error?.classList.remove('hidden');
+        return;
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      loading?.classList.add('hidden');
+      content?.classList.remove('hidden');
+
+      // Profile
+      const profileFields = document.querySelector('[data-profile-fields]');
+      if (profileFields) {
+        if (data.profile) {
+          const p = data.profile;
+          profileFields.innerHTML = `
+            <dl class="edu-dl">
+              <dt>Tên hiển thị</dt><dd>${p.display_name || '—'}</dd>
+              <dt>Khu vực</dt><dd>${p.region || '—'}</dd>
+              <dt>Ngày ghi danh</dt><dd>${new Date(p.enrollment_date).toLocaleDateString('vi-VN')}</dd>
+            </dl>`;
+        } else {
+          profileFields.innerHTML = '<p class="edu-muted">Chưa có hồ sơ. <a href="/bat-dau" class="edu-link">Tạo hồ sơ</a></p>';
+        }
+      }
+
+      // Career Map
+      const careerMapEl = document.querySelector('[data-career-map]');
+      if (careerMapEl) {
+        if (data.career_map) {
+          const cm = data.career_map;
+          const milestones = JSON.parse(cm.milestones || '[]');
+          careerMapEl.innerHTML = `
+            <p><strong>${cm.goal_title}</strong></p>
+            <p class="edu-muted">Hạn: ${new Date(cm.goal_deadline).toLocaleDateString('vi-VN')}</p>
+            <div class="milestones">
+              ${milestones.map((m: any) => `
+                <div class="milestone">
+                  <span class="milestone-phase">${m.phase} ngày</span>
+                  <ul>${m.goals.map((g: string) => `<li>${g}</li>`).join('')}</ul>
+                </div>
+              `).join('')}
+            </div>`;
+        } else {
+          careerMapEl.innerHTML = '<p class="edu-muted">Chưa có bản đồ. <a href="/danh-gia" class="edu-link">Làm đánh giá đầu vào</a></p>';
+        }
+      }
+
+      // Progress
+      const progressEl = document.querySelector('[data-progress]');
+      if (progressEl) {
+        const totalSubs = data.submissions?.length || 0;
+        const reviewed = data.submissions?.filter((s: any) => s.status === 'reviewed').length || 0;
+        const totalProducts = data.products?.length || 0;
+        progressEl.innerHTML = `
+          <div class="progress-grid">
+            <div><span class="stat-num">${totalSubs}</span><span class="stat-label">Bài nộp</span></div>
+            <div><span class="stat-num">${reviewed}</span><span class="stat-label">Đã duyệt</span></div>
+            <div><span class="stat-num">${totalProducts}</span><span class="stat-label">Sản phẩm</span></div>
+            <div><span class="stat-num">${data.certificates?.length || 0}</span><span class="stat-label">Chứng nhận</span></div>
+          </div>`;
+      }
+
+      // Submissions
+      const subsEl = document.querySelector('[data-submissions]');
+      if (subsEl) {
+        if (data.submissions?.length) {
+          subsEl.innerHTML = '<ul class="edu-list">' + data.submissions.map((s: any) => `
+            <li><span class="status-badge status-${s.status}">${s.status}</span> ${new Date(s.submitted_at).toLocaleDateString('vi-VN')}</li>
+          `).join('') + '</ul>';
+        } else {
+          subsEl.innerHTML = '<p class="edu-muted">Chưa có bài nộp.</p>';
+        }
+      }
+
+      // Products
+      const productsEl = document.querySelector('[data-products]');
+      if (productsEl) {
+        if (data.products?.length) {
+          productsEl.innerHTML = '<ul class="edu-list">' + data.products.map((p: any) => `
+            <li><strong>${p.title}</strong> ${p.rubric_level ? `<span class="rubric-badge">${p.rubric_level}</span>` : ''} ${p.verification_code ? `<a href="/xac-minh?code=${p.verification_code}" class="edu-link">Biên nhận</a>` : ''}</li>
+          `).join('') + '</ul>';
+        } else {
+          productsEl.innerHTML = '<p class="edu-muted">Chưa có sản phẩm.</p>';
+        }
+      }
+
+      // Certificates
+      const certsEl = document.querySelector('[data-certificates]');
+      if (certsEl) {
+        if (data.certificates?.length) {
+          certsEl.innerHTML = '<ul class="edu-list">' + data.certificates.map((c: any) => `
+            <li><strong>${c.type} — Cấp ${c.level}</strong> <a href="/xac-minh?code=${c.verification_code}" class="edu-link">Tra cứu</a></li>
+          `).join('') + '</ul>';
+        } else {
+          certsEl.innerHTML = '<p class="edu-muted">Chưa có chứng nhận.</p>';
+        }
+      }
+    } catch (e) {
+      loading?.classList.add('hidden');
+      error?.classList.remove('hidden');
+      console.error('Dashboard load failed:', e);
+    }
+  })();
+</script>

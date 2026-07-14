@@ -1,0 +1,75 @@
+---
+/**
+ * ReceiptLookup — tra cứu biên nhận năng lực (PUBLIC, no auth)
+ * GET /v1/edu/verification/:code
+ * Hỗ trợ ?code=xxx từ URL hoặc nhập tay
+ */
+const url = new URL(Astro.request.url);
+const initialCode = url.searchParams.get('code') || '';
+---
+
+<section class="edu-verify" data-edu-verify>
+  <h2>Tra cứu biên nhận năng lực</h2>
+  <p>Nhập mã tra cứu (verification code) in trên chứng nhận hoặc biên nhận.</p>
+  <form data-verify-form>
+    <input type="text" name="code" placeholder="VD: NAI-EDU-XXXX-XXXX" value={initialCode} required>
+    <button type="submit" class="edu-btn edu-btn-primary">Tra cứu</button>
+  </form>
+  <div class="verify-result hidden" data-result></div>
+  <div class="verify-error hidden" data-error></div>
+</section>
+
+<script is:inline define:vars={{ apiBase: 'https://api.nguyenai.net' }}>
+  (function() {
+    const form = document.querySelector('[data-verify-form]') as HTMLFormElement | null;
+    const result = document.querySelector('[data-result]');
+    const errorEl = document.querySelector('[data-error]');
+
+    async function lookup(code: string) {
+      try {
+        const res = await fetch(`${apiBase}/v1/edu/verification/${encodeURIComponent(code)}`);
+        if (res.status === 404) {
+          result?.classList.add('hidden');
+          errorEl?.classList.remove('hidden');
+          if (errorEl) errorEl.innerHTML = '<p>Biên nhận không tồn tại hoặc đã bị thu hồi.</p>';
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        errorEl?.classList.add('hidden');
+        result?.classList.remove('hidden');
+        if (result) {
+          result.innerHTML = `
+            <div class="receipt-card">
+              <h3>Biên nhận hợp lệ</h3>
+              <dl class="edu-dl">
+                <dt>Mã</dt><dd><code>${data.verification_code}</code></dd>
+                <dt>Loại</dt><dd>${data.record_type || 'Năng lực'}</dd>
+                <dt>Người học</dt><dd>${data.learner_name || '—'}</dd>
+                <dt>Nội dung</dt><dd>${data.title || data.description || '—'}</dd>
+                <dt>Mức rubric</dt><dd>${data.rubric_level || '—'}</dd>
+                <dt>Ngày cấp</dt><dd>${data.issued_at ? new Date(data.issued_at).toLocaleDateString('vi-VN') : '—'}</dd>
+                <dt>Trạng thái</dt><dd><span class="status-badge status-active">${data.status}</span></dd>
+              </dl>
+            </div>`;
+        }
+      } catch (e) {
+        console.error('Verify failed:', e);
+        errorEl?.classList.remove('hidden');
+      }
+    }
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = (form.querySelector('[name="code"]') as HTMLInputElement).value.trim();
+      if (code) lookup(code);
+    });
+
+    // Auto-lookup if code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoCode = urlParams.get('code');
+    if (autoCode) {
+      lookup(autoCode);
+    }
+  })();
+</script>

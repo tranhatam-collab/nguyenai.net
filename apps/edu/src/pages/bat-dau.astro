@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import DashboardPanel from '../components/DashboardPanel.astro';
 
 const title = 'Bắt đầu';
 const description = 'Đăng ký và đánh giá đầu vào — bắt đầu hành trình 90 ngày.';
@@ -9,11 +10,18 @@ const locale = 'vi';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="bat-dau">
   <main class="edu-page">
     <section class="hero">
-      <h1>Bắt đầu</h1>
-      <p>Đăng ký và đánh giá đầu vào — bắt đầu hành trình 90 ngày.</p>
+      <h1>Bắt đầu hành trình 90 ngày</h1>
+      <p>Đăng ký, làm đánh giá đầu vào, nhận bản đồ 90 ngày và bắt đầu học thật, làm thật.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="start-steps">
+      <ol class="steps-list">
+        <li><strong>Đăng ký tài khoản</strong> — miễn phí, email + mật khẩu hoặc Google.</li>
+        <li><strong>Làm đánh giá đầu vào</strong> — 10 câu hỏi, 5 phút. <a href="/danh-gia" class="edu-link">Bắt đầu đánh giá →</a></li>
+        <li><strong>Nhận bản đồ 90 ngày</strong> — mục tiêu, mốc 30/60/90, lộ trình. <a href="/ban-do-90-ngay" class="edu-link">Xem bản đồ →</a></li>
+        <li><strong>Chọn lộ trình học</strong> — 5 cấp từ Khởi động đến Chuyên Gia. <a href="/lo-trinh" class="edu-link">Chọn lộ trình →</a></li>
+        <li><strong>Bắt đầu bài học đầu tiên</strong> — 8 thành phần: giảng, đọc, kiểm tra, nhiệm vụ, sản phẩm, rubric, duyệt, biên nhận.</li>
+      </ol>
     </section>
+    <DashboardPanel />
   </main>
 </AcademyLayout>

@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import SubmissionForm from '../../components/SubmissionForm.astro';
 
 const title = 'Tasks';
 const description = 'Hands-on tasks with Nguyen AI Computer — real work, real submission.';
@@ -9,11 +10,9 @@ const locale = 'en';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="tasks">
   <main class="edu-page">
     <section class="hero">
-      <h1>Tasks</h1>
+      <h1>Hands-on Tasks</h1>
       <p>Hands-on tasks with Nguyen AI Computer — real work, real submission.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <SubmissionForm assignmentTitle="Sample task — Build a small product" />
   </main>
 </AcademyLayout>

@@ -1,0 +1,100 @@
+---
+/**
+ * CareerMapPanel — hiển thị + tạo bản đồ 90 ngày
+ * GET /v1/edu/career-map → POST /v1/edu/career-map nếu chưa có
+ */
+---
+
+<section class="edu-career-map" data-edu-career-map>
+  <div class="cm-loading" data-loading>
+    <p>Đang tải bản đồ...</p>
+  </div>
+  <div class="cm-error hidden" data-error>
+    <p>Bạn cần đăng nhập. <a href="https://auth.nguyenai.net/auth?redirect=https://edu.nguyenai.net/ban-do-90-ngay" class="edu-link">Đăng nhập</a></p>
+  </div>
+  <div class="cm-empty hidden" data-empty>
+    <h2>Tạo bản đồ 90 ngày</h2>
+    <p>Bản đồ 90 ngày giúp bạn đặt mục tiêu rõ ràng và theo dõi tiến độ.</p>
+    <form data-cm-form>
+      <label>Mục tiêu 90 ngày <input type="text" name="goal_title" placeholder="VD: Hoàn thành Cấp 1 + 4 sản phẩm trụ cột" required></label>
+      <label>Mô tả chi tiết <textarea name="goal_description" rows="3"></textarea></label>
+      <label>Lĩnh vực quan tâm <input type="text" name="career_track" placeholder="VD: Content, Code, Founder"></label>
+      <button type="submit" class="edu-btn edu-btn-primary">Tạo bản đồ</button>
+    </form>
+  </div>
+  <div class="cm-content hidden" data-content>
+    <h2 data-cm-title></h2>
+    <p class="edu-muted" data-cm-deadline></p>
+    <div class="milestones" data-cm-milestones></div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ apiBase: 'https://api.nguyenai.net' }}>
+  (async function() {
+    const loading = document.querySelector('[data-loading]');
+    const error = document.querySelector('[data-error]');
+    const empty = document.querySelector('[data-empty]');
+    const content = document.querySelector('[data-content]');
+    const formEl = document.querySelector('[data-cm-form]') as HTMLFormElement | null;
+
+    async function loadMap() {
+      try {
+        const res = await fetch(`${apiBase}/v1/edu/career-map`, { credentials: 'include' });
+        if (res.status === 401) {
+          loading?.classList.add('hidden');
+          error?.classList.remove('hidden');
+          return;
+        }
+        if (res.status === 404) {
+          loading?.classList.add('hidden');
+          empty?.classList.remove('hidden');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const cm = await res.json();
+        loading?.classList.add('hidden');
+        content?.classList.remove('hidden');
+
+        const titleEl = document.querySelector('[data-cm-title]');
+        const deadlineEl = document.querySelector('[data-cm-deadline]');
+        const milestonesEl = document.querySelector('[data-cm-milestones]');
+        if (titleEl) titleEl.textContent = cm.goal_title;
+        if (deadlineEl) deadlineEl.textContent = `Hạn: ${new Date(cm.goal_deadline).toLocaleDateString('vi-VN')}`;
+        if (milestonesEl) {
+          const milestones = JSON.parse(cm.milestones || '[]');
+          milestonesEl.innerHTML = milestones.map((m: any) => `
+            <div class="milestone">
+              <span class="milestone-phase">${m.phase} ngày</span>
+              <ul>${m.goals.map((g: string) => `<li>${g}</li>`).join('')}</ul>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        loading?.classList.add('hidden');
+        error?.classList.remove('hidden');
+      }
+    }
+
+    formEl?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(formEl);
+      const body: any = {};
+      formData.forEach((v, k) => { body[k] = v; });
+      try {
+        const res = await fetch(`${apiBase}/v1/edu/career-map`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        empty?.classList.add('hidden');
+        await loadMap();
+      } catch (err) {
+        console.error('Career map create failed:', err);
+      }
+    });
+
+    loadMap();
+  })();
+</script>

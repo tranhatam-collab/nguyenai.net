@@ -1,0 +1,93 @@
+---
+/**
+ * SubmissionForm — form nộp bài (sản phẩm)
+ * POST /v1/edu/submission
+ */
+interface Props {
+  assignmentId?: string;
+  assignmentTitle?: string;
+}
+const { assignmentId = '', assignmentTitle = 'Bài tập' } = Astro.props;
+---
+
+<section class="edu-submission" data-edu-submission>
+  <h2>Nộp bài: {assignmentTitle}</h2>
+  <form data-submission-form data-assignment-id={assignmentId}>
+    <div class="form-group">
+      <label for="content">Nội dung bài nộp <span class="required">*</span></label>
+      <textarea id="content" name="content" rows="8" required placeholder="Mô tả sản phẩm của bạn, quá trình làm, kết quả..."></textarea>
+    </div>
+    <div class="form-group">
+      <label for="work_log">Nhật ký làm việc</label>
+      <textarea id="work_log" name="work_log" rows="4" placeholder="Ghi lại các bước đã làm, thời gian, công cụ dùng..."></textarea>
+    </div>
+    <div class="form-group">
+      <label for="attachments">Link đính kèm (URL, cách nhau bởi dấu phẩy)</label>
+      <input type="text" id="attachments" name="attachments" placeholder="https://...">
+    </div>
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" name="ai_assistance_disclosed" value="1">
+        Tôi khai báo đã sử dụng hỗ trợ AI trong bài này
+      </label>
+    </div>
+    <div class="form-group" id="ai-detail-group" style="display:none;">
+      <label for="ai_detail">Chi tiết hỗ trợ AI</label>
+      <textarea id="ai_detail" name="ai_assistance_detail" rows="2" placeholder="AI đã giúp gì? Bạn đã chỉnh sửa gì?"></textarea>
+    </div>
+    <button type="submit" class="edu-btn edu-btn-primary">Nộp bài</button>
+  </form>
+  <div class="submission-result hidden" data-result>
+    <p>✓ Đã nộp bài thành công. <a href="/bai-hoc" class="edu-link">Quay lại bài học</a></p>
+  </div>
+  <div class="submission-error hidden" data-error>
+    <p>Lỗi nộp bài. Bạn có cần <a href="https://auth.nguyenai.net/auth?redirect=https://edu.nguyenai.net/bai-hoc" class="edu-link">đăng nhập</a>?</p>
+  </div>
+</section>
+
+<script is:inline>
+  (function() {
+    const form = document.querySelector('[data-submission-form]') as HTMLFormElement | null;
+    const result = document.querySelector('[data-result]');
+    const errorEl = document.querySelector('[data-error]');
+    const aiCheckbox = form?.querySelector('[name="ai_assistance_disclosed"]') as HTMLInputElement | null;
+    const aiDetailGroup = document.getElementById('ai-detail-group');
+
+    aiCheckbox?.addEventListener('change', () => {
+      if (aiDetailGroup) aiDetailGroup.style.display = aiCheckbox.checked ? 'block' : 'none';
+    });
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const assignmentId = form.getAttribute('data-assignment-id');
+      const formData = new FormData(form);
+      const attachmentsStr = (formData.get('attachments') as string || '').trim();
+      const body: any = {
+        assignment_id: assignmentId,
+        content: formData.get('content'),
+        work_log: formData.get('work_log'),
+        ai_assistance_disclosed: !!formData.get('ai_assistance_disclosed'),
+        ai_assistance_detail: formData.get('ai_assistance_detail') || null,
+        attachments: attachmentsStr ? attachmentsStr.split(',').map(s => s.trim()).filter(Boolean) : [],
+      };
+      try {
+        const res = await fetch('https://api.nguyenai.net/v1/edu/submission', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 401) {
+          errorEl?.classList.remove('hidden');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        form.style.display = 'none';
+        result?.classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission failed:', err);
+        errorEl?.classList.remove('hidden');
+      }
+    });
+  })();
+</script>

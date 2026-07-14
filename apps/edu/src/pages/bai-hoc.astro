@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import LessonPlayer from '../components/LessonPlayer.astro';
 
 const title = 'Bài học';
 const description = 'Mỗi bài học có đủ 8 thành phần: giảng, đọc, kiểm tra, nhiệm vụ, sản phẩm, rubric, duyệt, biên nhận.';
@@ -12,8 +13,6 @@ const locale = 'vi';
       <h1>Bài học</h1>
       <p>Mỗi bài học có đủ 8 thành phần: giảng, đọc, kiểm tra, nhiệm vụ, sản phẩm, rubric, duyệt, biên nhận.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <LessonPlayer lessonTitle="Bài học mẫu — Giới thiệu Máy Tính AI Nguyễn" lessonLevel="0" />
   </main>
 </AcademyLayout>

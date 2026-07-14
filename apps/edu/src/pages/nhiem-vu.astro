@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import SubmissionForm from '../components/SubmissionForm.astro';
 
 const title = 'Nhiệm vụ';
 const description = 'Nhiệm vụ thực hành trên Máy Tính AI Nguyễn — làm thật, nộp thật.';
@@ -9,11 +10,9 @@ const locale = 'vi';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="nhiem-vu">
   <main class="edu-page">
     <section class="hero">
-      <h1>Nhiệm vụ</h1>
+      <h1>Nhiệm vụ thực hành</h1>
       <p>Nhiệm vụ thực hành trên Máy Tính AI Nguyễn — làm thật, nộp thật.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <SubmissionForm assignmentTitle="Nhiệm vụ mẫu — Tạo sản phẩm nhỏ" />
   </main>
 </AcademyLayout>

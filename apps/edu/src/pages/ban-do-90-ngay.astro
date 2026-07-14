@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import CareerMapPanel from '../components/CareerMapPanel.astro';
 
 const title = 'Bản đồ 90 ngày';
 const description = 'Bản đồ hành động 30-60-90 ngày — mục tiêu, mốc, lộ trình.';
@@ -10,10 +11,8 @@ const locale = 'vi';
   <main class="edu-page">
     <section class="hero">
       <h1>Bản đồ 90 ngày</h1>
-      <p>Bản đồ hành động 30-60-90 ngày — mục tiêu, mốc, lộ trình.</p>
+      <p>Mục tiêu, mốc 30-60-90 ngày, lộ trình hành động.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <CareerMapPanel />
   </main>
 </AcademyLayout>

@@ -1,0 +1,132 @@
+---
+/**
+ * LessonPlayer — hiển thị bài học với 8 thành phần
+ * 1. Giảng (video/audio)  2. Đọc (transcript)  3. Kiểm tra (quiz)
+ * 4. Nhiệm vụ (task)      5. Sản phẩm           6. Rubric
+ * 7. Duyệt (review)       8. Biên nhận (receipt)
+ */
+interface Props {
+  lessonId?: string;
+  lessonTitle?: string;
+  lessonLevel?: string;
+}
+const { lessonId = '', lessonTitle = 'Bài học mẫu', lessonLevel = '0' } = Astro.props;
+
+const components = [
+  { id: 'lecture', label: 'Giảng', icon: '▶' },
+  { id: 'reading', label: 'Đọc', icon: '📖' },
+  { id: 'quiz', label: 'Kiểm tra', icon: '?' },
+  { id: 'task', label: 'Nhiệm vụ', icon: '✓' },
+  { id: 'product', label: 'Sản phẩm', icon: '◆' },
+  { id: 'rubric', label: 'Rubric', icon: '📊' },
+  { id: 'review', label: 'Duyệt', icon: '👁' },
+  { id: 'receipt', label: 'Biên nhận', icon: '🏷' },
+];
+---
+
+<section class="edu-lesson-player" data-lesson-id={lessonId}>
+  <header class="lesson-header">
+    <h2>{lessonTitle}</h2>
+    <span class="lesson-level">Cấp {lessonLevel}</span>
+  </header>
+
+  <nav class="lesson-tabs" role="tablist">
+    {components.map((c, i) => (
+      <button
+        type="button"
+        class={`lesson-tab ${i === 0 ? 'active' : ''}`}
+        data-tab={c.id}
+        role="tab"
+        aria-selected={i === 0 ? 'true' : 'false'}
+      >
+        <span class="tab-icon" aria-hidden="true">{c.icon}</span>
+        <span class="tab-label">{c.label}</span>
+      </button>
+    ))}
+  </nav>
+
+  <div class="lesson-content">
+    <div class="lesson-panel active" data-panel="lecture">
+      <h3>Giảng</h3>
+      <div class="video-placeholder">
+        <p>Video bài giảng sẽ hiển thị ở đây.</p>
+        <p class="edu-muted">Nội dung thật sẽ được thêm trong Sprint 3 khi có content production.</p>
+      </div>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="reading">
+      <h3>Đọc</h3>
+      <article class="reading-content">
+        <p>Transcript và tài liệu đọc sẽ hiển thị ở đây.</p>
+      </article>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="quiz">
+      <h3>Kiểm tra</h3>
+      <p class="edu-muted">Bài kiểm tra ngắn sau bài giảng.</p>
+      <button type="button" class="edu-btn edu-btn-secondary" data-start-quiz>Làm bài kiểm tra</button>
+      <div class="quiz-result hidden" data-quiz-result></div>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="task">
+      <h3>Nhiệm vụ</h3>
+      <p>Mô tả nhiệm vụ thực hành.</p>
+      <ul class="task-list">
+        <li>Đọc kỹ tài liệu</li>
+        <li>Thực hành trên Máy Tính AI Nguyễn</li>
+        <li>Tạo sản phẩm nhỏ</li>
+        <li>Nộp sản phẩm + nhật ký làm việc</li>
+      </ul>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="product">
+      <h3>Sản phẩm</h3>
+      <p>Sản phẩm bạn cần tạo ra sau bài học này.</p>
+      <p class="edu-muted">Không có sản phẩm = chưa hoàn thành bài học.</p>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="rubric">
+      <h3>Rubric (4 mức)</h3>
+      <table class="rubric-table">
+        <thead><tr><th>Mức</th><th>Tiêu chí</th></tr></thead>
+        <tbody>
+          <tr><td>A — Xuất sắc</td><td>Sản phẩm vượt yêu cầu, có thể dùng ngay</td></tr>
+          <tr><td>B — Đạt</td><td>Sản phẩm đủ yêu cầu, dùng được</td></tr>
+          <tr><td>C — Cần sửa</td><td>Sản phẩm thiếu, cần làm lại một phần</td></tr>
+          <tr><td>D — Chưa đạt</td><td>Sản phẩm không đủ, làm lại từ đầu</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="review">
+      <h3>Duyệt</h3>
+      <p>Mentor sẽ duyệt sản phẩm của bạn theo rubric 4 mức.</p>
+      <p class="edu-muted">Trạng thái duyệt sẽ hiển thị ở đây sau khi nộp.</p>
+    </div>
+
+    <div class="lesson-panel hidden" data-panel="receipt">
+      <h3>Biên nhận</h3>
+      <p>Sau khi duyệt đạt (A hoặc B), bạn nhận biên nhận năng lực.</p>
+      <p class="edu-muted">Biên nhận có mã tra cứu công khai tại <a href="/xac-minh" class="edu-link">/xac-minh</a>.</p>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function() {
+    const tabs = document.querySelectorAll('.lesson-tab');
+    const panels = document.querySelectorAll('.lesson-panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        panels.forEach(p => p.classList.add('hidden'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        const panel = document.querySelector(`[data-panel="${target}"]`);
+        panel?.classList.remove('hidden');
+        panel?.classList.add('active');
+      });
+    });
+  })();
+</script>

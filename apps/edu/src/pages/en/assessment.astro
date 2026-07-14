@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
+import AssessmentForm from '../../components/AssessmentForm.astro';
 
 const title = 'Entry Assessment';
 const description = 'Assess your skills and career direction — get your 90-day map.';
@@ -10,10 +11,8 @@ const locale = 'en';
   <main class="edu-page">
     <section class="hero">
       <h1>Entry Assessment</h1>
-      <p>Assess your skills and career direction — get your 90-day map.</p>
+      <p>10 questions to understand you — about 5 minutes. Results create your 90-day map.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
-    </section>
+    <AssessmentForm />
   </main>
 </AcademyLayout>
