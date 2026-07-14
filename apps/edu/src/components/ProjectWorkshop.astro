@@ -1,0 +1,126 @@
+---
+/**
+ * ProjectWorkshop — xưởng sản phẩm tối thiểu
+ * Form đăng dự án thật với 9 trường bắt buộc
+ * POST /v1/edu/submission (project type)
+ */
+---
+
+<section class="edu-project-workshop" data-edu-project>
+  <h2>Xưởng sản phẩm — Đăng dự án thật</h2>
+  <p class="edu-muted">9 trường bắt buộc. Dự án phải thật — có vấn đề thật, khách thật, người chịu trách nhiệm.</p>
+
+  <form data-project-form>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="prj-name">1. Tên dự án <span class="required">*</span></label>
+        <input type="text" id="prj-name" name="name" required placeholder="VD: Tối ưu quy trình đặt hàng cho quán cà phê X">
+      </div>
+
+      <div class="form-group">
+        <label for="prj-owner">2. Người chịu trách nhiệm <span class="required">*</span></label>
+        <input type="text" id="prj-owner" name="owner" required placeholder="Họ tên của bạn">
+      </div>
+
+      <div class="form-group full">
+        <label for="prj-problem">3. Mô tả vấn đề <span class="required">*</span></label>
+        <textarea id="prj-problem" name="problem" rows="3" required placeholder="Vấn đề gì đang xảy ra? Ai đang chịu? Tại sao cần giải quyết?"></textarea>
+      </div>
+
+      <div class="form-group full">
+        <label for="prj-solution">4. Mô tả giải pháp <span class="required">*</span></label>
+        <textarea id="prj-solution" name="solution" rows="3" required placeholder="Giải pháp của bạn là gì? Sản phẩm/dịch vụ gì?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="prj-customer">5. Khách hàng / người hưởng lợi <span class="required">*</span></label>
+        <input type="text" id="prj-customer" name="customer" required placeholder="Ai sẽ dùng? Ai sẽ trả tiền?">
+      </div>
+
+      <div class="form-group">
+        <label for="prj-timeline">6. Mốc thời gian <span class="required">*</span></label>
+        <input type="text" id="prj-timeline" name="timeline" required placeholder="VD: 4 tuần (1-28/08)">
+      </div>
+
+      <div class="form-group">
+        <label for="prj-budget">7. Ngân sách <span class="required">*</span></label>
+        <input type="text" id="prj-budget" name="budget" required placeholder="VD: 0 VNĐ (tự làm) hoặc 2.000.000 VNĐ">
+      </div>
+
+      <div class="form-group">
+        <label for="prj-outcome">8. Kết quả mong đợi <span class="required">*</span></label>
+        <input type="text" id="prj-outcome" name="outcome" required placeholder="VD: Quán cà phê tiết kiệm 30% thời gian đặt hàng">
+      </div>
+
+      <div class="form-group full">
+        <label for="prj-receipt">9. Biên nhận xác minh <span class="required">*</span></label>
+        <p class="edu-muted">Sau khi dự án hoàn thành, bạn sẽ nhận biên nhận xác minh với mã tra cứu công khai.</p>
+        <input type="checkbox" id="prj-receipt" name="receipt_ack" value="1" required>
+        <label for="prj-receipt" class="checkbox-label">Tôi hiểu rằng dự án phải hoàn thành để nhận biên nhận.</label>
+      </div>
+    </div>
+
+    <button type="submit" class="edu-btn edu-btn-primary">Đăng dự án</button>
+  </form>
+
+  <div class="project-result hidden" data-result>
+    <h3>✓ Dự án đã đăng ký</h3>
+    <p>Dự án của bạn đã được ghi nhận. Sau khi hoàn thành, bạn sẽ nhận biên nhận xác minh.</p>
+    <p>Mã dự án: <code data-project-id></code></p>
+    <a href="/du-an" class="edu-btn edu-btn-secondary">Về sàn dự án</a>
+  </div>
+
+  <div class="project-error hidden" data-error>
+    <p>Lỗi đăng dự án. Bạn có cần <a href="https://auth.nguyenai.net/auth?redirect=https://edu.nguyenai.net/du-an" class="edu-link">đăng nhập</a>?</p>
+  </div>
+</section>
+
+<script is:inline>
+  (function() {
+    const form = document.querySelector('[data-project-form]') as HTMLFormElement | null;
+    const result = document.querySelector('[data-result]');
+    const errorEl = document.querySelector('[data-error]');
+    const projectIdEl = document.querySelector('[data-project-id]');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const projectContent = JSON.stringify({
+        name: formData.get('name'),
+        owner: formData.get('owner'),
+        problem: formData.get('problem'),
+        solution: formData.get('solution'),
+        customer: formData.get('customer'),
+        timeline: formData.get('timeline'),
+        budget: formData.get('budget'),
+        outcome: formData.get('outcome'),
+        receipt_ack: !!formData.get('receipt_ack'),
+      });
+      try {
+        const res = await fetch('https://api.nguyenai.net/v1/edu/submission', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assignment_id: 'project-workshop',
+            content: projectContent,
+            work_log: 'Đăng ký dự án — xưởng sản phẩm',
+            ai_assistance_disclosed: false,
+          }),
+        });
+        if (res.status === 401) {
+          errorEl?.classList.remove('hidden');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        form.style.display = 'none';
+        if (projectIdEl) projectIdEl.textContent = data.submission_id;
+        result?.classList.remove('hidden');
+      } catch (err) {
+        console.error('Project submit failed:', err);
+        errorEl?.classList.remove('hidden');
+      }
+    });
+  })();
+</script>

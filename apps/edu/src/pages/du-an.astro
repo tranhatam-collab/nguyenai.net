@@ -1,5 +1,6 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import ProjectWorkshop from '../components/ProjectWorkshop.astro';
 
 const title = 'Dự án';
 const description = 'Sàn dự án thật — đủ 9 trường, có người chịu trách nhiệm, có biên nhận.';
@@ -33,9 +34,6 @@ const requiredFields = [
         <li>Biên nhận tra cứu công khai tại <a href="/xac-minh" class="edu-link">/xac-minh</a>.</li>
       </ul>
     </section>
-    <section class="content-section">
-      <h2>Dự án mẫu</h2>
-      <p class="edu-muted">Sàn dự án sẽ mở khi có đủ người học Cấp 2 trở lên.</p>
-    </section>
+    <ProjectWorkshop />
   </main>
 </AcademyLayout>
