@@ -84,6 +84,13 @@ This document provides a comprehensive project plan for both Nguyen AI (nguyenai
 
 **Note:** Accessibility violations fixed 2026-07-10 (0/0). Deferred Phase 2 items: full ESLint, InMemory → D1 persistence.
 
+#### 2a. CHƯƠNG TRÌNH NGƯỜI TRẺ LÀM | NGUYỄN AI EDU (kế hoạch tổng — 2026-07-14)
+
+Toàn bộ chương trình giáo dục–thực hành–việc làm–khởi nghiệp build theo:
+- `docs/edu/KE_HOACH_TONG_BUILD_NGUOI_TRE_LAM_V2.md` — **kế hoạch tổng duy nhất** cho team dev (5 cấp học, 60 bài content, 12 hướng nghề, 33 bảng, 4 giai đoạn 30/60/90 ngày/12 tháng, Final Exit Gate khóa)
+- `docs/governance/YOUTH_FUTURE_MASTER_CHARTER.md` — hiến chương (chờ Founder ký)
+- `docs/edu/GIAO_TRINH_NGUOI_TRE_LAM_TONG_THE_V1.md` + `docs/edu/CHUOI_CONTENT_NGUOI_TRE_LAM_V1.md` — ngân hàng bài học + content chi tiết
+
 #### 2b. BRAND SYNC COMMIT STANDARD (BINDING — áp dụng từ 2026-07-09)
 
 Mọi người/AI build vào repo này PHẢI biết:

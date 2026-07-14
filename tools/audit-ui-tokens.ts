@@ -59,32 +59,38 @@ for (const dir of SCAN_DIRS) {
       }
     });
 
-    // R1 — trong vùng <section|div|header ... dark-bg ...> ... </...>
-    const openRe = /<(section|header|div|footer)\b[^>]*class="[^"]*(bg-academy-header|academy-hero|nai-hero|invest-header)[^"]*"[^>]*>/g;
-    let m: RegExpExecArray | null;
-    while ((m = openRe.exec(src)) !== null) {
-      const tag = m[1];
-      const start = m.index + m[0].length;
-      // tìm thẻ đóng tương ứng (naive depth-1 theo cùng tag)
-      let depth = 1;
-      let idx = start;
-      const tagRe = new RegExp(`<${tag}\\b|</${tag}>`, 'g');
-      tagRe.lastIndex = start;
-      let t: RegExpExecArray | null;
-      while (depth > 0 && (t = tagRe.exec(src)) !== null) {
-        depth += t[0].startsWith('</') ? -1 : 1;
-        idx = t.index;
-      }
-      const chunk = src.slice(start, idx);
-      const chunkStartLine = src.slice(0, start).split('\n').length;
-      chunk.split('\n').forEach((line, off) => {
+    // R1 — quét một lượt theo dòng: theo dõi vùng nền tối bằng stack đếm độ sâu tag
+    // (O(n) — không quét lại file cho từng opener)
+    const openDark = /<(section|header|div|footer)\b[^>]*class="[^"]*(bg-academy-header|academy-hero|nai-hero|invest-header)[^"]*"/;
+    type Region = { tag: string; token: string; depth: number };
+    const stack: Region[] = [];
+    lines.forEach((line, i) => {
+      // báo vi phạm nếu đang trong vùng tối và dòng có chữ tối (trừ nền sáng cục bộ)
+      if (stack.length > 0) {
         const dt = line.match(DARK_TEXT);
-        if (dt && !LOCAL_LIGHT_BG.test(line)) {
+        if (dt && !LOCAL_LIGHT_BG.test(line) && !openDark.test(line)) {
           violations++;
-          report.push(`R1 ${rel}:${chunkStartLine + off} — "${dt[0]}" nằm trong vùng nền tối <${tag} ...${m![2]}...>`);
+          report.push(`R1 ${rel}:${i + 1} — "${dt[0]}" nằm trong vùng nền tối <${stack[0].tag} ...${stack[0].token}...>`);
         }
-      });
-    }
+      }
+      // cập nhật độ sâu các vùng đang mở theo tag tương ứng
+      for (const r of stack) {
+        const opens = (line.match(new RegExp(`<${r.tag}\\b`, 'g')) ?? []).length;
+        const closes = (line.match(new RegExp(`</${r.tag}>`, 'g')) ?? []).length;
+        r.depth += opens - closes;
+      }
+      for (let k = stack.length - 1; k >= 0; k--) {
+        if (stack[k].depth <= 0) stack.splice(k, 1);
+      }
+      // mở vùng tối mới (sau khi xử lý dòng hiện tại để không tự tính lại opener)
+      const od = line.match(openDark);
+      if (od) {
+        const opens = (line.match(new RegExp(`<${od[1]}\\b`, 'g')) ?? []).length;
+        const closes = (line.match(new RegExp(`</${od[1]}>`, 'g')) ?? []).length;
+        const depth = opens - closes;
+        if (depth > 0) stack.push({ tag: od[1], token: od[2], depth });
+      }
+    });
 
     // R4 — menu-toggle phải đủ aria
     if (src.includes('id="menu-toggle"')) {
