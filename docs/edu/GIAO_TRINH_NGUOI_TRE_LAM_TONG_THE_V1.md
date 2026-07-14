@@ -168,7 +168,7 @@ Quy tắc sản xuất: nội dung offline sinh từ CÙNG nguồn bài học on
 - Nhiệm vụ + nộp bài → `product-submission`; biên nhận → hạ tầng evidence hiện có (@nai/evidence) + trang `/verify` (đã fix XSS).
 - Hồ sơ năng lực → `learner-profile` + bản đồ 90 ngày `transition-map`.
 - Dự án/việc làm → `project-marketplace`, `job-marketplace`, `employer-portal`, `mentor-portal`.
-- Học bổng → tái dùng `@nai/scholarship` (71 exports sẵn có) — KHÔNG viết lại.
+- Học bổng → tái dùng `@nai/scholarship` (7 exports hiện có — phải build thêm interface 9 bước PHASE 8).
 - 9 tác nhân người học → cấu hình trên runtime-sdk qua Cổng huấn luyện AI Nguyễn (identity + output guard bắt buộc).
 - Chỉ số Phần V Hiến chương → `impact-dashboard`.
 

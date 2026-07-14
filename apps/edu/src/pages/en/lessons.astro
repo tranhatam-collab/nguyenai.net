@@ -1,0 +1,19 @@
+---
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+
+const title = 'Lessons';
+const description = 'Every lesson has 8 components: lecture, reading, quiz, task, product, rubric, review, receipt.';
+const locale = 'en';
+---
+
+<AcademyLayout title={title} description={description} locale={locale} activeNav="lessons">
+  <main class="edu-page">
+    <section class="hero">
+      <h1>Lessons</h1>
+      <p>Every lesson has 8 components: lecture, reading, quiz, task, product, rubric, review, receipt.</p>
+    </section>
+    <section class="content-placeholder">
+      <p>Content under construction per Master Plan V2 — Sprint 1 route skeleton.</p>
+    </section>
+  </main>
+</AcademyLayout>

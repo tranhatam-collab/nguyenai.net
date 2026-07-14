@@ -51,10 +51,12 @@
 |---|---|---|
 | M1 (GĐ1) | users*, learner_profiles, assessments, career_maps, learning_paths, courses, modules, lessons, quizzes, assignments, submissions, products, rubrics, reviews, certificates, verification_records | Học online end-to-end (*users tái dùng apps/auth) |
 | M2 (GĐ2) | projects, project_members, employers, jobs, applications, interviews, mentors, mentor_sessions | Sàn dự án + việc làm + mentor |
-| M3 (GĐ2) | scholarships*, startup_projects, customer_interviews, prototypes, market_tests | Học bổng (*tái dùng @nai/scholarship, chỉ thêm bảng nối) + vườn ươm |
-| M4 (GĐ3) | offline_cohorts, attendance, field_activities, impact_events, audit_logs* | Offline Đà Lạt + tác động (*audit_logs tái dùng @nai/audit) |
+| M3 (GĐ2) | scholarships*, startup_projects, customer_interviews, prototypes, market_tests | Học bổng (*@nai/scholarship hiện có 7 exports — phải build thêm interface học bổng 9 bước PHASE 8) + vườn ươm |
+| M4 (GĐ3) | offline_cohorts, attendance, field_activities, impact_events, audit_logs* | Offline Đà Lạt + tác động (*@nai/audit 19 exports, tái dùng được) |
 
 Quy tắc chung: trường liên lạc mã hóa; soft-delete + job xóa cứng; mọi bảng có created_at/updated_at; private-by-default.
+
+> **Đính chính audit 2026-07-14:** @nai/scholarship hiện có 7 exports (không phải 71). M3 phải build thêm interface học bổng 9 bước PHASE 8. @nai/audit có 19 exports, tái dùng được cho audit_logs. 30/33 bảng phải build mới (chỉ users + audit_logs tái dùng nguyên, scholarships tái dùng partial).
 
 ## 4. ROUTE MAP (PHASE 2/X — 19 route VI + 19 EN, khóa theo Founder)
 
