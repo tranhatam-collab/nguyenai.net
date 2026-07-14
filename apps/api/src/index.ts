@@ -119,6 +119,7 @@ import notificationRoutes from './routes/notifications';
 import approvalRoutes from './routes/admin-approvals';
 import { scholarshipRoutes } from './scholarship-routes';
 import investorRoutes from './investor-routes';
+import { eduRoutes } from './edu-routes';
 import {
   writeMemory,
   readMemory,
@@ -1390,5 +1391,6 @@ app.route('/', notificationRoutes);
 app.route('/', approvalRoutes);
 app.route('/v1/scholarship', scholarshipRoutes);
 app.route('/v1/investor', investorRoutes);
+app.route('/v1/edu', eduRoutes);
 
 export default app;

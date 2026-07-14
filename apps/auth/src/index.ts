@@ -57,6 +57,7 @@ import {
 import { setAuditStore, logAuditEvent, logLoginSuccess, logLoginFailure, logLogout, logAccessDenied } from '@nai/audit';
 import { renderLoginPage, sanitizeRedirect } from './login-page';
 import { renderVerifyPage } from './verify-page';
+import { assignEduRole, getEduPermissions, EDU_ROLES } from './edu-roles';
 
 // R10 fix: Structured error logger — no console.error in production.
 function logError(scope: string, err: unknown): void {
@@ -562,8 +563,10 @@ app.post('/v1/auth/login', async (c) => {
   }
 
   const primaryOrg = orgs[0];
-  const roles = orgs.map((o) => o.membership.role as Role);
-  const permissions = getPermissionsForRoles(roles);
+  const orgRoles = orgs.map((o) => o.membership.role as Role);
+  // Assign edu:learner by default — edu roles can be upgraded later by admin
+  const roles = assignEduRole(orgRoles, 'edu:learner');
+  const permissions = [...getPermissionsForRoles(orgRoles), ...getEduPermissions(roles)];
   const maxAge = getMaxAge(c);
 
   const sessionId = generateSessionId();
@@ -926,7 +929,7 @@ app.post('/v1/auth/magic-link/verify', async (c) => {
   const sessionId = crypto.randomUUID();
   const user = await findUserById(c.env.DB, link.user_id);
   if (!user) return c.json({ error: 'user not found' }, 404);
-  await createSession(c.env.DB, { session_id: sessionId, user_id: user.user_id, tenant_id: '', audience: 'web', issuer: 'auth.nguyenai.net', roles: [], permissions: [], device: c.req.header('User-Agent') ?? null, ip_address: c.req.header('CF-Connecting-IP') ?? null, user_agent: c.req.header('User-Agent') ?? null, csrf_token: crypto.randomUUID(), expires_at: new Date(Date.now()+3600000).toISOString() });
+  await createSession(c.env.DB, { session_id: sessionId, user_id: user.user_id, tenant_id: '', audience: 'web', issuer: 'auth.nguyenai.net', roles: assignEduRole([], 'edu:learner'), permissions: getEduPermissions(assignEduRole([], 'edu:learner')), device: c.req.header('User-Agent') ?? null, ip_address: c.req.header('CF-Connecting-IP') ?? null, user_agent: c.req.header('User-Agent') ?? null, csrf_token: crypto.randomUUID(), expires_at: new Date(Date.now()+3600000).toISOString() });
   await logLoginSuccess(user.user_id, '', c.req.header('CF-Connecting-IP') ?? 'unknown', c.req.header('User-Agent') ?? null);
   await setSignedSessionCookie(c, sessionId, 3600);
   return c.json({ ok: true, user: { id: user.user_id, email: user.email } });
@@ -1304,8 +1307,8 @@ async function googleOauthCallback(c: Context<AuthEnv>) {
     tenant_id: tenantId,
     audience: c.env.DEFAULT_AUDIENCE,
     issuer: c.env.AUTH_ISSUER,
-    roles: ['USER'],
-    permissions: getPermissionsForRoles(['USER' as Role]),
+    roles: assignEduRole(['USER'], 'edu:learner'),
+    permissions: [...getPermissionsForRoles(['USER' as Role]), ...getEduPermissions(['edu:learner'])],
     device: JSON.stringify({ ua: userAgent }),
     ip_address: ip,
     user_agent: userAgent,

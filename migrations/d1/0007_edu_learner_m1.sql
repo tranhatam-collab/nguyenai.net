@@ -342,9 +342,10 @@ CREATE TABLE IF NOT EXISTS rubrics (
 CREATE INDEX IF NOT EXISTS idx_rubric_status ON rubrics(status);
 
 -- ============================================================
--- 13. reviews — đánh giá sản phẩm bởi mentor
+-- 13. submission_reviews — đánh giá sản phẩm bởi mentor
+-- (tên reviews đã bị chiếm bởi scholarship_core — dùng submission_reviews)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS reviews (
+CREATE TABLE IF NOT EXISTS submission_reviews (
   review_id          TEXT PRIMARY KEY,
   submission_id      TEXT NOT NULL,
   product_id         TEXT,
@@ -367,9 +368,9 @@ CREATE TABLE IF NOT EXISTS reviews (
   FOREIGN KEY (reviewer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_review_submission ON reviews(submission_id);
-CREATE INDEX IF NOT EXISTS idx_review_reviewer ON reviews(reviewer_id);
-CREATE INDEX IF NOT EXISTS idx_review_level ON reviews(overall_level);
+CREATE INDEX IF NOT EXISTS idx_review_submission ON submission_reviews(submission_id);
+CREATE INDEX IF NOT EXISTS idx_review_reviewer ON submission_reviews(reviewer_id);
+CREATE INDEX IF NOT EXISTS idx_review_level ON submission_reviews(overall_level);
 
 -- ============================================================
 -- 14. certificates — chứng nhận (7 loại)
