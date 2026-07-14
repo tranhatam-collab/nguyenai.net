@@ -4,16 +4,38 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 const title = 'Dự án';
 const description = 'Sàn dự án thật — đủ 9 trường, có người chịu trách nhiệm, có biên nhận.';
 const locale = 'vi';
+
+const requiredFields = [
+  'Tên dự án', 'Mô tả vấn đề', 'Mô tả giải pháp', 'Người chịu trách nhiệm',
+  'Khách hàng/người hưởng lợi', 'Mốc thời gian', 'Ngân sách', 'Kết quả mong đợi', 'Biên nhận xác minh',
+];
 ---
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="du-an">
   <main class="edu-page">
     <section class="hero">
-      <h1>Dự án</h1>
-      <p>Sàn dự án thật — đủ 9 trường, có người chịu trách nhiệm, có biên nhận.</p>
+      <h1>Sàn dự án</h1>
+      <p>Dự án thật — đủ 9 trường, có người chịu trách nhiệm, có biên nhận.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="content-section">
+      <h2>9 trường bắt buộc</h2>
+      <ol class="fields-list">
+        {requiredFields.map(f => <li>{f}</li>)}
+      </ol>
+    </section>
+    <section class="content-section">
+      <h2>Quy tắc dự án</h2>
+      <ul class="rules-list">
+        <li>Dự án phải giải quyết <strong>vấn đề thật</strong>.</li>
+        <li>Có <strong>người chịu trách nhiệm</strong> rõ ràng.</li>
+        <li>Có <strong>khách hàng hoặc người hưởng lợi</strong> thật.</li>
+        <li>Sau khi hoàn thành, nhận <strong>biên nhận xác minh</strong>.</li>
+        <li>Biên nhận tra cứu công khai tại <a href="/xac-minh" class="edu-link">/xac-minh</a>.</li>
+      </ul>
+    </section>
+    <section class="content-section">
+      <h2>Dự án mẫu</h2>
+      <p class="edu-muted">Sàn dự án sẽ mở khi có đủ người học Cấp 2 trở lên.</p>
     </section>
   </main>
 </AcademyLayout>

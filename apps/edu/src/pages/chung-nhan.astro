@@ -4,16 +4,41 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 const title = 'Chứng nhận';
 const description = '7 loại chứng nhận — tra cứu công khai tại /xac-minh/.';
 const locale = 'vi';
+
+const certs = [
+  { type: 'Hoàn thành bài', desc: 'Hoàn thành 1 bài học với sản phẩm đạt (A hoặc B).' },
+  { type: 'Hoàn thành cấp', desc: 'Hoàn thành tất cả bài học trong 1 cấp.' },
+  { type: 'Sản phẩm trụ cột', desc: 'Sản phẩm đạt chuẩn trụ cột, dùng được thật.' },
+  { type: 'Dự án thật', desc: 'Hoàn thành dự án thật với biên nhận xác minh.' },
+  { type: 'Mentor', desc: 'Trở thành mentor, hướng dẫn người mới.' },
+  { type: 'Chuyên gia', desc: 'Đóng góp chuẩn giáo trình, hội đồng duyệt.' },
+  { type: 'Khởi nghiệp', desc: 'Thu dòng tiền đầu tiên từ dự án khởi nghiệp.' },
+];
 ---
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="chung-nhan">
   <main class="edu-page">
     <section class="hero">
       <h1>Chứng nhận</h1>
-      <p>7 loại chứng nhận — tra cứu công khai tại /xac-minh/.</p>
+      <p>7 loại chứng nhận — tra cứu công khai tại <a href="/xac-minh" class="edu-link">/xac-minh</a>.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="certs-grid">
+      {certs.map((c, i) => (
+        <div class="cert-card">
+          <div class="cert-num">{i + 1}</div>
+          <h3>{c.type}</h3>
+          <p>{c.desc}</p>
+        </div>
+      ))}
+    </section>
+    <section class="content-section">
+      <h2>Đặc điểm chứng nhận</h2>
+      <ul class="rules-list">
+        <li>Mỗi chứng nhận có <strong>mã tra cứu</strong> công khai.</li>
+        <li>Tra cứu tại <a href="/xac-minh" class="edu-link">/xac-minh</a> — không cần đăng nhập.</li>
+        <li>Chứng nhận liên kết với <strong>sản phẩm thật</strong> và <strong>biên nhận</strong>.</li>
+        <li>Không phải "chứng chỉ hoàn thành khóa học" — là <strong>biên nhận năng lực</strong>.</li>
+      </ul>
     </section>
   </main>
 </AcademyLayout>

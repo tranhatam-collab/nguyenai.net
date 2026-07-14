@@ -9,11 +9,27 @@ const locale = 'vi';
 <AcademyLayout title={title} description={description} locale={locale} activeNav="viec-lam">
   <main class="edu-page">
     <section class="hero">
-      <h1>Việc làm</h1>
-      <p>Sàn việc làm xác minh doanh nghiệp — cấm việc ảo.</p>
+      <h1>Sàn việc làm</h1>
+      <p>Việc làm xác minh doanh nghiệp — cấm việc ảo.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="content-section">
+      <h2>Quy tắc việc làm</h2>
+      <ul class="rules-list">
+        <li>Doanh nghiệp đăng việc phải <strong>xác minh</strong> (email domain, giấy phép).</li>
+        <li>Cấm việc ảo, việc không có lương, việc "thử việc không lương".</li>
+        <li>Mỗi việc làm có mô tả rõ ràng, lương rõ ràng, thời gian rõ ràng.</li>
+        <li>Người học nộp hồ sơ năng lực (sản phẩm + biên nhận) thay CV truyền thống.</li>
+        <li>Doanh nghiệp xem hồ sơ năng lực trước, sau đó mới liên hệ.</li>
+      </ul>
+    </section>
+    <section class="content-section">
+      <h2>Hồ sơ năng lực thay CV</h2>
+      <p>Thay vì CV truyền thống, người học Người Trẻ Làm có <strong>hồ sơ năng lực</strong>: danh sách sản phẩm thật + biên nhận xác minh + đánh giá từ mentor.</p>
+      <p><a href="/doanh-nghiep" class="edu-link">Doanh nghiệp đối tác →</a></p>
+    </section>
+    <section class="content-section">
+      <h2>Việc làm hiện có</h2>
+      <p class="edu-muted">Sàn việc làm sẽ mở khi có đủ doanh nghiệp đối tác và người học Cấp 1 trở lên.</p>
     </section>
   </main>
 </AcademyLayout>

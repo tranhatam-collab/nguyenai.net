@@ -4,6 +4,14 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 const title = 'Lộ trình học';
 const description = '5 cấp học từ Khởi động đến Chuyên Gia — chọn lộ trình phù hợp.';
 const locale = 'vi';
+
+const paths = [
+  { level: '0', name: 'Khởi động', hours: 10, desc: '4 bài nền, đánh giá đầu vào, bản đồ 90 ngày.', lessons: 4 },
+  { level: '1', name: 'Trụ cột', hours: 40, desc: '4 trụ cột: AI Office, Content, Code, Founder.', lessons: 16 },
+  { level: '2', name: 'Chuyên sâu', hours: 80, desc: 'Chọn track chuyên ngành, dự án thật.', lessons: 20 },
+  { level: '3', name: 'Dẫn dắt', hours: 60, desc: 'Mentor người mới, dẫn xưởng, quản lý nhóm.', lessons: 10 },
+  { level: '4', name: 'Chuyên gia', hours: 100, desc: 'Đóng góp chuẩn giáo trình, hội đồng duyệt.', lessons: 10 },
+];
 ---
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="lo-trinh">
@@ -12,8 +20,23 @@ const locale = 'vi';
       <h1>Lộ trình học</h1>
       <p>5 cấp học từ Khởi động đến Chuyên Gia — chọn lộ trình phù hợp.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="paths-grid">
+      {paths.map(p => (
+        <div class="path-card">
+          <div class="path-level">Cấp {p.level}</div>
+          <h3>{p.name}</h3>
+          <p class="path-desc">{p.desc}</p>
+          <div class="path-stats">
+            <span>{p.lessons} bài</span>
+            <span>{p.hours} giờ</span>
+          </div>
+          <a href="/bai-hoc" class="edu-btn edu-btn-secondary">Xem bài học</a>
+        </div>
+      ))}
+    </section>
+    <section class="content-section">
+      <h2>Cách chọn cấp</h2>
+      <p>Mới bắt đầu → Cấp 0. Đã có kỹ năng cơ bản → <a href="/danh-gia" class="edu-link">làm đánh giá đầu vào</a> để xác định cấp phù hợp.</p>
     </section>
   </main>
 </AcademyLayout>

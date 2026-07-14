@@ -4,6 +4,13 @@ import AcademyLayout from '../layouts/AcademyLayout.astro';
 const title = 'Tác động';
 const description = 'Báo cáo tác động 90 ngày — số thật, có bằng chứng.';
 const locale = 'vi';
+
+const metrics = [
+  { group: 'Người học', items: ['Số người học đăng ký', 'Số người học hoàn thành Cấp 0', 'Số người học hoàn thành Cấp 1', 'Số sản phẩm thật tạo ra'] },
+  { group: 'Việc làm & dự án', items: ['Số việc làm xác minh', 'Số dự án thật hoàn thành', 'Số doanh nghiệp đối tác', 'Dòng tiền đầu tiên (VNĐ)'] },
+  { group: 'Cộng đồng', items: ['Số mentor', 'Số chuyên gia', 'Số chương trình Đà Lạt', 'Số người học vùng khó'] },
+  { group: 'Chất lượng', items: ['Tỷ lệ sản phẩm đạt A', 'Tỷ lệ sản phẩm đạt B', 'Tỷ lệ hoàn thành 90 ngày', 'Số biên nhận tra cứu'] },
+];
 ---
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="tac-dong">
@@ -12,8 +19,29 @@ const locale = 'vi';
       <h1>Tác động</h1>
       <p>Báo cáo tác động 90 ngày — số thật, có bằng chứng.</p>
     </section>
-    <section class="content-placeholder">
-      <p>Nội dung đang được xây dựng theo Kế hoạch V2 — Sprint 1 route skeleton.</p>
+    <section class="content-section">
+      <h2>4 nhóm chỉ số</h2>
+      {metrics.map(m => (
+        <div class="metric-group">
+          <h3>{m.group}</h3>
+          <ul class="metric-list">
+            {m.items.map(item => <li>{item}</li>)}
+          </ul>
+        </div>
+      ))}
+    </section>
+    <section class="content-section">
+      <h2>Nguyên tắc báo cáo</h2>
+      <ul class="rules-list">
+        <li><strong>Số thật</strong> — không inflate, không ước lượng.</li>
+        <li><strong>Có bằng chứng</strong> — mỗi số có biên nhận hoặc log xác minh.</li>
+        <li><strong>Công khai</strong> — báo cáo 90 ngày công bố tại trang này.</li>
+        <li><strong>Không PR</strong> — báo cáo tác động, không báo cáo marketing.</li>
+      </ul>
+    </section>
+    <section class="content-section">
+      <h2>Báo cáo gần nhất</h2>
+      <p class="edu-muted">Báo cáo tác động đầu tiên sẽ công bố sau khi hoàn thành cohort 90 ngày đầu tiên.</p>
     </section>
   </main>
 </AcademyLayout>
