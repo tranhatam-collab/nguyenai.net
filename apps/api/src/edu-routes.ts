@@ -20,7 +20,6 @@
  * Tất cả endpoint (trừ verification) yêu cầu session + edu:learner role.
  */
 import { Hono } from 'hono';
-import { getCookie } from 'hono/cookie';
 
 type EduEnv = {
   Bindings: {
@@ -36,13 +35,12 @@ export const eduRoutes = new Hono<EduEnv>();
 
 /** Helper: validate session and return user_id */
 async function requireLearner(c: any): Promise<string | null> {
-  const sessionId = getCookie(c, 'nai_session');
-  if (!sessionId) return null;
-  const session: any = await c.env.DB.prepare(
-    'SELECT user_id, roles FROM sessions WHERE session_id = ?1 AND revoked_at IS NULL AND expires_at > ?2'
-  ).bind(sessionId, new Date().toISOString()).first();
+  // Use session resolved by API middleware (c.get('session'))
+  const session = c.get('session');
   if (!session) return null;
-  const roles: string[] = JSON.parse(session.roles || '[]');
+  // roles may be array (from resolveSessionFromCookie) or string (from DB)
+  const rawRoles = session.roles;
+  const roles: string[] = Array.isArray(rawRoles) ? rawRoles : JSON.parse(rawRoles || '[]');
   if (!roles.some(r => r.startsWith('edu:'))) return null;
   return session.user_id;
 }
@@ -389,9 +387,154 @@ eduRoutes.get('/products', async (c) => {
 eduRoutes.get('/verification/:code', async (c) => {
   const code = c.req.param('code');
   const record = await c.env.DB.prepare(
-    'SELECT * FROM verification_records WHERE verification_code = ?1 AND status = ?2'
+    `SELECT record_id, type, verification_code, subject_name, verifier_name,
+            title, description, related_id, related_type, status, issued_at
+     FROM verification_records WHERE verification_code = ?1 AND status = ?2`
   ).bind(code, 'active').first();
 
   if (!record) return c.json({ error: 'biên nhận không tồn tại hoặc đã bị thu hồi' }, 404);
   return c.json(record);
+});
+
+// ============================================================
+// Mentor endpoints (require edu:mentor or edu:admin)
+// ============================================================
+
+/** Helper: require mentor or admin */
+async function requireMentor(c: any): Promise<string | null> {
+  const session = c.get('session');
+  if (!session) return null;
+  const rawRoles = session.roles;
+  const roles: string[] = Array.isArray(rawRoles) ? rawRoles : JSON.parse(rawRoles || '[]');
+  if (!roles.some(r => r === 'edu:mentor' || r === 'edu:admin' || r === 'edu:reviewer')) return null;
+  return session.user_id;
+}
+
+// 15. GET /v1/edu/mentor/pending — danh sách bài chờ duyệt
+eduRoutes.get('/mentor/pending', async (c) => {
+  const mentorId = await requireMentor(c);
+  if (!mentorId) return c.json({ error: 'mentor authentication required' }, 401);
+
+  const pending = await c.env.DB.prepare(
+    `SELECT s.submission_id, s.user_id, s.assignment_id, s.content, s.submitted_at,
+            u.email as learner_email
+     FROM submissions s LEFT JOIN users u ON s.user_id = u.user_id
+     WHERE s.status = 'submitted' ORDER BY s.submitted_at ASC LIMIT 50`
+  ).all();
+
+  return c.json({ pending: pending.results });
+});
+
+// 16. POST /v1/edu/submission/:id/review — mentor duyệt bài
+eduRoutes.post('/submission/:id/review', async (c) => {
+  const mentorId = await requireMentor(c);
+  if (!mentorId) return c.json({ error: 'mentor authentication required' }, 401);
+
+  const submissionId = c.req.param('id');
+  const body = await c.req.json();
+  const now = new Date().toISOString();
+  const reviewId = crypto.randomUUID();
+
+  // Validate rubric level (schema uses 1-4: 4=A, 3=B, 2=C, 1=D)
+  const levelMap: Record<string, number> = { 'A': 4, 'B': 3, 'C': 2, 'D': 1 };
+  const overallLevel: number = typeof body.overall_level === 'number'
+    ? body.overall_level
+    : levelMap[body.overall_level as string] ?? 0;
+  if (overallLevel < 1 || overallLevel > 4) {
+    return c.json({ error: 'overall_level must be A/B/C/D or 1-4' }, 400);
+  }
+  const levelLetter = ({ 4: 'A', 3: 'B', 2: 'C', 1: 'D' } as const)[overallLevel as 1|2|3|4];
+
+  // Insert review (schema: rubric_id NOT NULL, feedback NOT NULL, detailed_scores NOT NULL)
+  await c.env.DB.prepare(
+    `INSERT INTO submission_reviews (review_id, submission_id, reviewer_id, rubric_id, overall_level, detailed_scores, feedback, status, reviewed_at, created_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`
+  ).bind(
+    reviewId, submissionId, mentorId,
+    body.rubric_id ?? 'rubric-level-1',
+    overallLevel,
+    JSON.stringify(body.detailed_scores ?? []),
+    body.feedback ?? 'No feedback',
+    'completed',
+    now, now
+  ).run();
+
+  // Update submission status (schema: submitted/under_review/approved/rejected/revision_requested/withdrawn)
+  const newStatus = (overallLevel >= 3) ? 'approved' : 'revision_requested';
+  await c.env.DB.prepare(
+    `UPDATE submissions SET status = ?1, reviewed_at = ?2, reviewed_by = ?3, review_id = ?4, revision_count = revision_count + 1, updated_at = ?5 WHERE submission_id = ?6`
+  ).bind(newStatus, now, mentorId, reviewId, now, submissionId).run();
+
+  // If A (4) or B (3), create product + verification record
+  if (overallLevel >= 3) {
+    const productId = crypto.randomUUID();
+    const verificationCode = `NAI-EDU-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    const recordId = crypto.randomUUID();
+
+    // Get submission details
+    const sub: any = await c.env.DB.prepare(
+      'SELECT user_id, assignment_id, content FROM submissions WHERE submission_id = ?1'
+    ).bind(submissionId).first();
+
+    if (sub) {
+      // Create product (schema: rubric_level INTEGER 1-4, status CHECK reviewed/published)
+      await c.env.DB.prepare(
+        `INSERT INTO products (product_id, user_id, submission_id, title, product_type, rubric_level, is_public, verification_code, status, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`
+      ).bind(
+        productId, sub.user_id, submissionId,
+        body.product_title ?? `Sản phẩm ${submissionId.slice(0, 8)}`,
+        body.product_type ?? 'assignment',
+        overallLevel,
+        body.make_public ? 1 : 0,
+        verificationCode,
+        'reviewed',
+        now, now
+      ).run();
+
+      // Create verification record (schema: type, subject_user_id, verifier_user_id, related_id, related_type)
+      await c.env.DB.prepare(
+        `INSERT INTO verification_records (record_id, type, verification_code, subject_user_id, verifier_user_id, title, description, related_id, related_type, status, issued_at, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)`
+      ).bind(
+        recordId, 'product', verificationCode,
+        sub.user_id, mentorId,
+        body.product_title ?? `Sản phẩm ${submissionId.slice(0, 8)}`,
+        body.feedback ?? null,
+        productId, 'product',
+        'active',
+        now, now
+      ).run();
+
+      return c.json({
+        review_id: reviewId,
+        submission_id: submissionId,
+        overall_level: levelLetter,
+        overall_level_num: overallLevel,
+        status: newStatus,
+        product_id: productId,
+        verification_code: verificationCode,
+      });
+    }
+  }
+
+  return c.json({
+    review_id: reviewId,
+    submission_id: submissionId,
+    overall_level: levelLetter,
+    overall_level_num: overallLevel,
+    status: newStatus,
+  });
+});
+
+// 17. GET /v1/edu/mentor/reviews — danh sách review đã làm
+eduRoutes.get('/mentor/reviews', async (c) => {
+  const mentorId = await requireMentor(c);
+  if (!mentorId) return c.json({ error: 'mentor authentication required' }, 401);
+
+  const reviews = await c.env.DB.prepare(
+    'SELECT review_id, submission_id, overall_level, status, submitted_at FROM submission_reviews WHERE reviewer_id = ?1 ORDER BY submitted_at DESC LIMIT 50'
+  ).bind(mentorId).all();
+
+  return c.json({ reviews: reviews.results });
 });
