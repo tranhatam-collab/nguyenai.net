@@ -1,8 +1,11 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
-import { SCHOLARSHIP_PROGRAMS } from '../data/scholarship-programs';
+import { SCHOLARSHIP_PILOT_POLICY, SCHOLARSHIP_PROGRAMS } from '../data/scholarship-programs';
 
 const programs = SCHOLARSHIP_PROGRAMS;
+if (SCHOLARSHIP_PILOT_POLICY.applicationStatus !== 'applications_open') {
+  return Astro.redirect('/hoc-bong/', 302);
+}
 ---
 
 <AcademyLayout

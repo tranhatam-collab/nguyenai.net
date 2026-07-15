@@ -1,6 +1,6 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
-import { programs, programCategories, scholarshipConfig, pricingTiers } from '../../data/programs';
+import { programs, programCategories, pricingTiers } from '../../data/programs';
 
 const categoryColors: Record<string, string> = {
   technology: 'bg-blue-100 text-blue-700',
@@ -16,21 +16,21 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
 ---
 
 <AcademyLayout
-  title="9 Chuỗi Chương trình Certification"
-  description="9 chuỗi chương trình Nguyễn AI Edu — công nghệ, AI, sáng tạo, khởi nghiệp, di sản, nghề nghiệp, cộng đồng. Học bổng 99 xuất/program, mục tiêu 1.000 xuất/năm."
+  title="9 lộ trình chuyên môn Academy"
+  description="9 lộ trình chuyên môn Academy được map vào 8 chương trình Người Trẻ Làm; học bổng không tự động gắn với từng lộ trình."
   activeNav="programs"
 >
   <section class="academy-container py-12" aria-label="Academy programs">
     <!-- Hero -->
     <div class="max-w-4xl mb-12">
       <h1 class="text-3xl md:text-4xl font-bold text-academy-text mb-3">
-        9 Chuỗi Chương trình Certification
+        9 lộ trình chuyên môn Academy
       </h1>
       <p class="text-academy-muted text-lg">
-        9 certification programs — công nghệ, AI, sáng tạo, khởi nghiệp, di sản, nghề nghiệp, cộng đồng.
+        Các lộ trình chuyên môn về công nghệ, sáng tạo, khởi nghiệp, di sản, nghề nghiệp và cộng đồng.
       </p>
       <p class="text-academy-muted text-base mt-1">
-        9 certification programs — technology, AI, creativity, entrepreneurship, heritage, career, community.
+        Chín lộ trình này không thay thế tám chương trình triển khai của Người Trẻ Làm.
       </p>
     </div>
 
@@ -53,37 +53,19 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
       </div>
     </div>
 
-    <!-- Scholarship banner -->
+    <!-- Scholarship boundary -->
     <div class="academy-card p-6 mb-12 border-2 border-green-500/30">
       <div class="flex items-start gap-4">
         <div class="text-4xl">🎓</div>
         <div class="flex-1">
           <h2 class="text-xl font-bold text-academy-text">
-            Học bổng 99 suất đầu — 9 × 11 · Mục tiêu 1.000 suất/năm
+            Học bổng chỉ mở sau khi chương trình và nguồn tài trợ được duyệt
           </h2>
           <p class="text-academy-muted text-sm mt-1">
-            99 học bổng toàn phần (9 programs × 11 suất). Mục tiêu 1.000 học bổng/năm — ưu tiên họ Nguyễn tại Việt Nam.
+            Pilot đặt mục tiêu 11 suất cho mỗi chương trình được lựa chọn. Chưa có lộ trình nào trên trang này được tự động gắn suất học bổng.
           </p>
-          <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="text-center p-3 bg-academy-bg rounded-lg">
-              <div class="text-2xl font-bold text-academy-accent">99</div>
-              <div class="text-xs text-academy-muted">Suất khởi động</div>
-            </div>
-            <div class="text-center p-3 bg-academy-bg rounded-lg">
-              <div class="text-2xl font-bold text-academy-accent">1.000</div>
-              <div class="text-xs text-academy-muted">Mục tiêu/năm</div>
-            </div>
-            <div class="text-center p-3 bg-academy-bg rounded-lg">
-              <div class="text-2xl font-bold text-academy-accent">20–49</div>
-              <div class="text-xs text-academy-muted">Tuổi</div>
-            </div>
-            <div class="text-center p-3 bg-academy-bg rounded-lg">
-              <div class="text-2xl font-bold text-academy-accent">11</div>
-              <div class="text-xs text-academy-muted">Suất/program</div>
-            </div>
-          </div>
-          <a href="/scholarship" class="inline-block mt-4 academy-btn academy-btn-primary text-sm">
-            Xem chi tiết học bổng →
+          <a href="/hoc-bong/" class="inline-block mt-4 academy-btn academy-btn-primary text-sm">
+            Xem lựa chọn hỗ trợ và quy trình →
           </a>
         </div>
       </div>
@@ -129,7 +111,7 @@ const formatVND = (n: number) => n.toLocaleString('vi-VN') + '₫';
             </div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs text-academy-muted">Học bổng</span>
-              <span class="text-sm font-semibold text-green-600">{program.scholarshipSlots} suất</span>
+              <span class="text-sm font-semibold text-academy-muted">Chưa công bố</span>
             </div>
             <a href={`/programs/${program.slug}`} class="block w-full text-center academy-btn academy-btn-primary text-sm">
               Xem chương trình →

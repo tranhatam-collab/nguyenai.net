@@ -8,6 +8,9 @@ interface Props {
   activeNav?: string;
   locale?: 'vi' | 'en';
   ogImage?: string;
+  canonicalPath?: string;
+  alternateViPath?: string;
+  alternateEnPath?: string;
 }
 
 const {
@@ -16,20 +19,23 @@ const {
   activeNav = '',
   locale,
   ogImage = '/og-default.png',
+  canonicalPath: canonicalPathOverride,
+  alternateViPath,
+  alternateEnPath,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
 const isEn = locale ? locale === 'en' : pathname.startsWith('/en');
 
-const viPath = isEn ? pathname.replace(/^\/en\/?/, '/') : pathname;
-const enPath = isEn ? pathname : `/en${pathname === '/' ? '/' : pathname}`;
-const canonicalPath = isEn ? pathname : viPath;
+const viPath = alternateViPath ?? (isEn ? pathname.replace(/^\/en\/?/, '/') : pathname);
+const enPath = alternateEnPath ?? (isEn ? pathname : `/en${pathname === '/' ? '/' : pathname}`);
+const canonicalPath = canonicalPathOverride ?? (isEn ? pathname : viPath);
 
 const siteName = isEn ? 'Nguyen AI Academy' : 'Nguyễn AI Academy';
 const defaultTitle = siteName;
 const defaultDescription = isEn
-  ? 'Free AI learning for Nguyen AI subscribers — 10 tracks, certification and more.'
-  : 'Học AI miễn phí cho người đăng ký Nguyễn AI — 10 track học tập, chứng chỉ xác minh và hơn thế nữa.';
+  ? 'A separately paid Academy with practical learning, reviewed evidence and verifiable certification.'
+  : 'Học viện trả phí riêng với chương trình thực hành, bằng chứng được đánh giá và chứng nhận có thể xác minh.';
 const finalTitle = title ?? defaultTitle;
 const finalDescription = description ?? defaultDescription;
 // Avoid duplicating site name when title already is the site name or contains it
@@ -55,8 +61,8 @@ const t = {
   menu: isEn ? 'Toggle menu' : 'Mở menu',
   switchLabel: isEn ? 'Tiếng Việt' : 'English',
   footerBlurb: isEn
-    ? 'Free AI learning for all Nguyen AI subscribers. 10 learning tracks, verified certificates, and the global Nguyen community.'
-    : 'Học AI miễn phí cho mọi người đăng ký Nguyễn AI. 10 lộ trình học tập, chứng chỉ xác minh và cộng đồng Nguyễn toàn cầu.',
+    ? 'A separately paid Academy. Scholarship access is granted through a scoped, reviewed and time-bound entitlement.'
+    : 'Học viện trả phí riêng. Quyền học theo học bổng được xét duyệt, giới hạn phạm vi và thời hạn.',
   footerAcademy: isEn ? 'Academy' : 'Academy',
   allTracks: isEn ? 'All tracks' : 'Tất cả lộ trình',
   verifyShort: isEn ? 'Verify' : 'Xác minh',
@@ -122,7 +128,7 @@ const SITE = 'https://edu.nguyenai.net';
             <a href={isEn ? '/en/' : '/'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'home' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.home}</a>
             <a href={`${prefix}/tracks`} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'tracks' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.tracks}</a>
             <a href="/programs" class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'programs' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.programs}</a>
-            <a href={isEn ? '/en/scholarship' : '/scholarship'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'scholarship' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.scholarship}</a>
+            <a href={isEn ? '/en/scholarships/' : '/hoc-bong/'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'scholarship' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.scholarship}</a>
             <a href={isEn ? '/en/certification' : '/certification'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'certification' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.certification}</a>
             <a href={isEn ? '/en/about' : '/about'} class={`px-3 py-2 rounded-md text-sm font-medium no-underline transition-colors ${activeNav === 'about' ? 'text-academy-gold' : 'text-white hover:text-academy-gold'}`}>{t.about}</a>
           </div>
@@ -158,7 +164,7 @@ const SITE = 'https://edu.nguyenai.net';
           <div class="flex flex-col gap-1 pt-3">
             <a href={isEn ? '/en/' : '/'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.home}</a>
             <a href={`${prefix}/tracks`} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.tracks}</a>
-            <a href={isEn ? '/en/scholarship' : '/scholarship'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.scholarship}</a>
+            <a href={isEn ? '/en/scholarships/' : '/hoc-bong/'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.scholarship}</a>
             <a href={isEn ? '/en/certification' : '/certification'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.certification}</a>
             <a href={isEn ? '/en/about' : '/about'} class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.about}</a>
             <a href="/verify" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10 no-underline">{t.verify}</a>

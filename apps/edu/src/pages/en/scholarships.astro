@@ -1,23 +1,5 @@
 ---
-import AcademyLayout from '../../layouts/AcademyLayout.astro';
-
-const title = 'Scholarships';
-const description = 'Scholarships, grants, support — transparent review process.';
-const locale = 'en';
+import ScholarshipOverview from '../../components/ScholarshipOverview.astro';
 ---
 
-<AcademyLayout title={title} description={description} locale={locale} activeNav="scholarships">
-  <main class="edu-page">
-    <section class="hero">
-      <h1>Scholarships</h1>
-      <p>Scholarships, grants, support — transparent review process.</p>
-    </section>
-    <section class="content-section">
-      <h2>About</h2>
-      <p>Types: Full, Partial, Project grant, Hardship support. Review: application, mentor interview, council approval, result in 7 days. nai/scholarship has 7 exports, building more in Sprint 3-4.</p>
-    </section>
-    <section class="cta-section">
-      <a href="/en/start" class="edu-btn edu-btn-primary">Start learning →</a>
-    </section>
-  </main>
-</AcademyLayout>
+<ScholarshipOverview locale="en" />

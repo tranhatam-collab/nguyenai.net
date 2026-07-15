@@ -1,13 +1,16 @@
 ---
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
-import { SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
+import { SCHOLARSHIP_PILOT_POLICY, SCHOLARSHIP_PROGRAMS } from '../../data/scholarship-programs';
 
 const programsJson = JSON.stringify(SCHOLARSHIP_PROGRAMS);
+if (SCHOLARSHIP_PILOT_POLICY.applicationStatus !== 'applications_open') {
+  return Astro.redirect('/en/scholarships/', 302);
+}
 ---
 
 <AcademyLayout
   title="Apply for Scholarship — Nguyen AI Academy"
-  description="Apply for the Nguyen AI Scholarship — full sponsorship for Academy access."
+  description="Scholarship application form. Applications open only after program selection, funding and approval."
   activeNav="scholarship"
 >
   <section class="academy-container py-12 max-w-2xl" aria-label="Apply for Scholarship form">

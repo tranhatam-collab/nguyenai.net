@@ -1,0 +1,118 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import {
+  SCHOLARSHIP_PILOT_POLICY,
+  SCHOLARSHIP_SUPPORT_OPTIONS,
+  SCHOLARSHIP_WORKFLOW,
+  YOUTH_PROGRAMS,
+} from '../data/scholarship-programs';
+
+interface Props {
+  locale: 'vi' | 'en';
+}
+
+const { locale } = Astro.props;
+const isEn = locale === 'en';
+const title = isEn ? 'Scholarships and learning support' : 'Học bổng và hỗ trợ học tập';
+const description = isEn
+  ? 'Support options, eligibility boundaries and the audited scholarship review process for Nguyen AI Edu.'
+  : 'Các lựa chọn hỗ trợ, ranh giới điều kiện và quy trình xét duyệt học bổng có kiểm soát của Nguyễn AI Edu.';
+---
+
+<AcademyLayout
+  title={title}
+  description={description}
+  locale={locale}
+  activeNav="scholarship"
+  canonicalPath={isEn ? '/en/scholarships/' : '/hoc-bong/'}
+  alternateViPath="/hoc-bong/"
+  alternateEnPath="/en/scholarships/"
+>
+  <section class="academy-container py-12 max-w-5xl" aria-label={title}>
+    <div class="max-w-3xl mb-10">
+      <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold text-amber-800 bg-amber-50 rounded-full">
+        {isEn ? 'Pilot configuration: funding pending' : 'Cấu hình thí điểm: đang chờ nguồn tài trợ'}
+      </div>
+      <h1 class="text-3xl md:text-5xl font-bold text-academy-text mb-4">{title}</h1>
+      <p class="text-lg text-academy-muted">{description}</p>
+      <p class="mt-4 text-sm text-academy-muted border-l-4 border-amber-500 pl-4">
+        {isEn ? SCHOLARSHIP_PILOT_POLICY.publicRuleEn : SCHOLARSHIP_PILOT_POLICY.publicRuleVi}
+        {' '}
+        {isEn
+          ? `The pilot target is ${SCHOLARSHIP_PILOT_POLICY.slotsPerSelectedProgram} awards for each approved selected program; no program has been publicly selected on this page.`
+          : `Mục tiêu pilot là ${SCHOLARSHIP_PILOT_POLICY.slotsPerSelectedProgram} suất cho mỗi chương trình được lựa chọn và phê duyệt; trang này chưa công bố chương trình nào đã được chọn.`}
+      </p>
+    </div>
+
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-2xl font-bold text-academy-text mb-2">
+        {isEn ? 'Choose the support you need' : 'Lựa chọn hỗ trợ phù hợp'}
+      </h2>
+      <p class="text-sm text-academy-muted mb-6">
+        {isEn
+          ? 'Applicants may request one or more support types. A request is not an award and remains subject to eligibility, funding and council approval.'
+          : 'Ứng viên có thể đề nghị một hoặc nhiều loại hỗ trợ. Việc lựa chọn không đồng nghĩa được cấp; mọi quyết định phụ thuộc điều kiện, nguồn lực và Hội đồng.'}
+      </p>
+      <div class="grid gap-3 md:grid-cols-2">
+        {SCHOLARSHIP_SUPPORT_OPTIONS.map((option) => (
+          <div class="border border-academy-border rounded-lg p-4 flex gap-3">
+            <span class="font-mono text-xs text-academy-accent mt-1">{option.id}</span>
+            <span class="font-semibold text-academy-text">{isEn ? option.nameEn : option.nameVi}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-2xl font-bold text-academy-text mb-2">
+        {isEn ? 'Nine-step review and accountability flow' : 'Quy trình xét duyệt và trách nhiệm chín bước'}
+      </h2>
+      <ol class="grid gap-3 md:grid-cols-2 mt-6">
+        {SCHOLARSHIP_WORKFLOW.map((step) => (
+          <li class="flex gap-3 border border-academy-border rounded-lg p-4">
+            <span class="w-8 h-8 shrink-0 rounded-full bg-academy-accent text-white flex items-center justify-center font-bold">{step.id}</span>
+            <span class="text-sm text-academy-text pt-1">{isEn ? step.en : step.vi}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="academy-card p-8 mb-8">
+      <h2 class="text-2xl font-bold text-academy-text mb-2">
+        {isEn ? 'Eight official delivery programs' : 'Tám chương trình triển khai chính thức'}
+      </h2>
+      <p class="text-sm text-academy-muted mb-6">
+        {isEn
+          ? 'These are the Youth Future / Young People at Work programs. Academy specialist pathways are mapped into them and do not carry automatic scholarship allocations.'
+          : 'Đây là tám chương trình của Tuổi Trẻ Tương Lai / Người Trẻ Làm. Các lộ trình chuyên môn Academy được map vào chương trình và không tự động có suất học bổng.'}
+      </p>
+      <div class="grid gap-3 md:grid-cols-2">
+        {YOUTH_PROGRAMS.map((program) => (
+          <div class="border border-academy-border rounded-lg p-4">
+            <span class="text-xs font-mono text-academy-accent">{program.id}</span>
+            <h3 class="font-semibold text-academy-text mt-1">{isEn ? program.nameEn : program.nameVi}</h3>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="academy-card p-8 border-2 border-academy-accent/20">
+      <h2 class="text-xl font-bold text-academy-text mb-3">
+        {isEn ? 'Financial streams remain separate' : 'Ba luồng tài chính luôn tách biệt'}
+      </h2>
+      <ul class="space-y-2 text-sm text-academy-text">
+        <li>{isEn ? 'Scholarships and learning support help an individual access education.' : 'Học bổng và hỗ trợ học tập giúp một cá nhân tiếp cận chương trình.'}</li>
+        <li>{isEn ? 'Project grants help a team deliver a real product.' : 'Tài trợ dự án giúp một nhóm hoàn thành sản phẩm thật.'}</li>
+        <li>{isEn ? 'Investment follows a separate qualified legal process and is never part of a scholarship application.' : 'Đầu tư đi theo quy trình pháp lý đủ điều kiện riêng và không nằm trong đơn học bổng.'}</li>
+      </ul>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href={isEn ? '/en/scholarship/policies' : '/scholarship/policies'} class="academy-btn academy-btn-primary">
+          {isEn ? 'Read policies' : 'Đọc chính sách'}
+        </a>
+        <span class="text-sm text-academy-muted self-center">
+          {isEn ? 'Application opening date: not announced.' : 'Ngày mở đơn: chưa công bố.'}
+        </span>
+      </div>
+    </div>
+  </section>
+</AcademyLayout>

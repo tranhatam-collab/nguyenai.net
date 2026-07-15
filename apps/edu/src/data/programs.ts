@@ -54,8 +54,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 12900000, usd: 520 },
       dongHanh: { vnd: 29000000, usd: 1160 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Tư duy Máy Tính AI', en: 'AI Computer mindset' },
@@ -105,8 +105,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 16900000, usd: 676 },
       dongHanh: { vnd: 39000000, usd: 1560 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Chiến lược nội dung', en: 'Content strategy' },
@@ -154,8 +154,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 19900000, usd: 796 },
       dongHanh: { vnd: 49000000, usd: 1960 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Tư duy sản phẩm', en: 'Product thinking' },
@@ -205,8 +205,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 29000000, usd: 1160 },
       dongHanh: { vnd: 79000000, usd: 3160 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Bản đồ doanh nghiệp', en: 'Business map' },
@@ -254,8 +254,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 39000000, usd: 1560 },
       dongHanh: { vnd: 99000000, usd: 3960 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Vấn đề', en: 'Problem' },
@@ -305,8 +305,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 18900000, usd: 756 },
       dongHanh: { vnd: 39000000, usd: 1560 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Câu hỏi nghiên cứu', en: 'Research question' },
@@ -354,8 +354,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 14900000, usd: 596 },
       dongHanh: { vnd: 29000000, usd: 1160 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Đánh giá năng lực', en: 'Skills assessment' },
@@ -405,8 +405,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 16900000, usd: 676 },
       dongHanh: { vnd: 39000000, usd: 1560 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Lịch sử gia đình', en: 'Family history' },
@@ -454,8 +454,8 @@ export const programs: Program[] = [
       chuyenNghiep: { vnd: 24900000, usd: 996 },
       dongHanh: { vnd: 59000000, usd: 2360 },
     },
-    scholarshipSlots: 11,
-    scholarshipGroups: 1,
+    scholarshipSlots: 0,
+    scholarshipGroups: 0,
     groupSize: 11,
     modules: [
       { vi: 'Tầm nhìn', en: 'Vision' },
@@ -524,11 +524,12 @@ export const pricingTiers = [
 ] as const;
 
 export const scholarshipConfig = {
-  totalPerYear: 1000,
-  slotsPerProgram: 11,
-  groupsPerProgram: 1,
+  // Zero until a selected delivery program has a funding and approval record.
+  approvedSlots: 0,
+  slotsPerSelectedProgramPilotTarget: 11,
+  selectedProgramIds: [] as string[],
+  applicationStatus: 'funding_pending' as const,
   groupSize: 11,
-  totalLaunchBatch: 99, // 9 × 11
   ageRange: { min: 20, max: 49 },
   groupStructure: [
     { group: 'Người trẻ đang tìm việc hoặc chuyển nghề', count: 3 },
@@ -546,15 +547,6 @@ export const scholarshipConfig = {
     { criteria: 'Khả năng tạo sản phẩm thật', weight: 15 },
     { criteria: 'Tinh thần chia sẻ lại cho cộng đồng', weight: 10 },
   ],
-  annualAllocation: [
-    { group: '9 chương trình cốt lõi (9 × 90)', count: 810 },
-    { group: 'Học bổng giáo viên và người làm giáo dục', count: 50 },
-    { group: 'Học bổng phụ nữ quay lại thị trường lao động', count: 50 },
-    { group: 'Học bổng nhà sáng lập trẻ', count: 30 },
-    { group: 'Học bổng cộng đồng và vùng hạn chế cơ hội', count: 30 },
-    { group: 'Học bổng nghiên cứu và dự án đặc biệt', count: 20 },
-    { group: 'Quỹ dự phòng và suất Founder', count: 10 },
-  ],
   passThresholds: {
     knowledge: 80,
     operation: 80,
@@ -570,23 +562,6 @@ export const scholarshipConfig = {
     retake3: 'Bắt buộc có mentor hỗ trợ, mentor xác nhận trước khi thi lại',
     retake4: 'Hội đồng học thuật xem xét, có thể yêu cầu học lại chuyên đề, chuyển cohort',
   },
-  fund: {
-    name: 'Nguyen AI Future Skills Scholarship Fund',
-    nameVi: 'Quỹ Học bổng Kỹ năng Tương lai Nguyễn AI',
-    legalDisclaimer: 'Chương trình tài trợ học bổng do hệ sinh thái Nguyễn AI vận hành. Chưa phải quỹ xã hội hoặc quỹ từ thiện được cấp phép độc lập.',
-    perScholarshipVND: 8_000_000,
-    perScholarshipUSD: 320,
-    perGroup11VND: 88_000_000,
-    perCohort30VND: 240_000_000,
-    perProgramYearVND: 720_000_000,
-  },
-  sponsorTiers: [
-    { tier: '1 học viên', vnd: '8.000.000₫' },
-    { tier: '1 nhóm 11 người', vnd: '88.000.000₫' },
-    { tier: '1 cohort 30 người', vnd: '240.000.000₫' },
-    { tier: '1 chương trình/năm', vnd: '720.000.000₫' },
-    { tier: 'Đối tác 1.000 học bổng', vnd: 'Theo thỏa thuận' },
-  ],
 };
 
 export function getProgramBySlug(slug: string): Program | undefined {

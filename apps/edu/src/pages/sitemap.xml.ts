@@ -9,17 +9,20 @@ const staticRoutes = [
   '/certification',
   '/tracks',
   '/programs',
-  '/scholarship',
+  '/hoc-bong',
   '/summer-2026',
-  '/apply',
-  '/login',
   '/verify',
 ];
 
-// English mirror routes for hreflang parity (AGENTS.md SEO rules)
-const enStaticRoutes = staticRoutes
-  .filter((p) => p !== '/login' && p !== '/verify')
-  .map((p) => `/en${p === '' ? '' : p}`);
+const enStaticRoutes = [
+  '/en',
+  '/en/about',
+  '/en/certification',
+  '/en/tracks',
+  '/en/scholarships',
+  '/en/summer-2026',
+  '/en/verify',
+];
 
 const trackRoutes = tracks.map((t) => `/tracks/${t.slug}`);
 const programRoutes = programs.map((p) => `/programs/${p.slug}`);
@@ -41,7 +44,7 @@ const allRoutes = [
 const urls = allRoutes.map((path) => {
   const priority = path === '' ? '1.0'
     : path === '/en' ? '1.0'
-    : path === '/scholarship' || path === '/en/scholarship' ? '0.9'
+    : path === '/hoc-bong' || path === '/en/scholarships' ? '0.9'
     : path === '/summer-2026' || path === '/en/summer-2026' ? '0.9'
     : path === '/apply' || path === '/en/apply' ? '0.9'
     : path === '/programs' || path === '/en/programs' ? '0.9'
