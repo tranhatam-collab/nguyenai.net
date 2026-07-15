@@ -1,7 +1,0 @@
-[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
-$ tsx src/validate.ts
-strict mode: use allowUnionTypes to allow union type keyword at "#/properties/plans/items/properties/agents" (strictTypes)
-strict mode: use allowUnionTypes to allow union type keyword at "#/properties/plans/items/properties/super_apps" (strictTypes)
-strict mode: use allowUnionTypes to allow union type keyword at "#/properties/plans/items/properties/academy_pass" (strictTypes)
-strict mode: use allowUnionTypes to allow union type keyword at "#/properties/plans/items/properties/academy_cert_discount" (strictTypes)
-✅ Catalog validation PASSED — 9 plans, 9 entitlement sets, all keys present

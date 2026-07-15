@@ -11,3 +11,4 @@ dist/
 
 # Mobile app submodule (separate repo)
 mobile/
+.audit-evidence/
