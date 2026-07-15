@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: 'Deploy verified artifacts to the locked production account'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   verify:
@@ -61,6 +67,9 @@ jobs:
 
       - name: Independence audit
         run: bash tools/audit-independence.sh
+
+      - name: Secret governance audit
+        run: node tools/audit-secret-governance.mjs
 
       - name: Security P0 audit
         run: npx tsx tools/audit-security-p0.ts
@@ -125,9 +134,11 @@ jobs:
           retention-days: 1
 
   deploy-web:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy Web to Cloudflare Pages
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
@@ -148,9 +159,11 @@ jobs:
           command: pages deploy dist --project-name=nai-web
 
   deploy-edu:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy Edu to Cloudflare Pages
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
@@ -171,9 +184,11 @@ jobs:
           command: pages deploy dist --project-name=nguyenai-edu
 
   deploy-console:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy Console to Cloudflare Pages
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
@@ -197,10 +212,11 @@ jobs:
     # RE-ENABLED 2026-07-13: Legal entity resolved per INVESTOR_ACCESS_POLICY.md.
     # VIET CAN NEW CORP (US) = primary legal entity, owns IP, issues SAFE.
     # KASAN JSC (VN, MST 0315521422) = commercial representative, receives VND.
-    if: true
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy Invest to Cloudflare Pages
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
@@ -221,9 +237,11 @@ jobs:
           command: pages deploy dist --project-name=nai-invest
 
   deploy-api:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy API Worker
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
@@ -266,9 +284,11 @@ jobs:
         #   VNPAY_HASH_SECRET: ${{ secrets.VNPAY_HASH_SECRET }}
 
   deploy-auth:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
     name: Deploy Auth Worker
     needs: verify
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
 

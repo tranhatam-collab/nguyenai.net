@@ -1,6 +1,8 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "nguyenai-api-gateway",
+  // FOUNDER LOCK: production resources and custom domain are owned by Anhhatam account.
+  "account_id": "62d57eaa548617aeecac766e5a1cb98e",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],

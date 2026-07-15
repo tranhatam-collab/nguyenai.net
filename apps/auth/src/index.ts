@@ -90,18 +90,10 @@ import {
   revokeApiKey,
   countFailedLogins,
   countFailedLoginsByIp,
+  findOAuthAccount,
+  createOAuthAccount,
+  findUserByEmailVerified,
 } from './db';
-
-// Stubs for OAuth functions not yet implemented in db.ts
-async function findOAuthAccount(_db: D1Database, _provider: string, _providerAccountId: string): Promise<{ user_id: string } | null> {
-  return null;
-}
-async function createOAuthAccount(_db: D1Database, _provider: string, _providerAccountId: string, _userId: string): Promise<void> {
-  // stub
-}
-async function findUserByEmailVerified(_db: D1Database, _email: string): Promise<{ id: string; email_verified: number; user_id?: string } | null> {
-  return null;
-}
 
 import type { Context } from 'hono';
 
@@ -1245,10 +1237,9 @@ async function googleOauthCallback(c: Context<AuthEnv>) {
     const existingUser = await findUserByEmailVerified(c.env.DB, userInfo.email);
     if (existingUser) {
       // Link OAuth to existing account
-      userId = existingUser.user_id ?? existingUser.id;
+      userId = existingUser.user_id;
       const orgs = await findOrgsByUser(c.env.DB, userId);
       tenantId = orgs[0]?.org.tenant_id ?? crypto.randomUUID();
-      const oauthId = crypto.randomUUID();
       await createOAuthAccount(c.env.DB, 'google', userInfo.sub, userId);
     } else {
       // Create new user (no password — OAuth only)
