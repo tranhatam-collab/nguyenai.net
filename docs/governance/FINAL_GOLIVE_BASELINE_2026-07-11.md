@@ -1,5 +1,7 @@
 # Final Go-Live Baseline — 2026-07-11 (Updated 2026-07-13)
 
+> **HISTORICAL SNAPSHOT ONLY:** Evidence này gắn với `d7a9c67`, không phải worktree/HEAD hiện tại. Dòng `JWT_SECRET set` chỉ nói secret name tồn tại, không chứng minh JWT auth; runtime không tiêu thụ `JWT_SECRET`. Current verdict: `JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md` = **HOLD**.
+
 **Verdict at update:** **PARTIAL GO-LIVE** — CI/CD + 6 sites live + OAuth flow fixed.  
 **Remaining blockers:** Payment provider accounts (KASAN/PayOS/Stripe), certificate verify product (Phase 2), LLM provider keys.
 

@@ -1,5 +1,7 @@
 # Production Evidence Packet — 2026-07-13
 
+> **HISTORICAL EVIDENCE:** Chỉ gắn với deployment commit `d7a9c67`. Không được dùng packet này để duyệt worktree hoặc release mới. `JWT_SECRET` được liệt kê nhưng không có runtime consumer; current A-to-Z verdict là **HOLD** theo `JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md`.
+
 ## Deployment Record
 
 | Field | Value |

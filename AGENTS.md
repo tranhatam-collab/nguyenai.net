@@ -86,6 +86,33 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/BRAND_SYNC_COMMIT_STANDARD_2026-07-09.md` — BINDING: chuẩn commit đồng bộ thương hiệu; cưỡng chế 3 tầng (pre-commit lefthook + CI + audit:all qua `tools/audit-ui-tokens.ts`). MỌI commit chạm giao diện phải qua gate này — muốn khác chuẩn phải sửa LOCK trước (Founder duyệt), không sửa giao diện trước
 - `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md` — FOUNDER LOCKED independence plan (BINDING, overrides Cross-Project Integration)
 - `docs/governance/GOVERNANCE_DECISION_LOG.md` — Founder decision log (QD-2026-07-08-01: independence lock)
+- `docs/governance/YOUTH_FUTURE_MASTER_CHARTER.md` — BINDING FOR BUILD: hiến chương Tuổi Trẻ Tương Lai / Người Trẻ Làm
+- `docs/product/NGUOI_TRE_LAM_PRODUCT_CATALOG_2026-07-14.md` — BINDING: catalog 18 trụ + 8 chương trình + 5 cấp + 12 hướng + học bổng
+- `docs/edu/KE_HOACH_TONG_BUILD_NGUOI_TRE_LAM_V2.md` — BINDING: phạm vi tổng giáo dục, thực hành, việc làm, khởi nghiệp
+- `docs/edu/EDU_REMEDIATION_BACKLOG_P0_P2_2026-07-14.md` — BINDING: thứ tự sửa P0 → P1 → P2, DoD và release kill criteria
+- `docs/governance/JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md` — BINDING: auth/secret truth + A-to-Z P0→P2 + release kill criteria
+
+### Auth, Secret and Release Lock — BINDING 2026-07-15
+
+- Auth canonical là opaque session trong D1 + cookie HMAC bằng `AUTH_SECRET`; hiện tại không phải JWT auth.
+- `JWT_SECRET` không có runtime consumer. Cấm claim JWT auth hoặc thêm consumer mới nếu chưa có Founder decision, threat model, migration, rotation/revocation plan và E2E.
+- Secret tồn tại trên dashboard không chứng minh flow hoạt động. Mọi status phải tách: source wired, secret name present, value valid, provider accepted, E2E passed.
+- Không ghi, log, commit, chat hoặc chụp secret value. Evidence chỉ được ghi secret name, Worker/environment, timestamp và kết quả kiểm tra không tiết lộ giá trị.
+- `config/secret-governance.json` là inventory machine-readable. Static gate: `pnpm audit:secret-governance`; production name gate: `pnpm audit:secrets:production`.
+- Push `main` chỉ được verify. Production deploy phải là manual dispatch có `deploy_production=true`, qua protected `production` environment và Founder/release approval.
+- CI xanh của commit cũ không chứng minh worktree/commit mới. Release evidence bắt buộc gắn exact SHA, deployment, environment và timestamp.
+- A-to-Z release hiện tại là `HOLD`; đóng P0 trước P1, P1 trước P2. Build/HTTP 200 không được dùng để bỏ qua auth, payment, accessibility, monitoring, restore, rollback, legal hoặc Founder sign-off.
+
+### Education Build Lock — BINDING 2026-07-14
+
+- Mọi task chạm `apps/edu`, Edu API/auth/data, content, scholarship, certificate, project, job, mentor hoặc pilot phải map đủ: `user journey → product/program → level → pillar → route → API → data → role → evidence → E2E → claim`.
+- 18 trụ, 8 chương trình, 5 cấp, 12 hướng nghề, 60 content và 9 lộ trình Academy là các trục khác nhau. Cấm dùng chín lộ trình Academy để thay tám chương trình Người Trẻ Làm.
+- P0 trong `EDU_REMEDIATION_BACKLOG_P0_P2_2026-07-14.md` phải đóng trước P1; P1 phải đóng trước P2. Không dùng sprint date hoặc build green để bỏ qua exit gate.
+- Academy trả phí riêng hoàn toàn; cấm copy “free for subscribers” hoặc bundled entitlement.
+- Học bổng có bảy lựa chọn hỗ trợ và quy trình chín bước. Scholarship, project grant và investment là ba luồng riêng.
+- Pilot chỉ có mục tiêu 11 suất cho mỗi chương trình đã được lựa chọn, có funding và decision record. Cấm tự claim `99 suất`, `1.000 học bổng/năm` hoặc `9 × 11`.
+- Route tồn tại, build pass, unit test pass hoặc dữ liệu mẫu không chứng minh user flow operational.
+- Không được publish/release khi critical path còn placeholder, in-memory production store, certificate giả, auth giả, project/job không có owner thật hoặc claim không có evidence.
 
 ### Strategy + Investor (canonical)
 

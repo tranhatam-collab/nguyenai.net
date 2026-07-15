@@ -5,10 +5,14 @@
 **Nguồn lệnh:** Phán quyết Founder "NGUYEN AI EDU COMPLETE EDUCATION, REAL-WORLD PRACTICE AND PRODUCT BUILD COMMAND" (13 PHASE + FINAL EXIT GATE — khóa nguyên văn tại mục 9 file này)
 **Tài liệu chi tiết kèm theo (đã có trong repo):**
 - `docs/governance/YOUTH_FUTURE_MASTER_CHARTER.md` — hiến chương (nâng cấp theo mục 1.2 dưới đây)
+- `docs/product/NGUOI_TRE_LAM_PRODUCT_CATALOG_2026-07-14.md` — catalog duy nhất: 18 trụ, 8 chương trình, 5 cấp, 12 hướng, 9 lộ trình Academy và học bổng
+- `docs/edu/EDU_REMEDIATION_BACKLOG_P0_P2_2026-07-14.md` — thứ tự sửa bắt buộc P0 → P1 → P2; thắng mọi sprint list cũ khi có mâu thuẫn
 - `docs/edu/GIAO_TRINH_NGUOI_TRE_LAM_TONG_THE_V1.md` — ngân hàng bài học chi tiết (map vào 5 cấp theo mục 2)
 - `docs/edu/CHUOI_CONTENT_NGUOI_TRE_LAM_V1.md` — 36/60 bài content đã có outline
 
 > **Chuẩn hoàn thiện (khóa):** Người học thật sự Đăng ký được → Học được → Làm được → Tạo sản phẩm được → Nhận phản hồi được → Có bằng chứng được → Tham gia dự án được → Tiếp cận việc làm được → Thử nghiệm khởi nghiệp được → Quay lại giúp người khác được. KHÔNG claim hoàn thành khi chưa có full user flow.
+
+> **Khóa cách đếm sản phẩm 2026-07-14:** 18 trụ là taxonomy đời sống; 8 chương trình là sản phẩm triển khai Người Trẻ Làm; 5 cấp là progression; 12 hướng là chuyên môn; 60 bài là content nền; 9 mã Academy hiện có là lộ trình chuyên môn cần mapping, không phải 9 chương trình học bổng. Không được đổi một mục tiêu 1.000 người học thành claim 1.000 học bổng.
 
 ---
 
@@ -17,7 +21,7 @@
 ### 1.1. Chín văn kiện PHASE 0 (người viết: lead + QA, Founder ký)
 | # | File | Nguồn nội dung |
 |---|---|---|
-| G0-1 | YOUTH_FUTURE_EDUCATION_CHARTER.md | Nâng cấp từ MASTER_CHARTER hiện có: thêm 5 cấp học, 12 hướng nghề, 60 bài |
+| G0-1 | YOUTH_FUTURE_MASTER_CHARTER.md | Charter duy nhất: thêm mapping 5 cấp học, 12 hướng nghề, 60 bài; không tạo Charter tên khác |
 | G0-2 | NGUOI_TRE_LAM_BRAND_CHARTER.md | Tên, tuyên ngôn, giọng nói, chuẩn ngôn từ content (từ Chuỗi content V1 mục Nguyên tắc) |
 | G0-3 | CURRICULUM_ARCHITECTURE.md | PHẦN V bộ kế hoạch Founder (5 cấp, giờ học, điều kiện qua cấp) |
 | G0-4 | ONLINE_OFFLINE_DELIVERY_STANDARD.md | PHẦN VI (2 ngày cuối tuần / 7 ngày / 30 ngày Đà Lạt) + Giáo trình V1 Phần VI |
@@ -58,7 +62,7 @@ Quy tắc chung: trường liên lạc mã hóa; soft-delete + job xóa cứng; 
 
 > **Đính chính audit 2026-07-14:** @nai/scholarship hiện có 7 exports (không phải 71). M3 phải build thêm interface học bổng 9 bước PHASE 8. @nai/audit có 19 exports, tái dùng được cho audit_logs. 30/33 bảng phải build mới (chỉ users + audit_logs tái dùng nguyên, scholarships tái dùng partial).
 
-## 4. ROUTE MAP (PHASE 2/X — 19 route VI + 19 EN, khóa theo Founder)
+## 4. ROUTE MAP (PHASE 2/X — 20 route VI + 20 EN khi tính root, khóa theo Founder)
 
 VI: `/ · /nguoi-tre-lam/ · /tuoi-tre-tuong-lai/ · /bat-dau/ · /danh-gia/ · /ban-do-90-ngay/ · /lo-trinh/ · /bai-hoc/ · /nhiem-vu/ · /san-pham/ · /du-an/ · /viec-lam/ · /khoi-nghiep/ · /hoc-bong/ · /doanh-nghiep/ · /chuyen-gia/ · /da-lat/ · /chung-nhan/ · /xac-minh/ · /tac-dong/`
 EN: bản đối xứng dưới `/en/` (young-people-at-work, youth-future, start, assessment, 90-day-map, learning-paths, lessons, tasks, products, projects, jobs, entrepreneurship, scholarships, employers, mentors, da-lat, certificates, verify, impact).
@@ -78,7 +82,7 @@ SEO: hreflang cặp + x-default→VI; route chức năng cá nhân noindex; site
 | Sprint | Việc | Đội |
 |---|---|---|
 | S3 (31–45) | M2+M3 · Sàn dự án (PHASE 5: brief → ứng tuyển → nhóm → mốc → nộp → phản hồi khách → sửa → biên nhận) · Sàn việc làm (PHASE 6: xác minh doanh nghiệp → đăng → hồ sơ → bài thử → phỏng vấn → kết quả → theo dõi) | BE+FE |
-| S4 (46–60) | Mentor portal (lịch, nhóm, chấm rubric, nhật ký) · Học bổng nối @nai/scholarship (đủ 9 bước PHASE 8 kể cả khiếu nại + thu hồi) · Chứng nhận 7 loại + /chung-nhan/ + /xac-minh/ · Vườn ươm bản tối thiểu (PHASE 7) | BE+FE / Vận hành tuyển 10 DN + 20 mentor |
+| S4 (46–60) | Mentor portal (lịch, nhóm, chấm rubric, nhật ký) · Học bổng nối @nai/scholarship (7 lựa chọn hỗ trợ + đủ 9 bước PHASE 8 kể cả khiếu nại + thu hồi; tách tài trợ dự án và đầu tư) · Chứng nhận 7 loại + /chung-nhan/ + /xac-minh/ · Vườn ươm bản tối thiểu (PHASE 7) | BE+FE / Vận hành tuyển 10 DN + 20 mentor |
 
 **Exit GĐ2:** 1 chu trình doanh nghiệp thật (PHẦN IV.5) và 1 chu trình mentor (PHẦN IV.6) chạy hết trên staging; chứng nhận cấp và xác minh được.
 
@@ -86,7 +90,7 @@ SEO: hreflang cặp + x-default→VI; route chức năng cá nhân noindex; site
 | Sprint | Việc | Đội |
 |---|---|---|
 | S5 (61–75) | Mở đăng ký công khai (content tuần 9–12 bơm traffic) · OFF module (PHASE 4: cohort, địa điểm, lịch, điểm danh, người dẫn, nhóm, tham quan, an toàn, liên hệ khẩn cấp, chỗ ở, đi lại, bữa ăn, nhật ký sự cố) · 8 tác nhân/người học (PHASE 9) qua identity+output guard, hành động nhạy cảm cần duyệt + biên nhận | FE+BE+AI |
-| S6 (76–90) | Chạy pilot: 100 người học, 4 track thí điểm, 20 dự án, 10 DN, 20 mentor, 11 suất học bổng/chương trình được chọn, 1 chương trình Đà Lạt 7 ngày (giáo án PHẦN VI.2) · impact-dashboard · 10 báo cáo PHASE 13 số thật | Toàn đội |
+| S6 (76–90) | Chạy pilot: 100 người học, 4 trụ thí điểm, 20 dự án, 10 DN, 20 mentor, 11 suất học bổng cho mỗi chương trình được Founder/Hội đồng lựa chọn và có funding, 1 chương trình Đà Lạt 7 ngày (giáo án PHẦN VI.2) · impact-dashboard · 10 báo cáo PHASE 13 số thật | Toàn đội |
 
 **Exit GĐ3 = FINAL EXIT GATE Founder (mục 9).**
 
@@ -130,3 +134,4 @@ Chỉ khi đủ toàn bộ, team mới được viết:
 
 ---
 **Hiệu lực:** Kế hoạch này là kế hoạch tổng duy nhất cho chương trình. V1 (`BUILD_PLAN_NGUOI_TRE_LAM_DEV_V1.md`) giữ làm phụ lục chi tiết kỹ thuật GĐ1–2; nếu mâu thuẫn, V2 thắng. Mọi thay đổi phạm vi cần Founder duyệt.
+**Thứ tự thi công:** `EDU_REMEDIATION_BACKLOG_P0_P2_2026-07-14.md` là companion bắt buộc của V2; team phải đóng P0 trước P1, P1 trước P2 và không được dùng timeline để bỏ qua exit gate.

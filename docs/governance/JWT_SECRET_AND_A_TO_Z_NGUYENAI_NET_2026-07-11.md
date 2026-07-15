@@ -1,5 +1,7 @@
 # JWT_SECRET & A-to-Z Release Framework — áp dụng nguyenai.net
 
+> **SUPERSEDED FOR CURRENT STATUS:** Đây là snapshot ngày 2026-07-11. Trạng thái và backlog hiện hành nằm tại `JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md`. Auth vẫn là D1 opaque session + `AUTH_SECRET`; `JWT_SECRET` được set sau snapshot nhưng không có runtime consumer.
+
 **Ngày:** 2026-07-11  
 **Phạm vi:** `nguyenai.net` monorepo (web / edu / invest / console / api / auth)  
 **Nguyên tắc:** Giải thích JWT đúng chuẩn + map **thật** vào kiến trúc hiện tại — không claim JWT nếu hệ đang dùng session cookie.

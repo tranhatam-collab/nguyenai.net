@@ -1,5 +1,7 @@
 # Final QA Report — 2026-07-13
 
+> **HISTORICAL SNAPSHOT ONLY:** Báo cáo này chỉ áp dụng cho commit `d7a9c67`. Probe OAuth ở đây chỉ xác minh redirect URI, không phải repeated-login/account-link E2E. Current verdict nằm tại `JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md` và là **HOLD**.
+
 ## Summary
 
 | Item | Status |
