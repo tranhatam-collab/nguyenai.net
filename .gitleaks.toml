@@ -23,6 +23,8 @@ regexes = [
   '''test.*key''',
   '''dev.*secret''',
   '''EVIDENCE_SIGNING_KEY.*dev''',
+  '''re_prefixes''',
+  '''ignore_prefixes''',
 ]
 
 [[rules]]
