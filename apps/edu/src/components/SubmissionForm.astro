@@ -10,7 +10,7 @@ interface Props {
 const { assignmentId = '', assignmentTitle = 'Bài tập' } = Astro.props;
 ---
 
-<section class="edu-submission" data-edu-submission>
+<section class="edu-submission" data-edu-submission aria-label="Nộp bài: {assignmentTitle}">
   <h2>Nộp bài: {assignmentTitle}</h2>
   <form data-submission-form data-assignment-id={assignmentId}>
     <div class="form-group">

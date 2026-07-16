@@ -24,13 +24,13 @@ const components = [
 ];
 ---
 
-<section class="edu-lesson-player" data-lesson-id={lessonId}>
+<section class="edu-lesson-player" data-lesson-id={lessonId} aria-label="{lessonTitle}">
   <header class="lesson-header">
     <h2>{lessonTitle}</h2>
     <span class="lesson-level">Cấp {lessonLevel}</span>
   </header>
 
-  <nav class="lesson-tabs" role="tablist">
+  <nav class="lesson-tabs" role="tablist" aria-label="Giảng">
     {components.map((c, i) => (
       <button
         type="button"

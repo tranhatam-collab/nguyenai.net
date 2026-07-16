@@ -8,7 +8,7 @@ const url = new URL(Astro.request.url);
 const initialCode = url.searchParams.get('code') || '';
 ---
 
-<section class="edu-verify" data-edu-verify>
+<section class="edu-verify" data-edu-verify aria-label="Tra cứu biên nhận năng lực">
   <h2>Tra cứu biên nhận năng lực</h2>
   <p>Nhập mã tra cứu (verification code) in trên chứng nhận hoặc biên nhận.</p>
   <form data-verify-form>

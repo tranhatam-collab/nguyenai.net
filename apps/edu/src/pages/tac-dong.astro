@@ -15,11 +15,11 @@ const metrics = [
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="tac-dong">
   <main class="edu-page">
-    <section class="hero">
+    <section class="hero" aria-label="Tác động">
       <h1>Tác động</h1>
       <p>Báo cáo tác động 90 ngày — số thật, có bằng chứng.</p>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="4 nhóm chỉ số">
       <h2>4 nhóm chỉ số</h2>
       {metrics.map(m => (
         <div class="metric-group">
@@ -30,7 +30,7 @@ const metrics = [
         </div>
       ))}
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="4 nhóm chỉ số">
       <h2>Nguyên tắc báo cáo</h2>
       <ul class="rules-list">
         <li><strong>Số thật</strong> — không inflate, không ước lượng.</li>
@@ -39,7 +39,7 @@ const metrics = [
         <li><strong>Không PR</strong> — báo cáo tác động, không báo cáo marketing.</li>
       </ul>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="4 nhóm chỉ số">
       <h2>Báo cáo gần nhất</h2>
       <p class="edu-muted">Báo cáo tác động đầu tiên sẽ công bố sau khi hoàn thành cohort 90 ngày đầu tiên.</p>
     </section>

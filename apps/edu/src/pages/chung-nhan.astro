@@ -18,11 +18,11 @@ const certs = [
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="chung-nhan">
   <main class="edu-page">
-    <section class="hero">
+    <section class="hero" aria-label="Chứng nhận">
       <h1>Chứng nhận</h1>
       <p>7 loại chứng nhận — tra cứu công khai tại <a href="/xac-minh" class="edu-link">/xac-minh</a>.</p>
     </section>
-    <section class="certs-grid">
+    <section class="certs-grid" aria-label="{c.type}">
       {certs.map((c, i) => (
         <div class="cert-card">
           <div class="cert-num">{i + 1}</div>
@@ -31,7 +31,7 @@ const certs = [
         </div>
       ))}
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="Đặc điểm chứng nhận">
       <h2>Đặc điểm chứng nhận</h2>
       <ul class="rules-list">
         <li>Mỗi chứng nhận có <strong>mã tra cứu</strong> công khai.</li>

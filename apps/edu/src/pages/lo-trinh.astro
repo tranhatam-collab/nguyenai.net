@@ -16,11 +16,11 @@ const paths = [
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="lo-trinh">
   <main class="edu-page">
-    <section class="hero">
+    <section class="hero" aria-label="Lộ trình học">
       <h1>Lộ trình học</h1>
       <p>5 cấp học từ Khởi động đến Chuyên Gia — chọn lộ trình phù hợp.</p>
     </section>
-    <section class="paths-grid">
+    <section class="paths-grid" aria-label="{p.name}">
       {paths.map(p => (
         <div class="path-card">
           <div class="path-level">Cấp {p.level}</div>
@@ -34,7 +34,7 @@ const paths = [
         </div>
       ))}
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="Cách chọn cấp">
       <h2>Cách chọn cấp</h2>
       <p>Mới bắt đầu → Cấp 0. Đã có kỹ năng cơ bản → <a href="/danh-gia" class="edu-link">làm đánh giá đầu vào</a> để xác định cấp phù hợp.</p>
     </section>

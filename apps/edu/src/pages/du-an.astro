@@ -14,17 +14,17 @@ const requiredFields = [
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="du-an">
   <main class="edu-page">
-    <section class="hero">
+    <section class="hero" aria-label="Sàn dự án">
       <h1>Sàn dự án</h1>
       <p>Dự án thật — đủ 9 trường, có người chịu trách nhiệm, có biên nhận.</p>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="9 trường bắt buộc">
       <h2>9 trường bắt buộc</h2>
       <ol class="fields-list">
         {requiredFields.map(f => <li>{f}</li>)}
       </ol>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="9 trường bắt buộc">
       <h2>Quy tắc dự án</h2>
       <ul class="rules-list">
         <li>Dự án phải giải quyết <strong>vấn đề thật</strong>.</li>

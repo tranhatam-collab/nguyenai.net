@@ -8,11 +8,11 @@ const locale = 'vi';
 
 <AcademyLayout title={title} description={description} locale={locale} activeNav="san-pham">
   <main class="edu-page">
-    <section class="hero">
+    <section class="hero" aria-label="Sản phẩm">
       <h1>Sản phẩm</h1>
       <p>Sản phẩm nhỏ đủ thật — không sản phẩm = chưa hoàn thành.</p>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="Quy tắc sản phẩm">
       <h2>Quy tắc sản phẩm</h2>
       <ul class="rules-list">
         <li>Mỗi bài học có 1 sản phẩm yêu cầu.</li>
@@ -22,7 +22,7 @@ const locale = 'vi';
         <li>Sản phẩm được mentor duyệt theo <a href="/bai-hoc" class="edu-link">rubric 4 mức</a>.</li>
       </ul>
     </section>
-    <section class="content-section">
+    <section class="content-section" aria-label="Quy tắc sản phẩm">
       <h2>Ví dụ sản phẩm</h2>
       <ul class="examples-list">
         <li>1 email giới thiệu bản thân (Cấp 0)</li>
@@ -33,7 +33,7 @@ const locale = 'vi';
         <li>1 pitch deck 5 slide (Cấp 1)</li>
       </ul>
     </section>
-    <section class="cta-section">
+    <section class="cta-section" aria-label="Cta Section">
       <a href="/nhiem-vu" class="edu-btn edu-btn-primary">Nộp sản phẩm →</a>
     </section>
   </main>
