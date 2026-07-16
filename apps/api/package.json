@@ -34,7 +34,8 @@
     "@nai/admin-approval": "workspace:*",
     "@nai/model-gateway": "workspace:*",
     "@nai/notifier": "workspace:*",
-    "@nai/training-gateway": "workspace:*"
+    "@nai/training-gateway": "workspace:*",
+    "@nai/ai-provider-client": "workspace:*"
   },
   "devDependencies": {
     "wrangler": "^4.0.0",

@@ -99,11 +99,12 @@ import {
 } from '@nai/conductor';
 import {
   setModelRegistry as setPrismModelRegistry,
+  setLLMProvider as setPrismLLMProvider,
   configureGen1Adapter,
   configureMockProvider,
-  configureDirectProvider,
   type ModelDescriptor,
 } from '@nai/prism';
+import { configureProviderGateway } from '@nai/ai-provider-client';
 import { invokeThroughTrainingGateway } from '@nai/training-gateway';
 import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
@@ -165,10 +166,10 @@ interface AppEnv {
     // When false, /v1/gen1/* routes return 404 and /v1/chat uses direct providers.
     // When true, Gen1 proxy is enabled for failoff only.
     LEGACY_BRIDGE_ENABLED?: string;
-    // WI-1.2: Direct LLM provider keys (set via `wrangler secret put`).
-    OPENAI_API_KEY?: string;
-    ANTHROPIC_API_KEY?: string;
-    GOOGLE_AI_API_KEY?: string;
+    // AI Provider Gateway — single source for all model invocations.
+    // See AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md
+    AI_PROVIDER_GATEWAY_URL?: string;
+    AI_PROVIDER_API_KEY?: string;
     // Phase 3 — evidence signing secret (HMAC-SHA256 for evidence packs)
     // SEC-P0-3: Must be set via `wrangler secret put EVIDENCE_SIGNING_KEY`.
     // Never committed. In production (ENVIRONMENT !== 'development') the
@@ -250,20 +251,19 @@ function initStores(env: AppEnv['Bindings']): void {
   // Load model registry from product-catalog models.json (bundled at build time)
   setPrismModelRegistry(modelsData as unknown as ModelDescriptor[]);
 
-  // WI-1.2: Configure LLM provider — direct providers take priority.
-  // Gen1 adapter is only used when LEGACY_BRIDGE_ENABLED=true (failoff).
+  // AI Provider Gateway — single source for all model invocations.
+  // See AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md
   const mode = env.LLM_PROVIDER_MODE ?? 'auto';
   if (mode === 'mock') {
     configureMockProvider();
   } else {
-    // Try direct providers first (OpenAI, Anthropic, Google)
-    const hasDirect = configureDirectProvider({
-      openaiApiKey: env.OPENAI_API_KEY,
-      anthropicApiKey: env.ANTHROPIC_API_KEY,
-      googleApiKey: env.GOOGLE_AI_API_KEY,
-    });
-    if (!hasDirect) {
-      // No keys at all — try Gen1 adapter only if legacy bridge is enabled
+    // Use AI Provider Gateway (aiagent.iai.one) — no direct vendor keys
+    const hasGateway = configureProviderGateway({
+      gatewayUrl: env.AI_PROVIDER_GATEWAY_URL ?? 'https://aiagent.iai.one',
+      apiKey: env.AI_PROVIDER_API_KEY ?? '',
+    }, setPrismLLMProvider);
+    if (!hasGateway) {
+      // No gateway key — try Gen1 adapter only if legacy bridge is enabled
       const legacyEnabled = env.LEGACY_BRIDGE_ENABLED === 'true';
       if (legacyEnabled && env.GEN1_GATEWAY_URL) {
         configureGen1Adapter({
@@ -271,7 +271,7 @@ function initStores(env: AppEnv['Bindings']): void {
           adminKey: env.GEN1_ADMIN_KEY,
         });
       } else {
-        // No keys at all — fall back to mock so the API still responds.
+        // No gateway key — fall back to mock so the API still responds.
         configureMockProvider();
       }
     }
@@ -612,7 +612,7 @@ app.post('/v1/chat', chatRateLimit, async (c) => {
     if (/provider\s+mock\s+is\s+not\s+allowed/i.test(msg) || /is not allowed/i.test(msg)) {
       return c.json({
         error: 'llm_providers_not_configured',
-        message: 'OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_AI_API_KEY chưa set trên nguyenai-api-gateway.',
+        message: 'AI_PROVIDER_API_KEY chưa set trên nguyenai-api-gateway. Liên hệ Team A để cấp gateway credential.',
       }, 503);
     }
     throw err;
@@ -690,7 +690,7 @@ app.post('/v1/stream', chatRateLimit, async (c) => {
     if (/provider\s+mock\s+is\s+not\s+allowed/i.test(msg) || /is not allowed/i.test(msg)) {
       return c.json({
         error: 'llm_providers_not_configured',
-        message: 'OPENAI_API_KEY / ANTHROPIC_API_KEY / GOOGLE_AI_API_KEY chưa set trên nguyenai-api-gateway.',
+        message: 'AI_PROVIDER_API_KEY chưa set trên nguyenai-api-gateway. Liên hệ Team A để cấp gateway credential.',
       }, 503);
     }
     throw err;
