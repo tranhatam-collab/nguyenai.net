@@ -2,7 +2,7 @@
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
 import ProgressBar from '../../components/ProgressBar.astro';
 import ProgressTracker from '../../components/react/ProgressTracker.tsx';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import { tracks } from '../../data/tracks';
 
 export async function getStaticPaths() {
@@ -13,18 +13,18 @@ export async function getStaticPaths() {
     const trackLessons = lessons
       .filter((l) => l.data.trackId === lesson.data.trackId)
       .sort((a, b) => a.data.order - b.data.order);
-    const currentIndex = trackLessons.findIndex((l) => l.slug === lesson.slug);
+    const currentIndex = trackLessons.findIndex((l) => l.id === lesson.id);
     const prev = currentIndex > 0 ? trackLessons[currentIndex - 1] : null;
     const next = currentIndex < trackLessons.length - 1 ? trackLessons[currentIndex + 1] : null;
     const isLastLesson = currentIndex === trackLessons.length - 1;
 
     return {
-      params: { slug: lesson.slug },
+      params: { slug: lesson.id },
       props: {
         lesson,
         track,
-        prev: prev ? { slug: prev.slug, title: prev.data.title } : null,
-        next: next ? { slug: next.slug, title: next.data.title } : null,
+        prev: prev ? { slug: prev.id, title: prev.data.title } : null,
+        next: next ? { slug: next.id, title: next.data.title } : null,
         trackLessonCount: trackLessons.length,
         isLastLesson,
         lessonOrder: lesson.data.order,
@@ -34,7 +34,7 @@ export async function getStaticPaths() {
 }
 
 const { lesson, track, prev, next, trackLessonCount, isLastLesson, lessonOrder } = Astro.props;
-const { Content } = await lesson.render();
+const { Content } = await render(lesson);
 const trackIdPadded = track ? String(track.id).padStart(2, '0') : '01';
 ---
 
@@ -122,7 +122,7 @@ const trackIdPadded = track ? String(track.id).padStart(2, '0') : '01';
     <div class="max-w-3xl mt-8">
       <ProgressTracker
         track={trackIdPadded}
-        currentLessonSlug={lesson.slug}
+        currentLessonSlug={lesson.id}
         client:load
       />
     </div>

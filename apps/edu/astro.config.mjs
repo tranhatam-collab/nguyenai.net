@@ -8,7 +8,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://edu.nguyenai.net',
   output: 'static',
-  adapter: cloudflare({ mode: 'directory' }),
+  adapter: cloudflare({ prerenderEnvironment: false }),
   integrations: [
     mdx(),
     tailwind(),

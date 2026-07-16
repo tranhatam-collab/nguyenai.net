@@ -8,6 +8,6 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://invest.nguyenai.net',
   output: 'server',
-  adapter: cloudflare(),
+  adapter: cloudflare({ prerenderEnvironment: false }),
   integrations: [tailwind()],
 });
