@@ -25,12 +25,9 @@ export interface ProviderResponse {
 }
 
 export const PROVIDER_REGISTRY: Record<string, { baseUrl: string }> = {
-  openai: { baseUrl: 'https://api.openai.com/v1' },
-  anthropic: { baseUrl: 'https://api.anthropic.com/v1' },
-  groq: { baseUrl: 'https://api.groq.com/openai/v1' },
-  cloudflare: { baseUrl: 'https://api.cloudflare.com/client/v4/accounts' },
-  // Gen1 upstream (aiagent.iai.one — FROZEN reference, adapter only)
-  'gen1-iai-one': { baseUrl: 'https://aiagent-iai-one-api-prod.tranhatam.workers.dev' },
+  // Per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16: all model invocations
+  // go through aiagent.iai.one. Direct vendor URLs are BANNED.
+  'ai-provider-gateway': { baseUrl: 'https://aiagent.iai.one' },
 };
 
 export async function callProvider(_req: ProviderRequest): Promise<ProviderResponse> {

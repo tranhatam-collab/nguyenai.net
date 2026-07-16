@@ -24,7 +24,13 @@ check(!/AI_PROVIDER_API_KEY/.test(wrangler), 'Provider API key must not be store
 check(!/OPENAI_API_KEY|ANTHROPIC_API_KEY|GOOGLE_AI_API_KEY/.test(api + prism), 'Direct vendor provider path still exists in Nguyen AI runtime');
 check(/AI_PROVIDER_GATEWAY_URL/.test(api), 'AI provider gateway is not wired into API runtime');
 check(/AI_PROVIDER_API_KEY/.test(api), 'AI_PROVIDER_API_KEY is not declared in API runtime');
-check(!/configureDirectProvider/.test(api), 'Direct provider configuration still exists in API runtime');
+check(!/configureDirectProvider/.test(api + prism), 'configureDirectProvider still exists in API runtime or @nai/prism');
+check(!/DirectLLMProvider/.test(prism), 'DirectLLMProvider class still exists in @nai/prism');
+check(!/api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com/.test(prism), 'Direct vendor URLs still exist in @nai/prism');
+
+// Also scan @nai/gateway-sdk for direct vendor URLs
+const gatewaySdk = read('packages/@nai/gateway-sdk/src/index.ts');
+check(!/api\.openai\.com|api\.anthropic\.com|api\.groq\.com/.test(gatewaySdk), 'Direct vendor URLs still exist in @nai/gateway-sdk');
 
 if (failures.length) {
   console.error('AI PROVIDER SOURCE AUDIT FAILED');

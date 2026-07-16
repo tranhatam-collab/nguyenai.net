@@ -13,7 +13,9 @@
  *   Founder Architecture Amendment. Adapter is NOT source of truth.
  * - Mock provider for tests (no network, deterministic).
  *
- * Per Founder decision: real LLM calls go via GEN1 adapter (GEN1_GATEWAY_URL).
+ * Per Founder decision 2026-07-16: real LLM calls go via AI Provider Gateway
+ * (aiagent.iai.one) using @nai/ai-provider-client. Direct vendor keys
+ * (OpenAI/Anthropic/Google) are BANNED. Direct vendor provider class removed.
  */
 
 // ============================================================
@@ -73,7 +75,7 @@ export interface ChatResponse {
     completion_tokens: number;
     total_tokens: number;
   };
-  /** Provider that served the request ('gen1-adapter' | 'mock' | 'direct-openai' | 'direct-anthropic' | 'direct-google'). */
+  /** Provider that served the request ('gen1-adapter' | 'mock' | 'gateway'). */
   served_by: string;
   /** Raw provider response id (if any). */
   provider_response_id: string | null;
@@ -331,218 +333,6 @@ function mapToGen1Model(naiModelId: string): string {
   if (naiModelId.includes('echo')) return 'echo-mini';
   // Default to iris-3 (free tier) for unknown models.
   return 'iris-3';
-}
-
-// ============================================================
-// Direct LLM provider — calls OpenAI / Anthropic / Google directly
-// (no Gen1 proxy). Used when LEGACY_BRIDGE_ENABLED is false.
-// ============================================================
-
-export interface DirectProviderConfig {
-  /** OpenAI API key (for gpt-* models). */
-  openaiApiKey?: string;
-  /** Anthropic API key (for claude-* models). */
-  anthropicApiKey?: string;
-  /** Google AI API key (for gemini-* models). */
-  googleApiKey?: string;
-  /** Optional fetch implementation (defaults to global fetch). */
-  fetchImpl?: typeof fetch;
-  /** Request timeout in ms. */
-  timeoutMs?: number;
-}
-
-export class DirectLLMProvider implements LLMProvider {
-  constructor(private cfg: DirectProviderConfig) {}
-
-  async chat(req: ChatRequest, model: ModelDescriptor): Promise<ChatResponse> {
-  const fetchFn = this.cfg.fetchImpl ?? fetch;
-    const provider = model.provider.toLowerCase();
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), this.cfg.timeoutMs ?? 60000);
-
-    try {
-      if (provider === 'openai' && this.cfg.openaiApiKey) {
-        return await this.callOpenAI(fetchFn, req, model);
-      }
-      if (provider === 'anthropic' && this.cfg.anthropicApiKey) {
-        return await this.callAnthropic(fetchFn, req, model);
-      }
-      if (provider === 'google' && this.cfg.googleApiKey) {
-        return await this.callGoogle(fetchFn, req, model);
-      }
-      // No matching key — return error
-      return {
-        model: model.id,
-        content: '',
-        finish_reason: 'error',
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        served_by: 'direct-none',
-        provider_response_id: null,
-      };
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-
-  private async callOpenAI(
-    fetchFn: typeof fetch,
-    req: ChatRequest,
-    model: ModelDescriptor,
-  ): Promise<ChatResponse> {
-    const resp = await fetchFn('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.cfg.openaiApiKey}`,
-      },
-      body: JSON.stringify({
-        model: model.providerModel,
-        messages: req.messages,
-        max_tokens: req.max_tokens ?? model.maxOutputTokens,
-        temperature: req.temperature ?? 0.7,
-      }),
-    });
-    if (!resp.ok) {
-      return {
-        model: model.id,
-        content: '',
-        finish_reason: 'error',
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        served_by: 'direct-openai',
-        provider_response_id: null,
-      };
-    }
-    const data = await resp.json() as {
-      id?: string;
-      choices?: Array<{ message?: { content?: string }; finish_reason?: string }>;
-      usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
-    };
-    return {
-      model: model.id,
-      content: data.choices?.[0]?.message?.content ?? '',
-      finish_reason: (data.choices?.[0]?.finish_reason as ChatResponse['finish_reason']) ?? 'stop',
-      usage: {
-        prompt_tokens: data.usage?.prompt_tokens ?? 0,
-        completion_tokens: data.usage?.completion_tokens ?? 0,
-        total_tokens: data.usage?.total_tokens ?? 0,
-      },
-      served_by: 'direct-openai',
-      provider_response_id: data.id ?? null,
-    };
-  }
-
-  private async callAnthropic(
-    fetchFn: typeof fetch,
-    req: ChatRequest,
-    model: ModelDescriptor,
-  ): Promise<ChatResponse> {
-    const systemMsg = req.messages.find((m) => m.role === 'system');
-    const nonSystem = req.messages.filter((m) => m.role !== 'system');
-    const resp = await fetchFn('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': this.cfg.anthropicApiKey!,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: model.providerModel,
-        system: systemMsg?.content ?? '',
-        messages: nonSystem.map((m) => ({ role: m.role, content: m.content })),
-        max_tokens: req.max_tokens ?? model.maxOutputTokens,
-        temperature: req.temperature ?? 0.7,
-      }),
-    });
-    if (!resp.ok) {
-      return {
-        model: model.id,
-        content: '',
-        finish_reason: 'error',
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        served_by: 'direct-anthropic',
-        provider_response_id: null,
-      };
-    }
-    const data = await resp.json() as {
-      id?: string;
-      content?: Array<{ text?: string }>;
-      stop_reason?: string;
-      usage?: { input_tokens?: number; output_tokens?: number };
-    };
-    return {
-      model: model.id,
-      content: data.content?.[0]?.text ?? '',
-      finish_reason: (data.stop_reason as ChatResponse['finish_reason']) ?? 'stop',
-      usage: {
-        prompt_tokens: data.usage?.input_tokens ?? 0,
-        completion_tokens: data.usage?.output_tokens ?? 0,
-        total_tokens: (data.usage?.input_tokens ?? 0) + (data.usage?.output_tokens ?? 0),
-      },
-      served_by: 'direct-anthropic',
-      provider_response_id: data.id ?? null,
-    };
-  }
-
-  private async callGoogle(
-    fetchFn: typeof fetch,
-    req: ChatRequest,
-    model: ModelDescriptor,
-  ): Promise<ChatResponse> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.providerModel}:generateContent?key=${this.cfg.googleApiKey}`;
-    const contents = req.messages
-      .filter((m) => m.role !== 'system')
-      .map((m) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      }));
-    const systemMsg = req.messages.find((m) => m.role === 'system');
-    const body: Record<string, unknown> = { contents };
-    if (systemMsg) {
-      body.systemInstruction = { parts: [{ text: systemMsg.content }] };
-    }
-    body.generationConfig = {
-      maxOutputTokens: req.max_tokens ?? model.maxOutputTokens,
-      temperature: req.temperature ?? 0.7,
-    };
-    const resp = await fetchFn(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!resp.ok) {
-      return {
-        model: model.id,
-        content: '',
-        finish_reason: 'error',
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        served_by: 'direct-google',
-        provider_response_id: null,
-      };
-    }
-    const data = await resp.json() as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
-      usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number };
-    };
-    return {
-      model: model.id,
-      content: data.candidates?.[0]?.content?.parts?.[0]?.text ?? '',
-      finish_reason: (data.candidates?.[0]?.finishReason as ChatResponse['finish_reason']) ?? 'stop',
-      usage: {
-        prompt_tokens: data.usageMetadata?.promptTokenCount ?? 0,
-        completion_tokens: data.usageMetadata?.candidatesTokenCount ?? 0,
-        total_tokens: data.usageMetadata?.totalTokenCount ?? 0,
-      },
-      served_by: 'direct-google',
-      provider_response_id: null,
-    };
-  }
-}
-
-/** Configure direct LLM provider with API keys. Returns true if any key was set. */
-export function configureDirectProvider(cfg: DirectProviderConfig): boolean {
-  if (!cfg.openaiApiKey && !cfg.anthropicApiKey && !cfg.googleApiKey) return false;
-  setLLMProvider(new DirectLLMProvider(cfg));
-  return true;
 }
 
 // ============================================================
