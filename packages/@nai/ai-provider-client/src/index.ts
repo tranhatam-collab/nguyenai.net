@@ -219,7 +219,7 @@ export class AIProviderClient {
 // Helpers
 // ============================================================
 
-function generateRequestId(): string {
+export function generateRequestId(): string {
   return `nai-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
