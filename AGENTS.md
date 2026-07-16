@@ -7,7 +7,7 @@ Nguyen AI Computer — a specialized cloud AI Computer line for individuals, fam
 > **FOUNDER DECISION QD-2026-07-08-01:** nguyenai.net độc lập hoàn toàn khỏi Gen1/Gen2.
 > Đây là Founder architecture decision riêng theo yêu cầu của Amendment 2026-07-02.
 >
-> - `/v1/chat` đi qua direct LLM provider (OpenAI/Anthropic/Google), KHÔNG qua `proxyToGen1`.
+> - `/v1/chat` đi qua `@nai/training-gateway` tới AI Provider Gateway `aiagent.iai.one`, KHÔNG gọi trực tiếp vendor và KHÔNG qua `proxyToGen1`.
 > - `LEGACY_BRIDGE_ENABLED=false` mặc định. `/v1/gen1/*` trả 404.
 > - `GEN1_GATEWAY_URL` gỡ khỏi `wrangler.jsonc` vars — chỉ set qua secret khi failoff.
 > - 8 route files mounted (trước là dead code).
@@ -91,6 +91,8 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/edu/KE_HOACH_TONG_BUILD_NGUOI_TRE_LAM_V2.md` — BINDING: phạm vi tổng giáo dục, thực hành, việc làm, khởi nghiệp
 - `docs/edu/EDU_REMEDIATION_BACKLOG_P0_P2_2026-07-14.md` — BINDING: thứ tự sửa P0 → P1 → P2, DoD và release kill criteria
 - `docs/governance/JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md` — BINDING: auth/secret truth + A-to-Z P0→P2 + release kill criteria
+- `docs/governance/AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md` — BINDING: mọi AI model phải qua `aiagent.iai.one`
+- `docs/governance/AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md` — BINDING: Team A provider trước, Team B Nguyen AI integration sau, rồi master P0→P2 backlog
 
 ### Auth, Secret and Release Lock — BINDING 2026-07-15
 
@@ -102,6 +104,9 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - Push `main` chỉ được verify. Production deploy phải là manual dispatch có `deploy_production=true`, qua protected `production` environment và Founder/release approval.
 - CI xanh của commit cũ không chứng minh worktree/commit mới. Release evidence bắt buộc gắn exact SHA, deployment, environment và timestamp.
 - A-to-Z release hiện tại là `HOLD`; đóng P0 trước P1, P1 trước P2. Build/HTTP 200 không được dùng để bỏ qua auth, payment, accessibility, monitoring, restore, rollback, legal hoặc Founder sign-off.
+- AI provider duy nhất là `aiagent.iai.one` qua contract gateway được version hóa. Cấm `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, provider SDK hoặc provider URL trực tiếp trong Nguyen AI runtime. Chỉ Team AI Provider được giữ vendor credentials.
+- Không dùng `GEN1_GATEWAY_URL` legacy failoff để giả lập AI Provider contract. Phải có `AI_PROVIDER_GATEWAY_URL` + `AI_PROVIDER_API_KEY` và contract/E2E riêng.
+- Team A phải đạt provider exit gate trước khi Team B được tích hợp. Codex chỉ QA audit, evidence review và kế hoạch; không tự tạo provider secret, không tự deploy provider, không tự mở fallback.
 
 ### Education Build Lock — BINDING 2026-07-14
 
@@ -274,7 +279,7 @@ Current state:
 - Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
 - Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
-- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` now uses direct LLM provider. See `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`.
+- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` must use the `aiagent.iai.one` AI Provider Gateway after Team A/B integration; no direct vendor provider path is allowed. See `docs/governance/AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
 - Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
 - Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
 - Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).
@@ -514,7 +519,7 @@ Build currently runs `astro build` for the static public website.
 - Investor site: `apps/invest/` (Astro static, 23 trang) — ✅ build pass.
 - Admin: `apps/admin/` (Phase 2 placeholder).
 - AI Computer runtime: **independent backend, in-progress** (build fresh trong `nguyenai.net/apps/api/` + `packages/@nai/*`, không inherit Gen1). Compatibility contract với Gen1/Gen2 khi integrate.
-- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` now uses direct LLM provider. See `docs/governance/NGUYENAI_NET_INDEPENDENCE_PLAN_2026-07-08.md`.
+- Gen1 gateway adapter: **DISABLED by default** (LEGACY_BRIDGE_ENABLED=false, 2026-07-08). `proxyToGen1` gated, returns 404. `/v1/chat` must use the `aiagent.iai.one` AI Provider Gateway after Team A/B integration; no direct vendor provider path is allowed. See `docs/governance/AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
 - Gen1 (`computer.iai.one`): FROZEN — reference only, build broken, secret exposed, không sửa. Architectural authority tham chiếu.
 - Gen2 (`maytinhai-os`): FROZEN — reference only, audit report fabricated (CORS `*` + SQLi thực tế), copy có chọn lọc package. Architectural authority tham chiếu.
 - Live runtime: unverified (còn 7 bước Founder làm thủ công — see `docs/deployment/FOUNDER_GO_LIVE_CHECKLIST.md`).

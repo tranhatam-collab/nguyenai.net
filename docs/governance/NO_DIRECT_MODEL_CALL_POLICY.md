@@ -1,5 +1,7 @@
 # No Direct Model Call Policy
 
+> **Provider amendment 2026-07-16:** The no-direct-call boundary now ends at the `aiagent.iai.one` AI Provider Gateway contract. Direct OpenAI/Anthropic/Google credentials and runtime paths are forbidden in Nguyen AI; see `AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md`.
+
 - **Status:** BINDING — Phase 1 Governance Lock
 - **Date:** 2026-07-09
 - **Owner:** Founder

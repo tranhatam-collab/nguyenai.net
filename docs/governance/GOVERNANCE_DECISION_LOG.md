@@ -1,6 +1,15 @@
 # Nhật ký quyết định quản trị — Nguyễn AI
 
+## QD-2026-07-16-01: AI Provider Single Source
+
+Nguyen AI chỉ sử dụng `aiagent.iai.one` làm AI Provider Gateway. Nguyen AI không giữ hoặc gọi trực tiếp OpenAI, Anthropic hoặc Google provider keys. Identity, entitlement, billing, evidence, audit và product data vẫn thuộc Nguyen AI.
+
+Decision đầy đủ: `docs/governance/AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
+Build order: Team AI Provider → provider exit gate → Team Nguyen AI Dev → QA-only master backlog.
+
 ## QD-2026-07-08-01: Độc lập hoàn toàn khỏi Gen1/Gen2
+
+> **Provider routing superseded 2026-07-16:** Khoản direct OpenAI/Anthropic/Google trong decision lịch sử này được thay bởi QD-2026-07-16-01. `aiagent.iai.one` chỉ được dùng theo AI Provider Gateway contract mới.
 
 **Người quyết định:** Trần Hà Tâm (Founder)
 **Ngày:** 2026-07-08

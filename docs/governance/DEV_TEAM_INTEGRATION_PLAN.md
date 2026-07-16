@@ -1,5 +1,7 @@
 # NAI — Dev Team Integration Plan
 
+> **Provider amendment 2026-07-16:** Phần AI provider/routing trong tài liệu lịch sử này đã được thay thế bởi `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md` và `AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md`. Không dùng các task yêu cầu giữ vendor keys trực tiếp trong Nguyen AI hoặc gọi Gen1 legacy path làm provider implementation.
+
 - **Status:** BINDING — Founder Build Directive
 - **Date:** 2026-07-02
 - **Owner:** Founder
@@ -322,7 +324,9 @@ nguyenai.net/                          (monorepo root, pnpm workspace)
 | P0-B.7 Build `@nai/approval` — approval gate UI + backend | Dev | Approval flow |
 | P0-B.8 E2E test: register → login → tenant → entitlement check → sensitive action → approval → audit | Dev | Test pass |
 
-### Sprint P1-A — Core Runtime (Gen1 integration) (tuần 4-8)
+### Sprint P1-A — Core Runtime (Gen1 integration) (SUPERSEDED — do not execute)
+
+Use `AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md` instead. This historical section must not be used to connect Nguyen AI directly to Gen1 or to retain vendor provider keys.
 
 **Mục tiêu:** AI Computer Console chạy được command cơ bản với 9 Agents.
 

@@ -46,7 +46,10 @@ for (const [serviceName, service] of Object.entries(inventory.services)) {
   requireAll(serviceName, names, service.requiredCore ?? [], 'core');
   requireAll(serviceName, names, service.requiredOAuth ?? [], 'OAuth');
   requireAny(serviceName, names, service.emailAnyOf ?? [], 'email');
-  if (service.aiAnyOf) requireAny(serviceName, names, service.aiAnyOf, 'AI provider');
+  if (service.aiProviderGateway) requireAll(serviceName, names, [service.aiProviderGateway.apiKeySecret], 'AI provider gateway');
+  for (const forbidden of service.forbiddenDirectProviderSecrets ?? []) {
+    if (names.has(forbidden)) failures.push(`${serviceName}: forbidden direct provider secret ${forbidden} is configured`);
+  }
   if (service.commerceAnyCompleteGroup) {
     const complete = service.commerceAnyCompleteGroup.some((group) => group.every((name) => names.has(name)));
     if (!complete) failures.push(`${serviceName} commerce: no complete payment secret group is configured`);

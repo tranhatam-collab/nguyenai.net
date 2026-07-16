@@ -36,7 +36,9 @@ check_english_in_vietnamese() {
   english_words=("the" "and" "is" "to" "of" "in" "for" "on" "at" "by" "as" "like" "over" "out" "against" "during" "around" "among")
   
   for word in "${english_words[@]}"; do
-    if grep -qi "\\b$word\\b" "$file" 2>/dev/null; then
+    # Use Perl regex for proper UTF-8 word boundary handling
+    # grep \b doesn't handle multi-byte UTF-8 correctly (e.g. "to" in "toàn")
+    if LC_ALL=en_US.UTF-8 perl -ne "exit 1 if !/\\b${word}\\b/i" "$file" 2>/dev/null; then
       echo -e "${RED}✗ Found English word '$word' in Vietnamese content: $file${NC}"
       ERRORS_FOUND=$((ERRORS_FOUND + 1))
     fi
@@ -53,7 +55,8 @@ check_vietnamese_in_english() {
   vietnamese_words=("là" "và" "của" "để" "với" "trên" "tại" "bởi" "về" "như" "thông" "qua" "sau" "trước" "giữa" "ngoài" "trong" "không" "có" "được" "một" "những" "các" "này" "kia" "đó" "cho" "đến" "bằng" "theo" "cũng" "nhưng" "hoặc" "nếu" "thì" "mà" "vì" "khi" "nên" "đã" "chưa" "sẽ" "đang" "rất" "quá" "hơn" "nhất" "ít" "nhiều" "đại" "thành" "phần" "toàn" "bộ" "hệ" "thống" "sản" "phẩm" "dịch" "vụ" "khách" "hàng" "người" "dùng" "trang" "web" "ứng" "dụng" "chức" "năng" "tính" "năng" "công" "cụ" "thông" "tin" "tin" "tức" "liên" "hệ" "kết" "nối" "mạng" "internet" "bảo" "mật" "an" "toàn" "quyền" "riêng" "tư" "liệu" "kho" "chứa" "lưu" "trữ" "xử" "lý" "phân" "tích" "hiển" "thị" "giao" "diện" "trải" "nghiệm" "tương" "tác" "hỗ" "trợ" "giúp" "đỡ" "hướng" "dẫn" "thủ" "tục" "cách" "dùng" "sử" "dụng" "cài" "đặt" "cấu" "hình" "thiết" "lập" "tùy" "chỉnh" "cau" "hình" "mặc" "định" "tùy" "biến" "tham" "số" "tham" "gia" "đăng" "ký" "đăng" "nhập" "đăng" "xuất" "gửi" "nhận" "xem" "đọc" "viết" "tạo" "sửa" "xóa" "bỏ" "thêm" "bớt" "tìm" "kiếm" "lọc" "sắp" "xếp" "phân" "loại" "nhóm" "danh" "mục" "thư" "mục" "tệp" "tin" "hình" "ảnh" "video" "âm" "thanh" "liên" "kết" "url" "địa" "chỉ" "site" "máy" "tính")
   
   for word in "${vietnamese_words[@]}"; do
-    if grep -qi "\\b$word\\b" "$file" 2>/dev/null; then
+    # Use Perl regex for proper UTF-8 word boundary handling
+    if LC_ALL=en_US.UTF-8 perl -ne "exit 1 if !/\\b${word}\\b/i" "$file" 2>/dev/null; then
       echo -e "${RED}✗ Found Vietnamese word '$word' in English content: $file${NC}"
       ERRORS_FOUND=$((ERRORS_FOUND + 1))
     fi

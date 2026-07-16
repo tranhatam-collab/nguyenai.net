@@ -5,6 +5,8 @@
 **Trạng thái phát hành:** **HOLD**  
 **Tính ràng buộc:** BINDING cho mọi task security, auth, payment, deploy và release cho đến khi tài liệu này được thay thế bằng Founder decision mới.
 
+**AI provider amendment:** Từ 2026-07-16, AI provider single source là `aiagent.iai.one`; xem `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md` và `AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md`. Direct vendor keys trong Nguyen AI là blocker.
+
 ## 1. Phán quyết đỏ trước
 
 Quy trình A-to-Z trong tài liệu Founder **chưa được áp dụng đầy đủ**. Repo có nhiều thành phần và gate tốt, nhưng chưa đạt điều kiện FULL PRODUCTION GO.
@@ -19,6 +21,7 @@ Các blocker đã được xác minh tươi:
 6. Workflow trên `origin/main` dùng Trivy `exit-code: 0` và Grype `fail-build: false`. Worktree này đã đổi sang fail-closed, nhưng chưa có CI run chứng minh cấu hình mới hoạt động.
 7. Chưa có bằng chứng tươi cho payment E2E, auth revoke/role/tenant E2E, performance/Core Web Vitals, browser matrix, monitoring alert thật, restore drill hoặc rollback drill.
 8. Push vào `main` trước đây tự deploy production trong khi `AGENTS.md` ghi production chưa approved. Workflow đã được đổi trong worktree này để deploy chỉ chạy khi manual dispatch có `deploy_production=true` và protected `production` environment; thay đổi chưa có hiệu lực cho đến khi merge và cấu hình reviewer trên GitHub.
+9. AI provider audit ngày 2026-07-16 FAIL: direct vendor path còn trong API/`@nai/prism`; chưa có `AI_PROVIDER_GATEWAY_URL` hoặc `AI_PROVIDER_API_KEY`; chưa có Team A provider contract và Team B integration E2E.
 
 Không được dùng các câu “JWT auth ready”, “A-to-Z completed”, “all green”, “go-live ready” hoặc “production-ready” cho trạng thái hiện tại.
 
@@ -113,7 +116,7 @@ P0 phải đóng trước P1. P1 phải đóng trước P2. Không dùng build p
 | AZ-P0-01 | Baseline repo: quyết định phạm vi các commit Edu local, commit/review hoặc tách branch; không để dirty worktree làm release source | Tech lead | `git status --short` sạch; SHA khớp review và CI |
 | AZ-P0-02 | Merge OAuth D1 fix; thêm test login Google lần 1, lần 2, link email đã verify, không tạo duplicate user | Auth team | D1 row assertions + browser E2E + logout/relogin pass |
 | AZ-P0-03 | Gỡ `JWT_SECRET` khỏi production Auth Worker sau Founder/ops confirmation; cập nhật evidence là unused removal, không gọi là JWT rotation | Founder/Ops | `wrangler secret list` không còn `JWT_SECRET`; auth login/session vẫn pass |
-| AZ-P0-04 | Cấu hình secret group đúng sản phẩm: API email; một payment group hoàn chỉnh; ít nhất một direct LLM provider | Founder/Ops | `pnpm audit:secrets:production` pass, không lộ values |
+| AZ-P0-04 | Cấu hình secret group đúng sản phẩm: API email; một payment group hoàn chỉnh; AI Provider Gateway group (`AI_PROVIDER_API_KEY`) do `aiagent.iai.one` cấp; không có vendor key trực tiếp trong Nguyen AI | Founder/Ops | `pnpm audit:secrets:production` pass, `pnpm audit:ai-provider` pass, không lộ values |
 | AZ-P0-05 | Sửa toàn bộ 107 accessibility violations và chạy manual keyboard/focus smoke cho critical routes | Frontend/QA | `pnpm audit:accessibility` exit 0 + manual evidence |
 | AZ-P0-06 | Auth/Authz production E2E: signup, email verify, Google OAuth, protected route, logout, expiry, revoke, role deny, tenant isolation | Auth/Security/QA | evidence gắn production deployment ID và test accounts |
 | AZ-P0-07 | Commerce/legal gate: xác nhận merchant/entity/refund/disclosure; checkout -> signed webhook -> order -> entitlement -> receipt -> refund/revoke, replay-safe | Payment/Legal/QA | real provider test-mode E2E, duplicate/replay/invalid signature tests |

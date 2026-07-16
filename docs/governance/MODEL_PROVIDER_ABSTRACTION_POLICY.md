@@ -1,5 +1,7 @@
 # Model Provider Abstraction Policy
 
+> **Provider amendment 2026-07-16:** Credential and runtime source rules in this historical policy are superseded by `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`. Nguyen AI must use `aiagent.iai.one` as the single AI Provider Gateway and must not retain vendor keys directly.
+
 - **Status:** BINDING — Phase 1 Governance Lock
 - **Date:** 2026-07-09
 - **Owner:** Founder
