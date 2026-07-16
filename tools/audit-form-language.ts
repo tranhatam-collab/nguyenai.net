@@ -117,6 +117,8 @@ function containsUiWord(content: string, word: string): boolean {
     new RegExp(`id\\s*=\\s*["'][^"']*${word}[^"']*["']`, 'i'),
     // fetch URL ending with /submit
     new RegExp(`/[^\\s"'\\\`]*${word}(?:['"\\\`/]|$)`, 'i'),
+    // console.error/log/warn string arguments (developer debug, not UI)
+    new RegExp(`console\\.(error|log|warn|info|debug)\\s*\\([^)]*\\b${word}\\b`, 'i'),
   ];
   
   // Find all occurrences of the word
