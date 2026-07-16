@@ -26,7 +26,7 @@ export type ToolCategory =
   | "business"
   | "automation";
 
-export type ToolAuthType = "none" | "api-key" | "oauth" | "byok";
+export type ToolAuthType = "none" | "api-key" | "oauth" | "byok" | "gateway-key";
 
 export interface ToolDefinition {
   id: ToolId;
@@ -82,7 +82,7 @@ export interface FreeApiRegistry {
   url: string;
   category: ToolCategory;
   description: string;
-  authType: "none" | "api-key" | "oauth";
+  authType: ToolAuthType;
   docsUrl: string;
   rateLimit: string;
   provides: string[];
