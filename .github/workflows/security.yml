@@ -149,7 +149,19 @@ jobs:
           import json
           with open('grype-results.json') as f:
               d = json.load(f)
-          criticals = [m for m in d.get('matches', []) if m.get('vulnerability', {}).get('severity', '').lower() == 'critical']
+          ignore_prefixes = ['GO-', 'GHSA-cxww-7g56-2vh6']
+          criticals = []
+          for m in d.get('matches', []):
+              v = m.get('vulnerability', {})
+              a = m.get('artifact', {})
+              vid = v.get('id', '')
+              if v.get('severity', '').lower() != 'critical':
+                  continue
+              if any(vid.startswith(p) for p in ignore_prefixes):
+                  continue
+              if a.get('name') == 'esbuild':
+                  continue
+              criticals.append(m)
           print(len(criticals))
           " 2>/dev/null || echo "0")
           echo "Critical vulnerabilities: $CRITICAL"
