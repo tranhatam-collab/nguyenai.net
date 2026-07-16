@@ -52,6 +52,7 @@ ALLOWLIST_PATTERNS=(
   "packages/@nai/prism/"                             # Gen1 adapter (gated, disabled by default)
   "packages/@nai/gateway-sdk/"                      # Gen1 adapter (not imported, dead code)
   "packages/@nai/investor-verify/"                  # verify.iai.one adapter
+  "packages/@nai/ai-provider-client/"               # AI Provider Gateway client (aiagent.iai.one per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16)
 )
 
 # Build exclude grep flags
