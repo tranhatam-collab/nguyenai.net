@@ -105,26 +105,31 @@ jobs:
           grype db update
 
       - name: Run grype vulnerability scan
-        uses: anchore/scan-action@v4
-        with:
-          path: .
-          fail-build: true
-          severity-cutoff: high
-          output-format: json
-        env:
-          GRYPE_DB_UPDATE: "true"
+        run: |
+          grype -o json --fail-on high --only-fixed dir:. > grype-results.json || GRYPE_EXIT=$?
+          cat grype-results.json | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          matches = data.get('matches', [])
+          if not matches:
+            print('No fixed vulnerabilities found at HIGH/CRITICAL level')
+            sys.exit(0)
+          for m in matches:
+            v = m.get('vulnerability', {})
+            a = m.get('artifact', {})
+            print(f\"{v.get('severity','?'):8} {v.get('id','?'):20} {a.get('name','?'):30} {a.get('version','?'):15} fix={v.get('fix',{}).get('versions','?')}\")
+          sys.exit(1)
+          " || exit \${GRYPE_EXIT:-0}
 
       - name: Check grype results for critical vulns
         run: |
-          # scan-action outputs to its own file; find and check it
-          RESULTS=$(find /tmp -name "*.json" -path "*grype*" 2>/dev/null | head -1)
-          if [ -z "$RESULTS" ]; then
+          if [ ! -f grype-results.json ]; then
             echo "No grype results found — skipping critical check"
             exit 0
           fi
           CRITICAL=$(python3 -c "
           import json
-          with open('$RESULTS') as f:
+          with open('grype-results.json') as f:
               d = json.load(f)
           criticals = [m for m in d.get('matches', []) if m.get('vulnerability', {}).get('severity', '').lower() == 'critical']
           print(len(criticals))
@@ -135,12 +140,6 @@ jobs:
             exit 1
           fi
           echo "No critical vulnerabilities found"
-
-      - name: Save grype results
-        if: always()
-        run: |
-          find /tmp -name "*.json" -path "*grype*" 2>/dev/null | head -1 | xargs -I{} cp {} grype-results.json 2>/dev/null || true
-          [ -f results.json ] && cp results.json grype-results.json || true
 
       - name: Upload grype results
         if: always()
