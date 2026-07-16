@@ -63,7 +63,7 @@ check(
   'Deploy verification job must execute the secret-governance audit',
 );
 check(/exit-code:\s*1/.test(securityWorkflow), 'Trivy must fail CI on HIGH/CRITICAL findings');
-check(/fail-build:\s*true/.test(securityWorkflow), 'Grype must fail CI instead of operating fail-open');
+check(/--fail-on\s+high/.test(securityWorkflow), 'Grype must fail CI on HIGH/CRITICAL findings (--fail-on high)');
 
 const requiredDocs = [
   'docs/deployment/SECRET_ROTATION_RUNBOOK.md',
