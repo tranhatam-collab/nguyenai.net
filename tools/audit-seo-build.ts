@@ -83,6 +83,10 @@ function checkFile(app: AppSpec, file: string): void {
   const locale = localeOf(rel);
   checked++;
 
+  // Skip redirect stubs (Astro redirect pages have <meta http-equiv="refresh"> or very short HTML)
+  const isRedirect = /<meta[^>]*http-equiv=["']refresh["']/i.test(html) || html.length < 500;
+  if (isRedirect) return;
+
   const fails: string[] = [];
   const htmlTagMatch = html.match(/<html[^>]*>/i);
   const htmlLang = htmlTagMatch ? readAttr(htmlTagMatch[0], 'lang') : null;
