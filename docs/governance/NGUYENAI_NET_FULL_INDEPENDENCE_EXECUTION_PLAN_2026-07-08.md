@@ -1,5 +1,10 @@
 # KẾ HOẠCH ĐỘC LẬP HOÀN TOÀN NGUYENAI.NET — v1.0
 
+> **⚠️ SUPERSEDED 2026-07-16:** Direct vendor key instructions (OPENAI_API_KEY, etc.)
+> in this document are BANNED per `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
+> All AI calls now go through `aiagent.iai.one` via `AI_PROVIDER_API_KEY`.
+> Kept for historical reference only — do not use for new decisions.
+
 > **Ngày:** 2026-07-08
 > **Người phê duyệt:** Trần Hà Tâm (Founder)
 > **Căn cứ:** Văn kiện V2.0 (2026-07-06), báo cáo kiểm định 2026-07-06, audit codebase trực tiếp 2026-07-08

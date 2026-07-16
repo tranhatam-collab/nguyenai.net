@@ -1,5 +1,10 @@
 # QA Audit — Go-Live Readiness Final Report
 
+> **⚠️ SUPERSEDED 2026-07-16:** Direct vendor key references (OPENAI_API_KEY, etc.)
+> in this document are BANNED per `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
+> All AI calls now go through `aiagent.iai.one` via `AI_PROVIDER_API_KEY`.
+> Kept for historical reference only — do not use for new decisions.
+
 **Date:** 2026-07-03
 **Auditor:** Devin (automated)
 **Commits covered:** `ab59ebf` → `fcdfbf9` (4 commits)

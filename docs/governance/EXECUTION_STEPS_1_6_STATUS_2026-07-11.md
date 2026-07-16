@@ -1,5 +1,10 @@
 # Execution status — steps 1–6 (2026-07-11)
 
+> **⚠️ SUPERSEDED 2026-07-16:** Direct vendor key instructions (OPENAI_API_KEY, etc.)
+> in this document are BANNED per `AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md`.
+> All AI calls now go through `aiagent.iai.one` via `AI_PROVIDER_API_KEY`.
+> Kept for historical reference only — do not use for new decisions.
+
 Account production: **62d57eaa548617aeecac766e5a1cb98e** (Anhhatam).
 
 | Step | Status | Evidence |

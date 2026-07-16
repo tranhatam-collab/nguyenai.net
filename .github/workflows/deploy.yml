@@ -71,6 +71,9 @@ jobs:
       - name: Secret governance audit
         run: node tools/audit-secret-governance.mjs
 
+      - name: AI provider single-source audit
+        run: node tools/audit-ai-provider-source.mjs
+
       - name: Security P0 audit
         run: npx tsx tools/audit-security-p0.ts
 

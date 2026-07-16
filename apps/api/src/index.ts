@@ -253,8 +253,14 @@ function initStores(env: AppEnv['Bindings']): void {
 
   // AI Provider Gateway — single source for all model invocations.
   // See AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md
+  const isProduction = env.ENVIRONMENT === 'production';
   const mode = env.LLM_PROVIDER_MODE ?? 'auto';
-  if (mode === 'mock') {
+
+  if (mode === 'mock' && isProduction) {
+    // BANNED: mock provider in production. Refuse to serve AI requests.
+    // This is a hard stop — do NOT fall back to mock.
+    console.error('[FATAL] LLM_PROVIDER_MODE=mock is BANNED in production. Set AI_PROVIDER_API_KEY.');
+  } else if (mode === 'mock') {
     configureMockProvider();
   } else {
     // Use AI Provider Gateway (aiagent.iai.one) — no direct vendor keys
@@ -263,16 +269,22 @@ function initStores(env: AppEnv['Bindings']): void {
       apiKey: env.AI_PROVIDER_API_KEY ?? '',
     }, setPrismLLMProvider);
     if (!hasGateway) {
-      // No gateway key — try Gen1 adapter only if legacy bridge is enabled
-      const legacyEnabled = env.LEGACY_BRIDGE_ENABLED === 'true';
-      if (legacyEnabled && env.GEN1_GATEWAY_URL) {
-        configureGen1Adapter({
-          baseUrl: env.GEN1_GATEWAY_URL,
-          adminKey: env.GEN1_ADMIN_KEY,
-        });
+      if (isProduction) {
+        // BANNED: no gateway key in production. Do NOT fall back to mock or Gen1.
+        // The API will return 503 on AI endpoints until AI_PROVIDER_API_KEY is set.
+        console.error('[FATAL] AI_PROVIDER_API_KEY not set in production. AI endpoints will return 503.');
       } else {
-        // No gateway key — fall back to mock so the API still responds.
-        configureMockProvider();
+        // Development only: try Gen1 adapter if legacy bridge is enabled (failoff)
+        const legacyEnabled = env.LEGACY_BRIDGE_ENABLED === 'true';
+        if (legacyEnabled && env.GEN1_GATEWAY_URL) {
+          configureGen1Adapter({
+            baseUrl: env.GEN1_GATEWAY_URL,
+            adminKey: env.GEN1_ADMIN_KEY,
+          });
+        } else {
+          // Dev fallback — mock is allowed in development only
+          configureMockProvider();
+        }
       }
     }
   }
@@ -578,6 +590,14 @@ async function proxyToGen1(
 app.post('/v1/chat', chatRateLimit, async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'unauthorized' }, 401);
+
+  // Production guard: refuse if AI_PROVIDER_API_KEY is not set
+  if (c.env.ENVIRONMENT === 'production' && !c.env.AI_PROVIDER_API_KEY) {
+    return c.json({
+      error: 'llm_providers_not_configured',
+      message: 'AI_PROVIDER_API_KEY chưa set. AI endpoints không khả dụng cho đến khi gateway credential được cấp.',
+    }, 503);
+  }
 
   const body = await c.req.json().catch(() => ({})) as {
     model?: string;
