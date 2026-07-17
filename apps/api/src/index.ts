@@ -1501,7 +1501,7 @@ app.route('/', aiNguyenRoutes);
 app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'authentication required' }, 401);
-  if (session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN') {
+  if (!session.roles?.includes('ADMIN') && !session.roles?.includes('SUPER_ADMIN')) {
     return c.json({ error: 'admin only' }, 403);
   }
 
