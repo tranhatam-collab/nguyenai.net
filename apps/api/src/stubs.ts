@@ -20,9 +20,8 @@ export const getProofStore = (): any => ({
 export type ReviewerResult = any;
 export type ReviewDecision = any;
 
-export function verifyCertificateId(certificateId: string): boolean {
-  return certificateId.length > 0;
-}
+// P0-EDU: verifyCertificateId stub removed — real D1-backed verify endpoint
+// is at GET /v1/edu/certificate/verify/:id in edu-routes.ts
 
 export async function verifyServiceAuth(_c: unknown): Promise<any> {
   return { ok: true, error: null, status: 200, userId: '', scopes: [] };

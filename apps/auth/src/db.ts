@@ -172,6 +172,36 @@ export async function findOrgsByUser(db: D1Database, userId: string): Promise<{ 
   }));
 }
 
+/**
+ * Find a specific membership record for a user in an org.
+ * Returns null if user is not a member of the org.
+ */
+export async function findMembership(
+  db: D1Database,
+  userId: string,
+  orgId: string,
+): Promise<D1Membership | null> {
+  const stmt = db.prepare('SELECT * FROM memberships WHERE user_id = ?1 AND org_id = ?2');
+  const result = await stmt.bind(userId, orgId).first<D1Membership>();
+  return result ?? null;
+}
+
+/**
+ * Check if user is an admin or owner of a specific org.
+ * Returns the membership record if admin/owner, null otherwise.
+ */
+export async function findOrgAdminMembership(
+  db: D1Database,
+  userId: string,
+  orgId: string,
+): Promise<D1Membership | null> {
+  const stmt = db.prepare(
+    'SELECT * FROM memberships WHERE user_id = ?1 AND org_id = ?2 AND role IN (?3, ?4)'
+  );
+  const result = await stmt.bind(userId, orgId, 'admin', 'owner').first<D1Membership>();
+  return result ?? null;
+}
+
 // ============================================================
 // Session queries
 // ============================================================

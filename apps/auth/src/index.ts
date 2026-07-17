@@ -73,6 +73,8 @@ import {
   createOrganization,
   createMembership,
   findOrgsByUser,
+  findMembership,
+  findOrgAdminMembership,
   createSession,
   findSessionById,
   revokeSession,
@@ -512,7 +514,7 @@ app.post('/v1/auth/verify-email', async (c) => {
 
 app.post('/v1/auth/login', async (c) => {
   const body = await c.req.json();
-  const { email, password, audience } = body;
+  const { email, password, audience, org_id } = body;
 
   if (!email || !password) {
     return c.json({ error: 'email and password are required' }, 400);
@@ -554,8 +556,17 @@ app.post('/v1/auth/login', async (c) => {
     return c.json({ error: 'invalid email or password' }, 401);
   }
 
-  const primaryOrg = orgs[0];
-  const orgRoles = orgs.map((o) => o.membership.role as Role);
+  // P0-AUTHZ: Bind roles to the selected org, not flattened across all orgs.
+  // If org_id is specified, use that org; otherwise default to primary (first) org.
+  const selectedOrg = org_id
+    ? orgs.find((o) => o.org.org_id === org_id)
+    : orgs[0];
+  if (!selectedOrg) {
+    await logLoginFailure(email, getClientIp(c), getUserAgent(c));
+    return c.json({ error: 'not a member of specified org' }, 403);
+  }
+
+  const orgRoles = [selectedOrg.membership.role as Role];
   // Assign edu:learner by default — edu roles can be upgraded later by admin
   const roles = assignEduRole(orgRoles, 'edu:learner');
   const permissions = [...getPermissionsForRoles(orgRoles), ...getEduPermissions(roles)];
@@ -565,10 +576,29 @@ app.post('/v1/auth/login', async (c) => {
   const csrfToken = generateCsrfToken();
   const targetAudience = audience ?? c.env.DEFAULT_AUDIENCE;
 
+  // P0-AUTHZ: MFA enforcement — if user has verified MFA factors, require MFA code before session
+  const mfaFactors = await findMfaFactorsByUser(c.env.DB, user.user_id);
+  const verifiedMfaFactors = mfaFactors.filter((f) => f.verified && !f.disabled_at);
+  if (verifiedMfaFactors.length > 0) {
+    // Create MFA challenge — user must complete via POST /v1/auth/login/mfa
+    const challengeId = crypto.randomUUID();
+    const challengeExpiry = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min TTL
+    await c.env.DB.prepare(
+      'INSERT INTO mfa_challenges (challenge_id, user_id, org_id, audience, expires_at) VALUES (?, ?, ?, ?, ?)'
+    ).bind(challengeId, user.user_id, selectedOrg.org.org_id, targetAudience, challengeExpiry).run();
+
+    return c.json({
+      mfa_required: true,
+      challenge_id: challengeId,
+      expires_at: challengeExpiry,
+      factors: verifiedMfaFactors.map((f) => ({ mfa_id: f.mfa_id, type: f.type, name: f.name })),
+    });
+  }
+
   await createSession(c.env.DB, {
     session_id: sessionId,
     user_id: user.user_id,
-    tenant_id: primaryOrg?.org.tenant_id ?? '',
+    tenant_id: selectedOrg.org.tenant_id,
     audience: targetAudience,
     issuer: c.env.AUTH_ISSUER,
     roles,
@@ -592,7 +622,102 @@ app.post('/v1/auth/login', async (c) => {
     locale: user.locale,
     roles,
     permissions,
-    tenant_id: primaryOrg?.org.tenant_id ?? '',
+    tenant_id: selectedOrg.org.tenant_id,
+    audience: targetAudience,
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+});
+
+// ============================================================
+// MFA Login completion — POST /v1/auth/login/mfa
+// P0-AUTHZ: Complete login after MFA challenge
+// ============================================================
+
+app.post('/v1/auth/login/mfa', async (c) => {
+  const { challenge_id, code } = await c.req.json() as { challenge_id?: string; code?: string };
+  if (!challenge_id || !code) {
+    return c.json({ error: 'challenge_id and code are required' }, 400);
+  }
+
+  // Look up challenge
+  const challenge = await c.env.DB.prepare(
+    'SELECT * FROM mfa_challenges WHERE challenge_id = ?1 AND used_at IS NULL AND expires_at > ?2'
+  ).bind(challenge_id, new Date().toISOString()).first<{
+    challenge_id: string; user_id: string; org_id: string; audience: string | null;
+    expires_at: string; used_at: string | null;
+  }>();
+  if (!challenge) {
+    return c.json({ error: 'invalid or expired challenge' }, 401);
+  }
+
+  // Mark challenge as used
+  await c.env.DB.prepare('UPDATE mfa_challenges SET used_at = ?1 WHERE challenge_id = ?2')
+    .bind(new Date().toISOString(), challenge_id).run();
+
+  // Verify MFA code against any verified factor using TOTP
+  const mfaFactors = await findMfaFactorsByUser(c.env.DB, challenge.user_id);
+  const verifiedFactors = mfaFactors.filter((f) => f.verified && !f.disabled_at && f.secret);
+  let mfaValid = false;
+  for (const factor of verifiedFactors) {
+    const totp = new TOTP({
+      issuer: 'Nguyen AI',
+      label: challenge.user_id,
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: Secret.fromBase32(factor.secret!),
+    });
+    const delta = totp.validate({ token: code, window: 1 });
+    if (delta !== null) {
+      mfaValid = true;
+      break;
+    }
+  }
+  if (!mfaValid) {
+    return c.json({ error: 'invalid MFA code' }, 401);
+  }
+
+  // Complete login — load org + create session
+  const orgs = await findOrgsByUser(c.env.DB, challenge.user_id);
+  const selectedOrg = orgs.find((o) => o.org.org_id === challenge.org_id);
+  if (!selectedOrg) {
+    return c.json({ error: 'org not found' }, 401);
+  }
+
+  const orgRoles = [selectedOrg.membership.role as Role];
+  const roles = assignEduRole(orgRoles, 'edu:learner');
+  const permissions = [...getPermissionsForRoles(orgRoles), ...getEduPermissions(roles)];
+  const maxAge = getMaxAge(c);
+
+  const sessionId = generateSessionId();
+  const csrfToken = generateCsrfToken();
+  const targetAudience = challenge.audience ?? c.env.DEFAULT_AUDIENCE;
+
+  await createSession(c.env.DB, {
+    session_id: sessionId,
+    user_id: challenge.user_id,
+    tenant_id: selectedOrg.org.tenant_id,
+    audience: targetAudience,
+    issuer: c.env.AUTH_ISSUER,
+    roles,
+    permissions,
+    device: JSON.stringify({ ua: getUserAgent(c) }),
+    ip_address: getClientIp(c),
+    user_agent: getUserAgent(c),
+    csrf_token: csrfToken,
+    expires_at: getExpiresAt(maxAge),
+  });
+
+  await logLoginSuccess(challenge.user_id, sessionId, getClientIp(c), getUserAgent(c));
+  await setSignedSessionCookie(c, sessionId, maxAge);
+
+  return c.json({
+    session_id: sessionId,
+    user_id: challenge.user_id,
+    roles,
+    permissions,
+    tenant_id: selectedOrg.org.tenant_id,
     audience: targetAudience,
     csrf_token: csrfToken,
     expires_at: getExpiresAt(maxAge),
@@ -1005,6 +1130,9 @@ app.get('/v1/auth/orgs/:id/members', async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'unauthorized' }, 401);
   const orgId = c.req.param('id');
+  // P0-AUTHZ: Verify session user is a member of this org
+  const membership = await findMembership(c.env.DB, session.user_id, orgId);
+  if (!membership) return c.json({ error: 'forbidden: not a member of this org' }, 403);
   const memberships = await c.env.DB.prepare(
     'SELECT m.*, u.email FROM memberships m JOIN users u ON m.user_id = u.user_id WHERE m.org_id = ?1'
   ).bind(orgId).all();
@@ -1019,8 +1147,16 @@ app.post('/v1/auth/orgs/:id/invite', async (c) => {
   const session = c.get('session');
   if (!session) return c.json({ error: 'unauthorized' }, 401);
   const orgId = c.req.param('id');
+  // P0-AUTHZ: Only admin/owner of this org can invite
+  const adminMembership = await findOrgAdminMembership(c.env.DB, session.user_id, orgId);
+  if (!adminMembership) return c.json({ error: 'forbidden: admin/owner only' }, 403);
   const { email, role } = await c.req.json() as { email?: string; role?: string };
   if (!email || !role) return c.json({ error: 'email and role required' }, 400);
+  // P0-AUTHZ: Cannot invite with role higher than inviter's
+  const inviterRole = adminMembership.role;
+  if (role === 'owner' && inviterRole !== 'owner') {
+    return c.json({ error: 'cannot invite owner unless you are owner' }, 403);
+  }
   const invitee = await findUserByEmail(c.env.DB, email);
   if (!invitee) return c.json({ error: 'user not found' }, 404);
   await createMembership(c.env.DB, { membership_id: crypto.randomUUID(), user_id: invitee.user_id, org_id: orgId, role, permissions: [] });
@@ -1036,7 +1172,20 @@ app.delete('/v1/auth/orgs/:id/members/:userId', async (c) => {
   if (!session) return c.json({ error: 'unauthorized' }, 401);
   const orgId = c.req.param('id');
   const userId = c.req.param('userId');
+  // P0-AUTHZ: Only admin/owner of this org can remove members
+  const adminMembership = await findOrgAdminMembership(c.env.DB, session.user_id, orgId);
+  if (!adminMembership) return c.json({ error: 'forbidden: admin/owner only' }, 403);
+  // P0-AUTHZ: Cannot remove yourself (prevents accidental lockout)
+  if (userId === session.user_id) return c.json({ error: 'cannot remove yourself' }, 400);
+  // P0-AUTHZ: Cannot remove an owner unless you are owner
+  const targetMembership = await findMembership(c.env.DB, userId, orgId);
+  if (!targetMembership) return c.json({ error: 'member not found' }, 404);
+  if (targetMembership.role === 'owner' && adminMembership.role !== 'owner') {
+    return c.json({ error: 'cannot remove owner unless you are owner' }, 403);
+  }
   await c.env.DB.prepare('DELETE FROM memberships WHERE org_id = ?1 AND user_id = ?2').bind(orgId, userId).run();
+  // P0-AUTHZ: Revoke all sessions for the removed user (session invalidation)
+  await revokeAllUserSessions(c.env.DB, userId);
   return c.json({ ok: true });
 });
 

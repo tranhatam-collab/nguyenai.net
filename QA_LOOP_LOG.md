@@ -364,3 +364,31 @@
 **OVERALL: ✅ ALL GREEN**
 
 ---
+
+## QA Loop #27 — 2026-07-17T18:32:09Z
+
+| Step | Result | Detail |
+|------|--------|--------|
+| typecheck | ✅ PASS | 0 errors |
+| build | ✅ PASS | Tasks:91successful,91total |
+| audit:all | ✅ PASS | 19/19 audits passed |
+| audit-seo-build | ✅ PASS | [32mBUILDAUDITPASSED[0m |
+| test | ❌ FAIL | @nai/warden:test: 25 passed, 0 failed;@nai/telemetry:test: 40 passed, 0 failed;@nai/echo:test: 30 passed, 0 failed;@nai/trace:test: 35 passed, 0 failed;@nai/tally:test: 27 passed, 0 failed;@nai/loom:test:   ✓ failing pipeline returns failed status;@nai/loom:test:   ✓ failing stage marked failed;@nai/seal:test: 33 passed, 0 failed;@nai/test-llm:test:   ✓ runTestSuite failed = 0;@nai/test-llm:test: 56 passed, 0 failed; |
+
+**OVERALL: ❌ HAS FAILURES**
+
+---
+
+## QA Loop #28 — 2026-07-17T18:35:10Z
+
+| Step | Result | Detail |
+|------|--------|--------|
+| typecheck | ✅ PASS | 0 errors |
+| build | ✅ PASS | Tasks:91successful,91total |
+| audit:all | ✅ PASS | 19/19 audits passed |
+| audit-seo-build | ✅ PASS | [32mBUILDAUDITPASSED[0m |
+| test | ✅ PASS | Tasks:152successful,152total |
+
+**OVERALL: ✅ ALL GREEN**
+
+---

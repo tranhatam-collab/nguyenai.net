@@ -321,6 +321,17 @@ app.use('/v1/*', async (c, next) => {
     ? await parseSessionCookieValue(sessionCookie, c.env.AUTH_SECRET)
     : null;
   c.set('session', sessionId ? await resolveSessionFromCookie(sessionId, c.env) : null);
+
+  // P0-AUTHZ: CSRF enforcement for state-changing requests (POST/PUT/PATCH/DELETE)
+  const method = c.req.method.toUpperCase();
+  const session = c.get('session');
+  if (session && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
+    const csrfHeader = c.req.header('X-CSRF-Token');
+    if (!csrfHeader || csrfHeader !== session.csrf_token) {
+      return c.json({ error: 'CSRF token required' }, 403);
+    }
+  }
+
   await next();
 });
 
@@ -1221,16 +1232,30 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         req,
         price as any,
       );
+      // P0-PAY: Log checkout_created, NOT payment_received — money has NOT arrived yet.
+      // payment_received is emitted by the settlement webhook only.
       await logAuditEvent({
         user_id: session.user_id,
         session_id: session.session_id,
-        event_type: 'payment_received',
+        event_type: 'checkout_created',
         actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
         user_agent: c.req.header('User-Agent') ?? 'unknown',
         target: price_id,
         result: 'success',
-        metadata: { gateway: 'stripe', amount: session_url.amount, currency },
+        metadata: { gateway: 'stripe', amount: session_url.amount, currency, checkout_url: session_url.authorize_url },
       });
+      // P0-PAY: Record pending ledger entry
+      if (c.env.DB) {
+        try {
+          await c.env.DB.prepare(
+            'INSERT OR IGNORE INTO payment_ledger (ledger_id, payment_id, user_id, tenant_id, gateway, price_id, amount, currency, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          ).bind(
+            crypto.randomUUID(), session_url.session_id,
+            session.user_id, session.tenant_id ?? 'default',
+            'stripe', price_id, session_url.amount, currency, 'pending',
+          ).run();
+        } catch { /* ledger best-effort */ }
+      }
       return c.json(session_url);
     } else if (gateway === 'vnpay') {
       const session_url = await createVnPayCheckout(
@@ -1243,16 +1268,29 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         req,
         price as any,
       );
+      // P0-PAY: Log checkout_created, NOT payment_received — money has NOT arrived yet.
       await logAuditEvent({
         user_id: session.user_id,
         session_id: session.session_id,
-        event_type: 'payment_received',
+        event_type: 'checkout_created',
         actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
         user_agent: c.req.header('User-Agent') ?? 'unknown',
         target: price_id,
         result: 'success',
-        metadata: { gateway: 'vnpay', amount: session_url.amount, currency: 'VND' },
+        metadata: { gateway: 'vnpay', amount: session_url.amount, currency: 'VND', checkout_url: session_url.authorize_url },
       });
+      // P0-PAY: Record pending ledger entry
+      if (c.env.DB) {
+        try {
+          await c.env.DB.prepare(
+            'INSERT OR IGNORE INTO payment_ledger (ledger_id, payment_id, user_id, tenant_id, gateway, price_id, amount, currency, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          ).bind(
+            crypto.randomUUID(), session_url.session_id,
+            session.user_id, session.tenant_id ?? 'default',
+            'vnpay', price_id, session_url.amount, 'VND', 'pending',
+          ).run();
+        } catch { /* ledger best-effort */ }
+      }
       return c.json(session_url);
     } else {
       // payos — VietQR via pay-gateway.nguyenai.net (merchant of record: KASAN JSC).
@@ -1270,6 +1308,28 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         req,
         price as any,
       );
+      // P0-PAY: Log checkout_created + record pending ledger entry
+      await logAuditEvent({
+        user_id: session.user_id,
+        session_id: session.session_id,
+        event_type: 'checkout_created',
+        actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+        user_agent: c.req.header('User-Agent') ?? 'unknown',
+        target: price_id,
+        result: 'success',
+        metadata: { gateway: 'payos', amount: session_url.amount, currency: 'VND', checkout_url: session_url.authorize_url },
+      });
+      if (c.env.DB) {
+        try {
+          await c.env.DB.prepare(
+            'INSERT OR IGNORE INTO payment_ledger (ledger_id, payment_id, user_id, tenant_id, gateway, price_id, amount, currency, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          ).bind(
+            crypto.randomUUID(), session_url.session_id,
+            session.user_id, session.tenant_id ?? 'default',
+            'payos', price_id, session_url.amount, 'VND', 'pending',
+          ).run();
+        } catch { /* ledger best-effort */ }
+      }
       return c.json(session_url);
     }
   } catch (err) {
@@ -1367,6 +1427,15 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
     metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id, event_id: stripeEventId },
   });
 
+  // P0-PAY: Update ledger to paid
+  if (c.env.DB) {
+    try {
+      await c.env.DB.prepare(
+        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ?'
+      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, result.gateway_payment_id).run();
+    } catch { /* ledger best-effort */ }
+  }
+
   // P0-PAY-2: Grant entitlement after successful payment
   try {
     if (result.user_id && result.user_id !== 'unknown') {
@@ -1462,6 +1531,15 @@ app.post('/v1/payment/webhook', async (c) => {
     },
   });
 
+  // P0-PAY: Update ledger to paid
+  if (c.env.DB) {
+    try {
+      await c.env.DB.prepare(
+        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ?'
+      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, result.gateway_payment_id).run();
+    } catch { /* ledger best-effort */ }
+  }
+
   // P0-PAY-2: Grant entitlement after successful payment
   try {
     if (result.user_id && result.user_id !== 'unknown') {
@@ -1515,7 +1593,7 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
   }
 
   const body = await c.req.json();
-  const { payment_id, gateway, gateway_payment_id, amount, currency, reason, user_id, tenant_id } = body as {
+  const { payment_id, gateway, gateway_payment_id, amount, currency, reason, user_id, tenant_id, price_id } = body as {
     payment_id: string;
     gateway: Gateway;
     gateway_payment_id: string;
@@ -1524,6 +1602,7 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
     reason: string;
     user_id: string;
     tenant_id: string;
+    price_id?: string;
   };
 
   if (!payment_id || !gateway || !gateway_payment_id || !amount || !reason) {
@@ -1531,6 +1610,20 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
   }
   if (!reason.trim()) {
     return c.json({ error: 'reason is required for refund' }, 400);
+  }
+
+  // P0-PAY: Look up price_id from ledger if not provided in request
+  let resolvedPriceId = price_id;
+  if (!resolvedPriceId && c.env.DB) {
+    const ledgerRow = await c.env.DB.prepare(
+      'SELECT price_id FROM payment_ledger WHERE payment_id = ?1'
+    ).bind(payment_id).first<{ price_id: string }>();
+    if (ledgerRow?.price_id) {
+      resolvedPriceId = ledgerRow.price_id;
+    }
+  }
+  if (!resolvedPriceId) {
+    return c.json({ error: 'price_id required (not found in ledger for this payment_id)' }, 400);
   }
 
   const refundReq: RefundRequest = {
@@ -1569,16 +1662,13 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
       );
     }
 
-    // Revoke entitlement after refund
+    // Revoke entitlement after refund — use resolved price_id, NOT payment_id
     try {
       const { revokePaymentEntitlement } = await import('@nai/entitlement');
-      const prices = (pricesData as Array<{ id: string }>);
-      // Find the price_id from the refund — we need it to revoke
-      // For now, use the payment_id as price_id lookup
       const revokeResult = await revokePaymentEntitlement(
         refundReq.user_id,
         refundReq.tenant_id,
-        payment_id, // price_id — should be passed in refund request
+        resolvedPriceId!,
         refundResult.refund_id,
       );
       await logAuditEvent({
@@ -1611,6 +1701,23 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
         reason: refundResult.reason,
       },
     });
+
+    // P0-PAY: Update payment ledger with refund result
+    if (c.env.DB && refundResult.status !== 'failed') {
+      try {
+        await c.env.DB.prepare(
+          'UPDATE payment_ledger SET status = ?, refunded_at = ?, refund_id = ?, refund_amount = ? WHERE payment_id = ?'
+        ).bind(
+          refundResult.status === 'refunded' ? 'refunded' : 'partial',
+          refundResult.refunded_at ?? new Date().toISOString(),
+          refundResult.refund_id,
+          refundResult.amount,
+          payment_id,
+        ).run();
+      } catch (ledgerErr) {
+        console.error('Ledger update failed:', ledgerErr);
+      }
+    }
 
     return c.json(refundResult);
   } catch (err) {

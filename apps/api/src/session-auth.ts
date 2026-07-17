@@ -42,6 +42,38 @@ export function requireAdminSession(
   return session;
 }
 
+/**
+ * P0-AUTHZ: Require admin role AND that the session's tenant matches the requested tenant.
+ * Prevents cross-tenant admin access — admin of tenant A cannot access tenant B's data.
+ */
+export function requireAdminForTenant(
+  c: Context,
+  tenantId: string,
+): ApiSession | Response {
+  const session = requireAdminSession(c);
+  if (session instanceof Response) return session;
+  if (session.tenant_id !== tenantId) {
+    return c.json({ error: 'Forbidden: admin role does not apply to this tenant' }, 403);
+  }
+  return session;
+}
+
+/**
+ * P0-AUTHZ: Require that the session's tenant matches the requested tenant.
+ * Used for non-admin tenant-scoped resources.
+ */
+export function requireTenantMatch(
+  c: Context,
+  tenantId: string,
+): ApiSession | Response {
+  const session = requireAuthSession(c);
+  if (session instanceof Response) return session;
+  if (session.tenant_id !== tenantId) {
+    return c.json({ error: 'Forbidden: cross-tenant access denied' }, 403);
+  }
+  return session;
+}
+
 /** Scholarship/investor modules use legacy lowercase role aliases in route guards. */
 const SCHOLARSHIP_ROLE_ALIASES: Record<string, readonly Role[]> = {
   investor: ['QUALIFIED_INVESTOR', 'DATA_ROOM_MEMBER', 'INVESTOR_APPLICANT'],

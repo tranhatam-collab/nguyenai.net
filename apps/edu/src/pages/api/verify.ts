@@ -1,33 +1,10 @@
 import type { APIRoute } from 'astro';
 
-// Placeholder certificate database
-const placeholderCertificates: Record<string, {
-  id: string;
-  holder: string;
-  trackTitle: string;
-  trackId: number;
-  issuedDate: string;
-  status: string;
-}> = {
-  'NAI-Academy-0001-0001': {
-    id: 'NAI-Academy-0001-0001',
-    holder: 'Nguyen AI Subscriber',
-    trackTitle: 'AI Computer Fundamentals',
-    trackId: 1,
-    issuedDate: '2024-09-01',
-    status: 'valid',
-  },
-  'NAI-Academy-0002-0001': {
-    id: 'NAI-Academy-0002-0001',
-    holder: 'Demo User',
-    trackTitle: 'Agent Operation',
-    trackId: 2,
-    issuedDate: '2024-09-15',
-    status: 'valid',
-  },
-};
+// P0-EDU: Real certificate verification — proxies to API worker D1-backed endpoint.
+// Replaces placeholder certificate database.
+const API_BASE = import.meta.env.PUBLIC_API_BASE_URL ?? 'https://api.nguyenai.net';
 
-export const GET: APIRoute = ({ url }) => {
+export const GET: APIRoute = async ({ url }) => {
   const id = url.searchParams.get('id');
 
   if (!id) {
@@ -44,16 +21,54 @@ export const GET: APIRoute = ({ url }) => {
     );
   }
 
-  const certificate = placeholderCertificates[id.toUpperCase()] ?? null;
+  try {
+    const resp = await fetch(`${API_BASE}/v1/edu/certificate/verify/${encodeURIComponent(id)}`);
+    const data = await resp.json() as {
+      valid: boolean;
+      certificate_id?: string;
+      type?: string;
+      level?: string;
+      branch?: string | null;
+      title_vi?: string;
+      title_en?: string;
+      status?: string;
+      issued_at?: string;
+      revoked_at?: string | null;
+      rubric_version?: string;
+      verification_code?: string;
+    };
 
-  return new Response(
-    JSON.stringify({
-      valid: certificate !== null,
-      certificate,
-    }),
-    {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    }
-  );
+    // Map API response to the shape the frontend expects
+    const certificate = data.valid ? {
+      id: data.certificate_id ?? id,
+      holder: '', // Public verify does not expose holder name for privacy
+      trackTitle: data.title_vi ?? data.title_en ?? '',
+      trackId: 0,
+      issuedDate: data.issued_at ?? '',
+      status: data.status ?? 'unknown',
+    } : null;
+
+    return new Response(
+      JSON.stringify({
+        valid: data.valid,
+        certificate,
+      }),
+      {
+        status: resp.status,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch {
+    return new Response(
+      JSON.stringify({
+        valid: false,
+        certificate: null,
+        error: 'Verification service unavailable',
+      }),
+      {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
 };
