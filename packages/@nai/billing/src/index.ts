@@ -588,7 +588,7 @@ export interface RefundResult {
   amount: number;
   currency: Currency;
   status: 'refunded' | 'partial' | 'failed';
-  refunded_at: string;
+  refunded_at: string | null;
   reason: string;
 }
 
@@ -637,23 +637,83 @@ export async function createStripeRefund(
  * VNPay refund uses the refund API endpoint.
  */
 export async function createVnPayRefund(
-  env: { VNPAY_TMN_CODE: string; VNPAY_HASH_SECRET: string },
+  env: { VNPAY_TMN_CODE: string; VNPAY_HASH_SECRET: string; VNPAY_PAY_URL?: string },
   req: RefundRequest,
 ): Promise<RefundResult> {
-  // VNPay refund API — simplified for MVP
-  // Production: sign the request with HMAC-SHA512
   const refundId = crypto.randomUUID();
-  return {
-    refund_id: refundId,
-    gateway: 'vnpay',
-    gateway_refund_id: `RF-${refundId.slice(0, 12).toUpperCase()}`,
-    original_payment_id: req.payment_id,
-    amount: req.amount,
-    currency: req.currency,
-    status: 'refunded',
-    refunded_at: new Date().toISOString(),
-    reason: req.reason,
-  };
+
+  // VNPay refund requires signed HMAC-SHA512 request to provider API.
+  // If credentials or endpoint are missing, return 'failed' — NEVER fake success.
+  if (!env.VNPAY_TMN_CODE || !env.VNPAY_HASH_SECRET) {
+    return {
+      refund_id: refundId,
+      gateway: 'vnpay',
+      gateway_refund_id: '',
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: 'failed',
+      refunded_at: null,
+      reason: req.reason,
+    };
+  }
+
+  // VNPay refund API — sign request with HMAC-SHA512
+  const vnpayUrl = env.VNPAY_PAY_URL ?? 'https://sandbox.vnpayment.vn/merchantv2/api/transaction/refund';
+  const params = new URLSearchParams({
+    vnp_TmnCode: env.VNPAY_TMN_CODE,
+    vnp_TxnRef: req.gateway_payment_id,
+    vnp_Amount: String(Math.round(req.amount * 100)),
+    vnp_OrderInfo: req.reason ?? 'refund',
+    vnp_CreateDate: new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14),
+  });
+  const signedQuery = params.toString();
+  const signature = await hmacSha512(env.VNPAY_HASH_SECRET, signedQuery);
+
+  try {
+    const resp = await fetch(`${vnpayUrl}?${signedQuery}&vnp_SecureHash=${signature}`, {
+      method: 'POST',
+    });
+    const data = await resp.json() as Record<string, unknown>;
+    const success = String(data.vnp_ResponseCode ?? '') === '00';
+    return {
+      refund_id: refundId,
+      gateway: 'vnpay',
+      gateway_refund_id: String(data.vnp_TxnRef ?? `RF-${refundId.slice(0, 12).toUpperCase()}`),
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: success ? 'refunded' : 'failed',
+      refunded_at: success ? new Date().toISOString() : null,
+      reason: req.reason,
+    };
+  } catch {
+    return {
+      refund_id: refundId,
+      gateway: 'vnpay',
+      gateway_refund_id: '',
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: 'failed',
+      refunded_at: null,
+      reason: req.reason,
+    };
+  }
+}
+
+/**
+ * HMAC-SHA512 helper for VNPay signing.
+ */
+async function hmacSha512(key: string, data: string): Promise<string> {
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', enc.encode(key),
+    { name: 'HMAC', hash: 'SHA-512' },
+    false, ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(data));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -665,51 +725,75 @@ export async function createPayOsRefund(
   req: RefundRequest,
 ): Promise<RefundResult> {
   const refundId = crypto.randomUUID();
-  // PayOS refund — call pay-gateway refund endpoint
-  if (env.PAY_GATEWAY_BASE_URL && env.PAY_GATEWAY_API_KEY) {
-    try {
-      const resp = await fetch(`${env.PAY_GATEWAY_BASE_URL}/v1/refunds`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.PAY_GATEWAY_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          order_id: req.gateway_payment_id,
-          amount: req.amount,
-          reason: req.reason,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json() as Record<string, unknown>;
-        return {
-          refund_id: refundId,
-          gateway: 'payos',
-          gateway_refund_id: String(data.refund_id ?? `RF-${refundId.slice(0, 12).toUpperCase()}`),
-          original_payment_id: req.payment_id,
-          amount: Number(data.amount ?? req.amount),
-          currency: req.currency,
-          status: 'refunded',
-          refunded_at: new Date().toISOString(),
-          reason: req.reason,
-        };
-      }
-    } catch {
-      // Fall through to simulated response
-    }
+
+  // Fail-closed: if gateway credentials are missing, return 'failed' — NEVER fake success.
+  if (!env.PAY_GATEWAY_BASE_URL || !env.PAY_GATEWAY_API_KEY) {
+    return {
+      refund_id: refundId,
+      gateway: 'payos',
+      gateway_refund_id: '',
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: 'failed',
+      refunded_at: null,
+      reason: req.reason,
+    };
   }
-  // Simulated response for dev/test
-  return {
-    refund_id: refundId,
-    gateway: 'payos',
-    gateway_refund_id: `RF-${refundId.slice(0, 12).toUpperCase()}`,
-    original_payment_id: req.payment_id,
-    amount: req.amount,
-    currency: req.currency,
-    status: 'refunded',
-    refunded_at: new Date().toISOString(),
-    reason: req.reason,
-  };
+
+  try {
+    const resp = await fetch(`${env.PAY_GATEWAY_BASE_URL}/v1/refunds`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.PAY_GATEWAY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        order_id: req.gateway_payment_id,
+        amount: req.amount,
+        reason: req.reason,
+      }),
+    });
+    if (resp.ok) {
+      const data = await resp.json() as Record<string, unknown>;
+      return {
+        refund_id: refundId,
+        gateway: 'payos',
+        gateway_refund_id: String(data.refund_id ?? `RF-${refundId.slice(0, 12).toUpperCase()}`),
+        original_payment_id: req.payment_id,
+        amount: Number(data.amount ?? req.amount),
+        currency: req.currency,
+        status: 'refunded',
+        refunded_at: new Date().toISOString(),
+        reason: req.reason,
+      };
+    }
+    // Non-OK response — return failed, do NOT fake success
+    return {
+      refund_id: refundId,
+      gateway: 'payos',
+      gateway_refund_id: '',
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: 'failed',
+      refunded_at: null,
+      reason: req.reason,
+    };
+  } catch {
+    // Network error — return failed, do NOT fake success
+    return {
+      refund_id: refundId,
+      gateway: 'payos',
+      gateway_refund_id: '',
+      original_payment_id: req.payment_id,
+      amount: req.amount,
+      currency: req.currency,
+      status: 'failed',
+      refunded_at: null,
+      reason: req.reason,
+    };
+  }
 }
 
 /**

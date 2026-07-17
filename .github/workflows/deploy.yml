@@ -74,6 +74,9 @@ jobs:
       - name: AI provider single-source audit
         run: node tools/audit-ai-provider-source.mjs
 
+      - name: Production durability audit
+        run: node tools/audit-production-durability.mjs
+
       - name: Security P0 audit
         run: npx tsx tools/audit-security-p0.ts
 

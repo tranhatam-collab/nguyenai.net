@@ -48,6 +48,8 @@ import {
   checkCommandQuota,
   InMemoryEntitlementStore,
   setEntitlementStore,
+  D1SubscriptionStore,
+  setSubscriptionStore,
 } from '@nai/entitlement';
 
 import {
@@ -116,7 +118,7 @@ import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
 import { chatRateLimit, paymentRateLimit } from './rate-limiter';
 // P0-PAY-1: Webhook replay protection.
-import { checkReplay, recordProcessed } from './webhook-replay';
+import { checkReplay, recordProcessed, setReplayStore, createD1ReplayStore } from './webhook-replay';
 
 // WI-1.1: Route modules — mounted for independent operation.
 import modelGatewayRoutes from './routes/model-gateway';
@@ -295,6 +297,13 @@ function initStores(env: AppEnv['Bindings']): void {
         }
       }
     }
+  }
+
+  // P0-PAY-01: Durable webhook replay store (D1) — replaces in-memory Map
+  if (env.DB) {
+    setReplayStore(createD1ReplayStore(env.DB));
+    // P0-PAY-02: Durable subscription store (D1) — replaces in-memory Map
+    setSubscriptionStore(new D1SubscriptionStore(env.DB));
   }
 
   storesInitialized = true;
@@ -1332,14 +1341,14 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
 
   if (!result) {
     // Event type not payment-related — acknowledge but don't process
-    if (stripeEventId) recordProcessed('stripe', stripeEventId, 'ignored', { received: true, processed: false });
+    if (stripeEventId) await recordProcessed('stripe', stripeEventId, 'ignored', { received: true, processed: false });
     return c.json({ received: true, processed: false });
   }
 
   // Replay protection — check if this event was already processed
   const replayKey = stripeEventId || result.gateway_payment_id;
   if (replayKey) {
-    const replay = checkReplay('stripe', replayKey);
+    const replay = await checkReplay('stripe', replayKey);
     if (replay) {
       return c.json({ ...replay.response_body as object, replayed: true });
     }
@@ -1386,7 +1395,7 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
   }
 
   const response = { received: true, processed: true, payment: result, invoice };
-  if (replayKey) recordProcessed('stripe', replayKey, 'processed', response);
+  if (replayKey) await recordProcessed('stripe', replayKey, 'processed', response);
   return c.json(response);
 });
 
@@ -1421,14 +1430,14 @@ app.post('/v1/payment/webhook', async (c) => {
 
   if (!result) {
     // Non-terminal / non-paid event — acknowledge without processing.
-    if (payosEventId) recordProcessed('payos', payosEventId, 'ignored', { received: true, processed: false });
+    if (payosEventId) await recordProcessed('payos', payosEventId, 'ignored', { received: true, processed: false });
     return c.json({ received: true, processed: false });
   }
 
   // Replay protection — check if this event was already processed
   const replayKey = payosEventId || result.gateway_payment_id;
   if (replayKey) {
-    const replay = checkReplay('payos', replayKey);
+    const replay = await checkReplay('payos', replayKey);
     if (replay) {
       return c.json({ ...replay.response_body as object, replayed: true });
     }
@@ -1481,7 +1490,7 @@ app.post('/v1/payment/webhook', async (c) => {
   }
 
   const response = { received: true, processed: true, payment: result, invoice };
-  if (replayKey) recordProcessed('payos', replayKey, 'processed', response);
+  if (replayKey) await recordProcessed('payos', replayKey, 'processed', response);
   return c.json(response);
 });
 
@@ -1630,7 +1639,7 @@ app.post('/v1/payment/webhook/stripe/refund', async (c) => {
 
   // Replay protection
   if (stripeEventId) {
-    const replay = checkReplay('stripe-refund', stripeEventId);
+    const replay = await checkReplay('stripe-refund', stripeEventId);
     if (replay) {
       return c.json({ ...replay.response_body as object, replayed: true });
     }
@@ -1638,7 +1647,7 @@ app.post('/v1/payment/webhook/stripe/refund', async (c) => {
 
   const result = parseStripeRefundEvent(event);
   if (!result) {
-    if (stripeEventId) recordProcessed('stripe-refund', stripeEventId, 'ignored', { received: true, processed: false });
+    if (stripeEventId) await recordProcessed('stripe-refund', stripeEventId, 'ignored', { received: true, processed: false });
     return c.json({ received: true, processed: false });
   }
 
@@ -1659,7 +1668,7 @@ app.post('/v1/payment/webhook/stripe/refund', async (c) => {
   });
 
   const response = { received: true, processed: true, refund: result };
-  if (stripeEventId) recordProcessed('stripe-refund', stripeEventId, 'processed', response);
+  if (stripeEventId) await recordProcessed('stripe-refund', stripeEventId, 'processed', response);
   return c.json(response);
 });
 

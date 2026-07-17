@@ -503,6 +503,84 @@ export class InMemorySubscriptionStore implements SubscriptionStore {
   }
 }
 
+// ============================================================
+// D1-backed subscription store (production)
+// ============================================================
+
+export class D1SubscriptionStore implements SubscriptionStore {
+  constructor(private db: D1Database) {}
+
+  async getSubscription(userId: string, tenantId: string): Promise<SubscriptionState | null> {
+    const row = await this.db.prepare(
+      'SELECT * FROM subscriptions WHERE user_id = ? AND tenant_id = ? AND status = ? ORDER BY created_at DESC LIMIT 1'
+    ).bind(userId, tenantId, 'active').first<Record<string, unknown>>();
+    return row ? this.mapRow(row) : null;
+  }
+
+  async createSubscription(sub: Omit<SubscriptionState, 'subscription_id' | 'created_at' | 'updated_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await this.db.prepare(
+      `INSERT INTO subscriptions (subscription_id, user_id, tenant_id, plan_id, gateway, gateway_subscription_id, status, current_period_start, current_period_end, cancel_at_period_end, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      id, sub.user_id, sub.tenant_id, sub.plan_id, sub.gateway,
+      sub.gateway_subscription_id, sub.status,
+      sub.current_period_start, sub.current_period_end,
+      sub.cancel_at_period_end ? 1 : 0,
+      now, now,
+    ).run();
+    return id;
+  }
+
+  async listSubscriptions(userId: string, tenantId: string): Promise<SubscriptionState[]> {
+    const rows = await this.db.prepare(
+      'SELECT * FROM subscriptions WHERE user_id = ? AND tenant_id = ? ORDER BY created_at DESC'
+    ).bind(userId, tenantId).all<Record<string, unknown>>();
+    return (rows.results ?? []).map((r: Record<string, unknown>) => this.mapRow(r));
+  }
+
+  async updateSubscription(subscriptionId: string, updates: Partial<SubscriptionState>): Promise<void> {
+    const sets: string[] = [];
+    const vals: unknown[] = [];
+    for (const [k, v] of Object.entries(updates)) {
+      if (k === 'subscription_id' || k === 'created_at') continue;
+      if (k === 'cancel_at_period_end') {
+        sets.push('cancel_at_period_end = ?');
+        vals.push(v ? 1 : 0);
+      } else {
+        sets.push(`${k} = ?`);
+        vals.push(v);
+      }
+    }
+    sets.push('updated_at = ?');
+    vals.push(new Date().toISOString());
+    vals.push(subscriptionId);
+    await this.db.prepare(`UPDATE subscriptions SET ${sets.join(', ')} WHERE subscription_id = ?`).bind(...vals).run();
+  }
+
+  async deleteSubscription(subscriptionId: string): Promise<void> {
+    await this.db.prepare('DELETE FROM subscriptions WHERE subscription_id = ?').bind(subscriptionId).run();
+  }
+
+  private mapRow(row: Record<string, unknown>): SubscriptionState {
+    return {
+      subscription_id: String(row.subscription_id),
+      user_id: String(row.user_id),
+      tenant_id: String(row.tenant_id),
+      plan_id: String(row.plan_id) as PlanId,
+      gateway: String(row.gateway) as 'stripe' | 'vnpay' | 'payos',
+      gateway_subscription_id: String(row.gateway_subscription_id),
+      status: String(row.status) as SubscriptionState['status'],
+      current_period_start: String(row.current_period_start),
+      current_period_end: String(row.current_period_end),
+      cancel_at_period_end: Boolean(row.cancel_at_period_end),
+      created_at: String(row.created_at),
+      updated_at: String(row.updated_at ?? row.created_at),
+    };
+  }
+}
+
 let defaultSubscriptionStore: SubscriptionStore = new InMemorySubscriptionStore();
 
 export function setSubscriptionStore(store: SubscriptionStore) {

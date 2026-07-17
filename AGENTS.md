@@ -93,6 +93,7 @@ Read these before making product, brand, SEO, privacy or architecture changes.
 - `docs/governance/JWT_SECRET_A_TO_Z_QA_AUDIT_AND_REMEDIATION_PLAN_2026-07-15.md` — BINDING: auth/secret truth + A-to-Z P0→P2 + release kill criteria
 - `docs/governance/AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.md` — BINDING: mọi AI model phải qua `aiagent.iai.one`
 - `docs/governance/AI_PROVIDER_TWO_TEAM_BUILD_PLAN_2026-07-16.md` — BINDING: Team A provider trước, Team B Nguyen AI integration sau, rồi master P0→P2 backlog
+- `docs/governance/FULL_SCOPE_FAST_OPERATION_EXECUTION_PLAN_2026-07-17.md` — BINDING FOR EXECUTION: giữ nguyên toàn bộ catalog; tăng tốc P0→P3 bằng shared platform, evidence gates và activation waves, không thu hẹp sản phẩm
 
 ### Auth, Secret and Release Lock — BINDING 2026-07-15
 

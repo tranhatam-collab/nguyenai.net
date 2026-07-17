@@ -538,3 +538,122 @@ eduRoutes.get('/mentor/reviews', async (c) => {
 
   return c.json({ reviews: reviews.results });
 });
+
+// 18. GET /v1/edu/certificate/verify/:id — public certificate verification
+// Per EDU-P0-03: deterministic ID, evidence/rubric/version/revoke status, public verify E2E
+eduRoutes.get('/certificate/verify/:id', async (c) => {
+  const certId = c.req.param('id');
+  if (!certId || certId.length < 8) {
+    return c.json({ valid: false, error: 'invalid_certificate_id' }, 400);
+  }
+
+  const cert = await c.env.DB.prepare(
+    `SELECT certificate_id, user_id, type, level, branch, title_vi, title_en,
+            verification_code, status, issued_at, revoked_at, rubric_version
+     FROM certificates WHERE certificate_id = ?1`
+  ).bind(certId).first();
+
+  if (!cert) {
+    return c.json({ valid: false, error: 'not_found' }, 404);
+  }
+
+  // Public verify: expose only allowed metadata (no user_id, no private data)
+  return c.json({
+    valid: cert.status === 'issued',
+    certificate_id: cert.certificate_id,
+    type: cert.type,
+    level: cert.level,
+    branch: cert.branch,
+    title_vi: cert.title_vi,
+    title_en: cert.title_en,
+    status: cert.status,
+    issued_at: cert.issued_at,
+    revoked_at: cert.revoked_at,
+    rubric_version: cert.rubric_version,
+    verification_code: cert.verification_code,
+  });
+});
+
+// 19. POST /v1/edu/certificate/issue — issue certificate (mentor/admin only)
+eduRoutes.post('/certificate/issue', async (c) => {
+  const mentorId = await requireMentor(c);
+  if (!mentorId) return c.json({ error: 'mentor authentication required' }, 401);
+
+  const body = await c.req.json();
+  const { user_id, type, level, branch, title_vi, title_en, rubric_version } = body as {
+    user_id: string;
+    type: string;
+    level: string;
+    branch?: string;
+    title_vi: string;
+    title_en: string;
+    rubric_version?: string;
+  };
+
+  if (!user_id || !type || !level || !title_vi || !title_en) {
+    return c.json({ error: 'missing required fields' }, 400);
+  }
+
+  const certId = `NAI-Academy-${type.slice(0, 4).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  const verificationCode = crypto.randomUUID().slice(0, 12).toUpperCase();
+  const now = new Date().toISOString();
+
+  await c.env.DB.prepare(
+    `INSERT INTO certificates (certificate_id, user_id, type, level, branch, title_vi, title_en, verification_code, status, issued_at, rubric_version)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'issued', ?, ?)`
+  ).bind(certId, user_id, type, level, branch ?? null, title_vi, title_en, verificationCode, now, rubric_version ?? '2026-07-14.1').run();
+
+  // Audit
+  try {
+    const { logAuditEvent } = await import('@nai/audit');
+    await logAuditEvent({
+      event_type: 'certificate_issued',
+      user_id: mentorId,
+      session_id: null,
+      actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+      user_agent: c.req.header('User-Agent') ?? null,
+      target: certId,
+      result: 'success',
+      metadata: { certificate_id: certId, user_id, type, level },
+    });
+  } catch { /* audit best-effort */ }
+
+  return c.json({
+    certificate_id: certId,
+    verification_code: verificationCode,
+    status: 'issued',
+    issued_at: now,
+  });
+});
+
+// 20. POST /v1/edu/certificate/:id/revoke — revoke certificate (admin only)
+eduRoutes.post('/certificate/:id/revoke', async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  if (!session.roles?.includes('ADMIN') && !session.roles?.includes('SUPER_ADMIN')) {
+    return c.json({ error: 'admin only' }, 403);
+  }
+
+  const certId = c.req.param('id');
+  const now = new Date().toISOString();
+
+  await c.env.DB.prepare(
+    'UPDATE certificates SET status = ?, revoked_at = ? WHERE certificate_id = ?'
+  ).bind('revoked', now, certId).run();
+
+  try {
+    const { logAuditEvent } = await import('@nai/audit');
+    await logAuditEvent({
+      event_type: 'certificate_revoked',
+      user_id: session.user_id,
+      session_id: session.session_id ?? null,
+      actor_ip: c.req.header('CF-Connecting-IP') ?? null,
+      user_agent: c.req.header('User-Agent') ?? null,
+      target: certId,
+      result: 'success',
+      metadata: { certificate_id: certId },
+    });
+  } catch { /* audit best-effort */ }
+
+  return c.json({ certificate_id: certId, status: 'revoked', revoked_at: now });
+});
