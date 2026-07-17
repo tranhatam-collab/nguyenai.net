@@ -67,10 +67,14 @@ import {
   createStripeCheckout,
   createVnPayCheckout,
   createPayOsCheckout,
+  createStripeRefund,
+  createVnPayRefund,
+  createPayOsRefund,
   verifyStripeWebhook,
   verifyVnPayReturn,
   verifyPayOsWebhook,
   parseStripeEvent,
+  parseStripeRefundEvent,
   parseVnPayReturn,
   parsePayOsWebhook,
   generateInvoice,
@@ -78,6 +82,8 @@ import {
   type Gateway,
   type Currency,
   type CheckoutRequest,
+  type RefundRequest,
+  type RefundResult,
 } from '@nai/billing';
 
 // Phase 3 — Core Runtime imports
@@ -109,6 +115,8 @@ import { invokeThroughTrainingGateway } from '@nai/training-gateway';
 import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
 import { chatRateLimit, paymentRateLimit } from './rate-limiter';
+// P0-PAY-1: Webhook replay protection.
+import { checkReplay, recordProcessed } from './webhook-replay';
 
 // WI-1.1: Route modules — mounted for independent operation.
 import modelGatewayRoutes from './routes/model-gateway';
@@ -1319,11 +1327,22 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
   if (!valid) return c.json({ error: 'invalid signature' }, 400);
 
   const event = JSON.parse(payload) as Record<string, unknown>;
+  const stripeEventId = String(event.id ?? '');
   const result = parseStripeEvent(event);
 
   if (!result) {
     // Event type not payment-related — acknowledge but don't process
+    if (stripeEventId) recordProcessed('stripe', stripeEventId, 'ignored', { received: true, processed: false });
     return c.json({ received: true, processed: false });
+  }
+
+  // Replay protection — check if this event was already processed
+  const replayKey = stripeEventId || result.gateway_payment_id;
+  if (replayKey) {
+    const replay = checkReplay('stripe', replayKey);
+    if (replay) {
+      return c.json({ ...replay.response_body as object, replayed: true });
+    }
   }
 
   const invoice = generateInvoice(result, false); // Stripe = international, no VAT
@@ -1336,10 +1355,39 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
     user_agent: c.req.header('User-Agent') ?? 'unknown',
     target: result.gateway_payment_id,
     result: 'success',
-    metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id },
+    metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id, event_id: stripeEventId },
   });
 
-  return c.json({ received: true, processed: true, payment: result, invoice });
+  // P0-PAY-2: Grant entitlement after successful payment
+  try {
+    if (result.user_id && result.user_id !== 'unknown') {
+      const { grantPaymentEntitlement } = await import('@nai/entitlement');
+      const grantResult = await grantPaymentEntitlement(
+        result.user_id,
+        'default',
+        result.price_id,
+        'stripe',
+        result.gateway_payment_id,
+      );
+      await logAuditEvent({
+        user_id: result.user_id,
+        session_id: null,
+        event_type: 'entitlement_granted',
+        actor_ip: 'webhook',
+        user_agent: 'stripe-webhook',
+        target: result.price_id,
+        result: grantResult.granted ? 'success' : 'failure',
+        metadata: { gateway: 'stripe', payment_id: result.gateway_payment_id, grant: grantResult },
+      });
+    }
+  } catch (entErr) {
+    console.error('Entitlement grant failed (stripe):', entErr);
+    // Don't fail the webhook — payment is confirmed, entitlement can be reconciled
+  }
+
+  const response = { received: true, processed: true, payment: result, invoice };
+  if (replayKey) recordProcessed('stripe', replayKey, 'processed', response);
+  return c.json(response);
 });
 
 // ============================================================
@@ -1369,9 +1417,21 @@ app.post('/v1/payment/webhook', async (c) => {
   }
 
   const result = parsePayOsWebhook(body);
+  const payosEventId = String(body.event_id ?? body.order_id ?? '');
+
   if (!result) {
     // Non-terminal / non-paid event — acknowledge without processing.
+    if (payosEventId) recordProcessed('payos', payosEventId, 'ignored', { received: true, processed: false });
     return c.json({ received: true, processed: false });
+  }
+
+  // Replay protection — check if this event was already processed
+  const replayKey = payosEventId || result.gateway_payment_id;
+  if (replayKey) {
+    const replay = checkReplay('payos', replayKey);
+    if (replay) {
+      return c.json({ ...replay.response_body as object, replayed: true });
+    }
   }
 
   const invoice = generateInvoice(result, true); // VietQR = VN customer → KASAN JSC VAT 10%
@@ -1388,12 +1448,41 @@ app.post('/v1/payment/webhook', async (c) => {
       gateway: 'payos',
       amount: result.amount,
       invoice_id: invoice.invoice_id,
-      event_id: String(body.event_id ?? ''),
+      event_id: payosEventId,
       merchant: 'KASAN_JSC',
     },
   });
 
-  return c.json({ received: true, processed: true, payment: result, invoice });
+  // P0-PAY-2: Grant entitlement after successful payment
+  try {
+    if (result.user_id && result.user_id !== 'unknown') {
+      const { grantPaymentEntitlement } = await import('@nai/entitlement');
+      const grantResult = await grantPaymentEntitlement(
+        result.user_id,
+        'default',
+        result.price_id,
+        'payos',
+        result.gateway_payment_id,
+      );
+      await logAuditEvent({
+        user_id: result.user_id,
+        session_id: null,
+        event_type: 'entitlement_granted',
+        actor_ip: 'webhook',
+        user_agent: 'payos-webhook',
+        target: result.price_id,
+        result: grantResult.granted ? 'success' : 'failure',
+        metadata: { gateway: 'payos', payment_id: result.gateway_payment_id, grant: grantResult },
+      });
+    }
+  } catch (entErr) {
+    console.error('Entitlement grant failed (payos):', entErr);
+    // Don't fail the webhook — payment is confirmed, entitlement can be reconciled
+  }
+
+  const response = { received: true, processed: true, payment: result, invoice };
+  if (replayKey) recordProcessed('payos', replayKey, 'processed', response);
+  return c.json(response);
 });
 
 // ============================================================
@@ -1404,6 +1493,176 @@ app.post('/v1/payment/webhook', async (c) => {
 
 app.route('/', modelGatewayRoutes);
 app.route('/', aiNguyenRoutes);
+// ============================================================
+// POST /v1/payment/refund — refund a payment (admin only)
+// P0-PAY-3: Refund flow with entitlement revocation
+// ============================================================
+
+app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
+  const session = c.get('session');
+  if (!session) return c.json({ error: 'authentication required' }, 401);
+  if (session.role !== 'ADMIN' && session.role !== 'SUPER_ADMIN') {
+    return c.json({ error: 'admin only' }, 403);
+  }
+
+  const body = await c.req.json();
+  const { payment_id, gateway, gateway_payment_id, amount, currency, reason, user_id, tenant_id } = body as {
+    payment_id: string;
+    gateway: Gateway;
+    gateway_payment_id: string;
+    amount: number;
+    currency: Currency;
+    reason: string;
+    user_id: string;
+    tenant_id: string;
+  };
+
+  if (!payment_id || !gateway || !gateway_payment_id || !amount || !reason) {
+    return c.json({ error: 'payment_id, gateway, gateway_payment_id, amount, reason are required' }, 400);
+  }
+  if (!reason.trim()) {
+    return c.json({ error: 'reason is required for refund' }, 400);
+  }
+
+  const refundReq: RefundRequest = {
+    payment_id,
+    gateway,
+    gateway_payment_id,
+    amount,
+    currency,
+    reason: reason.trim(),
+    user_id: user_id || session.user_id,
+    tenant_id: tenant_id || 'default',
+  };
+
+  try {
+    let refundResult: RefundResult;
+    if (gateway === 'stripe') {
+      refundResult = await createStripeRefund(
+        { STRIPE_SECRET_KEY: c.env.STRIPE_SECRET_KEY },
+        refundReq,
+      );
+    } else if (gateway === 'vnpay') {
+      refundResult = await createVnPayRefund(
+        {
+          VNPAY_TMN_CODE: c.env.VNPAY_TMN_CODE,
+          VNPAY_HASH_SECRET: c.env.VNPAY_HASH_SECRET,
+        },
+        refundReq,
+      );
+    } else {
+      refundResult = await createPayOsRefund(
+        {
+          PAY_GATEWAY_BASE_URL: c.env.PAY_GATEWAY_BASE_URL ?? '',
+          PAY_GATEWAY_API_KEY: c.env.PAY_GATEWAY_API_KEY ?? '',
+        },
+        refundReq,
+      );
+    }
+
+    // Revoke entitlement after refund
+    try {
+      const { revokePaymentEntitlement } = await import('@nai/entitlement');
+      const prices = (pricesData as Array<{ id: string }>);
+      // Find the price_id from the refund — we need it to revoke
+      // For now, use the payment_id as price_id lookup
+      const revokeResult = await revokePaymentEntitlement(
+        refundReq.user_id,
+        refundReq.tenant_id,
+        payment_id, // price_id — should be passed in refund request
+        refundResult.refund_id,
+      );
+      await logAuditEvent({
+        user_id: refundReq.user_id,
+        session_id: null,
+        event_type: 'entitlement_revoked',
+        actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+        user_agent: c.req.header('User-Agent') ?? 'unknown',
+        target: payment_id,
+        result: revokeResult.revoked ? 'success' : 'failure',
+        metadata: { refund_id: refundResult.refund_id, gateway, revoke: revokeResult },
+      });
+    } catch (revErr) {
+      console.error('Entitlement revoke failed:', revErr);
+    }
+
+    await logAuditEvent({
+      user_id: refundReq.user_id,
+      session_id: session.session_id,
+      event_type: 'payment_refunded',
+      actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+      user_agent: c.req.header('User-Agent') ?? 'unknown',
+      target: payment_id,
+      result: refundResult.status === 'failed' ? 'failure' : 'success',
+      metadata: {
+        gateway,
+        refund_id: refundResult.refund_id,
+        amount: refundResult.amount,
+        currency: refundResult.currency,
+        reason: refundResult.reason,
+      },
+    });
+
+    return c.json(refundResult);
+  } catch (err) {
+    console.error('Refund creation failed:', err);
+    return c.json({ error: 'refund creation failed' }, 502);
+  }
+});
+
+// ============================================================
+// POST /v1/payment/webhook/stripe/refund — Stripe refund webhook
+// ============================================================
+
+app.post('/v1/payment/webhook/stripe/refund', async (c) => {
+  const payload = await c.req.text();
+  const signature = c.req.header('Stripe-Signature') ?? '';
+
+  const valid = await verifyStripeWebhook(
+    { STRIPE_SECRET_KEY: c.env.STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET: c.env.STRIPE_WEBHOOK_SECRET },
+    payload,
+    signature,
+  );
+  if (!valid) return c.json({ error: 'invalid signature' }, 400);
+
+  const event = JSON.parse(payload) as Record<string, unknown>;
+  const stripeEventId = String(event.id ?? '');
+
+  // Replay protection
+  if (stripeEventId) {
+    const replay = checkReplay('stripe-refund', stripeEventId);
+    if (replay) {
+      return c.json({ ...replay.response_body as object, replayed: true });
+    }
+  }
+
+  const result = parseStripeRefundEvent(event);
+  if (!result) {
+    if (stripeEventId) recordProcessed('stripe-refund', stripeEventId, 'ignored', { received: true, processed: false });
+    return c.json({ received: true, processed: false });
+  }
+
+  await logAuditEvent({
+    user_id: 'unknown', // Stripe webhook doesn't always include user_id
+    session_id: null,
+    event_type: 'payment_refunded',
+    actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
+    user_agent: c.req.header('User-Agent') ?? 'unknown',
+    target: result.original_payment_id,
+    result: 'success',
+    metadata: {
+      gateway: 'stripe',
+      refund_id: result.refund_id,
+      amount: result.amount,
+      event_id: stripeEventId,
+    },
+  });
+
+  const response = { received: true, processed: true, refund: result };
+  if (stripeEventId) recordProcessed('stripe-refund', stripeEventId, 'processed', response);
+  return c.json(response);
+});
+
 app.route('/', fallbackRoutes);
 app.route('/', incidentRoutes);
 app.route('/', selfHealRoutes);

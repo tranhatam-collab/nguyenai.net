@@ -460,6 +460,7 @@ export interface SubscriptionStore {
   createSubscription(sub: Omit<SubscriptionState, 'subscription_id' | 'created_at' | 'updated_at'>): Promise<string>;
   updateSubscription(subscriptionId: string, updates: Partial<SubscriptionState>): Promise<void>;
   deleteSubscription(subscriptionId: string): Promise<void>;
+  listSubscriptions?(userId: string, tenantId: string): Promise<SubscriptionState[]>;
 }
 
 export class InMemorySubscriptionStore implements SubscriptionStore {
@@ -482,6 +483,12 @@ export class InMemorySubscriptionStore implements SubscriptionStore {
     };
     this.subs.set(id, full);
     return id;
+  }
+
+  async listSubscriptions(userId: string, tenantId: string): Promise<SubscriptionState[]> {
+    return [...this.subs.values()].filter(
+      (s) => s.user_id === userId && s.tenant_id === tenantId
+    );
   }
 
   async updateSubscription(subscriptionId: string, updates: Partial<SubscriptionState>): Promise<void> {
@@ -565,4 +572,122 @@ export async function processSubscriptionExpiry(subscriptionId: string): Promise
   await defaultSubscriptionStore.updateSubscription(subscriptionId, {
     status: 'expired',
   });
+}
+
+// ============================================================
+// Payment → Entitlement grant
+// ============================================================
+
+/**
+ * Grant entitlement after successful payment.
+ * Handles both plan subscriptions and standalone prices.
+ *
+ * @param userId - User who paid
+ * @param tenantId - Tenant ID
+ * @param priceId - price_id from prices.json
+ * @param gateway - Payment gateway (stripe/vnpay/payos)
+ * @param paymentId - Gateway payment ID for audit
+ * @returns { granted: boolean, key?: string, value?: unknown, reason?: string }
+ */
+export async function grantPaymentEntitlement(
+  userId: string,
+  tenantId: string,
+  priceId: string,
+  gateway: string,
+  paymentId: string,
+): Promise<{ granted: boolean; key?: string; value?: unknown; reason?: string }> {
+  // Find the price item
+  const prices = (await import('@nai/product-catalog')).prices;
+  const price = prices.find((p) => p.id === priceId);
+  if (!price) {
+    return { granted: false, reason: `Price not found: ${priceId}` };
+  }
+
+  // Grant the entitlement from the price item
+  const entitlementKey = price.entitlement_key;
+  const entitlementValue = price.entitlement_value;
+
+  await defaultStore.grant({
+    user_id: userId,
+    tenant_id: tenantId,
+    key: entitlementKey,
+    value: entitlementValue,
+    source: `payment:${gateway}`,
+    granted_by: `webhook:${gateway}`,
+    expires_at: null, // No expiry for MVP — subscription lifecycle handles revocation
+    revoked_at: null,
+  });
+
+  // Also create a subscription record if it's a recurring price
+  if (price.period === 'month' || price.period === 'year') {
+    const now = new Date();
+    const periodEnd = new Date(now);
+    if (price.period === 'month') {
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+    } else {
+      periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+    }
+
+    await defaultSubscriptionStore.createSubscription({
+      user_id: userId,
+      tenant_id: tenantId,
+      plan_id: priceId,
+      status: 'active',
+      current_period_start: now.toISOString(),
+      current_period_end: periodEnd.toISOString(),
+      gateway: gateway as 'stripe' | 'vnpay' | 'payos',
+      gateway_subscription_id: paymentId,
+    });
+  }
+
+  return {
+    granted: true,
+    key: entitlementKey,
+    value: entitlementValue,
+  };
+}
+
+/**
+ * Revoke entitlement after refund.
+ *
+ * @param userId - User who was refunded
+ * @param tenantId - Tenant ID
+ * @param priceId - price_id from prices.json
+ * @param refundId - Refund ID for audit
+ * @returns { revoked: boolean, reason?: string }
+ */
+export async function revokePaymentEntitlement(
+  userId: string,
+  tenantId: string,
+  priceId: string,
+  refundId: string,
+): Promise<{ revoked: boolean; reason?: string }> {
+  const prices = (await import('@nai/product-catalog')).prices;
+  const price = prices.find((p) => p.id === priceId);
+  if (!price) {
+    return { revoked: false, reason: `Price not found: ${priceId}` };
+  }
+
+  // Find and revoke the entitlement
+  const records = await defaultStore.getEntitlements(userId, tenantId);
+  const target = records.find(
+    (r) => r.key === price.entitlement_key && r.source?.startsWith('payment:') && r.revoked_at === null,
+  );
+  if (target) {
+    await defaultStore.revoke(target.entitlement_id, `refund:${refundId}`);
+  }
+
+  // Cancel subscription if exists
+  if (defaultSubscriptionStore.listSubscriptions) {
+    const subs = await defaultSubscriptionStore.listSubscriptions(userId, tenantId);
+    for (const sub of subs) {
+      if (sub.plan_id === priceId && sub.status === 'active') {
+        await defaultSubscriptionStore.updateSubscription(sub.subscription_id, {
+          status: 'canceled',
+        });
+      }
+    }
+  }
+
+  return { revoked: true };
 }
