@@ -445,7 +445,7 @@ export interface SubscriptionState {
   user_id: string;
   tenant_id: string;
   plan_id: PlanId;
-  gateway: 'stripe' | 'vnpay';
+  gateway: 'stripe' | 'vnpay' | 'payos';
   gateway_subscription_id: string;
   status: 'active' | 'past_due' | 'canceled' | 'expired' | 'trialing';
   current_period_start: string;
@@ -520,7 +520,7 @@ export async function createSubscription(
   userId: string,
   tenantId: string,
   planId: PlanId,
-  gateway: 'stripe' | 'vnpay',
+  gateway: 'stripe' | 'vnpay' | 'payos',
   gatewaySubscriptionId: string,
   periodStart: Date,
   periodEnd: Date
@@ -607,11 +607,15 @@ export async function grantPaymentEntitlement(
   const entitlementKey = price.entitlement_key;
   const entitlementValue = price.entitlement_value;
 
+  if (!entitlementKey) {
+    return { granted: false, reason: `Price ${priceId} has no entitlement_key` };
+  }
+
   await defaultStore.grant({
     user_id: userId,
     tenant_id: tenantId,
     key: entitlementKey,
-    value: entitlementValue,
+    value: entitlementValue ?? true,
     source: `payment:${gateway}`,
     granted_by: `webhook:${gateway}`,
     expires_at: null, // No expiry for MVP — subscription lifecycle handles revocation
@@ -631,12 +635,13 @@ export async function grantPaymentEntitlement(
     await defaultSubscriptionStore.createSubscription({
       user_id: userId,
       tenant_id: tenantId,
-      plan_id: priceId,
+      plan_id: priceId as PlanId,
       status: 'active',
       current_period_start: now.toISOString(),
       current_period_end: periodEnd.toISOString(),
       gateway: gateway as 'stripe' | 'vnpay' | 'payos',
       gateway_subscription_id: paymentId,
+      cancel_at_period_end: false,
     });
   }
 

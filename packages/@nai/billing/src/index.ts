@@ -719,7 +719,8 @@ export function parseStripeRefundEvent(event: Record<string, unknown>): RefundRe
   const type = String(event.type ?? '');
   if (type !== 'charge.refunded') return null;
 
-  const obj = event.data?.object as Record<string, unknown> | undefined;
+  const data = event.data as Record<string, unknown> | undefined;
+  const obj = data?.object as Record<string, unknown> | undefined;
   if (!obj) return null;
 
   const amountRefunded = Number(obj.amount_refunded ?? 0) / 100;
