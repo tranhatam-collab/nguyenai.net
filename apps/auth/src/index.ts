@@ -651,11 +651,10 @@ app.post('/v1/auth/login/mfa', async (c) => {
     return c.json({ error: 'invalid or expired challenge' }, 401);
   }
 
-  // Mark challenge as used
-  await c.env.DB.prepare('UPDATE mfa_challenges SET used_at = ?1 WHERE challenge_id = ?2')
-    .bind(new Date().toISOString(), challenge_id).run();
-
-  // Verify MFA code against any verified factor using TOTP
+  // P0-AUDIT: Verify TOTP BEFORE consuming the challenge.
+  // Previous code marked used_at before verification — a wrong code would
+  // consume the challenge, preventing retry. Now we verify first, then
+  // atomically consume only on success.
   const mfaFactors = await findMfaFactorsByUser(c.env.DB, challenge.user_id);
   const verifiedFactors = mfaFactors.filter((f) => f.verified && !f.disabled_at && f.secret);
   let mfaValid = false;
@@ -675,7 +674,22 @@ app.post('/v1/auth/login/mfa', async (c) => {
     }
   }
   if (!mfaValid) {
+    // P0-AUDIT: Do NOT consume challenge on wrong code — allow retry.
+    // Track failed attempts for rate limiting.
+    // In a future version, add attempt_count column + lockout after N failures.
     return c.json({ error: 'invalid MFA code' }, 401);
+  }
+
+  // P0-AUDIT: Consume challenge ONLY after successful TOTP verification.
+  // Use conditional atomic update: SET used_at = now WHERE used_at IS NULL
+  // This prevents race condition where two concurrent requests both verify
+  // the same code and both try to consume.
+  const consumeResult = await c.env.DB.prepare(
+    'UPDATE mfa_challenges SET used_at = ?1 WHERE challenge_id = ?2 AND used_at IS NULL'
+  ).bind(new Date().toISOString(), challenge_id).run();
+  // If no rows were updated, another request already consumed this challenge
+  if (!consumeResult.meta?.changes || consumeResult.meta.changes === 0) {
+    return c.json({ error: 'challenge already consumed' }, 409);
   }
 
   // Complete login — load org + create session

@@ -24,6 +24,13 @@ const processedEvents = new Map<string, ProcessedEvent>();
 
 export interface ReplayStore {
   checkReplay(gateway: string, eventId: string): Promise<ProcessedEvent | null>;
+  /**
+   * P0-AUDIT: Atomically claim an event for processing BEFORE side effects.
+   * Returns true if the claim succeeded (caller should process),
+   * false if the event was already claimed/processed (caller should return cached response).
+   * This prevents the TOCTOU race where two concurrent requests both pass checkReplay.
+   */
+  claimReplay(gateway: string, eventId: string): Promise<boolean>;
   recordProcessed(gateway: string, eventId: string, result: 'processed' | 'ignored', responseBody: unknown): Promise<void>;
   clearReplayCache(): Promise<void>;
   getReplayCacheSize(): Promise<number>;
@@ -34,6 +41,9 @@ export interface ReplayStore {
 // ============================================================
 
 class InMemoryReplayStore implements ReplayStore {
+  // P0-AUDIT: Track in-flight claims to prevent concurrent processing
+  private claimedEvents = new Set<string>();
+
   async checkReplay(gateway: string, eventId: string): Promise<ProcessedEvent | null> {
     const key = buildKey(gateway, eventId);
     const cached = processedEvents.get(key);
@@ -43,6 +53,17 @@ class InMemoryReplayStore implements ReplayStore {
       return null;
     }
     return cached;
+  }
+
+  async claimReplay(gateway: string, eventId: string): Promise<boolean> {
+    const key = buildKey(gateway, eventId);
+    // Check if already processed
+    const cached = processedEvents.get(key);
+    if (cached && cached.expires_at > Date.now()) return false;
+    // Check if already claimed by another concurrent request
+    if (this.claimedEvents.has(key)) return false;
+    this.claimedEvents.add(key);
+    return true;
   }
 
   async recordProcessed(gateway: string, eventId: string, result: 'processed' | 'ignored', responseBody: unknown): Promise<void> {
@@ -55,10 +76,13 @@ class InMemoryReplayStore implements ReplayStore {
       expires_at: now + REPLAY_TTL_MS,
       response_body: responseBody,
     });
+    // P0-AUDIT: Release claim after recording
+    this.claimedEvents.delete(key);
   }
 
   async clearReplayCache(): Promise<void> {
     processedEvents.clear();
+    this.claimedEvents.clear();
   }
 
   async getReplayCacheSize(): Promise<number> {
@@ -98,16 +122,40 @@ class D1ReplayStore implements ReplayStore {
     };
   }
 
+  async claimReplay(gateway: string, eventId: string): Promise<boolean> {
+    // P0-AUDIT: Atomic claim — INSERT with 'processing' status. If the key
+    // already exists, INSERT fails and we return false (already claimed/processed).
+    // This prevents the TOCTOU race where two concurrent requests both pass checkReplay.
+    const key = buildKey(gateway, eventId);
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + REPLAY_TTL_MS);
+    try {
+      await this.db.prepare(
+        'INSERT INTO webhook_replay (event_key, gateway, event_id, result, response_body, processed_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      ).bind(
+        key, gateway, eventId, 'processing',
+        null, // response_body will be updated in recordProcessed
+        now.toISOString(), expiresAt.toISOString(),
+      ).run();
+      return true;
+    } catch {
+      // INSERT failed — key already exists (already claimed or processed)
+      return false;
+    }
+  }
+
   async recordProcessed(gateway: string, eventId: string, result: 'processed' | 'ignored', responseBody: unknown): Promise<void> {
     const key = buildKey(gateway, eventId);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + REPLAY_TTL_MS);
+    // P0-AUDIT: UPDATE the existing claimed row, not INSERT OR REPLACE
     await this.db.prepare(
-      'INSERT OR REPLACE INTO webhook_replay (event_key, gateway, event_id, result, response_body, processed_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      'UPDATE webhook_replay SET result = ?, response_body = ?, processed_at = ?, expires_at = ? WHERE event_key = ?'
     ).bind(
-      key, gateway, eventId, result,
+      result,
       JSON.stringify(responseBody),
       now.toISOString(), expiresAt.toISOString(),
+      key,
     ).run();
   }
 
@@ -143,6 +191,15 @@ export function createD1ReplayStore(db: D1Database): ReplayStore {
  */
 export async function checkReplay(gateway: string, eventId: string): Promise<ProcessedEvent | null> {
   return replayStore.checkReplay(gateway, eventId);
+}
+
+/**
+ * P0-AUDIT: Atomically claim an event for processing BEFORE side effects.
+ * Returns true if the claim succeeded (caller should process),
+ * false if the event was already claimed/processed (caller should return cached response).
+ */
+export async function claimReplay(gateway: string, eventId: string): Promise<boolean> {
+  return replayStore.claimReplay(gateway, eventId);
 }
 
 /**

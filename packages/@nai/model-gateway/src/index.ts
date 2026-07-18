@@ -15,7 +15,11 @@ import { logAuditEvent, logGovernanceAuditEvent } from '@nai/audit';
 // Types
 // ============================================================
 
-export type ModelProvider = 'openai' | 'anthropic' | 'cohere' | 'google' | 'meta' | 'mistral' | 'gen1' | 'gen2';
+// P0-AUDIT: Per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16, the only allowed
+// provider identity is 'ai-provider-gateway' (aiagent.iai.one). Direct vendor
+// names (openai, anthropic, etc.) and Gen1/Gen2 are NOT valid provider identities
+// in the model gateway contract — they are internal to the AI Provider Gateway.
+export type ModelProvider = 'ai-provider-gateway';
 
 export interface ModelInvocation {
   invocation_id: string;
@@ -142,20 +146,32 @@ let defaultStore: ModelGatewayStore = new InMemoryModelGatewayStore();
 // ============================================================
 
 export class D1ModelGatewayStore implements ModelGatewayStore {
-  constructor(private db: D1Database, private signingKey?: string) {}
+  // P0-AUDIT: signingKey is required — no fallback to weak hash
+  constructor(private db: D1Database, private signingKey: string) {
+    if (!signingKey) {
+      throw new Error('D1ModelGatewayStore requires MODEL_GATEWAY_SIGNING_KEY. Set via wrangler secret put.');
+    }
+  }
 
   async createInvocation(invocation: Omit<ModelInvocation, 'invocation_id' | 'created_at'>): Promise<string> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     await this.db.prepare(
       `INSERT INTO model_invocations (invocation_id, user_id, tenant_id, session_id, provider, model,
-        prompt_tokens, completion_tokens, total_tokens, cost_usd, data_classification, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        prompt_tokens, completion_tokens, total_tokens, cost_usd, data_classification,
+        policy_version, identity_check_passed, language_check_passed, safety_check_passed,
+        receipt_id, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       id, invocation.user_id, invocation.tenant_id, invocation.session_id,
       invocation.provider, invocation.model,
       invocation.prompt_tokens, invocation.completion_tokens, invocation.total_tokens,
       invocation.cost_usd, invocation.data_classification,
+      invocation.policy_version,
+      invocation.identity_check_passed ? 1 : 0,
+      invocation.language_check_passed ? 1 : 0,
+      invocation.safety_check_passed ? 1 : 0,
+      invocation.receipt_id || null,
       'pending', now, now,
     ).run();
     return id;
@@ -213,22 +229,16 @@ export class D1ModelGatewayStore implements ModelGatewayStore {
   }
 
   private async generateSignature(receipt: Omit<ModelReceipt, 'receipt_id' | 'created_at' | 'signature'>): Promise<string> {
-    // P0-AI: Use HMAC-SHA256 with signing key in production, not simple hash
+    // P0-AUDIT: Fail-closed — if signing key is missing, reject in production.
+    // No fallback to weak hash.
+    if (!this.signingKey) {
+      throw new Error('MODEL_GATEWAY_SIGNING_KEY is required for receipt signing. Set via wrangler secret put.');
+    }
     const data = JSON.stringify(receipt);
-    if (this.signingKey) {
-      const enc = new TextEncoder();
-      const key = await crypto.subtle.importKey('raw', enc.encode(this.signingKey), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
-      return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
-    }
-    // Fallback: deterministic hash (for dev/test without signing key)
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash).toString(16);
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey('raw', enc.encode(this.signingKey), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
+    return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   private mapInvocation(row: Record<string, unknown>): ModelInvocation {
@@ -244,9 +254,10 @@ export class D1ModelGatewayStore implements ModelGatewayStore {
       total_tokens: Number(row.total_tokens),
       cost_usd: Number(row.cost_usd),
       policy_version: String(row.policy_version ?? '1.0.0'),
-      identity_check_passed: Boolean(row.identity_check_passed ?? true),
-      language_check_passed: Boolean(row.language_check_passed ?? true),
-      safety_check_passed: Boolean(row.safety_check_passed ?? true),
+      // P0-AUDIT: Read actual policy result from DB, not default true
+      identity_check_passed: Number(row.identity_check_passed) === 1,
+      language_check_passed: Number(row.language_check_passed) === 1,
+      safety_check_passed: Number(row.safety_check_passed) === 1,
       data_classification: String(row.data_classification ?? 'internal'),
       receipt_id: String(row.receipt_id ?? ''),
       created_at: String(row.created_at),
@@ -276,7 +287,7 @@ let defaultConfig: ModelGatewayConfig = {
   enforceLanguage: true,
   enforceSafety: true,
   enforceDataClassification: true,
-  allowedProviders: ['openai', 'anthropic', 'cohere', 'google', 'meta', 'mistral', 'gen1', 'gen2'],
+  allowedProviders: ['ai-provider-gateway'],
   allowedModels: ['*'],
 };
 

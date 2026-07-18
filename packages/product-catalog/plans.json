@@ -164,7 +164,7 @@
       "nguyen-founders"
     ],
     "approval_gate": "sensitive",
-    "academy_pass": true,
+    "academy_pass": false,
     "academy_cert_discount": 0
   },
   {
@@ -262,7 +262,7 @@
       "nguyen-chapter-os"
     ],
     "approval_gate": "board",
-    "academy_pass": true,
+    "academy_pass": false,
     "academy_cert_discount": 0
   },
   {

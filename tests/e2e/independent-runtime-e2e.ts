@@ -29,6 +29,7 @@ import {
 import {
   InMemoryModelGatewayStore,
   setModelGatewayStore,
+  setModelGatewayConfig,
   invokeModel,
 } from '@nai/model-gateway';
 
@@ -52,6 +53,7 @@ async function testRunIndependentlyWithoutGen1Gen2() {
   const gatewayStore = new InMemoryModelGatewayStore();
   const fallbackStore = new InMemoryFallbackStore();
   setModelGatewayStore(gatewayStore);
+  setModelGatewayConfig({ allowedProviders: ["ai-provider-gateway"], allowedModels: ["*"] });
   setFallbackStore(fallbackStore);
   setFallbackEnabled(false);
 
@@ -60,7 +62,7 @@ async function testRunIndependentlyWithoutGen1Gen2() {
     'user-1',
     'tenant-1',
     'session-1',
-    'openai',
+    'ai-provider-gateway',
     'gpt-4',
     100,
     200,
@@ -76,13 +78,14 @@ async function testNotUseGen1Gen2AsSourceOfTruth() {
   console.log('Test: not use Gen 1/Gen 2 as source of truth');
   const gatewayStore = new InMemoryModelGatewayStore();
   setModelGatewayStore(gatewayStore);
+  setModelGatewayConfig({ allowedProviders: ["ai-provider-gateway"], allowedModels: ["*"] });
 
   // Query data from independent runtime
   const result = await invokeModel(
     'user-1',
     'tenant-1',
     'session-1',
-    'openai',
+    'ai-provider-gateway',
     'gpt-4',
     100,
     200,
@@ -183,6 +186,7 @@ async function testVerifyFallbackDoesNotBecomeSourceOfTruth() {
   const gatewayStore = new InMemoryModelGatewayStore();
   setFallbackStore(fallbackStore);
   setModelGatewayStore(gatewayStore);
+  setModelGatewayConfig({ allowedProviders: ["ai-provider-gateway"], allowedModels: ["*"] });
   setFallbackEnabled(true);
 
   // Execute fallback
@@ -191,7 +195,7 @@ async function testVerifyFallbackDoesNotBecomeSourceOfTruth() {
   await executeFallback(requestId);
 
   // Verify independent runtime remains source of truth
-  const result = await invokeModel('user-1', 'tenant-1', 'session-1', 'openai', 'gpt-4', 100, 200, 0.01, 'public');
+  const result = await invokeModel('user-1', 'tenant-1', 'session-1', 'ai-provider-gateway', 'gpt-4', 100, 200, 0.01, 'public');
   assert(result.invocationId !== undefined, 'independent runtime still operational');
 
   // In production, we would verify data is synced back to independent runtime

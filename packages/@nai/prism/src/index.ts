@@ -237,6 +237,35 @@ export class MockLLMProvider implements LLMProvider {
   }
 }
 
+/**
+ * P0-AUDIT: GatewayMockLLMProvider — test provider that simulates the AI
+ * Provider Gateway response. Returns served_by='ai-provider-gateway' so
+ * training-gateway tests exercise the real provider path, not the mock path.
+ */
+export class GatewayMockLLMProvider implements LLMProvider {
+  private callCount = 0;
+
+  async chat(req: ChatRequest, model: ModelDescriptor): Promise<ChatResponse> {
+    this.callCount++;
+    const lastUser = [...req.messages].reverse().find((m) => m.role === 'user');
+    const canned = `[gateway:${model.id}] ${lastUser?.content ?? '(empty)'}`;
+    const promptTokens = req.messages.reduce((n, m) => n + Math.ceil(m.content.length / 4), 0);
+    const completionTokens = Math.ceil(canned.length / 4);
+    return {
+      model: model.id,
+      content: canned,
+      finish_reason: 'stop',
+      usage: {
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+        total_tokens: promptTokens + completionTokens,
+      },
+      served_by: 'ai-provider-gateway',
+      provider_response_id: `gw-mock-${this.callCount}`,
+    };
+  }
+}
+
 // ============================================================
 // GEN1 adapter provider — calls aiagent.iai.one (FROZEN reference)
 // ============================================================

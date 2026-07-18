@@ -118,7 +118,7 @@ import { recordEvidence, getEvidenceForCommand } from '@nai/evidence';
 // P1-3: rate limiters for chat/stream/payment routes.
 import { chatRateLimit, paymentRateLimit } from './rate-limiter';
 // P0-PAY-1: Webhook replay protection.
-import { checkReplay, recordProcessed, setReplayStore, createD1ReplayStore } from './webhook-replay';
+import { checkReplay, claimReplay, recordProcessed, setReplayStore, createD1ReplayStore } from './webhook-replay';
 
 // WI-1.1: Route modules — mounted for independent operation.
 import modelGatewayRoutes from './routes/model-gateway';
@@ -1419,12 +1419,17 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
     return c.json({ received: true, processed: false });
   }
 
-  // Replay protection — check if this event was already processed
+  // P0-AUDIT: Atomic replay protection — claim BEFORE side effects
   const replayKey = stripeEventId || result.gateway_payment_id;
   if (replayKey) {
     const replay = await checkReplay('stripe', replayKey);
     if (replay) {
       return c.json({ ...replay.response_body as object, replayed: true });
+    }
+    // P0-AUDIT: Atomically claim the event. If claim fails, another request is processing it.
+    const claimed = await claimReplay('stripe', replayKey);
+    if (!claimed) {
+      return c.json({ error: 'event already being processed' }, 409);
     }
   }
 
@@ -1517,12 +1522,16 @@ app.post('/v1/payment/webhook', async (c) => {
     return c.json({ received: true, processed: false });
   }
 
-  // Replay protection — check if this event was already processed
+  // P0-AUDIT: Atomic replay protection — claim BEFORE side effects
   const replayKey = payosEventId || result.gateway_payment_id;
   if (replayKey) {
     const replay = await checkReplay('payos', replayKey);
     if (replay) {
       return c.json({ ...replay.response_body as object, replayed: true });
+    }
+    const claimed = await claimReplay('payos', replayKey);
+    if (!claimed) {
+      return c.json({ error: 'event already being processed' }, 409);
     }
   }
 

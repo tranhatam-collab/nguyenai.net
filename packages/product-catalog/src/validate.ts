@@ -62,14 +62,12 @@ for (const planId of Object.keys(entitlements)) {
   }
 }
 
-// 5. Verify academy.pass is true ONLY for Founder and Chapter (per ENTITLEMENT_MODEL.md §3.1 + Founder decision D-015)
-const ACADEMY_PASS_PLANS = ['nguyen-founder', 'nguyen-chapter'];
+// 5. Verify academy.pass is false for ALL plans — Academy is standalone paid per Education Build Lock
+// "Academy trả phí riêng hoàn toàn; cấm copy 'free for subscribers' hoặc bundled entitlement."
+// This overrides D-015 which previously allowed Founder/Chapter to bundle Academy Pass.
 for (const [planId, ent] of Object.entries(entitlements)) {
-  if (ent['academy.pass'] === true && !ACADEMY_PASS_PLANS.includes(planId)) {
-    errors.push(`academy.pass must be false for machine plan: ${planId} (only Founder and Chapter include Academy Pass per D-015)`);
-  }
-  if (ent['academy.pass'] === false && ACADEMY_PASS_PLANS.includes(planId)) {
-    errors.push(`academy.pass must be true for: ${planId} (Founder and Chapter include Academy Pass per D-015)`);
+  if (ent['academy.pass'] === true) {
+    errors.push(`academy.pass must be false for: ${planId} — Academy is standalone paid, not bundled (Education Build Lock 2026-07-14)`);
   }
 }
 

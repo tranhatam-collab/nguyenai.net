@@ -54,6 +54,8 @@ ALLOWLIST_PATTERNS=(
   "packages/@nai/investor-verify/"                  # verify.iai.one adapter
   "packages/@nai/ai-provider-client/"               # AI Provider Gateway client (aiagent.iai.one per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16)
   "packages/@nai/contracts/"                        # Tool definitions reference aiagent.iai.one gateway URLs
+  "packages/@nai/model-gateway/"                    # Model gateway contract references aiagent.iai.one per AI_PROVIDER_SINGLE_SOURCE_DECISION
+  "packages/@nai/training-gateway/"                 # Training gateway references ai-provider-gateway per AI_PROVIDER_SINGLE_SOURCE_DECISION
 )
 
 # Build exclude grep flags

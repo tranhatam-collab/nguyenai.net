@@ -274,7 +274,23 @@ export async function invokeThroughTrainingGateway(
   });
 
   // 8. Determine final content
-  const finalContent = guardResult.action === 'allow' ? result.content : (guardResult.modified_output ?? result.content);
+  // P0-AUDIT: block action must NEVER fallback to original content.
+  // - allow: use original content
+  // - modify: use modified_output (fallback to original only if modify produced nothing)
+  // - block: use modified_output if present, otherwise empty string (NOT original)
+  // - error: empty string
+  let finalContent: string;
+  if (guardResult.action === 'allow') {
+    finalContent = result.content;
+  } else if (guardResult.action === 'modify') {
+    finalContent = guardResult.modified_output ?? result.content;
+  } else if (guardResult.action === 'block') {
+    // P0-AUDIT: Block must never return original content — use modified_output or empty
+    finalContent = guardResult.modified_output ?? '';
+  } else {
+    // error or unknown action
+    finalContent = guardResult.modified_output ?? '';
+  }
 
   return {
     content: finalContent,

@@ -129,7 +129,7 @@
       "nguyen-founders"
     ],
     "machine.approval.required": "sensitive",
-    "academy.pass": true,
+    "academy.pass": false,
     "academy.tracks.enabled": [
       "free-intro"
     ],
@@ -215,7 +215,7 @@
       "nguyen-chapter-os"
     ],
     "machine.approval.required": "board",
-    "academy.pass": true,
+    "academy.pass": false,
     "academy.tracks.enabled": [
       "free-intro"
     ],
