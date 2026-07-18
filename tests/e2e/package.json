@@ -6,7 +6,7 @@
   "scripts": {
     "build": "echo 'no build'",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/p0b-e2e.ts",
+    "test": "tsx src/p0b-e2e.ts && tsx src/ai-provider-authenticated-journey-e2e.ts",
     "lint": "echo 'TODO'"
   },
   "dependencies": {
@@ -57,7 +57,9 @@
     "@nai/loom": "workspace:*",
     "@nai/runtime-sdk": "workspace:*",
     "@nai/contracts": "workspace:*",
-    "@nai/email": "workspace:*"
+    "@nai/email": "workspace:*",
+    "@nai/ai-provider-client": "workspace:*",
+    "@nai/model-gateway": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250101.0",

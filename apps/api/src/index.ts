@@ -287,10 +287,12 @@ function initStores(env: AppEnv['Bindings']): void {
   } else if (mode === 'mock') {
     configureMockProvider();
   } else {
-    // Use AI Provider Gateway (aiagent.iai.one) — no direct vendor keys
+    // Use AI Provider Gateway (api.aiagent.iai.one) — no direct vendor keys
+    // P0-AUDIT: Must use api.* subdomain (API Worker, JSON), NOT root domain (Pages, HTML)
     const hasGateway = configureProviderGateway({
-      gatewayUrl: env.AI_PROVIDER_GATEWAY_URL ?? 'https://aiagent.iai.one',
+      gatewayUrl: env.AI_PROVIDER_GATEWAY_URL ?? 'https://api.aiagent.iai.one',
       apiKey: env.AI_PROVIDER_API_KEY ?? '',
+      tenantId: 'nguyenai-net',
     }, setPrismLLMProvider);
     if (!hasGateway) {
       if (isProduction) {

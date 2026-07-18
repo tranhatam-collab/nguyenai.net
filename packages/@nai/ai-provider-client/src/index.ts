@@ -13,7 +13,7 @@
 // ============================================================
 
 export interface ProviderGatewayConfig {
-  /** Gateway URL (e.g. https://aiagent.iai.one). Not a secret — contract URL. */
+  /** Gateway URL (e.g. https://api.aiagent.iai.one). Not a secret — contract URL. */
   gatewayUrl: string;
   /** API key issued by Team A. Stored in Worker secret store. */
   apiKey: string;

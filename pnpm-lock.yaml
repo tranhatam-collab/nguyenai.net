@@ -1436,6 +1436,9 @@ importers:
 
   tests/e2e:
     dependencies:
+      '@nai/ai-provider-client':
+        specifier: workspace:*
+        version: link:../../packages/@nai/ai-provider-client
       '@nai/approval':
         specifier: workspace:*
         version: link:../../packages/@nai/approval
@@ -1505,6 +1508,9 @@ importers:
       '@nai/loom':
         specifier: workspace:*
         version: link:../../packages/@nai/loom
+      '@nai/model-gateway':
+        specifier: workspace:*
+        version: link:../../packages/@nai/model-gateway
       '@nai/nguyen-tools':
         specifier: workspace:*
         version: link:../../packages/@nai/nguyen-tools
