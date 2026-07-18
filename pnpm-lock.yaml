@@ -837,6 +837,9 @@ importers:
         specifier: workspace:*
         version: link:../audit
     devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20240620.0
+        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
@@ -1362,6 +1365,9 @@ importers:
         specifier: workspace:*
         version: link:../prism
     devDependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20240620.0
+        version: 4.20260629.1
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0

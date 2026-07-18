@@ -24,7 +24,11 @@
     // Set via `wrangler secret put EVIDENCE_SIGNING_KEY`. resolveEvidenceSigningKey()
     // throws in production when the secret is missing; dev uses a non-prod fallback.
     // WI-1.2: LLM_PROVIDER_MODE changed from 'gen1' to 'auto' (direct providers first).
-    "LLM_PROVIDER_MODE": "auto"
+    "LLM_PROVIDER_MODE": "auto",
+    // P0-AI: AI Provider Gateway URL — public URL, not secret. Per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16.
+    "AI_PROVIDER_GATEWAY_URL": "https://aiagent.iai.one",
+    // P0-AI: MODEL_GATEWAY_SIGNING_KEY — set via `wrangler secret put MODEL_GATEWAY_SIGNING_KEY`
+    // Used by D1ModelGatewayStore to sign receipts with HMAC-SHA256.
   },
   "d1_databases": [
     {

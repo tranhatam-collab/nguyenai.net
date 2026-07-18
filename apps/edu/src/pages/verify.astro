@@ -45,7 +45,7 @@ import CertBadge from '../components/CertBadge.astro';
     <!-- Info -->
     <div class="text-sm text-academy-muted space-y-2">
       <p>
-        <strong class="text-academy-text">Lưu ý:</strong> Đây là hệ thống placeholder. API xác minh đầy đủ sẽ hoạt động sau khi triển khai.
+        <strong class="text-academy-text">Lưu ý:</strong> Hệ thống xác minh truy vấn registry chính thức của Nguyen AI Academy theo thời gian thực.
       </p>
       <p>
         <strong class="text-academy-text">Note:</strong> Certificate verification queries the official Nguyen AI Academy registry in real time.
@@ -73,6 +73,7 @@ import CertBadge from '../components/CertBadge.astro';
 
   function showLoading(): void {
     if (!result) return;
+    result.classList.remove('hidden');
     clearResult();
     const p = document.createElement('p');
     p.className = 'text-sm text-academy-muted';

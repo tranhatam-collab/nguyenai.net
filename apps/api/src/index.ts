@@ -194,6 +194,8 @@ interface AppEnv {
   };
   Variables: {
     session: Session | null;
+    correlationId: string;
+    traceId: string | undefined;
   };
 }
 
@@ -237,6 +239,18 @@ app.use('*', async (c, next) => {
   // CSP for API JSON responses — restrictive since there is no HTML to render.
   c.header('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
   c.header('X-XSS-Protection', '0'); // disabled in favor of CSP; avoids old-browser bugs
+});
+
+// P0-OBS: Correlation ID middleware — attach x-request-id to every request
+app.use('*', async (c, next) => {
+  const incomingId = c.req.header('x-request-id') ?? c.req.header('x-correlation-id');
+  const correlationId = incomingId || crypto.randomUUID();
+  const traceId = c.req.header('x-trace-id') ?? undefined;
+  c.set('correlationId', correlationId);
+  c.set('traceId', traceId);
+  c.header('x-request-id', correlationId);
+  if (traceId) c.header('x-trace-id', traceId);
+  await next();
 });
 
 // ============================================================

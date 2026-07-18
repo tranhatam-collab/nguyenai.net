@@ -4,7 +4,11 @@
 # Usage: bash tools/audit-independence.sh
 #
 # Checks:
-#   1. No aiagent.iai.one / computer.iai.one in runtime config (wrangler.jsonc, .dev.vars)
+#   1. No computer.iai.one in runtime config (wrangler.jsonc, .dev.vars)
+#      NOTE: aiagent.iai.one is ALLOWED as the AI Provider Gateway per
+#      AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16 (overrides independence lock
+#      for AI provider routing only). It must appear as AI_PROVIDER_GATEWAY_URL,
+#      not as GEN1_GATEWAY_URL.
 #   2. No maytinhai.org / api.maytinhai.org fetch calls in source code
 #   3. GEN1_GATEWAY_URL must NOT be in wrangler.jsonc vars (only via secret)
 #   4. LEGACY_BRIDGE_ENABLED must NOT be 'true' in wrangler.jsonc vars
@@ -22,15 +26,28 @@ echo "==> Independence audit — nguyenai.net must not depend on Gen1/Gen2 at ru
 echo
 
 # ── Check 1: No Gen1 upstream URLs in runtime config ──
-echo "    [1/6] Checking runtime config for Gen1 upstream URLs..."
-GEN1_URLS="aiagent.iai.one\|computer.iai.one"
+# Per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16, aiagent.iai.one is the
+# approved AI Provider Gateway URL (AI_PROVIDER_GATEWAY_URL). Only computer.iai.one
+# (Gen1 runtime) is banned. aiagent.iai.one must appear as AI_PROVIDER_GATEWAY_URL.
+echo "    [1/6] Checking runtime config for banned Gen1 URLs (computer.iai.one)..."
+GEN1_BANNED="computer.iai.one"
 for f in apps/api/wrangler.jsonc apps/auth/wrangler.jsonc apps/api/.dev.vars apps/auth/.dev.vars; do
   if [ -f "$f" ]; then
-    matches=$(grep -n "$GEN1_URLS" "$f" 2>/dev/null || true)
+    matches=$(grep -n "$GEN1_BANNED" "$f" 2>/dev/null || true)
     if [ -n "$matches" ]; then
-      echo "FAIL: Gen1 URL found in $f:"
+      echo "FAIL: Banned Gen1 URL (computer.iai.one) found in $f:"
       echo "  $matches"
       VIOLATIONS=$((VIOLATIONS + 1))
+    fi
+    # aiagent.iai.one is allowed only as AI_PROVIDER_GATEWAY_URL, not GEN1_GATEWAY_URL
+    aiagent_matches=$(grep -n "aiagent.iai.one" "$f" 2>/dev/null || true)
+    if [ -n "$aiagent_matches" ]; then
+      bad_aiagent=$(echo "$aiagent_matches" | grep -v "AI_PROVIDER_GATEWAY_URL" || true)
+      if [ -n "$bad_aiagent" ]; then
+        echo "FAIL: aiagent.iai.one found outside AI_PROVIDER_GATEWAY_URL in $f:"
+        echo "  $bad_aiagent"
+        VIOLATIONS=$((VIOLATIONS + 1))
+      fi
     fi
   fi
 done

@@ -49,6 +49,9 @@
     "audit:ai-provider": "node tools/audit-ai-provider-source.mjs",
     "audit:production-durability": "node tools/audit-production-durability.mjs",
     "audit:edu-plan": "node tools/audit-edu-plan-lock.mjs",
+    "test:alerts": "node tools/alert-test.mjs",
+    "drill:backup-restore": "node tools/backup-restore-drill.mjs",
+    "drill:rollback": "node tools/rollback-drill.mjs",
     "db:migrate": "pnpm --filter @nai/migrations migrate:apply",
     "db:status": "pnpm --filter @nai/migrations migrate:status",
     "prepare": "lefthook install"

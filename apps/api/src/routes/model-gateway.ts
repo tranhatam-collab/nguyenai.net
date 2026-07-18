@@ -14,10 +14,20 @@ import {
   invokeModel,
   getInvocationReceipt,
   listUserInvocations,
+  setModelGatewayStore,
+  D1ModelGatewayStore,
   type ModelProvider,
 } from '@nai/model-gateway';
 
 const modelGatewayRoutes = new Hono();
+
+// P0-AI: Initialize D1-backed model gateway store when DB is available
+let modelGatewayStoreInitialized = false;
+function initModelGatewayStore(env: { DB?: D1Database; MODEL_GATEWAY_SIGNING_KEY?: string }) {
+  if (modelGatewayStoreInitialized || !env.DB) return;
+  setModelGatewayStore(new D1ModelGatewayStore(env.DB, env.MODEL_GATEWAY_SIGNING_KEY));
+  modelGatewayStoreInitialized = true;
+}
 
 // ============================================================
 // Helper: require authenticated user
@@ -36,6 +46,7 @@ function requireAuth(c: Context) {
 // ============================================================
 
 modelGatewayRoutes.post('/v1/model-gateway/invoke', async (c) => {
+  initModelGatewayStore(c.env as unknown as { DB?: D1Database; MODEL_GATEWAY_SIGNING_KEY?: string });
   const authError = requireAuth(c);
   if (authError) return authError;
 

@@ -77,6 +77,7 @@ Code đã clean. Nhưng nếu `JWT_SECRET` đã set trên Cloudflare dashboard, 
 | SRE-P0-02 | Alert test | Team 6 | Synthetic failure → alert → acknowledge → incident record |
 | SRE-P0-03 | D1/R2 backup + restore drill | Team 6 | Restore vào isolated env, integrity check pass, RTO/RPO record |
 | SRE-P0-04 | Rollback drill | Team 6 + 0 | Rollback exact deployment không xóa production data |
+| SRE-P0-05 | Branch protection on `main` | Founder + Ops | Require PR review, status checks (CI), no force-push. Currently UNPROTECTED. |
 | LEGAL-P0-01 | Merchant/entity/IP/refund/privacy/disclosure review | Founder + Legal | Written decision + public copy approved |
 | RELEASE-P0-01 | Six critical production journeys | Team 0 + all | Auth, payment, AI, workflow, Edu cert, refund/incident pass trên cùng deployment |
 | RELEASE-P0-02 | Founder release verdict | Founder | Signed GO/BETA/HOLD gắn exact SHA + deployment IDs |

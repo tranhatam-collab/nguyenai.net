@@ -136,6 +136,140 @@ export class InMemoryModelGatewayStore implements ModelGatewayStore {
 // ============================================================
 
 let defaultStore: ModelGatewayStore = new InMemoryModelGatewayStore();
+
+// ============================================================
+// D1-backed store — for production
+// ============================================================
+
+export class D1ModelGatewayStore implements ModelGatewayStore {
+  constructor(private db: D1Database, private signingKey?: string) {}
+
+  async createInvocation(invocation: Omit<ModelInvocation, 'invocation_id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    await this.db.prepare(
+      `INSERT INTO model_invocations (invocation_id, user_id, tenant_id, session_id, provider, model,
+        prompt_tokens, completion_tokens, total_tokens, cost_usd, data_classification, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      id, invocation.user_id, invocation.tenant_id, invocation.session_id,
+      invocation.provider, invocation.model,
+      invocation.prompt_tokens, invocation.completion_tokens, invocation.total_tokens,
+      invocation.cost_usd, invocation.data_classification,
+      'pending', now, now,
+    ).run();
+    return id;
+  }
+
+  async getInvocation(invocationId: string): Promise<ModelInvocation | null> {
+    const row = await this.db.prepare('SELECT * FROM model_invocations WHERE invocation_id = ?').bind(invocationId).first<Record<string, unknown>>();
+    return row ? this.mapInvocation(row) : null;
+  }
+
+  async updateInvocation(invocationId: string, updates: Partial<ModelInvocation>): Promise<void> {
+    const sets: string[] = [];
+    const vals: unknown[] = [];
+    for (const [k, v] of Object.entries(updates)) {
+      if (k === 'invocation_id' || k === 'created_at') continue;
+      sets.push(`${k} = ?`);
+      vals.push(v);
+    }
+    sets.push('updated_at = ?');
+    vals.push(new Date().toISOString());
+    vals.push(invocationId);
+    await this.db.prepare(`UPDATE model_invocations SET ${sets.join(', ')} WHERE invocation_id = ?`).bind(...vals).run();
+  }
+
+  async listInvocations(filters?: { user_id?: string; tenant_id?: string; provider?: ModelProvider }): Promise<ModelInvocation[]> {
+    let sql = 'SELECT * FROM model_invocations WHERE 1=1';
+    const vals: unknown[] = [];
+    if (filters?.user_id) { sql += ' AND user_id = ?'; vals.push(filters.user_id); }
+    if (filters?.tenant_id) { sql += ' AND tenant_id = ?'; vals.push(filters.tenant_id); }
+    if (filters?.provider) { sql += ' AND provider = ?'; vals.push(filters.provider); }
+    sql += ' ORDER BY created_at DESC LIMIT 100';
+    const rows = await this.db.prepare(sql).bind(...vals).all<Record<string, unknown>>();
+    return (rows.results ?? []).map((r: Record<string, unknown>) => this.mapInvocation(r));
+  }
+
+  async createReceipt(receipt: Omit<ModelReceipt, 'receipt_id' | 'created_at' | 'signature'>): Promise<string> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const signature = await this.generateSignature(receipt);
+    await this.db.prepare(
+      `INSERT INTO model_receipts (receipt_id, invocation_id, provider, model,
+        prompt_tokens, completion_tokens, total_tokens, cost_usd, policy_version, signature, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      id, receipt.invocation_id, receipt.provider, receipt.model,
+      receipt.prompt_tokens, receipt.completion_tokens, receipt.total_tokens,
+      receipt.cost_usd, receipt.policy_version, signature, now,
+    ).run();
+    return id;
+  }
+
+  async getReceipt(receiptId: string): Promise<ModelReceipt | null> {
+    const row = await this.db.prepare('SELECT * FROM model_receipts WHERE receipt_id = ?').bind(receiptId).first<Record<string, unknown>>();
+    return row ? this.mapReceipt(row) : null;
+  }
+
+  private async generateSignature(receipt: Omit<ModelReceipt, 'receipt_id' | 'created_at' | 'signature'>): Promise<string> {
+    // P0-AI: Use HMAC-SHA256 with signing key in production, not simple hash
+    const data = JSON.stringify(receipt);
+    if (this.signingKey) {
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode(this.signingKey), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
+      return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    // Fallback: deterministic hash (for dev/test without signing key)
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+  }
+
+  private mapInvocation(row: Record<string, unknown>): ModelInvocation {
+    return {
+      invocation_id: String(row.invocation_id),
+      user_id: String(row.user_id),
+      tenant_id: String(row.tenant_id),
+      session_id: row.session_id as string | null,
+      provider: String(row.provider) as ModelProvider,
+      model: String(row.model),
+      prompt_tokens: Number(row.prompt_tokens),
+      completion_tokens: Number(row.completion_tokens),
+      total_tokens: Number(row.total_tokens),
+      cost_usd: Number(row.cost_usd),
+      policy_version: String(row.policy_version ?? '1.0.0'),
+      identity_check_passed: Boolean(row.identity_check_passed ?? true),
+      language_check_passed: Boolean(row.language_check_passed ?? true),
+      safety_check_passed: Boolean(row.safety_check_passed ?? true),
+      data_classification: String(row.data_classification ?? 'internal'),
+      receipt_id: String(row.receipt_id ?? ''),
+      created_at: String(row.created_at),
+    };
+  }
+
+  private mapReceipt(row: Record<string, unknown>): ModelReceipt {
+    return {
+      receipt_id: String(row.receipt_id),
+      invocation_id: String(row.invocation_id),
+      provider: String(row.provider) as ModelProvider,
+      model: String(row.model),
+      prompt_tokens: Number(row.prompt_tokens),
+      completion_tokens: Number(row.completion_tokens),
+      total_tokens: Number(row.total_tokens),
+      cost_usd: Number(row.cost_usd),
+      policy_version: String(row.policy_version),
+      created_at: String(row.created_at),
+      signature: String(row.signature),
+    };
+  }
+}
+
 let defaultConfig: ModelGatewayConfig = {
   policyVersion: '1.0.0',
   enforceIdentity: true,

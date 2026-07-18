@@ -231,3 +231,89 @@ export function clearTelemetry(): void {
   metricDescriptors.clear();
   activeExporter = null;
 }
+
+// ============================================================
+// P0-OBS: Correlation IDs — request tracing across services
+// ============================================================
+
+export const CORRELATION_ID_HEADER = 'x-request-id';
+export const TRACE_ID_HEADER = 'x-trace-id';
+
+/**
+ * Generate a new correlation ID (UUID v4 style).
+ */
+export function generateCorrelationId(): string {
+  return crypto.randomUUID();
+}
+
+/**
+ * Extract correlation ID from incoming request headers, or generate a new one.
+ * Returns tuple of [correlationId, traceId] where traceId may be undefined.
+ */
+export function extractCorrelationId(headers: Headers): { correlationId: string; traceId?: string } {
+  const incoming = headers.get(CORRELATION_ID_HEADER) ?? headers.get('x-correlation-id');
+  const traceId = headers.get(TRACE_ID_HEADER) ?? undefined;
+  return {
+    correlationId: incoming || generateCorrelationId(),
+    traceId,
+  };
+}
+
+/**
+ * Structured log entry with correlation context.
+ */
+export interface StructuredLogEntry {
+  timestamp: string;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  message: string;
+  correlation_id: string;
+  trace_id?: string;
+  user_id?: string;
+  tenant_id?: string;
+  session_id?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Log context — attached to all log entries in a request.
+ */
+export class LogContext {
+  constructor(
+    public readonly correlationId: string,
+    public readonly traceId: string | undefined,
+    private fields: Record<string, unknown> = {},
+  ) {}
+
+  set(key: string, value: unknown): void {
+    this.fields[key] = value;
+  }
+
+  log(level: StructuredLogEntry['level'], message: string, extra?: Record<string, unknown>): StructuredLogEntry {
+    const entry: StructuredLogEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      correlation_id: this.correlationId,
+      ...this.fields,
+      ...extra,
+    };
+    if (this.traceId) entry.trace_id = this.traceId;
+    // Output as structured JSON to console (Workers log stream)
+    console.log(JSON.stringify(entry));
+    return entry;
+  }
+
+  info(message: string, extra?: Record<string, unknown>): StructuredLogEntry {
+    return this.log('info', message, extra);
+  }
+  warn(message: string, extra?: Record<string, unknown>): StructuredLogEntry {
+    return this.log('warn', message, extra);
+  }
+  error(message: string, extra?: Record<string, unknown>): StructuredLogEntry {
+    return this.log('error', message, extra);
+  }
+  debug(message: string, extra?: Record<string, unknown>): StructuredLogEntry {
+    return this.log('debug', message, extra);
+  }
+}
+

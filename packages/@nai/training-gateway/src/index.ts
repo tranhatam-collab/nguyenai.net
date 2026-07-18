@@ -16,7 +16,7 @@
  */
 
 import { logGovernanceAuditEvent } from '@nai/audit';
-import { invokeModel } from '@nai/model-gateway';
+import { invokeModel, type ModelProvider } from '@nai/model-gateway';
 import {
   checkAllPolicies,
   type Language,
@@ -230,8 +230,10 @@ export async function invokeThroughTrainingGateway(
   }
 
   // 6. Create invocation + receipt BEFORE output guard
-  const provider: any = result.served_by?.startsWith('direct-') ? result.served_by.replace('direct-', '') : 'mock';
-  const costUsd = 0; // cost not computed in this phase
+  // P0-AI: Use the actual served_by value from the provider, not fallback to 'mock'.
+  // The AI Provider Gateway sets served_by='ai-provider-gateway'; the Gen1 adapter sets 'gen1-adapter'.
+  const provider = (result.served_by || 'unknown') as ModelProvider;
+  const costUsd = 0; // cost reconciliation is handled by Team 3 + 2 in AI-P0-04
   const invocationResult = await invokeModel(
     user_id,
     tenant_id,
