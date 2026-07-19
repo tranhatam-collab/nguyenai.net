@@ -56,4 +56,8 @@ assert(resolveGatewayModelId('iai-one/iris-3') === 'iai-one/iris-3', 'Test 6a: i
 assert(resolveGatewayModelId('gpt-4o') === 'gpt-4o', 'Test 6b: unknown vendor ID passthrough (gateway will reject)');
 
 console.log(`\n${pass} passed, ${fail} failed.`);
-if (fail > 0) process.exit(1);
+if (fail > 0) {
+  // Use globalThis to avoid needing @types/node in the Workers-typed package.
+  // tsx provides process.exit at runtime; the cast keeps typecheck happy.
+  (globalThis as { process?: { exit: (code: number) => void } }).process?.exit(1);
+}
