@@ -228,6 +228,44 @@ function sleep(ms: number): Promise<void> {
 }
 
 // ============================================================
+// Model ID mapping — nguyenai.net model catalog → aiagent.iai.one model IDs
+// ============================================================
+
+/**
+ * Maps Nguyen AI product-catalog model IDs (e.g. "nguyen-iris-3") to
+ * AI Provider Gateway model IDs (e.g. "iai-one/iris-3").
+ *
+ * The gateway only recognizes the iaione/* namespace. Without this map,
+ * the gateway rejects every Nguyen AI model ID with 400/404.
+ *
+ * Models not in the map fall back to a heuristic: strip "nguyen-" prefix
+ * and prepend "iai-one/". Unknown models are passed through unchanged
+ * so the gateway can return its own error (preserves contract surface).
+ */
+const NAI_TO_GATEWAY_MODEL_MAP: Record<string, string> = {
+  'nguyen-iris-3': 'iai-one/iris-3',
+  'nguyen-pulse-3': 'iai-one/pulse-3',
+  'nguyen-echo-mini': 'iai-one/echo-mini',
+};
+
+/**
+ * Resolve a Nguyen AI model ID to the AI Provider Gateway model ID.
+ * Order: explicit map → heuristic (nguyen-X → iai-one/X) → passthrough.
+ */
+export function resolveGatewayModelId(naiModelId: string): string {
+  if (NAI_TO_GATEWAY_MODEL_MAP[naiModelId]) {
+    return NAI_TO_GATEWAY_MODEL_MAP[naiModelId]!;
+  }
+  // Heuristic: nguyen-iris-3 → iris-3 → iai-one/iris-3
+  if (naiModelId.startsWith('nguyen-')) {
+    const stripped = naiModelId.slice('nguyen-'.length);
+    return `iai-one/${stripped}`;
+  }
+  // Already gateway-shaped or unknown — pass through
+  return naiModelId;
+}
+
+// ============================================================
 // LLMProvider adapter for @nai/prism
 // ============================================================
 
@@ -245,8 +283,9 @@ export class GatewayLLMProvider implements LLMProvider {
   }
 
   async chat(req: ChatRequest, model: ModelDescriptor): Promise<ChatResponse> {
+    const gatewayModelId = resolveGatewayModelId(model.id);
     const resp = await this.client.chat({
-      model: model.id,
+      model: gatewayModelId,
       messages: req.messages,
       max_tokens: req.max_tokens,
       temperature: req.temperature,

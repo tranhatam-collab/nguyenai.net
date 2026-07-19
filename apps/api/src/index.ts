@@ -365,6 +365,17 @@ app.get('/health', (c) => {
   });
 });
 
+// /v1/health — alias for gateway/monitoring contract
+app.get('/v1/health', (c) => {
+  return c.json({
+    status: 'ok',
+    service: 'nai-api',
+    version: '0.1.0',
+    timestamp: new Date().toISOString(),
+    environment: c.env.ENVIRONMENT,
+  });
+});
+
 // ============================================================
 // Session — GET /v1/session
 // ============================================================
@@ -1188,14 +1199,48 @@ app.get('/v1/prices', (c) => {
 // ============================================================
 // Models — GET /v1/models
 // ============================================================
+// Per AI_PROVIDER_SINGLE_SOURCE_DECISION_2026-07-16: do NOT expose
+// direct vendor provider info (openai/anthropic/google/groq/etc.) or
+// vendor providerModel identifiers. All invocation goes through the
+// AI Provider Gateway (aiagent.iai.one). The "provider" field returned
+// here is the gateway surface, not the underlying vendor.
 
 app.get('/v1/models', (c) => {
   const tier = c.req.query('tier');
-  let models = modelsData as Array<{ id: string; tier: string; displayName: string; provider: string; providerModel: string; freeTier: boolean }>;
+  let models = modelsData as Array<{
+    id: string;
+    tier: string;
+    displayName: string;
+    provider: string;
+    providerModel: string;
+    freeTier: boolean;
+    capabilities?: string[];
+    contextWindow?: number;
+    maxOutputTokens?: number;
+    costPer1kInput?: number;
+    costPer1kOutput?: number;
+    speed?: string;
+    quality?: string;
+  }>;
   if (tier) {
     models = models.filter((m) => m.tier === tier);
   }
-  return c.json({ models, count: models.length });
+  // Redact vendor surface — every model is served via the AI Provider Gateway.
+  const redacted = models.map((m) => ({
+    id: m.id,
+    displayName: m.displayName,
+    tier: m.tier,
+    provider: 'ai-provider-gateway',
+    capabilities: m.capabilities,
+    contextWindow: m.contextWindow,
+    maxOutputTokens: m.maxOutputTokens,
+    costPer1kInput: m.costPer1kInput,
+    costPer1kOutput: m.costPer1kOutput,
+    speed: m.speed,
+    quality: m.quality,
+    freeTier: m.freeTier,
+  }));
+  return c.json({ models: redacted, count: redacted.length });
 });
 
 // ============================================================
