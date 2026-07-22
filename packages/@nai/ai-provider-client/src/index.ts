@@ -294,7 +294,11 @@ export class GatewayLLMProvider implements LLMProvider {
     });
 
     return {
-      model: resp.model,
+      // Return the original NAI catalog model ID (e.g. "nguyen-iris-3"), not
+      // the gateway's internal ID (e.g. "iai-one/iris-3"). The user requested
+      // a catalog model; the response should echo that same ID back. The
+      // gateway model ID is an internal implementation detail.
+      model: model.id,
       content: resp.content,
       finish_reason: resp.finish_reason,
       usage: resp.usage,

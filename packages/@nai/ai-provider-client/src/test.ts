@@ -55,6 +55,45 @@ assert(resolveGatewayModelId('nguyen-spectra-xl') === 'iai-one/spectra-xl', 'Tes
 assert(resolveGatewayModelId('iai-one/iris-3') === 'iai-one/iris-3', 'Test 6a: iai-one/iris-3 passthrough');
 assert(resolveGatewayModelId('gpt-4o') === 'gpt-4o', 'Test 6b: unknown vendor ID passthrough (gateway will reject)');
 
+// Test 7: GatewayLLMProvider.chat returns the original catalog model ID, not the gateway's internal ID.
+// This verifies the contract: user sends "nguyen-iris-3" → response echoes "nguyen-iris-3" (not "iai-one/iris-3").
+// We mock fetch to capture the outbound request and return a response with the gateway model ID.
+const captured: { body: { model?: string } | null } = { body: null };
+const mockFetch = async (_url: string, init: RequestInit) => {
+  const body = JSON.parse(init.body as string) as { model?: string };
+  captured.body = body;
+  return new Response(JSON.stringify({
+    model: body.model, // gateway echoes back its internal ID
+    content: 'test response',
+    finish_reason: 'stop',
+    usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+    provider_response_id: 'resp-123',
+    request_id: 'req-123',
+    latency_ms: 100,
+  }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+};
+
+const providerWithMock = new GatewayLLMProvider({
+  gatewayUrl: 'https://api.aiagent.iai.one',
+  apiKey: 'test-key',
+  fetchImpl: mockFetch as typeof fetch,
+});
+
+const chatResp: { model: string; content: string; served_by: string } = await providerWithMock.chat(
+  {
+    tenant_id: 'nguyenai-net',
+    user_id: 'user-1',
+    plan_id: 'free',
+    model: 'nguyen-iris-3',
+    messages: [{ role: 'user', content: 'hello' }],
+  } as unknown as Parameters<typeof providerWithMock.chat>[0],
+  { id: 'nguyen-iris-3', displayName: 'Iris 3', tier: 'free' } as unknown as Parameters<typeof providerWithMock.chat>[1],
+);
+
+assert(captured.body?.model === 'iai-one/iris-3', 'Test 7a: outbound request uses gateway model ID (iai-one/iris-3)');
+assert(chatResp.model === 'nguyen-iris-3', 'Test 7b: response echoes catalog model ID (nguyen-iris-3), not gateway internal ID');
+assert(chatResp.served_by === 'ai-provider-gateway', 'Test 7c: served_by is ai-provider-gateway');
+
 console.log(`\n${pass} passed, ${fail} failed.`);
 if (fail > 0) {
   // Use globalThis to avoid needing @types/node in the Workers-typed package.
