@@ -1305,7 +1305,9 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         result: 'success',
         metadata: { gateway: 'stripe', amount: session_url.amount, currency, checkout_url: session_url.authorize_url },
       });
-      // P0-PAY: Record pending ledger entry
+      // P0-PAY: Record pending ledger entry — failure must NOT be silent.
+      // If the ledger insert fails, the webhook will not be able to correlate
+      // the payment, and the user's entitlement will not be granted.
       if (c.env.DB) {
         try {
           await c.env.DB.prepare(
@@ -1315,7 +1317,11 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
             session.user_id, session.tenant_id ?? 'default',
             'stripe', price_id, session_url.amount, currency, 'pending',
           ).run();
-        } catch { /* ledger best-effort */ }
+        } catch (ledgerErr) {
+          console.error('[P0-PAY] Checkout ledger insert failed (stripe):', ledgerErr);
+          // Still return the checkout URL — the user can still pay.
+          // Reconciliation will handle the missing ledger row.
+        }
       }
       return c.json(session_url);
     } else if (gateway === 'vnpay') {
@@ -1340,7 +1346,7 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
         result: 'success',
         metadata: { gateway: 'vnpay', amount: session_url.amount, currency: 'VND', checkout_url: session_url.authorize_url },
       });
-      // P0-PAY: Record pending ledger entry
+      // P0-PAY: Record pending ledger entry — failure must NOT be silent.
       if (c.env.DB) {
         try {
           await c.env.DB.prepare(
@@ -1350,7 +1356,9 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
             session.user_id, session.tenant_id ?? 'default',
             'vnpay', price_id, session_url.amount, 'VND', 'pending',
           ).run();
-        } catch { /* ledger best-effort */ }
+        } catch (ledgerErr) {
+          console.error('[P0-PAY] Checkout ledger insert failed (vnpay):', ledgerErr);
+        }
       }
       return c.json(session_url);
     } else {
@@ -1389,7 +1397,9 @@ app.post('/v1/payment/checkout', paymentRateLimit, async (c) => {
             session.user_id, session.tenant_id ?? 'default',
             'payos', price_id, session_url.amount, 'VND', 'pending',
           ).run();
-        } catch { /* ledger best-effort */ }
+        } catch (ledgerErr) {
+          console.error('[P0-PAY] Checkout ledger insert failed (payos):', ledgerErr);
+        }
       }
       return c.json(session_url);
     }
@@ -1493,13 +1503,26 @@ app.post('/v1/payment/webhook/stripe', async (c) => {
     metadata: { gateway: 'stripe', amount: result.amount, invoice_id: invoice.invoice_id, event_id: stripeEventId },
   });
 
-  // P0-PAY: Update ledger to paid
+  // P0-PAY: Update ledger to paid — correlate by session_id (internal UUID),
+  // NOT by gateway_payment_id. The ledger row created at checkout has
+  // payment_id = session_id (internal UUID). The gateway_payment_id (cs_*)
+  // is different and would never match. Without this fix, the ledger row
+  // stays pending forever.
   if (c.env.DB) {
     try {
-      await c.env.DB.prepare(
-        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ?'
-      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, result.gateway_payment_id).run();
-    } catch { /* ledger best-effort */ }
+      const ledgerKey = result.session_id || result.gateway_payment_id;
+      const updateResult = await c.env.DB.prepare(
+        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ? AND status = ?'
+      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, ledgerKey, 'pending').run();
+      // P0-AUDIT: If no rows updated, the ledger row was not found or already paid.
+      // Log this for reconciliation — do NOT silently swallow.
+      if (!updateResult.meta?.changes || updateResult.meta.changes === 0) {
+        console.error(`[P0-PAY] Ledger update matched 0 rows for payment_id=${ledgerKey}. Possible causes: session_id mismatch, already processed, or checkout did not create ledger row.`);
+      }
+    } catch (ledgerErr) {
+      // P0-AUDIT: Ledger failure must NOT be silently swallowed — log for reconciliation.
+      console.error('[P0-PAY] Ledger update failed (stripe):', ledgerErr);
+    }
   }
 
   // P0-PAY-2: Grant entitlement after successful payment
@@ -1601,13 +1624,20 @@ app.post('/v1/payment/webhook', async (c) => {
     },
   });
 
-  // P0-PAY: Update ledger to paid
+  // P0-PAY: Update ledger to paid — correlate by session_id (internal UUID),
+  // NOT by gateway_payment_id. See stripe webhook handler for full explanation.
   if (c.env.DB) {
     try {
-      await c.env.DB.prepare(
-        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ?'
-      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, result.gateway_payment_id).run();
-    } catch { /* ledger best-effort */ }
+      const ledgerKey = result.session_id || result.gateway_payment_id;
+      const updateResult = await c.env.DB.prepare(
+        'UPDATE payment_ledger SET status = ?, paid_at = ?, gateway_payment_id = ? WHERE payment_id = ? AND status = ?'
+      ).bind('paid', new Date().toISOString(), result.gateway_payment_id, ledgerKey, 'pending').run();
+      if (!updateResult.meta?.changes || updateResult.meta.changes === 0) {
+        console.error(`[P0-PAY] Ledger update matched 0 rows for payment_id=${ledgerKey}. Possible causes: session_id mismatch, already processed, or checkout did not create ledger row.`);
+      }
+    } catch (ledgerErr) {
+      console.error('[P0-PAY] Ledger update failed (payos):', ledgerErr);
+    }
   }
 
   // P0-PAY-2: Grant entitlement after successful payment
@@ -1662,59 +1692,98 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
     return c.json({ error: 'admin only' }, 403);
   }
 
+  // P0-AUDIT: The refund endpoint must NOT trust gateway, gateway_payment_id,
+  // amount, user_id, tenant_id, or price_id from the client request body.
+  // These are all loaded from the ledger row, which is the trusted source.
+  // The client only provides payment_id (to identify the ledger row),
+  // amount (the refund amount, validated against the ledger), and reason.
   const body = await c.req.json();
-  const { payment_id, gateway, gateway_payment_id, amount, currency, reason, user_id, tenant_id, price_id } = body as {
-    payment_id: string;
-    gateway: Gateway;
-    gateway_payment_id: string;
-    amount: number;
-    currency: Currency;
-    reason: string;
-    user_id: string;
-    tenant_id: string;
-    price_id?: string;
+  const { payment_id, amount: requestedAmount, reason } = body as {
+    payment_id?: string;
+    amount?: number;
+    reason?: string;
   };
 
-  if (!payment_id || !gateway || !gateway_payment_id || !amount || !reason) {
-    return c.json({ error: 'payment_id, gateway, gateway_payment_id, amount, reason are required' }, 400);
+  if (!payment_id || !requestedAmount || !reason) {
+    return c.json({ error: 'payment_id, amount, reason are required' }, 400);
   }
   if (!reason.trim()) {
     return c.json({ error: 'reason is required for refund' }, 400);
   }
-
-  // P0-PAY: Look up price_id from ledger if not provided in request
-  let resolvedPriceId = price_id;
-  if (!resolvedPriceId && c.env.DB) {
-    const ledgerRow = await c.env.DB.prepare(
-      'SELECT price_id FROM payment_ledger WHERE payment_id = ?1'
-    ).bind(payment_id).first<{ price_id: string }>();
-    if (ledgerRow?.price_id) {
-      resolvedPriceId = ledgerRow.price_id;
-    }
-  }
-  if (!resolvedPriceId) {
-    return c.json({ error: 'price_id required (not found in ledger for this payment_id)' }, 400);
+  if (requestedAmount <= 0) {
+    return c.json({ error: 'amount must be positive' }, 400);
   }
 
+  // P0-AUDIT: Load the COMPLETE ledger row — all trusted fields come from here.
+  if (!c.env.DB) {
+    return c.json({ error: 'database unavailable — cannot verify ledger' }, 503);
+  }
+  const ledger = await c.env.DB.prepare(
+    'SELECT * FROM payment_ledger WHERE payment_id = ?1'
+  ).bind(payment_id).first<{
+    ledger_id: string;
+    payment_id: string;
+    user_id: string;
+    tenant_id: string;
+    gateway: Gateway;
+    gateway_payment_id: string | null;
+    price_id: string;
+    plan_id: string | null;
+    amount: number;
+    currency: Currency;
+    status: string;
+    refund_amount: number | null;
+  }>();
+
+  if (!ledger) {
+    return c.json({ error: 'payment not found in ledger' }, 404);
+  }
+
+  // P0-AUDIT: Tenant guard — admin can only refund within their own tenant
+  // (unless SUPER_ADMIN). This prevents cross-tenant refund attacks.
+  if (!session.roles?.includes('SUPER_ADMIN') && session.tenant_id !== ledger.tenant_id) {
+    return c.json({ error: 'forbidden: payment belongs to a different tenant' }, 403);
+  }
+
+  // P0-AUDIT: Status guard — can only refund a paid payment.
+  if (ledger.status !== 'paid' && ledger.status !== 'partial') {
+    return c.json({ error: `cannot refund payment with status '${ledger.status}' (must be 'paid' or 'partial')` }, 409);
+  }
+
+  // P0-AUDIT: Amount guard — refund amount cannot exceed (paid amount - already refunded).
+  const alreadyRefunded = ledger.refund_amount ?? 0;
+  const maxRefundable = ledger.amount - alreadyRefunded;
+  if (requestedAmount > maxRefundable) {
+    return c.json({
+      error: `refund amount ${requestedAmount} exceeds refundable balance ${maxRefundable} (paid: ${ledger.amount}, already refunded: ${alreadyRefunded})`,
+    }, 422);
+  }
+
+  // P0-AUDIT: gateway_payment_id must come from the ledger, not the client.
+  if (!ledger.gateway_payment_id) {
+    return c.json({ error: 'ledger row has no gateway_payment_id — cannot issue gateway refund' }, 409);
+  }
+
+  // P0-AUDIT: Construct refund request ONLY from trusted ledger data.
   const refundReq: RefundRequest = {
-    payment_id,
-    gateway,
-    gateway_payment_id,
-    amount,
-    currency,
+    payment_id: ledger.payment_id,
+    gateway: ledger.gateway,
+    gateway_payment_id: ledger.gateway_payment_id,
+    amount: requestedAmount,
+    currency: ledger.currency,
     reason: reason.trim(),
-    user_id: user_id || session.user_id,
-    tenant_id: tenant_id || 'default',
+    user_id: ledger.user_id,
+    tenant_id: ledger.tenant_id,
   };
 
   try {
     let refundResult: RefundResult;
-    if (gateway === 'stripe') {
+    if (ledger.gateway === 'stripe') {
       refundResult = await createStripeRefund(
         { STRIPE_SECRET_KEY: c.env.STRIPE_SECRET_KEY },
         refundReq,
       );
-    } else if (gateway === 'vnpay') {
+    } else if (ledger.gateway === 'vnpay') {
       refundResult = await createVnPayRefund(
         {
           VNPAY_TMN_CODE: c.env.VNPAY_TMN_CODE,
@@ -1732,31 +1801,31 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
       );
     }
 
-    // Revoke entitlement after refund — use resolved price_id, NOT payment_id
+    // Revoke entitlement after refund — use ledger price_id (trusted), NOT client-provided.
     try {
       const { revokePaymentEntitlement } = await import('@nai/entitlement');
       const revokeResult = await revokePaymentEntitlement(
-        refundReq.user_id,
-        refundReq.tenant_id,
-        resolvedPriceId!,
+        ledger.user_id,
+        ledger.tenant_id,
+        ledger.price_id,
         refundResult.refund_id,
       );
       await logAuditEvent({
-        user_id: refundReq.user_id,
+        user_id: ledger.user_id,
         session_id: null,
         event_type: 'entitlement_revoked',
         actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
         user_agent: c.req.header('User-Agent') ?? 'unknown',
         target: payment_id,
         result: revokeResult.revoked ? 'success' : 'failure',
-        metadata: { refund_id: refundResult.refund_id, gateway, revoke: revokeResult },
+        metadata: { refund_id: refundResult.refund_id, gateway: ledger.gateway, revoke: revokeResult },
       });
     } catch (revErr) {
       console.error('Entitlement revoke failed:', revErr);
     }
 
     await logAuditEvent({
-      user_id: refundReq.user_id,
+      user_id: ledger.user_id,
       session_id: session.session_id,
       event_type: 'payment_refunded',
       actor_ip: c.req.header('CF-Connecting-IP') ?? 'unknown',
@@ -1764,24 +1833,29 @@ app.post('/v1/payment/refund', paymentRateLimit, async (c) => {
       target: payment_id,
       result: refundResult.status === 'failed' ? 'failure' : 'success',
       metadata: {
-        gateway,
+        gateway: ledger.gateway,
         refund_id: refundResult.refund_id,
         amount: refundResult.amount,
         currency: refundResult.currency,
         reason: refundResult.reason,
+        admin_user_id: session.user_id,
+        admin_tenant_id: session.tenant_id,
       },
     });
 
-    // P0-PAY: Update payment ledger with refund result
+    // P0-PAY: Update payment ledger with refund result.
+    // P0-AUDIT: Accumulate refund_amount (don't overwrite) to support partial refunds.
     if (c.env.DB && refundResult.status !== 'failed') {
       try {
+        const newTotalRefunded = alreadyRefunded + refundResult.amount;
+        const newStatus = newTotalRefunded >= ledger.amount ? 'refunded' : 'partial';
         await c.env.DB.prepare(
           'UPDATE payment_ledger SET status = ?, refunded_at = ?, refund_id = ?, refund_amount = ? WHERE payment_id = ?'
         ).bind(
-          refundResult.status === 'refunded' ? 'refunded' : 'partial',
+          newStatus,
           refundResult.refunded_at ?? new Date().toISOString(),
           refundResult.refund_id,
-          refundResult.amount,
+          newTotalRefunded,
           payment_id,
         ).run();
       } catch (ledgerErr) {

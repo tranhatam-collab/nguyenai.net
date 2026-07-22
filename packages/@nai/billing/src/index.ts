@@ -75,6 +75,14 @@ export interface PaymentResult {
   status: 'paid' | 'failed' | 'pending' | 'refunded';
   paid_at: string;
   raw: Record<string, unknown>;
+  /**
+   * Internal session ID from checkout metadata. Used to correlate the
+   * webhook event with the ledger row created at checkout time.
+   * The ledger stores `payment_id = session_id` (internal UUID), NOT
+   * the gateway's payment ID. Without this correlation, the ledger
+   * row stays pending forever.
+   */
+  session_id?: string;
 }
 
 export interface InvoiceRecord {
@@ -253,6 +261,11 @@ export function parseStripeEvent(event: Record<string, unknown>): PaymentResult 
     status: 'paid',
     paid_at: new Date().toISOString(),
     raw: obj,
+    // P0-PAY: Extract session_id from metadata to correlate with ledger row.
+    // The ledger stores payment_id = session_id (internal UUID from checkout).
+    // Without this, the webhook update WHERE payment_id = gateway_payment_id
+    // would never match (gateway_payment_id is cs_*, not the internal UUID).
+    session_id: metadata.session_id ?? '',
   };
 }
 
@@ -537,6 +550,8 @@ export function parsePayOsWebhook(body: Record<string, unknown>): PaymentResult 
     status: 'paid',
     paid_at: new Date().toISOString(),
     raw: body,
+    // P0-PAY: Extract session_id from metadata to correlate with ledger row.
+    session_id: md.session_id ?? '',
   };
 }
 

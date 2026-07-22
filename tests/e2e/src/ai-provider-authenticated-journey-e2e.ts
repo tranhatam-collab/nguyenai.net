@@ -374,6 +374,83 @@ setModelRegistry(TEST_MODELS);
 }
 
 // ============================================================
+// Test 11: Public catalog model ID contract — nguyen-iris-3
+// P1-AUDIT: The E2E registry above uses iai-one/iris-3 (internal gateway
+// IDs). This test exercises the PUBLIC catalog namespace (nguyen-iris-3)
+// through GatewayLLMProvider to verify the contract:
+//   - Outbound request to gateway uses iai-one/iris-3 (internal ID)
+//   - Response echoes nguyen-iris-3 (catalog ID the user requested)
+//   - resolveGatewayModelId maps nguyen-* -> iai-one/*
+// ============================================================
+{
+  const { resolveGatewayModelId } = await import('@nai/ai-provider-client');
+
+  // Verify the mapping function
+  assert(resolveGatewayModelId('nguyen-iris-3') === 'iai-one/iris-3', 'resolveGatewayModelId maps nguyen-iris-3 -> iai-one/iris-3');
+  assert(resolveGatewayModelId('nguyen-pulse-3') === 'iai-one/pulse-3', 'resolveGatewayModelId maps nguyen-pulse-3 -> iai-one/pulse-3');
+
+  // Mock fetch that captures the outbound request body
+  let outboundModel: string | null = null;
+  const mockFetch = async (_url: string, init: RequestInit) => {
+    const body = JSON.parse(init.body as string) as { model?: string };
+    outboundModel = body.model ?? null;
+    // Gateway echoes back its internal model ID
+    return new Response(JSON.stringify({
+      model: body.model,
+      content: 'Catalog contract response',
+      finish_reason: 'stop',
+      usage: { prompt_tokens: 5, completion_tokens: 3, total_tokens: 8 },
+      provider_response_id: 'prv-catalog-001',
+      request_id: 'req-catalog-001',
+      latency_ms: 80,
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+
+  // Use a catalog model descriptor (what the user sees in /v1/models)
+  const catalogModel = {
+    id: 'nguyen-iris-3',
+    name: 'Iris 3',
+    tier: 'free',
+    provider: 'ai-provider-gateway',
+    capabilities: ['chat'],
+    freeTier: true,
+    contextWindow: 4096,
+    maxOutput: 2048,
+    costPer1kInput: 0,
+    costPer1kOutput: 0,
+    description: 'Free tier model (catalog ID)',
+  } as unknown as ModelDescriptor;
+
+  const provider = new GatewayLLMProvider({
+    gatewayUrl: 'https://api.aiagent.iai.one',
+    apiKey: 'test-key',
+    tenantId: 'nguyenai-net',
+    fetchImpl: mockFetch as typeof fetch,
+  });
+
+  const result = await provider.chat(
+    {
+      messages: [{ role: 'user', content: 'Hello from catalog' }],
+      user_id: 'user-catalog',
+      tenant_id: 'tenant-catalog',
+      model: 'nguyen-iris-3',
+    } as never,
+    catalogModel,
+  );
+
+  // P1-AUDIT: Outbound request must use the GATEWAY model ID (iai-one/iris-3),
+  // NOT the catalog ID (nguyen-iris-3). The gateway only knows iai-one/* IDs.
+  assert(outboundModel === 'iai-one/iris-3', `outbound request uses gateway model ID (iai-one/iris-3), got: ${outboundModel}`);
+
+  // P1-AUDIT: Response must echo the CATALOG model ID (nguyen-iris-3),
+  // NOT the gateway's internal ID. The user requested nguyen-iris-3 and
+  // expects to see it echoed back in the response.
+  assert(result.model === 'nguyen-iris-3', `response echoes catalog model ID (nguyen-iris-3), got: ${result.model}`);
+  assert(result.served_by === 'ai-provider-gateway', 'catalog flow: served_by is ai-provider-gateway');
+  assert(result.content === 'Catalog contract response', 'catalog flow: content from gateway');
+}
+
+// ============================================================
 // Report
 // ============================================================
 console.log('AI Provider Authenticated Journey E2E');

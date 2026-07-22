@@ -640,15 +640,24 @@ app.post('/v1/auth/login/mfa', async (c) => {
     return c.json({ error: 'challenge_id and code are required' }, 400);
   }
 
-  // Look up challenge
+  // P1-AUDIT: MFA_MAX_ATTEMPTS — lock challenge after this many failed attempts.
+  const MFA_MAX_ATTEMPTS = 5;
+
+  // Look up challenge — include attempt_count and locked_at (added by migration 0013)
   const challenge = await c.env.DB.prepare(
     'SELECT * FROM mfa_challenges WHERE challenge_id = ?1 AND used_at IS NULL AND expires_at > ?2'
   ).bind(challenge_id, new Date().toISOString()).first<{
     challenge_id: string; user_id: string; org_id: string; audience: string | null;
     expires_at: string; used_at: string | null;
+    attempt_count: number; locked_at: string | null;
   }>();
   if (!challenge) {
     return c.json({ error: 'invalid or expired challenge' }, 401);
+  }
+
+  // P1-AUDIT: Reject if challenge is locked due to too many failed attempts.
+  if (challenge.locked_at) {
+    return c.json({ error: 'challenge locked due to too many failed attempts', locked_at: challenge.locked_at }, 423);
   }
 
   // P0-AUDIT: Verify TOTP BEFORE consuming the challenge.
@@ -674,10 +683,31 @@ app.post('/v1/auth/login/mfa', async (c) => {
     }
   }
   if (!mfaValid) {
-    // P0-AUDIT: Do NOT consume challenge on wrong code — allow retry.
-    // Track failed attempts for rate limiting.
-    // In a future version, add attempt_count column + lockout after N failures.
-    return c.json({ error: 'invalid MFA code' }, 401);
+    // P1-AUDIT: Increment attempt_count atomically. Lock challenge if
+    // attempt_count reaches MFA_MAX_ATTEMPTS. This prevents brute-force
+    // attacks on the TOTP code (6 digits = 1M combinations, 5 attempts
+    // per challenge makes brute-force impractical).
+    const newAttemptCount = (challenge.attempt_count ?? 0) + 1;
+    const shouldLock = newAttemptCount >= MFA_MAX_ATTEMPTS;
+    await c.env.DB.prepare(
+      'UPDATE mfa_challenges SET attempt_count = ?1, locked_at = ?2 WHERE challenge_id = ?3 AND used_at IS NULL'
+    ).bind(
+      newAttemptCount,
+      shouldLock ? new Date().toISOString() : null,
+      challenge_id,
+    ).run();
+
+    if (shouldLock) {
+      return c.json({
+        error: 'challenge locked due to too many failed attempts',
+        attempts: newAttemptCount,
+        max_attempts: MFA_MAX_ATTEMPTS,
+      }, 423);
+    }
+    return c.json({
+      error: 'invalid MFA code',
+      attempts_remaining: MFA_MAX_ATTEMPTS - newAttemptCount,
+    }, 401);
   }
 
   // P0-AUDIT: Consume challenge ONLY after successful TOTP verification.

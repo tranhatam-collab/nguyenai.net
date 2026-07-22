@@ -5,7 +5,7 @@
  * Gateway integration (Stripe/VNPay) requires live API keys — tested via tools/test-models.mjs pattern.
  */
 
-import { computeVat, generateInvoice, parseStripeEvent, parseVnPayReturn, type PaymentResult } from './index.ts';
+import { computeVat, generateInvoice, parseStripeEvent, parseVnPayReturn, parsePayOsWebhook, type PaymentResult } from './index.ts';
 
 let passed = 0;
 let failed = 0;
@@ -85,7 +85,7 @@ const checkoutEvent = {
       id: 'cs_test_123',
       amount_total: 800,
       currency: 'usd',
-      metadata: { user_id: 'user-1', tenant_id: 'tenant-1', price_id: 'academy-pass' },
+      metadata: { user_id: 'user-1', tenant_id: 'tenant-1', price_id: 'academy-pass', session_id: 'sess-uuid-abc' },
     },
   },
 };
@@ -98,6 +98,8 @@ assert(result?.currency === 'USD', 'Parsed: currency = USD');
 assert(result?.user_id === 'user-1', 'Parsed: user_id from metadata');
 assert(result?.price_id === 'academy-pass', 'Parsed: price_id from metadata');
 assert(result?.status === 'paid', 'Parsed: status = paid');
+assert(result?.session_id === 'sess-uuid-abc', 'Parsed: session_id from metadata (P0-PAY correlation key)');
+assert(result?.gateway_payment_id === 'cs_test_123', 'Parsed: gateway_payment_id = cs_test_123 (gateway ID, not internal UUID)');
 
 const irrelevantEvent = { type: 'customer.updated', data: { object: {} } };
 assert(parseStripeEvent(irrelevantEvent) === null, 'Irrelevant event returns null');
@@ -124,6 +126,37 @@ assert(vnpayResult.gateway_payment_id === 'test123', 'VNPay: txnRef captured');
 
 const vnpayFailed = parseVnPayReturn({ ...vnpayParams, vnp_ResponseCode: '99' });
 assert(vnpayFailed.status === 'failed', 'VNPay: failed response code = failed status');
+
+// ============================================================
+// PayOS webhook parsing — session_id correlation (P0-PAY)
+// ============================================================
+
+console.log('\n=== PayOS Webhook Parsing ===');
+
+const payosBody = {
+  event_type: 'payment.completed',
+  order_id: 'nai-nguyenai-abc123',
+  amount: 199000,
+  metadata: { user_id: 'user-2', tenant_id: 'tenant-2', price_id: 'founder-pass', session_id: 'sess-uuid-xyz' },
+};
+
+const payosResult = parsePayOsWebhook(payosBody);
+assert(payosResult !== null, 'PayOS: payment.completed parsed');
+assert(payosResult?.gateway === 'payos', 'PayOS: gateway = payos');
+assert(payosResult?.gateway_payment_id === 'nai-nguyenai-abc123', 'PayOS: gateway_payment_id = order_id');
+assert(payosResult?.session_id === 'sess-uuid-xyz', 'PayOS: session_id from metadata (P0-PAY correlation key)');
+assert(payosResult?.user_id === 'user-2', 'PayOS: user_id from metadata');
+assert(payosResult?.price_id === 'founder-pass', 'PayOS: price_id from metadata');
+assert(payosResult?.status === 'paid', 'PayOS: status = paid');
+
+const payosIrrelevant = parsePayOsWebhook({ event_type: 'payment.pending', order_id: 'x' });
+assert(payosIrrelevant === null, 'PayOS: non-terminal event returns null');
+
+// P0-PAY: Verify session_id is the correlation key, NOT gateway_payment_id.
+// The ledger stores payment_id = session_id (internal UUID from checkout).
+// The webhook must update WHERE payment_id = session_id, not gateway_payment_id.
+assert(payosResult!.session_id !== payosResult!.gateway_payment_id, 'P0-PAY: session_id != gateway_payment_id (they must not be confused)');
+assert(result!.session_id !== result!.gateway_payment_id, 'P0-PAY: stripe session_id != gateway_payment_id (they must not be confused)');
 
 // ============================================================
 // Summary
